@@ -14,6 +14,7 @@ export default function HomePage() {
 				router.push("/auth/signIn");
 			} else {
 				setUser(user);
+				router.push(`/${user.uid}`);
 			}
 		});
 		return () => unsubscribe();
