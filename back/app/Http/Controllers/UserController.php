@@ -15,18 +15,12 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        // バリデーション
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-        ]);
 
         // ユーザー作成
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']), // パスワードをハッシュ化
+            'id' => $request->id,
+            'name' => $request->name,
+            'email' => $request->email,
         ]);
 
         return response()->json(['message' => 'User created successfully', 'user' => $user], 201);
