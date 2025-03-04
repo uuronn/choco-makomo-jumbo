@@ -15,6 +15,28 @@ export default function SignInPage() {
 				throw new Error("Google Sign-In Error");
 			}
 
+			// 既存ユーザーか確認
+			const checkUser = await fetch(
+				`http://163.44.121.57/users/${res.user.uid}`,
+			);
+
+			if (checkUser.ok) {
+				router.push(`/${res.user.uid}`);
+				return;
+			}
+
+			await fetch("http://163.44.121.57/users", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					id: res.user.uid,
+					name: res.user.displayName,
+					email: res.user.email,
+				}),
+			});
+
 			router.push(`/${res.user.uid}`);
 		} catch (error) {
 			console.error("Google Sign-In Error", error);
