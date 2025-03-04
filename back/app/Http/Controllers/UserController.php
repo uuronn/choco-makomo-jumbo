@@ -13,17 +13,17 @@ class UserController extends Controller
         return response()->json(User::all());
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request): JsonResponse
+{
+    $validated = $request->validate([
+        'id' => 'required|unique:users,id', // IDが一意であることを保証
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email|max:255',
+    ]);
 
-        // ユーザー作成
-        $user = User::create([
-            'id' => $request->id,
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
+    $user = User::create($validated);
 
-        return response()->json(['message' => 'User created successfully', 'user' => $user], 201);
-    }
+    return response()->json(['message' => 'User created successfully', 'user' => $user], 201);
+}
 }
 
