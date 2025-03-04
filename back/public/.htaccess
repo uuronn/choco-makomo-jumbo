@@ -22,4 +22,7 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+
+    # AllowOverride All は.htaccessの使用を許可するという設定です。
+    AllowOverride All
 </IfModule>
