@@ -17,7 +17,7 @@ export default function SignInPage() {
 
 			// 既存ユーザーか確認
 			const checkUser = await fetch(
-				`http://163.44.121.57/users/${res.user.uid}`,
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}`,
 			);
 
 			if (checkUser.ok) {
@@ -25,7 +25,7 @@ export default function SignInPage() {
 				return;
 			}
 
-			await fetch("http://163.44.121.57/users", {
+			await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -34,6 +34,7 @@ export default function SignInPage() {
 					id: res.user.uid,
 					name: res.user.displayName,
 					email: res.user.email,
+					point: 50,
 				}),
 			});
 

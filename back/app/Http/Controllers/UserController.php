@@ -38,5 +38,19 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    public function checkUser($id)
+    {
+        // ユーザーが存在するか確認
+        $user = User::find($id);
+
+        if ($user) {
+            // ユーザーが存在する場合、200 OKを返す
+            return response()->json(['message' => 'User exists'], 200);
+        }
+
+        // ユーザーが存在しない場合、404 Not Foundを返す
+        return response()->json(['message' => 'User not found'], 404);
+    }
 }
 
