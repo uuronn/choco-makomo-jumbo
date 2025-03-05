@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CharacterController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -17,6 +18,10 @@ Route::get('/abc', [UserController::class, 'index']);
 Route::get('/users/{id}', [UserController::class, 'checkUser']);
 
 Route::put('/users/{id}/point', [UserController::class, 'updatePoint']);
+
+Route::get('/characters', [CharacterController::class, 'index']); // すべてのキャラクターを取得
+
+Route::get('/characters/{id}', [CharacterController::class, 'show']); // 特定のキャラクターを取得
 
 // ユーザーを作成するPOSTルート
 Route::post('/users', [UserController::class, 'store'])->withoutMiddleware([VerifyCsrfToken::class]);
