@@ -12,7 +12,7 @@ class UserCharacter extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'user_id', 'character_id', 'acquired_at', 'level', 'experience', 'power'
+        'user_id', 'character_id', 'acquired_at', 'level', 'life', 'power', 'speed'
     ];
 
     public $timestamps = true;
@@ -36,7 +36,9 @@ class UserCharacter extends Model
 
         static::creating(function ($model) {
             if (is_null($model->power)) {
+                $model->power = $model->character->base_life;
                 $model->power = $model->character->base_power; // Characterのbase_powerをコピー
+                $model->power = $model->character->base_speed; // Characterのbase_speedをコピー
             }
         });
     }
