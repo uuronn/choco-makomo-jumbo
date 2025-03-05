@@ -32,9 +32,6 @@ class GachaController extends Controller
 
         $userCharacter->save();
 
-        return response()->json([
-            'message' => 'キャラをゲットしました！',
-            'character' => $character->name,
-        ]);
+        return response()->json($character);
     }
 }
