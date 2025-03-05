@@ -23,9 +23,10 @@ class GachaController extends Controller
         $userCharacter = new UserCharacter([
             'user_id' => $user->id,
             'character_id' => $character->id,
-            'acquired_at' => now(),
+            'life' => $character->life,
+            'power' => $character->power,
+            'speed' => $character->speed,
             'level' => 1,
-            'experience' => 0,
             // 'power'はbootメソッドで自動設定される
         ]);
 
