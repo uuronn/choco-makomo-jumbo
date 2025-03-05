@@ -12,5 +12,7 @@ Route::get('/users', [UserController::class, 'index']);
 
 Route::get('/aaa', [UserController::class, 'index']);
 
+Route::get('/abc', [UserController::class, 'index']);
+
 // ユーザーを作成するPOSTルート
 Route::post('/users', [UserController::class, 'store'])->withoutMiddleware([VerifyCsrfToken::class]);

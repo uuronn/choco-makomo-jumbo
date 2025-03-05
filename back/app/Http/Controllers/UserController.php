@@ -15,13 +15,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        // Validate the incoming request data
-        $validated = $request->validate([
-            'id' => 'required|integer|unique:users,id',
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'point' => 'required|numeric'
-        ]);
+
 
         try {
             // Create new user
