@@ -52,5 +52,32 @@ class UserController extends Controller
         // ユーザーが存在しない場合、404 Not Foundを返す
         return response()->json(['message' => 'User not found'], 404);
     }
+
+    public function updatePoint(Request $request, $id)
+    {
+        // ユーザーを検索
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        // リクエストから追加するpointを取得
+        $additionalPoint = $request->input('point');
+
+        // バリデーション
+        if (!is_numeric($additionalPoint)) {
+            return response()->json(['error' => 'Point must be a number'], 422);
+        }
+
+        // 現在のpointに追加
+        $user->point = $user->point + (int)$additionalPoint;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Point added successfully',
+            'user' => $user
+        ], 200);
+    }
 }
 

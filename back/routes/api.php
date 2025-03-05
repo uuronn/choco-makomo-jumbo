@@ -16,5 +16,7 @@ Route::get('/abc', [UserController::class, 'index']);
 
 Route::get('/users/{id}', [UserController::class, 'checkUser']);
 
+Route::put('/users/{id}/point', [UserController::class, 'updatePoint']);
+
 // ユーザーを作成するPOSTルート
 Route::post('/users', [UserController::class, 'store'])->withoutMiddleware([VerifyCsrfToken::class]);
