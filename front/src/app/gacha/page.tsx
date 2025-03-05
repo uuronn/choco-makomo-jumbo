@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "~/app/context/AuthProvider";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function GachaPage() {
 	const { user } = useAuth();
@@ -66,9 +67,19 @@ export default function GachaPage() {
 
 			{/* ガチャ結果を表示 */}
 			{gachaResult && (
-				<div className="mt-6 p-4 bg-white rounded-lg shadow">
-					<p>引いたキャラ: {gachaResult.characterName}</p>
+				<div className="mt-6 p-4 bg-white rounded-lg text-black shadow">
+					<p>引いたキャラ: {gachaResult.name}</p>
+					<p>ライフ: {gachaResult.base_life}</p>
+					<p>パワー: {gachaResult.base_power}</p>
+					<p>スピード: {gachaResult.base_speed}</p>
 					<p>レア度: {gachaResult.rarity}</p>
+					<p>スキル: {gachaResult.skill}</p>
+					<Image
+						src={gachaResult.image_url}
+						alt={gachaResult.name}
+						width={200}
+						height={200}
+					/>
 				</div>
 			)}
 		</div>
