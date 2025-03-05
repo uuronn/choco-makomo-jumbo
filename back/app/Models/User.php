@@ -15,5 +15,5 @@ class User extends Authenticatable
     public $incrementing = false; // UID を文字列の PK にするため false
     protected $keyType = 'string';
 
-    protected $fillable = ['id', 'name', 'email'];
+    protected $fillable = ['id', 'name', 'email', 'point'];
 }
