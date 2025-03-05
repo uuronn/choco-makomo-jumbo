@@ -16,7 +16,6 @@ class UserController extends Controller
     public function store(Request $request)
     {
 
-
         try {
             // Create new user
             $user = User::create([
