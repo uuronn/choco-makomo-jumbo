@@ -34,4 +34,18 @@ class GachaController extends Controller
 
         return response()->json($character);
     }
+
+    public function characterList($id)
+{
+    $user = User::find($id);
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+
+    $userCharacters = UserCharacter::where('user_id', $user->id)
+        ->with('character')
+        ->get();
+
+    return response()->json($userCharacters);
+}
 }
