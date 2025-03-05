@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class GachaController extends Controller
 {
-    public function pull(Request $request, $id)
+    public function gacha($id)
     {
         // ユーザーを検索
         $user = User::find($id);
