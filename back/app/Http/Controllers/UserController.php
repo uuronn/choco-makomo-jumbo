@@ -13,17 +13,36 @@ class UserController extends Controller
         return response()->json(User::all());
     }
 
-    public function store(Request $request): JsonResponse
-{
-    $validated = $request->validate([
-        'id' => 'required|unique:users,id', // IDが一意であることを保証
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email|max:255',
-    ]);
+    public function store(Request $request)
+    {
+        // Validate the incoming request data
+        $validated = $request->validate([
+            'id' => 'required|integer|unique:users,id',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'point' => 'required|numeric'
+        ]);
 
-    $user = User::create($validated);
+        try {
+            // Create new user
+            $user = User::create([
+                'id' => $request->id,
+                'name' => $request->name,
+                'email' => $request->email,
+                'point' => $request->point
+            ]);
 
-    return response()->json(['message' => 'User created successfully', 'user' => $user], 201);
-}
+            return response()->json([
+                'message' => 'User created successfully',
+                'data' => $user
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error creating user',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
 
