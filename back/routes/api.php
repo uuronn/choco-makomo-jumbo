@@ -25,6 +25,8 @@ Route::post('/users/{id}/gacha', [GachaController::class, 'gacha']);
 
 Route::get('/users/{id}/characters', [GachaController::class, 'characterList']);
 
+Route::get('characters/training', [GachaController::class, 'trainCharacter']);
+
 Route::get('/characters', [CharacterController::class, 'index']); // すべてのキャラクターを取得
 
 Route::get('/characters/{id}', [CharacterController::class, 'show']); // 特定のキャラクターを取得

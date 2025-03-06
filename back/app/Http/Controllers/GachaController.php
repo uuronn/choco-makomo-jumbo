@@ -48,4 +48,32 @@ class GachaController extends Controller
 
     return response()->json($userCharacters);
 }
+
+public function trainCharacter(Request $request)
+{
+    $userId = $request->input('user_id');
+    $characterId = $request->input('character_id');
+    $powerIncrement = $request->input('power', 0); // デフォルト0
+    $lifeIncrement = $request->input('life', 0);   // デフォルト0
+    $speedIncrement = $request->input('speed', 0); // デフォルト0
+
+    $userCharacter = UserCharacter::where('user_id', $userId)
+        ->where('character_id', $characterId)
+        ->first();
+
+    if (!$userCharacter) {
+        return response()->json(['error' => 'キャラクターが見つかりません'], 404);
+    }
+
+    // 育成: power, life, speedをリクエストの値で強化
+    $userCharacter->power += $powerIncrement;
+    $userCharacter->life += $lifeIncrement;
+    $userCharacter->speed += $speedIncrement;
+    $userCharacter->save();
+
+    return response()->json([
+        'message' => 'ステータスを強化しました！',
+        'userCharacter' => $userCharacter->load('character'), // characterはレスポンス用に残す
+    ]);
+}
 }
