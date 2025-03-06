@@ -66,9 +66,9 @@ public function trainCharacter(Request $request)
     }
 
     // 育成: power, life, speedをリクエストの値で強化
-    $userCharacter->power += $powerIncrement;
-    $userCharacter->life += $lifeIncrement;
-    $userCharacter->speed += $speedIncrement;
+    $userCharacter->power += 30;
+    $userCharacter->life += 30;
+    $userCharacter->speed += 30;
     $userCharacter->save();
 
     return response()->json([
