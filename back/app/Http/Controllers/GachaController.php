@@ -84,7 +84,6 @@ public function trainCharacter(Request $request)
         'speed' => $userCharacter->speed,
     ]);
 
-
     // $userCharacter->save();
 
     // 複合主キーで直接更新
