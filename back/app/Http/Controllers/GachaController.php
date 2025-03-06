@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Character;
 use App\Models\UserCharacter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class GachaController extends Controller
 {
@@ -66,14 +67,26 @@ public function trainCharacter(Request $request)
     }
 
     // null対策を入れて加算
-    // $userCharacter->power = ($userCharacter->power ?? 0) + $powerIncrement;
-    // $userCharacter->life = ($userCharacter->life ?? 0) + $lifeIncrement;
-    // $userCharacter->speed = ($userCharacter->speed ?? 0) + $speedIncrement;
-    // $userCharacter->save();
+    Log::info('Before update', [
+        'power' => $userCharacter->power,
+        'life' => $userCharacter->life,
+        'speed' => $userCharacter->speed,
+        'increments' => [$powerIncrement, $lifeIncrement, $speedIncrement],
+    ]);
+
+    $userCharacter->power = ($userCharacter->power ?? 0) + $powerIncrement;
+    $userCharacter->life = ($userCharacter->life ?? 0) + $lifeIncrement;
+    $userCharacter->speed = ($userCharacter->speed ?? 0) + $speedIncrement;
+
+    Log::info('After update', [
+        'power' => $userCharacter->power,
+        'life' => $userCharacter->life,
+        'speed' => $userCharacter->speed,
+    ]);
 
     return response()->json([
         'message' => 'ステータスを強化しました！',
-        'userCharacter' => $userCharacter->load('character'), // characterはレスポンス用に残す
+        'userCharacter' => $userCharacter, // characterはレスポンス用に残す
     ]);
 }
 }
