@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\CharacterController;
+use App\Http\Controllers\GachaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Models\UserCharacter;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 
 Route::get('/test', function () {
@@ -18,6 +20,12 @@ Route::get('/abc', [UserController::class, 'index']);
 Route::get('/users/{id}', [UserController::class, 'checkUser']);
 
 Route::put('/users/{id}/point', [UserController::class, 'updatePoint']);
+
+Route::post('/users/{id}/gacha', [GachaController::class, 'gacha']);
+
+Route::get('/users/{id}/characters', [GachaController::class, 'characterList']);
+
+Route::put('/characters/training', [GachaController::class, 'trainCharacter']);
 
 Route::get('/characters', [CharacterController::class, 'index']); // すべてのキャラクターを取得
 

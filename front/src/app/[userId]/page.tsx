@@ -23,23 +23,23 @@ export default function HomePage() {
 		fetchCharacters();
 	}, []);
 
-	useEffect(() => {
-		const unsubscribe = auth.onAuthStateChanged((user) => {
-			if (!user) {
-				router.push("/auth/signIn");
-			} else {
-				setUser(user);
-				router.push(`/${user.uid}`);
-			}
-		});
-		return () => unsubscribe();
-	}, [router]);
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (!user) {
+        router.push("/auth/signIn");
+      } else {
+        setUser(user);
+        router.push(`/${user.uid}`);
+      }
+    });
+    return () => unsubscribe();
+  }, [router]);
 
-	const handleLogout = async () => {
-		await auth.signOut();
-		router.push("/auth/signIn");
-	};
-
+  const handleLogout = async () => {
+    await auth.signOut();
+    router.push("/auth/signIn");
+  };
+  
 	return (
 		<div className="flex flex-col items-center justify-center h-screen">
 			<h1 className="text-2xl font-bold">Dashboard</h1>
