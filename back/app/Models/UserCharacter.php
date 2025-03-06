@@ -36,9 +36,9 @@ class UserCharacter extends Model
 
         static::creating(function ($model) {
             if (is_null($model->power)) {
-                $model->power = $model->character->base_life;
+                $model->life = $model->character->base_life;
                 $model->power = $model->character->base_power; // Characterのbase_powerをコピー
-                $model->power = $model->character->base_speed; // Characterのbase_speedをコピー
+                $model->speed = $model->character->base_speed; // Characterのbase_speedをコピー
             }
         });
     }
