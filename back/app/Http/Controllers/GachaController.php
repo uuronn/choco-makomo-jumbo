@@ -84,7 +84,18 @@ public function trainCharacter(Request $request)
         'speed' => $userCharacter->speed,
     ]);
 
-    $userCharacter->save();
+
+    // $userCharacter->save();
+
+    // 複合主キーで直接更新
+    UserCharacter::where('user_id', $userId)
+        ->where('character_id', $characterId)
+        ->update([
+            'power' => $userCharacter->power,
+            'life' => $userCharacter->life,
+            'speed' => $userCharacter->speed,
+            'updated_at' => now(), // タイムスタンプを手動で更新
+        ]);
 
     return response()->json([
         'message' => 'ステータスを強化しました！',
