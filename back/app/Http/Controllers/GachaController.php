@@ -84,6 +84,8 @@ public function trainCharacter(Request $request)
         'speed' => $userCharacter->speed,
     ]);
 
+    $userCharacter->save();
+
     return response()->json([
         'message' => 'ステータスを強化しました！',
         'userCharacter' => $userCharacter, // characterはレスポンス用に残す
