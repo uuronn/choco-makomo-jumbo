@@ -8,6 +8,8 @@ class UserCharacter extends Model
 {
     protected $table = 'user_character';
 
+    // 複合主キーを指定
+    protected $primaryKey = ['user_id', 'character_id'];
     public $incrementing = false;
     protected $keyType = 'string';
 
@@ -25,6 +27,15 @@ class UserCharacter extends Model
     public function character()
     {
         return $this->belongsTo(Character::class, 'character_id', 'id');
+    }
+
+    // 複合主キーの場合、getKeyメソッドをオーバーライド
+    public function getKey()
+    {
+        return [
+            'user_id' => $this->user_id,
+            'character_id' => $this->character_id,
+        ];
     }
 
     /**
