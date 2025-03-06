@@ -73,7 +73,7 @@ public function trainCharacter(Request $request)
 
     return response()->json([
         'message' => 'ステータスを強化しました！',
-        'userCharacter' => $userCharacter, // characterはレスポンス用に残す
+        'userCharacter' => $userCharacter->load('character'), // characterはレスポンス用に残す
     ]);
 }
 }
