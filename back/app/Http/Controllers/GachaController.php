@@ -65,10 +65,10 @@ public function trainCharacter(Request $request)
         return response()->json(['error' => 'キャラクターが見つかりません'], 404);
     }
 
-    // 育成: power, life, speedをリクエストの値で強化
-    $userCharacter->power += 30;
-    $userCharacter->life += 30;
-    $userCharacter->speed += 30;
+    // null対策を入れて加算
+    $userCharacter->power = ($userCharacter->power ?? 0) + $powerIncrement;
+    $userCharacter->life = ($userCharacter->life ?? 0) + $lifeIncrement;
+    $userCharacter->speed = ($userCharacter->speed ?? 0) + $speedIncrement;
     $userCharacter->save();
 
     return response()->json([
