@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\CharacterController;
 use App\Http\Controllers\GachaController;
+use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Models\UserCharacter;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 
 Route::get('/test', function () {
@@ -26,6 +26,8 @@ Route::post('/users/{id}/gacha', [GachaController::class, 'gacha']);
 Route::get('/users/{id}/characters', [GachaController::class, 'characterList']);
 
 Route::put('/characters/training', [GachaController::class, 'trainCharacter']);
+
+Route::post('/rooms', [RoomController::class, 'store']);
 
 Route::get('/characters', [CharacterController::class, 'index']); // すべてのキャラクターを取得
 
