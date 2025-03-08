@@ -4,6 +4,11 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="L-ipL3VNlymOuzcuuuFK-5" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="L-ipL3VNlymOuzcuuuFK-1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="194.81818181818176" y="66" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="L-ipL3VNlymOuzcuuuFK-1" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
           <mxGeometry x="61" y="36" width="30" height="60" as="geometry" />
         </mxCell>
