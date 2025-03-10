@@ -19,8 +19,26 @@ class GachaController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        $character = Character::inRandomOrder()->first(); // ランダムにキャラを1つ取得（仮）
+        $character = Character::inRandomOrder()->first(); // ランダムにキャラを取得
 
+        // 既に所持しているか確認
+        $userCharacter = UserCharacter::where('user_id', $user->id)
+                                      ->where('character_id', $character->id)
+                                      ->first();
+
+        if ($userCharacter) {
+            // すでに持っている場合、ポイントを加算
+            $additionalPoint = 10; // 例: 重複時は10ポイント付与
+            $this->updatePointInternal($user, $additionalPoint);
+
+            return response()->json([
+                'message' => 'Character already owned! You received ' . $additionalPoint . ' points!',
+                'character' => $character,
+                'new_point' => $user->point
+            ]);
+        }
+
+        // 新規キャラを付与
         $userCharacter = new UserCharacter([
             'user_id' => $user->id,
             'character_id' => $character->id,
@@ -28,12 +46,18 @@ class GachaController extends Controller
             'power' => $character->base_power,
             'speed' => $character->base_speed,
             'level' => 1,
-            // 'power'はbootメソッドで自動設定される
         ]);
 
         $userCharacter->save();
 
         return response()->json($character);
+    }
+
+
+    private function updatePointInternal($user, $additionalPoint)
+    {
+        $user->point += $additionalPoint;
+        $user->save();
     }
 
     public function characterList($id)
