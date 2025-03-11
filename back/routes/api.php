@@ -3,6 +3,7 @@
 use App\Http\Controllers\CharacterController;
 use App\Http\Controllers\GachaController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\UserCharacterController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -32,6 +33,8 @@ Route::post('/rooms', [RoomController::class, 'store']);
 Route::get('/characters', [CharacterController::class, 'index']); // すべてのキャラクターを取得
 
 Route::get('/characters/{id}', [CharacterController::class, 'show']); // 特定のキャラクターを取得
+
+Route::delete('/users/{userId}/character', [UserCharacterController::class, 'destroy']);
 
 // ユーザーを作成するPOSTルート
 Route::post('/users', [UserController::class, 'store'])->withoutMiddleware([VerifyCsrfToken::class]);
