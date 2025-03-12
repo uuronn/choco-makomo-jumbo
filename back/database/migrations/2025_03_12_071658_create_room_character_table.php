@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('skill')->nullable();
             $table->timestamps();
 
-            $table->foreign('room_id')->references('id')->on('rooms')->onDelete('cascade');
+            $table->foreign('room_id')->references('id')->on('room')->onDelete('cascade');
         });
     }
 
