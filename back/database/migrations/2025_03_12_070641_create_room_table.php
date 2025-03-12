@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rooms', function (Blueprint $table) {
+        Schema::create('room', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('host_user_id')->index(); // ホストのユーザーID
             $table->uuid('guest_user_id')->nullable()->index(); // ゲストのユーザーID（対戦相手がいない場合はNULL）
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rooms');
+        Schema::dropIfExists('room');
     }
 };
