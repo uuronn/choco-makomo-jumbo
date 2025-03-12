@@ -62,7 +62,7 @@ class RoomController extends Controller
             ]);
 
             return response()->json([
-                'room' => $room->load('roomCharacters'),
+                'room' => $room->load('roomCharacter'),
                 'message' => 'Room created successfully',
             ], 201);
         } catch (\Exception $e) {

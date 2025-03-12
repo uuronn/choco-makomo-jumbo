@@ -27,7 +27,7 @@ class Room extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function roomCharacters()
+    public function roomCharacter()
     {
         return $this->hasMany(RoomCharacter::class);
     }
