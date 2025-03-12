@@ -10,8 +10,8 @@ class CreateRoomCharacterTable extends Migration
     {
         Schema::create('room_character', function (Blueprint $table) {
             $table->id();
-            $table->uuid('room_id');
-            $table->string('character_id');
+            $table->uuid('room_id')->index();
+            $table->uuid('character_id');
             $table->integer('level');
             $table->integer('life');
             $table->integer('power');
