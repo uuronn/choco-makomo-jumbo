@@ -22,7 +22,7 @@ class RoomController extends Controller
             // バリデーション
             $request->validate([
                 'characters' => 'required|array|min:1|max:3',
-                'characters.*.character_id' => 'required|string|exists:user_character,character_id,user_id,' . Str::uuid(),
+                'characters.*.character_id' => 'required|string|exists:user_character,character_id',
                 'characters.*.level' => 'required|integer|min:1',
                 'characters.*.life' => 'required|integer|min:0',
                 'characters.*.power' => 'required|integer|min:0',
