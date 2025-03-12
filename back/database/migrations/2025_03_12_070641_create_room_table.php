@@ -11,11 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('room', function (Blueprint $table) {
+        Schema::create('rooms', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('user_id')->index(); // user_id を追加
-            $table->string('status'); // 追加：status カラム
+            $table->uuid('host_user_id')->index(); // ホストのユーザーID
+            $table->uuid('guest_user_id')->nullable()->index(); // ゲストのユーザーID（対戦相手がいない場合はNULL）
+            $table->string('status'); // ルームの状態（waiting, in_progress, finished など）
             $table->timestamps();
+
+            // 外部キー制約（オプション）
+            $table->foreign('host_user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('guest_user_id')->references('id')->on('users')->onDelete('set null'); // ゲストが抜けたらNULLにする
         });
     }
 
@@ -24,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('room');
+        Schema::dropIfExists('rooms');
     }
 };
