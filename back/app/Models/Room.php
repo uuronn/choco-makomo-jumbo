@@ -7,6 +7,8 @@ use Illuminate\Support\Str;
 
 class Room extends Model
 {
+    protected $table = 'room';
+
     protected $keyType = 'string';
     public $incrementing = false;
 
