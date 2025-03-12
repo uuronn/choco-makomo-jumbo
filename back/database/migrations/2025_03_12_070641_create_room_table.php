@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('room', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->uuid('user_id')->index(); // user_id を追加
+            $table->string('status'); // 追加：status カラム
             $table->timestamps();
         });
     }
