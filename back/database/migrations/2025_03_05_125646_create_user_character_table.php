@@ -12,7 +12,7 @@ return new class extends Migration
             $table->uuid('user_id');
             $table->uuid('character_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('character_id')->references('id')->on('characters')->onDelete('cascade');
+            $table->foreign('character_id')->references('id')->on('character')->onDelete('cascade');
             $table->integer('level');
             $table->integer('life');
             $table->integer('power');
