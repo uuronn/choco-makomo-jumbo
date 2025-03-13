@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Shared\Model\Skill;
+use App\Model\Skill;
 use Illuminate\Database\Seeder;
 
 class SkillSeeder extends Seeder
