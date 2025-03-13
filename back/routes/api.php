@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\CharacterController;
+use App\Http\Controller\CharacterController;
+// use App\Http\Controllers\CharacterController;
 use App\Http\Controllers\GachaController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UserCharacterController;
@@ -13,6 +14,8 @@ Route::get('/test', function () {
 });
 
 Route::get('/users', [UserController::class, 'index']);
+
+Route::get('/charactersTest', [CharacterController::class, 'index']);
 
 Route::get('/aaa', [UserController::class, 'index']);
 
