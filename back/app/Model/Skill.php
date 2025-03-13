@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Shared\Model;
+namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Shared\Model;
+namespace App\Model;
 
-use App\Shared\Model\Skill;
+use App\Model\Skill;
 use App\Skill\PartyPowerChainSkill;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
