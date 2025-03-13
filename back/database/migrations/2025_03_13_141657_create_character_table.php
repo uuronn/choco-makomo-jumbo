@@ -23,9 +23,9 @@ return new class extends Migration
             $table->timestamps();
 
             // 外部キー制約
-            // $table->foreign('active_skill_id')->references('id')->on('skill')->onDelete('set null');
-            // $table->foreign('passive_skill_id')->references('id')->on('skill')->onDelete('set null');
-            // $table->foreign('party_skill_id')->references('id')->on('skill')->onDelete('set null');
+            $table->foreign('active_skill_id')->references('id')->on('skill')->onDelete('set null');
+            $table->foreign('passive_skill_id')->references('id')->on('skill')->onDelete('set null');
+            $table->foreign('party_skill_id')->references('id')->on('skill')->onDelete('set null');
         });
     }
 
