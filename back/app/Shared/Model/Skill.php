@@ -7,6 +7,8 @@ use Illuminate\Support\Str;
 
 class Skill extends Model
 {
+    protected $table = 'skill';
+
     protected $keyType = 'string';
     public $incrementing = false;
 

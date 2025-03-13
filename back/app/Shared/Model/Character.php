@@ -3,7 +3,6 @@
 namespace App\Shared\Model;
 
 use App\Shared\Model\Skill;
-use App\Shared\Model\Skill as ModelSkill;
 use App\Skill\PartyPowerChainSkill;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -33,7 +32,7 @@ class Character extends Model
 
     public function activeSkill()
     {
-        return $this->belongsTo(ModelSkill::class, 'active_skill_id');
+        return $this->belongsTo(Skill::class, 'active_skill_id');
     }
 
     public function passiveSkill()
