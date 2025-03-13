@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 
 class Character extends Model
 {
+    protected $table = 'character';
+
     protected $keyType = 'string';
     public $incrementing = false;
 
