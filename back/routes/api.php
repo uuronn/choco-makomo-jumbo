@@ -33,7 +33,7 @@ Route::post('/rooms', [RoomController::class, 'store']);
 
 Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
 
-Route::put('/rooms/join', [RoomController::class, 'join']);
+Route::post('/rooms/join', [RoomController::class, 'join']);
 
 Route::post('/rooms/end-battle', [RoomController::class, 'endBattle']);
 

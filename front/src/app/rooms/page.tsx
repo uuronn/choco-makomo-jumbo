@@ -58,6 +58,8 @@ export default function RoomListPage() {
 	const handleRoomAction = async (roomId?: string) => {
 		if (!user) return;
 
+		console.info("roomId", roomId);
+
 		if (selectedCharacters.length < 1 || selectedCharacters.length > 3) {
 			setError("パーティは 1 〜 3 体まで選択してください");
 			return;
@@ -66,8 +68,9 @@ export default function RoomListPage() {
 
 		// ルームに参加（既存のルーム）
 		if (roomId) {
+			console.info("tst", roomId);
 			await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/join`, {
-				method: "PUT",
+				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					guest_user_id: user.uid,
