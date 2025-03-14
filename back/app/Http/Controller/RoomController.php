@@ -175,4 +175,48 @@ class RoomController
         }
     }
 
+    public function startBattle(Request $request)
+    {
+        try {
+            // リクエストからルームIDを取得
+            $roomId = $request->input('room_id');
+            $userId = $request->input('user_id'); // フロント側からホストの `user_id` を送る
+
+            // ルームを取得
+            $room = Room::where('id', $roomId)->first();
+
+            if (!$room) {
+                return response()->json([
+                    'message' => 'ルームが見つかりません',
+                ], 404);
+            }
+
+            // リクエストしたユーザーがホストであることを確認
+            if ($room->host_user_id !== $userId) {
+                return response()->json([
+                    'message' => 'バトル開始の権限がありません',
+                ], 403);
+            }
+
+            // ルームの状態が `ready` であることを確認
+            if ($room->status !== 'ready') {
+                return response()->json([
+                    'message' => 'バトルを開始できる状態ではありません',
+                ], 400);
+            }
+
+            // バトル開始（status を `battling` に更新）
+            $room->update(['status' => 'battling']);
+
+            return response()->json([
+                'message' => 'バトルが開始されました',
+                'room' => $room,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'バトル開始に失敗しました',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
