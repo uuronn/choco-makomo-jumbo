@@ -8,6 +8,7 @@ import Link from "next/link";
 export default function RoomDetailPage() {
 	const { user } = useAuth();
 	const { roomId } = useParams();
+	const router = useRouter();
 
 	console.info("room_id", roomId);
 
@@ -18,7 +19,8 @@ export default function RoomDetailPage() {
 	useEffect(() => {
 		if (!roomId || !user) return;
 
-		(async () => {
+		// ルーム情報を取得
+		const fetchRoom = async () => {
 			try {
 				const res = await fetch(
 					`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/${roomId}`,
@@ -41,8 +43,50 @@ export default function RoomDetailPage() {
 			} finally {
 				setLoading(false);
 			}
-		})();
+		};
+
+		fetchRoom();
+
+		// リアルタイムでルームの状態を監視（バトル開始時の自動遷移）
+		const interval = setInterval(fetchRoom, 3000); // 3秒ごとにチェック
+
+		return () => clearInterval(interval);
 	}, [roomId, user]);
+
+	// バトルが開始されたらバトル画面へ遷移
+	useEffect(() => {
+		if (room?.status === "battling") {
+			router.push(`/battle/${roomId}`);
+		}
+	}, [room, router, roomId]);
+
+	// バトル開始（ホストのみ実行可能）
+	const startBattle = async () => {
+		if (!user) return;
+
+		if (!room || room.host_user_id !== user.uid) {
+			alert("ホストのみがバトルを開始できます");
+			return;
+		}
+
+		const res = await fetch(
+			`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/start-battle`,
+			{
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ room_id: room.id, user_id: user.uid }),
+			},
+		);
+
+		if (!res.ok) {
+			alert("バトル開始に失敗しました");
+			console.error(await res.json());
+			return;
+		}
+
+		// バトル開始時に即時画面遷移
+		router.push(`/battle/${roomId}`);
+	};
 
 	if (!user) return <p>...loading</p>;
 	if (loading) return <p>ルーム情報を取得中...</p>;
@@ -70,37 +114,26 @@ export default function RoomDetailPage() {
 				</p>
 			</div>
 
-			{/* {room.status === "waiting" && !room.guest_user_id && (
+			{/* バトル開始ボタン（ホストのみ表示） */}
+			{room.status === "ready" && user?.uid === room.host_user_id && (
 				<button
+					type="button"
 					className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md"
-					onClick={async () => {
-						try {
-							const res = await fetch(
-								`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/join`,
-								{
-									method: "POST",
-									headers: { "Content-Type": "application/json" },
-									body: JSON.stringify({
-										room_id,
-										guest_user_id: user.id,
-									}),
-								},
-							);
-
-							if (!res.ok) {
-								throw new Error("ルーム参加に失敗しました");
-							}
-
-							const data = await res.json();
-							setRoom(data.room);
-						} catch (error) {
-							console.error(error);
-						}
-					}}
+					onClick={startBattle}
 				>
-					ルームに参加する
+					バトルを開始する
 				</button>
-			)} */}
+			)}
+
+			{/* 既にバトルが開始している場合 */}
+			{room.status === "battling" && (
+				<Link
+					href={`/battle/${roomId}`}
+					className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md"
+				>
+					バトル画面へ進む
+				</Link>
+			)}
 
 			<Link href="/" className="mt-4 text-blue-500">
 				戻る
