@@ -46,6 +46,7 @@ export default function CharacterListPage() {
 							width={100}
 							height={100}
 						/>
+						<p>タイプ：{userCharacter.character.type}</p>
 						<p>レア度: {userCharacter.character.rarity}</p>
 						<p>レベル: {userCharacter.level}</p>
 						<p>ライフ: {userCharacter.life}</p>
