@@ -20,7 +20,6 @@ class RoomCharacter extends Model
         'life',
         'power',
         'speed',
-        'skill',
     ];
 
     protected static function boot()

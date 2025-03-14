@@ -6,9 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+
     public function up()
     {
         Schema::create('room_character', function (Blueprint $table) {
@@ -19,16 +17,12 @@ return new class extends Migration
             $table->integer('life');
             $table->integer('power');
             $table->integer('speed');
-            $table->string('skill')->nullable();
             $table->timestamps();
 
             $table->foreign('room_id')->references('id')->on('room')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('room_character');
