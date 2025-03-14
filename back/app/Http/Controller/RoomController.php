@@ -219,4 +219,117 @@ class RoomController
             ], 500);
         }
     }
+
+    public function simulateBattle($roomId)
+    {
+        try {
+            $room = Room::where('id', $roomId)->first();
+
+            if (!$room || $room->status !== 'battling') {
+                return response()->json(['message' => 'バトルを開始できません'], 400);
+            }
+
+            $hostCharacters = RoomCharacter::where('room_id', $roomId)
+                ->whereHas('room', function ($query) use ($room) {
+                    $query->where('host_user_id', $room->host_user_id);
+                })
+                ->get();
+
+            $guestCharacters = RoomCharacter::where('room_id', $roomId)
+                ->whereHas('room', function ($query) use ($room) {
+                    $query->where('guest_user_id', $room->guest_user_id);
+                })
+                ->get();
+
+            // 速度順に並び替え
+            $battleOrder = $hostCharacters->merge($guestCharacters)->sortByDesc('speed')->values();
+
+            $log = [];
+            $turn = 1;
+
+            while ($hostCharacters->sum('life') > 0 && $guestCharacters->sum('life') > 0) {
+                $log[] = "ターン $turn 開始！";
+
+                foreach ($battleOrder as $attacker) {
+                    $targetGroup = $hostCharacters->contains($attacker) ? $guestCharacters : $hostCharacters;
+                    $target = $targetGroup->firstWhere('life', '>', 0);
+
+                    if (!$target) continue;
+
+                    // ダメージ計算
+                    $damage = $attacker->power;
+                    $target->life = max(0, $target->life - $damage);
+                    $target->save();
+
+                    $log[] = "{$attacker->character_id} が {$target->character_id} に $damage のダメージ！";
+
+                    if ($target->life <= 0) {
+                        $log[] = "{$target->character_id} は倒れた！";
+                    }
+                }
+                $turn++;
+            }
+
+            // 勝者判定
+            $winner = $hostCharacters->sum('life') > 0 ? 'host' : 'guest';
+            $winnerId = $winner === 'host' ? $room->host_user_id : $room->guest_user_id;
+
+            $room->update([
+                'status' => 'finished',
+                'winner_id' => $winnerId,
+            ]);
+
+            return response()->json([
+                'message' => 'バトルが終了しました',
+                'winner' => $winner,
+                'log' => $log,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'バトルのシミュレーションに失敗しました',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function endBattle(Request $request)
+    {
+        try {
+            $roomId = $request->input('room_id');
+            $winner = $request->input('winner'); // "host" or "guest"
+
+            // ルームを取得
+            $room = Room::where('id', $roomId)->first();
+
+            if (!$room) {
+                return response()->json([
+                    'message' => 'ルームが見つかりません',
+                ], 404);
+            }
+
+            // ルームの状態が `battling` でなければ処理しない
+            if ($room->status !== 'battling') {
+                return response()->json([
+                    'message' => 'バトルが進行中ではありません',
+                ], 400);
+            }
+
+            // 勝者を保存（勝者のユーザーIDを設定）
+            $winnerUserId = $winner === 'host' ? $room->host_user_id : $room->guest_user_id;
+            $room->update([
+                'status' => 'finished',
+                'winner_id' => $winnerUserId, // 勝者のIDを記録（`rooms` テーブルに `winner_id` カラムが必要）
+            ]);
+
+            return response()->json([
+                'message' => 'バトル結果が保存されました',
+                'room' => $room,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'バトル結果の保存に失敗しました',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
