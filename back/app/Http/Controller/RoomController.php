@@ -146,7 +146,7 @@ class RoomController
             }
 
             // ルームを取得
-            $room = Room::with(['roomCharacters']) // ルームに紐づくキャラ情報を取得
+            $room = Room::with(['roomCharacter']) // ルームに紐づくキャラ情報を取得
                         ->select('id', 'host_user_id', 'guest_user_id', 'status')
                         ->where('id', $room_id)
                         ->first();
