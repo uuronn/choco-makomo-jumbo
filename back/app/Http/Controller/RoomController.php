@@ -132,4 +132,47 @@ class RoomController
             ], 500);
         }
     }
+
+    public function show(Request $request, $room_id)
+    {
+        try {
+            // 認証ユーザーを取得（フロントからリクエスト時に `user_id` を渡す必要あり）
+            $user_id = $request->user_id;
+
+            if (!$user_id) {
+                return response()->json([
+                    'message' => 'ユーザーIDが必要です',
+                ], 401); // 401 Unauthorized
+            }
+
+            // ルームを取得
+            $room = Room::select('id', 'host_user_id', 'guest_user_id', 'status')
+                        ->where('id', $room_id)
+                        ->first();
+
+            if (!$room) {
+                return response()->json([
+                    'message' => '指定されたルームが見つかりません',
+                ], 404);
+            }
+
+            // **権限チェック (host_user_id もしくは guest_user_id のみ許可)**
+            if ($room->host_user_id !== $user_id && $room->guest_user_id !== $user_id) {
+                return response()->json([
+                    'message' => 'このルームにアクセスする権限がありません',
+                ], 403); // 403 Forbidden
+            }
+
+            return response()->json([
+                'room' => $room,
+                'message' => 'Room retrieved successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to retrieve room',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }
