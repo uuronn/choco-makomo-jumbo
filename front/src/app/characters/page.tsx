@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
+import Image from "next/image";
 
 export default function CharacterListPage() {
 	const { user } = useAuth();
@@ -39,6 +40,12 @@ export default function CharacterListPage() {
 						<h2 className="text-xl font-semibold">
 							{userCharacter.character.name}
 						</h2>
+						<Image
+							src={userCharacter.character.image_url}
+							alt="test"
+							width={100}
+							height={100}
+						/>
 						<p>レア度: {userCharacter.character.rarity}</p>
 						<p>レベル: {userCharacter.level}</p>
 						<p>ライフ: {userCharacter.life}</p>
