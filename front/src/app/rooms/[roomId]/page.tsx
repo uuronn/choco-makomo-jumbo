@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation"; // Next.js 13 以降の useRouter
+import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthProvider";
 import Link from "next/link";
 
@@ -15,6 +15,11 @@ export default function RoomDetailPage() {
 	const [room, setRoom] = useState<any>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [battleLog, setBattleLog] = useState<string[]>([]);
+	const [battleState, setBattleState] = useState<
+		"idle" | "in_progress" | "finished"
+	>("idle");
+	const [winner, setWinner] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (!roomId || !user) return;
@@ -53,13 +58,6 @@ export default function RoomDetailPage() {
 		return () => clearInterval(interval);
 	}, [roomId, user]);
 
-	// バトルが開始されたらバトル画面へ遷移
-	useEffect(() => {
-		if (room?.status === "battling") {
-			router.push(`/battle/${roomId}`);
-		}
-	}, [room, router, roomId]);
-
 	// バトル開始（ホストのみ実行可能）
 	const startBattle = async () => {
 		if (!user) return;
@@ -84,8 +82,45 @@ export default function RoomDetailPage() {
 			return;
 		}
 
-		// バトル開始時に即時画面遷移
-		router.push(`/battle/${roomId}`);
+		// バトル開始したら simulate-battle を叩く
+		runBattle();
+	};
+
+	// バトル進行処理（サーバーでバトルをシミュレート）
+	const runBattle = async () => {
+		if (!room) return;
+
+		const res = await fetch(
+			`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/simulate-battle`,
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ room_id: room.id }),
+			},
+		);
+
+		if (!res.ok) {
+			alert("バトルの進行に失敗しました");
+			console.error(await res.json());
+			return;
+		}
+
+		const data = await res.json();
+		setBattleLog(data.log);
+		setWinner(data.winner);
+		setBattleState("finished");
+
+		// バトル結果を保存
+		saveBattleResult(data.winner);
+	};
+
+	// バトル結果を保存
+	const saveBattleResult = async (winner: string) => {
+		await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/end-battle`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ room_id: room.id, winner }),
+		});
 	};
 
 	if (!user) return <p>...loading</p>;
@@ -125,14 +160,22 @@ export default function RoomDetailPage() {
 				</button>
 			)}
 
-			{/* 既にバトルが開始している場合 */}
-			{room.status === "battling" && (
-				<Link
-					href={`/battle/${roomId}`}
-					className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md"
-				>
-					バトル画面へ進む
-				</Link>
+			{/* バトル進行ログ */}
+			{battleState !== "idle" && (
+				<div className="bg-gray-800 text-white p-4 rounded-md mt-6 w-full max-w-md">
+					<h2 className="text-xl font-bold">バトルログ</h2>
+					{battleLog.map((log, index) => (
+						<p key={index}>{log}</p>
+					))}
+				</div>
+			)}
+
+			{/* バトル結果 */}
+			{battleState === "finished" && (
+				<div className="bg-green-500 text-white p-4 rounded-md mt-6">
+					<h2 className="text-xl font-bold">バトル終了</h2>
+					<p>勝者: {winner === "host" ? "ホスト" : "ゲスト"}</p>
+				</div>
 			)}
 
 			<Link href="/" className="mt-4 text-blue-500">
