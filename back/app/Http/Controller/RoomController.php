@@ -136,7 +136,7 @@ class RoomController
     public function show(Request $request, $room_id)
     {
         try {
-            // 認証ユーザーを取得（フロントからリクエスト時に `user_id` を渡す必要あり）
+            // 認証ユーザーを取得（フロントから `user_id` を渡す必要あり）
             $user_id = $request->user_id;
 
             if (!$user_id) {
@@ -146,7 +146,8 @@ class RoomController
             }
 
             // ルームを取得
-            $room = Room::select('id', 'host_user_id', 'guest_user_id', 'status')
+            $room = Room::with(['roomCharacters']) // ルームに紐づくキャラ情報を取得
+                        ->select('id', 'host_user_id', 'guest_user_id', 'status')
                         ->where('id', $room_id)
                         ->first();
 
@@ -165,6 +166,7 @@ class RoomController
 
             return response()->json([
                 'room' => $room,
+                'room_characters' => $room->roomCharacters, // ルームキャラクターも返す
                 'message' => 'Room retrieved successfully',
             ], 200);
         } catch (\Exception $e) {
