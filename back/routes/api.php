@@ -32,7 +32,7 @@ Route::put('/characters/training', [GachaController::class, 'trainCharacter']);
 
 Route::post('/rooms', [RoomController::class, 'store']);
 
-Route::post('/rooms/join', [RoomController::class, 'join']);
+Route::put('/rooms/join', [RoomController::class, 'join']);
 
 Route::get('/characters', [CharacterController::class, 'index']); // すべてのキャラクターを取得
 
