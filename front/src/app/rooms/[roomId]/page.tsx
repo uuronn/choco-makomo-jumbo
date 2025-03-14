@@ -1,28 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Next.js 13 以降の useRouter
+import { useParams, useRouter } from "next/navigation"; // Next.js 13 以降の useRouter
 import { useAuth } from "../../context/AuthProvider";
 import Link from "next/link";
 
-export default function RoomDetailPage({
-	params,
-}: { params: { room_id: string } }) {
-	const router = useRouter();
+export default function RoomDetailPage() {
 	const { user } = useAuth();
-	const { room_id } = params;
+	const { roomId } = useParams();
+
+	console.info("room_id", roomId);
 
 	const [room, setRoom] = useState<any>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (!room_id || !user) return;
+		if (!roomId || !user) return;
 
 		(async () => {
 			try {
 				const res = await fetch(
-					`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/${room_id}`,
+					`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/${roomId}`,
 					{
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
@@ -43,7 +42,7 @@ export default function RoomDetailPage({
 				setLoading(false);
 			}
 		})();
-	}, [room_id, user]);
+	}, [roomId, user]);
 
 	if (!user) return <p>...loading</p>;
 	if (loading) return <p>ルーム情報を取得中...</p>;

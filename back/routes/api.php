@@ -33,7 +33,7 @@ Route::post('/rooms', [RoomController::class, 'store']);
 
 Route::put('/rooms/join', [RoomController::class, 'join']);
 
-Route::get('/rooms/{roomId}', [RoomController::class, 'show']);
+Route::post('/rooms/{roomId}', [RoomController::class, 'show']);
 
 Route::get('/characters', [CharacterController::class, 'index']); // すべてのキャラクターを取得
 
