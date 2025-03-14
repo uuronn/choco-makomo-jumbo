@@ -13,6 +13,8 @@ export default function HomePage() {
 			<h1 className="text-2xl font-bold">Dashboard</h1>
 			<p>{user.displayName}</p>
 
+			<Link href="/rooms">ルーム一覧</Link>
+
 			<Link href="/characters">キャラ一覧</Link>
 
 			<Link href="/gacha">ガチャ</Link>
