@@ -56,4 +56,62 @@ class RoomController
             ], 500);
         }
     }
+
+    public function join(Request $request)
+    {
+        try {
+            // 指定されたルームが存在するかチェック
+            $room = Room::where('id', $request->room_id)->first();
+
+            if (!$room) {
+                return response()->json([
+                    'message' => '指定されたルームが見つかりません',
+                ], 404);
+            }
+
+            // ルームの状態が "waiting" であることを確認
+            if ($room->status !== 'waiting') {
+                return response()->json([
+                    'message' => 'このルームには参加できません',
+                ], 400);
+            }
+
+            // すでにゲストユーザーが設定されているか確認
+            if ($room->guest_user_id) {
+                return response()->json([
+                    'message' => 'このルームにはすでにゲストが参加しています',
+                ], 400);
+            }
+
+            // ゲストユーザーを登録
+            $room->update([
+                'guest_user_id' => $request->guest_user_id,
+                'status' => 'in_progress', // ルームの状態を変更
+            ]);
+
+            // ルームキャラクターの作成（ゲストユーザーのキャラクター情報がある場合）
+            if (!empty($request->characters)) {
+                foreach ($request->characters as $characterData) {
+                    RoomCharacter::create([
+                        'room_id' => $room->id,
+                        'character_id' => $characterData['character_id'],
+                        'level' => $characterData['level'],
+                        'life' => $characterData['life'],
+                        'power' => $characterData['power'],
+                        'speed' => $characterData['speed'],
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'room' => $room->load('roomCharacter'),
+                'message' => 'Room joined successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to join room',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
