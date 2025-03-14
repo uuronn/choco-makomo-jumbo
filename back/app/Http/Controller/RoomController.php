@@ -10,6 +10,24 @@ use Illuminate\Support\Str;
 class RoomController
 {
 
+    public function index()
+    {
+        try {
+            // ルーム一覧を取得（キャラクター情報を含めずに取得）
+            $rooms = Room::select('id', 'host_user_id', 'guest_user_id', 'status')->get();
+
+            return response()->json([
+                'rooms' => $rooms,
+                'message' => 'Rooms retrieved successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to retrieve rooms',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     /**
      * ルーム作成
      */
