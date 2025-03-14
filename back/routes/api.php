@@ -16,9 +16,7 @@ Route::get('/users', [UserController::class, 'index']);
 
 Route::get('/charactersTest', [CharacterController::class, 'index']);
 
-Route::get('/aaa', [UserController::class, 'index']);
-
-Route::get('/abc', [UserController::class, 'index']);
+Route::get('/rooms', [RoomController::class, 'index']);
 
 Route::get('/users/{id}', [UserController::class, 'checkUser']);
 
