@@ -16,6 +16,7 @@ export default function RoomDetailPage() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [battleLog, setBattleLog] = useState<string[]>([]);
+	const [isMyTurn, setIsMyTurn] = useState(false);
 	const [battleState, setBattleState] = useState<
 		"idle" | "in_progress" | "finished"
 	>("idle");
@@ -43,6 +44,9 @@ export default function RoomDetailPage() {
 
 				const data = await res.json();
 				setRoom(data.room);
+
+				// 自分のターンかどうかを確認
+				setIsMyTurn(data.room.current_turn_user_id === user.uid);
 			} catch (err: any) {
 				setError(err.message);
 			} finally {
@@ -52,7 +56,7 @@ export default function RoomDetailPage() {
 
 		fetchRoom();
 
-		// リアルタイムでルームの状態を監視（バトル開始時の自動遷移）
+		// ルームの状態をリアルタイム監視
 		const interval = setInterval(fetchRoom, 3000); // 3秒ごとにチェック
 
 		return () => clearInterval(interval);
@@ -81,46 +85,30 @@ export default function RoomDetailPage() {
 			console.error(await res.json());
 			return;
 		}
-
-		// バトル開始したら simulate-battle を叩く
-		runBattle();
 	};
 
-	// バトル進行処理（サーバーでバトルをシミュレート）
-	const runBattle = async () => {
-		if (!room) return;
+	// コマンドを送信する
+	const sendCommand = async (command: "attack" | "defend") => {
+		if (!room || !isMyTurn) return;
 
 		const res = await fetch(
-			`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/simulate-battle`,
+			`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/action`,
 			{
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ room_id: room.id }),
+				body: JSON.stringify({ room_id: room.id, user_id: user.uid, command }),
 			},
 		);
 
 		if (!res.ok) {
-			alert("バトルの進行に失敗しました");
+			alert("コマンドの送信に失敗しました");
 			console.error(await res.json());
 			return;
 		}
 
 		const data = await res.json();
-		setBattleLog(data.log);
-		setWinner(data.winner);
-		setBattleState("finished");
-
-		// バトル結果を保存
-		saveBattleResult(data.winner);
-	};
-
-	// バトル結果を保存
-	const saveBattleResult = async (winner: string) => {
-		await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/end-battle`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ room_id: room.id, winner }),
-		});
+		setBattleLog([...battleLog, data.message]);
+		setIsMyTurn(false);
 	};
 
 	if (!user) return <p>...loading</p>;
@@ -147,36 +135,40 @@ export default function RoomDetailPage() {
 				<p>
 					<strong>ステータス:</strong> {room.status}
 				</p>
+				<p>
+					<strong>現在のターン:</strong>{" "}
+					{room.current_turn_user_id === user.uid
+						? "あなたのターン"
+						: "相手のターン"}
+				</p>
 			</div>
 
-			{/* バトル開始ボタン（ホストのみ表示） */}
-			{room.status === "ready" && user?.uid === room.host_user_id && (
-				<button
-					type="button"
-					className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md"
-					onClick={startBattle}
-				>
-					バトルを開始する
-				</button>
-			)}
-
-			{/* バトル進行ログ */}
-			{battleState !== "idle" && (
-				<div className="bg-gray-800 text-white p-4 rounded-md mt-6 w-full max-w-md">
-					<h2 className="text-xl font-bold">バトルログ</h2>
-					{battleLog.map((log, index) => (
-						<p key={index}>{log}</p>
-					))}
+			{/* コマンド選択 */}
+			{isMyTurn && (
+				<div className="mt-4">
+					<h2 className="text-xl font-bold">コマンドを選択</h2>
+					<button
+						className="bg-red-500 text-white px-4 py-2 rounded-md m-2"
+						onClick={() => sendCommand("attack")}
+					>
+						攻撃する
+					</button>
+					<button
+						className="bg-blue-500 text-white px-4 py-2 rounded-md m-2"
+						onClick={() => sendCommand("defend")}
+					>
+						防御する
+					</button>
 				</div>
 			)}
 
-			{/* バトル結果 */}
-			{battleState === "finished" && (
-				<div className="bg-green-500 text-white p-4 rounded-md mt-6">
-					<h2 className="text-xl font-bold">バトル終了</h2>
-					<p>勝者: {winner === "host" ? "ホスト" : "ゲスト"}</p>
-				</div>
-			)}
+			{/* バトルログ */}
+			<div className="bg-gray-800 text-white p-4 rounded-md mt-6 w-full max-w-md">
+				<h2 className="text-xl font-bold">バトルログ</h2>
+				{battleLog.map((log, index) => (
+					<p key={index}>{log}</p>
+				))}
+			</div>
 
 			<Link href="/" className="mt-4 text-blue-500">
 				戻る
