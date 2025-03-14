@@ -19,8 +19,8 @@ return new class extends Migration
             $table->timestamps();
 
             // 外部キー制約（オプション）
-            $table->foreign('host_user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('guest_user_id')->references('id')->on('users')->onDelete('set null'); // ゲストが抜けたらNULLにする
+            $table->foreign('host_user_id')->references('id')->on('user')->onDelete('cascade');
+            $table->foreign('guest_user_id')->references('id')->on('user')->onDelete('set null'); // ゲストが抜けたらNULLにする
         });
     }
 

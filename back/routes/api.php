@@ -1,12 +1,11 @@
 <?php
 
 use App\Http\Controller\CharacterController;
-// use App\Http\Controllers\CharacterController;
-use App\Http\Controllers\GachaController;
-use App\Http\Controllers\RoomController;
-use App\Http\Controllers\UserCharacterController;
+use App\Http\Controller\GachaController;
+use App\Http\Controller\RoomController;
+use App\Http\Controller\UserCharacterController;
+use App\Http\Controller\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 
 Route::get('/test', function () {

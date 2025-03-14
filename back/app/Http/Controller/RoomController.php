@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controller;
 
-use App\Models\Room;
-use App\Models\RoomCharacter;
+use App\Model\Room;
+use App\Model\RoomCharacter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class RoomController extends Controller
+class RoomController
 {
     public function store(Request $request)
     {

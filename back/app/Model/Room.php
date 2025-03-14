@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Room extends Model
 {
-    protected $table = 'room'; // `room` → `rooms` に修正（複数形が標準）
+    protected $table = 'room';
 
     protected $keyType = 'string';
     public $incrementing = false;
