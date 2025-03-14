@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
-import { p } from "framer-motion/client";
 import Link from "next/link";
 
 export default function RoomListPage() {
