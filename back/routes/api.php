@@ -31,6 +31,8 @@ Route::get('/rooms', [RoomController::class, 'index']);
 
 Route::post('/rooms', [RoomController::class, 'store']);
 
+Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
+
 Route::put('/rooms/join', [RoomController::class, 'join']);
 
 Route::post('/rooms/{roomId}', [RoomController::class, 'show']);
