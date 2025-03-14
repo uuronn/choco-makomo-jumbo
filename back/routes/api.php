@@ -16,7 +16,6 @@ Route::get('/users', [UserController::class, 'index']);
 
 Route::get('/charactersTest', [CharacterController::class, 'index']);
 
-Route::get('/rooms', [RoomController::class, 'index']);
 
 Route::get('/users/{id}', [UserController::class, 'checkUser']);
 
@@ -28,9 +27,13 @@ Route::get('/users/{id}/characters', [GachaController::class, 'characterList']);
 
 Route::put('/characters/training', [GachaController::class, 'trainCharacter']);
 
+Route::get('/rooms', [RoomController::class, 'index']);
+
 Route::post('/rooms', [RoomController::class, 'store']);
 
 Route::put('/rooms/join', [RoomController::class, 'join']);
+
+Route::get('/rooms/{roomId}', [RoomController::class, 'show']);
 
 Route::get('/characters', [CharacterController::class, 'index']); // すべてのキャラクターを取得
 
