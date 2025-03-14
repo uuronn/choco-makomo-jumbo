@@ -34,7 +34,7 @@ class Room extends Model
         return $this->belongsTo(User::class, 'guest_user_id'); // ゲストのユーザー情報を取得
     }
 
-    public function roomCharacters()
+    public function roomCharacter()
     {
         return $this->hasMany(RoomCharacter::class);
     }

@@ -16,10 +16,10 @@ class PartyPowerChainSkill
     public function apply($context = null): array
     {
         if (!$context->party) return [];
-        $count = $context->party->roomCharacters->count();
+        $count = $context->party->roomCharacter->count();
         $increase = $this->baseAmount * $count; // 1体:+5, 2体:+10, 3体:+15
         $results = [];
-        foreach ($context->party->roomCharacters as $char) {
+        foreach ($context->party->roomCharacter as $char) {
             $char->power += $increase;
             $char->save();
             $results[] = ['character_id' => $char->character_id, 'effect' => "攻撃力 +{$increase}"];
