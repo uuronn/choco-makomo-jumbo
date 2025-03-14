@@ -198,8 +198,8 @@ class RoomController
                 ], 403);
             }
 
-            // ルームの状態が `ready` であることを確認
-            if ($room->status !== 'ready') {
+            // ルームの状態が `waiting` であることを確認
+            if ($room->status !== 'waiting') {
                 return response()->json([
                     'message' => 'バトルを開始できる状態ではありません',
                 ], 400);
@@ -220,77 +220,33 @@ class RoomController
         }
     }
 
-    public function simulateBattle($roomId)
+    public function processAction(Request $request)
     {
         try {
+            $roomId = $request->input('room_id');
+            $userId = $request->input('user_id');
+            $command = $request->input('command'); // "attack" or "defend"
+
             $room = Room::where('id', $roomId)->first();
 
             if (!$room || $room->status !== 'battling') {
-                return response()->json(['message' => 'バトルを開始できません'], 400);
+                return response()->json(['message' => 'バトルが進行中ではありません'], 400);
             }
 
-            $hostCharacters = RoomCharacter::where('room_id', $roomId)
-                ->whereHas('room', function ($query) use ($room) {
-                    $query->where('host_user_id', $room->host_user_id);
-                })
-                ->get();
-
-            $guestCharacters = RoomCharacter::where('room_id', $roomId)
-                ->whereHas('room', function ($query) use ($room) {
-                    $query->where('guest_user_id', $room->guest_user_id);
-                })
-                ->get();
-
-            // 速度順に並び替え
-            $battleOrder = $hostCharacters->merge($guestCharacters)->sortByDesc('speed')->values();
-
-            $log = [];
-            $turn = 1;
-
-            while ($hostCharacters->sum('life') > 0 && $guestCharacters->sum('life') > 0) {
-                $log[] = "ターン $turn 開始！";
-
-                foreach ($battleOrder as $attacker) {
-                    $targetGroup = $hostCharacters->contains($attacker) ? $guestCharacters : $hostCharacters;
-                    $target = $targetGroup->firstWhere('life', '>', 0);
-
-                    if (!$target) continue;
-
-                    // ダメージ計算
-                    $damage = $attacker->power;
-                    $target->life = max(0, $target->life - $damage);
-                    $target->save();
-
-                    $log[] = "{$attacker->character_id} が {$target->character_id} に $damage のダメージ！";
-
-                    if ($target->life <= 0) {
-                        $log[] = "{$target->character_id} は倒れた！";
-                    }
-                }
-                $turn++;
+            if ($room->current_turn_user_id !== $userId) {
+                return response()->json(['message' => 'あなたのターンではありません'], 403);
             }
 
-            // 勝者判定
-            $winner = $hostCharacters->sum('life') > 0 ? 'host' : 'guest';
-            $winnerId = $winner === 'host' ? $room->host_user_id : $room->guest_user_id;
+            // ターンを切り替える
+            $nextTurnUserId = $room->host_user_id === $userId ? $room->guest_user_id : $room->host_user_id;
+            $room->update(['current_turn_user_id' => $nextTurnUserId]);
 
-            $room->update([
-                'status' => 'finished',
-                'winner_id' => $winnerId,
-            ]);
-
-            return response()->json([
-                'message' => 'バトルが終了しました',
-                'winner' => $winner,
-                'log' => $log,
-            ], 200);
+            return response()->json(['message' => "{$userId} が {$command} を選択しました", 'room' => $room], 200);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'バトルのシミュレーションに失敗しました',
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(['message' => '処理に失敗しました', 'error' => $e->getMessage()], 500);
         }
     }
+
 
     public function endBattle(Request $request)
     {
