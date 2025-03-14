@@ -35,6 +35,8 @@ Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
 
 Route::post('/rooms/join', [RoomController::class, 'join']);
 
+Route::post('/rooms/action', [RoomController::class, 'processAction']);
+
 Route::post('/rooms/end-battle', [RoomController::class, 'endBattle']);
 
 Route::post('/rooms/{roomId}', [RoomController::class, 'show']);
