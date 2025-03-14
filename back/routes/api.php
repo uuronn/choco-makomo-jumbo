@@ -35,7 +35,11 @@ Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
 
 Route::put('/rooms/join', [RoomController::class, 'join']);
 
+Route::post('/rooms/end-battle', [RoomController::class, 'endBattle']);
+
 Route::post('/rooms/{roomId}', [RoomController::class, 'show']);
+
+Route::post('/rooms/simulate-battle', [RoomController::class, 'simulateBattle']);
 
 Route::get('/characters', [CharacterController::class, 'index']); // すべてのキャラクターを取得
 
