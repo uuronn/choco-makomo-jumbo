@@ -25,7 +25,7 @@ export default function RoomDetailPage() {
 					{
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ user_id: user.id }),
+						body: JSON.stringify({ user_id: user.uid }),
 					},
 				);
 
