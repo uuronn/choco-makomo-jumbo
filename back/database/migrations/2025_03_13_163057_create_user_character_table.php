@@ -17,6 +17,7 @@ return new class extends Migration
             $table->smallInteger('life');
             $table->smallInteger('power');
             $table->smallInteger('speed');
+            $table->smallInteger('evasion');
             $table->primary(['user_id', 'character_id']);
             $table->timestamps();
         });
