@@ -7,7 +7,6 @@ use App\Model\UserCharacter;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class UserCharacterController
 {
@@ -75,7 +74,7 @@ class UserCharacterController
                 ->where('characterId', $characterId)
                 ->first();
 
-            if (!$userCharacter) return response()->json(['message' => 'UserCharacter not found'], 404);
+            if (!$userCharacter) return response()->json(['message' => 'UserCharacter not found', 'userId' => $userId, 'characterId' => $characterId], 404);
 
             // 現在のレベルが100未満かチェック（増加後の値も考慮）
             $life = $request->life;
