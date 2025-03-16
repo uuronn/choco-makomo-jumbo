@@ -13,7 +13,7 @@ class CharacterController
     {
         $characterList = Character::all();
 
-        if (!$characterList) return response()->json(['message' => 'CharacterList not found'], 404);
+        if ($characterList->isEmpty()) return response()->json(['message' => 'CharacterList not found'], 404);
 
         return response()->json($characterList, 200);
     }
