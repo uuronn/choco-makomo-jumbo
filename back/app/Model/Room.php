@@ -12,6 +12,8 @@ class Room extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     protected $fillable = ['id', 'host_user_id', 'guest_user_id', 'status'];
 
     protected static function boot()

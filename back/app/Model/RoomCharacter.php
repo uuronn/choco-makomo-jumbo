@@ -12,6 +12,8 @@ class RoomCharacter extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     protected $fillable = [
         'id',
         'room_id',
