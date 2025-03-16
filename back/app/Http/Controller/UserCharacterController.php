@@ -59,6 +59,7 @@ class UserCharacterController
     public function levelUp(Request $request)
     {
         try {
+            // TODO: 'userId'と'characterId'をクエリパラメータで受け取るように変更
             // $request->validate([
             //     'userId' => 'required|string|exists:user,id',
             //     'characterId' => 'required|string|exists:character,id',
