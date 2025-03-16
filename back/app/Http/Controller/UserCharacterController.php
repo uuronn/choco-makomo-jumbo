@@ -74,7 +74,7 @@ class UserCharacterController
     public function levelUp(Request $request)
 {
     try {
-        // バリデーション
+        // バリデーション（コメントアウトされているので、そのまま維持）
         // $request->validate([
         //     'user_id' => 'required|string|exists:user,id',
         //     'character_id' => 'required|string|exists:character,id',
@@ -104,6 +104,7 @@ class UserCharacterController
 
         // レベルアップ処理
         $updated = DB::transaction(function () use ($userCharacter, $life, $power, $speed, $totalIncrease) {
+            // 属性を更新
             $userCharacter->life += $life;
             $userCharacter->power += $power;
             $userCharacter->speed += $speed;
@@ -112,7 +113,16 @@ class UserCharacterController
             // 保存前にデバッグ用ログ
             Log::info('Before save:', $userCharacter->toArray());
 
-            $userCharacter->save();
+            // save() の代わりに update() を使用
+            UserCharacter::where('user_id', $userCharacter->user_id)
+                ->where('character_id', $userCharacter->character_id)
+                ->update([
+                    'life' => $userCharacter->life,
+                    'power' => $userCharacter->power,
+                    'speed' => $userCharacter->speed,
+                    'level' => $userCharacter->level,
+                    'updated_at' => now(),
+                ]);
 
             return $userCharacter;
         });
