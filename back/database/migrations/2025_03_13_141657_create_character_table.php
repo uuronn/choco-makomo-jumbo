@@ -13,9 +13,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('type');
             $table->smallInteger('rarity');
-            $table->bigInteger('base_power');
-            $table->bigInteger('base_life');
-            $table->bigInteger('base_speed');
+            $table->smallInteger('base_power');
+            $table->smallInteger('base_life');
+            $table->smallInteger('base_speed');
+            $table->smallInteger('base_evasion');
             $table->uuid('active_skill_id')->nullable();
             $table->uuid('passive_skill_id')->nullable();
             $table->uuid('party_skill_id')->nullable();
