@@ -67,8 +67,8 @@ class UserCharacterController
             //     'speed' => 'required|integer|min:0',
             // ]);
 
-            $userId = $request->query('userId');
-            $characterId = $request->query('characterId');
+            $userId = $request->route('userId');
+            $characterId = $request->route('characterId');
 
             $userCharacter = UserCharacter::where('userId', $userId)
                 ->where('characterId', $characterId)
