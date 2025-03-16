@@ -13,10 +13,10 @@ return new class extends Migration
             $table->uuid('character_id');
             $table->foreign('user_id')->references('id')->on('user')->onDelete('cascade');
             $table->foreign('character_id')->references('id')->on('character')->onDelete('cascade');
-            $table->integer('level');
-            $table->integer('life');
-            $table->integer('power');
-            $table->integer('speed');
+            $table->smallInteger('level');
+            $table->smallInteger('life');
+            $table->smallInteger('power');
+            $table->smallInteger('speed');
             $table->primary(['user_id', 'character_id']);
             $table->timestamps();
         });
