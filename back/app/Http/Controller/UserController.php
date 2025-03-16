@@ -43,9 +43,9 @@ class UserController
     /**
      * ユーザーが存在するか確認
      */
-    public function checkUser(Request $request)
+    public function checkUser($userId)
     {
-        $user = User::find($request->user_id);
+        $user = User::find($userId);
 
         if (!$user) return response()->json(['message' => 'User not found'], 404);
 
@@ -55,9 +55,9 @@ class UserController
     /**
      * ユーザーのpointを更新
      */
-    public function updatePoint(Request $request)
+    public function updatePoint(Request $request, $userId)
     {
-        $user = User::find($request->user_id);
+        $user = User::find($userId);
 
         if (!$user) return response()->json(['message' => 'User not found'], 404);
 
