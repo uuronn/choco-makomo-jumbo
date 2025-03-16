@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->text('description');
             $table->string('effect_type');
-            $table->integer('effect_amount');
+            $table->smallInteger('effect_amount');
             $table->timestamps();
         });
     }
