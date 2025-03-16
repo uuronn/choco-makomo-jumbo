@@ -103,13 +103,25 @@ class UserCharacterController
             // レベルアップ処理
             $updated = DB::transaction(function () use ($userCharacter, $request) {
                 // レベルを1増やす
-                $userCharacter->level += 1;
+                // $userCharacter->level += 1;
 
                 // ステータスを増加（上限なし）
-                $userCharacter->life += $request->life;
-                $userCharacter->power += $request->power;
-                $userCharacter->speed += $request->speed;
+                // $userCharacter->life += $request->life;
+                // $userCharacter->power += $request->power;
+                // $userCharacter->speed += $request->speed;
 
+                $life = $request->input('life');
+                $power = $request->input('power');
+                $speed = $request->input('speed');
+
+                $totalIncrease = (int)$life + (int)$power + (int)$speed;
+
+                $userCharacter->life += (int)$life;
+                $userCharacter->power += (int)$power;
+                $userCharacter->speed += (int)$speed;
+
+                // レベルも合計値分増加
+                $userCharacter->level += $totalIncrease;
                 $userCharacter->save();
 
                 return $userCharacter;
