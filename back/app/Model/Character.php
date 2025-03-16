@@ -15,7 +15,7 @@ class Character extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'id', 'name', 'type', 'rarity', 'base_power', 'image_url', 'base_life', 'base_speed',
+        'id', 'name', 'type', 'rarity', 'base_power', 'image_url', 'base_life', 'base_speed', 'base_evasion',
         'active_skill_id', 'passive_skill_id', 'party_skill_id'
     ];
 

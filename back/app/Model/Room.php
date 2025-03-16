@@ -26,12 +26,12 @@ class Room extends Model
 
     public function hostUser()
     {
-        return $this->belongsTo(User::class, 'host_user_id'); // ホストのユーザー情報を取得
+        return $this->belongsTo(User::class, 'host_user_id');
     }
 
     public function guestUser()
     {
-        return $this->belongsTo(User::class, 'guest_user_id'); // ゲストのユーザー情報を取得
+        return $this->belongsTo(User::class, 'guest_user_id');
     }
 
     public function roomCharacter()

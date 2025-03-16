@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Model;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,6 +17,6 @@ class User extends Authenticatable
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'name', 'email', 'email_verified_at', 'password', 'point', 'remember_token', 'created_at', 'updated_at'
+        'id', 'name', 'email', 'point', 'created_at', 'updated_at'
     ];
 }
