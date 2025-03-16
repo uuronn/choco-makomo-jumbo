@@ -8,14 +8,7 @@ use App\Http\Controller\UserController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 
-Route::get('/test', function () {
-    return view('welcome');
-});
-
 Route::get('/users', [UserController::class, 'index']);
-
-Route::get('/charactersTest', [CharacterController::class, 'index']);
-
 
 Route::get('/users/{id}', [UserController::class, 'checkUser']);
 
