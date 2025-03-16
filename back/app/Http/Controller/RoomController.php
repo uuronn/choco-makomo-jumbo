@@ -285,7 +285,6 @@ class RoomController
         }
     }
 
-
     public function endBattle(Request $request)
     {
         try {
