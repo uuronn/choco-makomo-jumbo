@@ -60,8 +60,8 @@ class UserCharacterController
     {
         try {
             $request->validate([
-                'user_id' => 'required|string|exists:user,id',
-                'character_id' => 'required|string|exists:character,id',
+                'userId' => 'required|string|exists:user,id',
+                'characterId' => 'required|string|exists:character,id',
                 'life' => 'required|integer|min:0',
                 'power' => 'required|integer|min:0',
                 'speed' => 'required|integer|min:0',
