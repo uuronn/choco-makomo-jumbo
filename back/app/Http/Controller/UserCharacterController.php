@@ -59,13 +59,13 @@ class UserCharacterController
     public function levelUp(Request $request)
     {
         try {
-            $request->validate([
-                'userId' => 'required|string|exists:user,id',
-                'characterId' => 'required|string|exists:character,id',
-                'life' => 'required|integer|min:0',
-                'power' => 'required|integer|min:0',
-                'speed' => 'required|integer|min:0',
-            ]);
+            // $request->validate([
+            //     'userId' => 'required|string|exists:user,id',
+            //     'characterId' => 'required|string|exists:character,id',
+            //     'life' => 'required|integer|min:0',
+            //     'power' => 'required|integer|min:0',
+            //     'speed' => 'required|integer|min:0',
+            // ]);
 
             $userId = $request->query('userId');
             $characterId = $request->query('characterId');
