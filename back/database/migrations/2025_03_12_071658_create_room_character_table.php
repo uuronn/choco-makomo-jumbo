@@ -13,10 +13,11 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('room_id')->index();
             $table->uuid('character_id');
-            $table->integer('level');
-            $table->integer('life');
-            $table->integer('power');
-            $table->integer('speed');
+            $table->smallInteger('level');
+            $table->smallInteger('life');
+            $table->smallInteger('power');
+            $table->smallInteger('speed');
+            $table->smallInteger('evasion');
             $table->timestamps();
 
             $table->foreign('room_id')->references('id')->on('room')->onDelete('cascade');
