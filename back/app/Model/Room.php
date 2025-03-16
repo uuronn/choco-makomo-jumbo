@@ -14,7 +14,7 @@ class Room extends Model
 
     protected $hidden = ['created_at', 'updated_at'];
 
-    protected $fillable = ['id', 'host_user_id', 'guest_user_id', 'status'];
+    protected $fillable = ['id', 'hostUserId', 'guestUserId', 'status'];
 
     protected static function boot()
     {
@@ -28,12 +28,12 @@ class Room extends Model
 
     public function hostUser()
     {
-        return $this->belongsTo(User::class, 'host_user_id');
+        return $this->belongsTo(User::class, 'hostUserId');
     }
 
     public function guestUser()
     {
-        return $this->belongsTo(User::class, 'guest_user_id');
+        return $this->belongsTo(User::class, 'guestUserId');
     }
 
     public function roomCharacter()

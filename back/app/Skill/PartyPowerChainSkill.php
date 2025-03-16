@@ -22,7 +22,7 @@ class PartyPowerChainSkill
         foreach ($context->party->roomCharacter as $char) {
             $char->power += $increase;
             $char->save();
-            $results[] = ['character_id' => $char->character_id, 'effect' => "攻撃力 +{$increase}"];
+            $results[] = ['characterId' => $char->characterId, 'effect' => "攻撃力 +{$increase}"];
         }
         return $results;
     }

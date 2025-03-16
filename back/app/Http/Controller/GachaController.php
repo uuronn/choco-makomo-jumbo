@@ -18,8 +18,8 @@ class GachaController
         $character = Character::inRandomOrder()->first();
 
         // 既に所持しているか確認
-        $userCharacter = UserCharacter::where('user_id', $user->id)
-                                    ->where('character_id', $character->id)
+        $userCharacter = UserCharacter::where('userId', $user->id)
+                                    ->where('characterId', $character->id)
                                     ->first();
 
         if ($userCharacter) {
@@ -37,8 +37,8 @@ class GachaController
         }
 
         $userCharacter = new UserCharacter([
-            'user_id' => $user->id,
-            'character_id' => $character->id,
+            'userId' => $user->id,
+            'characterId' => $character->id,
             'life' => $character->base_life,
             'power' => $character->base_power,
             'speed' => $character->base_speed,

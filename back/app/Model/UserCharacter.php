@@ -6,36 +6,36 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserCharacter extends Model
 {
-    protected $table = 'user_character';
+    protected $table = 'userCharacter';
 
-    protected $primaryKey = ['user_id', 'character_id'];
+    protected $primaryKey = ['userId', 'characterId'];
     public $incrementing = false;
     protected $keyType = 'string';
 
     protected $hidden = ['created_at', 'updated_at'];
 
     protected $fillable = [
-        'user_id', 'character_id', 'level', 'life', 'power', 'speed', 'evasion'
+        'userId', 'characterId', 'level', 'life', 'power', 'speed', 'evasion'
     ];
 
     public $timestamps = true;
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'userId', 'id');
     }
 
     public function character()
     {
-        return $this->belongsTo(Character::class, 'character_id', 'id');
+        return $this->belongsTo(Character::class, 'characterId', 'id');
     }
 
     // 複合主キーの場合、getKeyメソッドをオーバーライド
     public function getKey()
     {
         return [
-            'user_id' => $this->user_id,
-            'character_id' => $this->character_id,
+            'userId' => $this->userId,
+            'characterId' => $this->characterId,
         ];
     }
 

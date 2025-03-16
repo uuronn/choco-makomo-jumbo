@@ -18,9 +18,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 500,
                 'base_speed' => 80,
                 'base_evasion' => 7, // 高耐久・高火力でスピードもそこそこ
-                'active_skill_id' => 'skill_uuid1',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid1',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/ruby.webp',
             ],
             [
@@ -31,9 +31,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 400,
                 'base_speed' => 60,
                 'base_evasion' => 4, // 中庸なステータス
-                'active_skill_id' => 'skill_uuid2',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid2',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/php.webp',
             ],
             [
@@ -44,9 +44,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 300,
                 'base_speed' => 70,
                 'base_evasion' => 6, // スピードと火力寄り
-                'active_skill_id' => 'skill_uuid3',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid3',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/swift.webp',
             ],
             [
@@ -57,9 +57,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 30,
                 'base_speed' => 10,
                 'base_evasion' => 2, // 低ステータスで回避も低い
-                'active_skill_id' => null,
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => null,
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/css.webp',
             ],
             [
@@ -70,9 +70,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 310,
                 'base_speed' => 100,
                 'base_evasion' => 9, // 高火力・高スピードで回避も高い
-                'active_skill_id' => 'skill_uuid5',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid5',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/go.webp',
             ],
             [
@@ -83,9 +83,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 110,
                 'base_speed' => 100,
                 'base_evasion' => 8, // スピード特化
-                'active_skill_id' => 'skill_uuid6',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid6',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/html.webp',
             ],
             [
@@ -96,9 +96,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 110,
                 'base_speed' => 100,
                 'base_evasion' => 9, // 超火力・高スピード
-                'active_skill_id' => 'skill_uuid7',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid7',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/nodejs.webp',
             ],
             [
@@ -109,9 +109,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 100,
                 'base_speed' => 200,
                 'base_evasion' => 10, // 超スピードで最高回避
-                'active_skill_id' => 'skill_uuid8',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid8',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/react.webp',
             ],
             [
@@ -122,9 +122,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 100,
                 'base_speed' => 150,
                 'base_evasion' => 8, // 高スピードで回避も高め
-                'active_skill_id' => 'skill_uuid9',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid9',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/rust.webp',
             ],
             [
@@ -135,9 +135,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 200,
                 'base_speed' => 120,
                 'base_evasion' => 7, // バランス型でやや高め
-                'active_skill_id' => 'skill_uuid10',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid10',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/angular.webp',
             ],
             [
@@ -148,9 +148,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 300,
                 'base_speed' => 90,
                 'base_evasion' => 6, // 高火力で回避は中程度
-                'active_skill_id' => 'skill_uuid11',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid11',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/aws.webp',
             ],
             [
@@ -161,9 +161,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 250,
                 'base_speed' => 60,
                 'base_evasion' => 5, // 中庸なステータス
-                'active_skill_id' => 'skill_uuid12',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid12',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/docker.webp',
             ],
             [
@@ -174,9 +174,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 350,
                 'base_speed' => 50,
                 'base_evasion' => 3, // 低スピードで回避も低め
-                'active_skill_id' => 'skill_uuid13',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid13',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/mysql.webp',
             ],
             [
@@ -187,9 +187,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 400,
                 'base_speed' => 90,
                 'base_evasion' => 6, // バランス型
-                'active_skill_id' => 'skill_uuid14',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid14',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/azure.webp',
             ],
             [
@@ -200,9 +200,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 200,
                 'base_speed' => 130,
                 'base_evasion' => 8, // スピード寄り
-                'active_skill_id' => 'skill_uuid15',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid15',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/gcp.webp',
             ],
             [
@@ -213,9 +213,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 150,
                 'base_speed' => 80,
                 'base_evasion' => 5, // スピードそこそこ
-                'active_skill_id' => 'skill_uuid16',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid16',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/git.webp',
             ],
             [
@@ -226,9 +226,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 400,
                 'base_speed' => 110,
                 'base_evasion' => 7, // バランス型でやや高め
-                'active_skill_id' => 'skill_uuid17',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid17',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/github.webp',
             ],
             [
@@ -239,9 +239,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 170,
                 'base_speed' => 75,
                 'base_evasion' => 5, // 中庸
-                'active_skill_id' => 'skill_uuid18',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid18',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/gitlab.webp',
             ],
             [
@@ -252,9 +252,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 220,
                 'base_speed' => 130,
                 'base_evasion' => 8, // スピード寄り
-                'active_skill_id' => 'skill_uuid19',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid19',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/javascript.webp',
             ],
             [
@@ -265,9 +265,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 360,
                 'base_speed' => 65,
                 'base_evasion' => 4, // 低スピード
-                'active_skill_id' => 'skill_uuid20',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid20',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/postgresql.webp',
             ],
             [
@@ -278,9 +278,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 280,
                 'base_speed' => 75,
                 'base_evasion' => 5, // 中庸
-                'active_skill_id' => 'skill_uuid21',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid21',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/supabase.webp',
             ],
             [
@@ -291,9 +291,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 450,
                 'base_speed' => 95,
                 'base_evasion' => 6, // 高火力・耐久
-                'active_skill_id' => 'skill_uuid22',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid22',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/unity.webp',
             ],
             [
@@ -304,9 +304,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 190,
                 'base_speed' => 140,
                 'base_evasion' => 8, // スピード寄り
-                'active_skill_id' => 'skill_uuid23',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid23',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/vue.webp',
             ],
             [
@@ -317,9 +317,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 350,
                 'base_speed' => 85,
                 'base_evasion' => 6, // バランス型
-                'active_skill_id' => 'skill_uuid24',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid24',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/linux.webp',
             ],
             [
@@ -330,9 +330,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 200,
                 'base_speed' => 70,
                 'base_evasion' => 5, // 中庸
-                'active_skill_id' => 'skill_uuid25',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid25',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/mac.webp',
             ],
             [
@@ -343,9 +343,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 450,
                 'base_speed' => 90,
                 'base_evasion' => 6, // 高耐久・火力
-                'active_skill_id' => 'skill_uuid26',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid26',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/rubyonrails.webp',
             ],
             [
@@ -356,9 +356,9 @@ class CharacterSeeder extends Seeder
                 'base_life' => 300,
                 'base_speed' => 60,
                 'base_evasion' => 4, // 低スピード
-                'active_skill_id' => 'skill_uuid27',
-                'passive_skill_id' => null,
-                'party_skill_id' => null,
+                'activeSkillId' => 'skill_uuid27',
+                'passiveSkillId' => null,
+                'partySkillId' => null,
                 'image_url' => '/character/windows.webp',
             ],
         ];

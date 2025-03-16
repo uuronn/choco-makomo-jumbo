@@ -22,7 +22,7 @@ class UserCharacterController
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        $userCharacters = UserCharacter::where('user_id', $user->id)
+        $userCharacters = UserCharacter::where('userId', $user->id)
             ->with('character')
             ->get();
 
@@ -32,8 +32,8 @@ class UserCharacterController
 
             return [
                 // UserCharacter（変動値）
-                'user_id' => $userCharacter->user_id,
-                'character_id' => $userCharacter->character_id,
+                'userId' => $userCharacter->userId,
+                'characterId' => $userCharacter->characterId,
                 'level' => $userCharacter->level,
                 'life' => $userCharacter->life,
                 'power' => $userCharacter->power,
@@ -43,9 +43,9 @@ class UserCharacterController
                 'type' => $character->type,
                 'rarity' => $character->rarity,
                 'base_evasion' => $character->base_evasion,
-                'active_skill_id' => $character->active_skill_id,
-                'passive_skill_id' => $character->passive_skill_id,
-                'party_skill_id' => $character->party_skill_id,
+                'activeSkillId' => $character->activeSkillId,
+                'passiveSkillId' => $character->passiveSkillId,
+                'partySkillId' => $character->partySkillId,
                 'image_url' => $character->image_url,
             ];
         });
@@ -71,8 +71,8 @@ class UserCharacterController
             $userId = $request->query('userId');
             $characterId = $request->query('characterId');
 
-            $userCharacter = UserCharacter::where('user_id', $userId)
-                ->where('character_id', $characterId)
+            $userCharacter = UserCharacter::where('userId', $userId)
+                ->where('characterId', $characterId)
                 ->first();
 
             if (!$userCharacter) return response()->json(['message' => 'UserCharacter not found'], 404);
@@ -92,8 +92,8 @@ class UserCharacterController
                 $userCharacter->speed += $speed;
                 $userCharacter->level += $totalIncrease;
 
-                UserCharacter::where('user_id', $userCharacter->user_id)
-                    ->where('character_id', $userCharacter->character_id)
+                UserCharacter::where('userId', $userCharacter->userId)
+                    ->where('characterId', $userCharacter->characterId)
                     ->update([
                         'life' => $userCharacter->life,
                         'power' => $userCharacter->power,
@@ -118,7 +118,7 @@ class UserCharacterController
      */
     public function destroy($userId)
     {
-        $deletedCount = UserCharacter::where('user_id', $userId)->destroy();
+        $deletedCount = UserCharacter::where('userId', $userId)->destroy();
 
         if ($deletedCount > 0) {
             return response()->json([

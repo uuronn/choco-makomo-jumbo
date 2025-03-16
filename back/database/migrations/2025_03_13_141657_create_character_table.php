@@ -17,16 +17,16 @@ return new class extends Migration
             $table->smallInteger('base_life');
             $table->smallInteger('base_speed');
             $table->smallInteger('base_evasion');
-            $table->uuid('active_skill_id')->nullable();
-            $table->uuid('passive_skill_id')->nullable();
-            $table->uuid('party_skill_id')->nullable();
+            $table->uuid('activeSkillId')->nullable();
+            $table->uuid('passiveSkillId')->nullable();
+            $table->uuid('partySkillId')->nullable();
             $table->string('image_url');
             $table->timestamps();
 
             // 外部キー制約
-            $table->foreign('active_skill_id')->references('id')->on('skill')->onDelete('set null');
-            $table->foreign('passive_skill_id')->references('id')->on('skill')->onDelete('set null');
-            $table->foreign('party_skill_id')->references('id')->on('skill')->onDelete('set null');
+            $table->foreign('activeSkillId')->references('id')->on('skill')->onDelete('set null');
+            $table->foreign('passiveSkillId')->references('id')->on('skill')->onDelete('set null');
+            $table->foreign('partySkillId')->references('id')->on('skill')->onDelete('set null');
         });
     }
 

@@ -15,7 +15,7 @@ class RoomController
     {
         try {
             // ルーム一覧を取得（キャラクター情報を含めずに取得）
-            $rooms = Room::select('id', 'host_user_id', 'guest_user_id', 'status')->get();
+            $rooms = Room::select('id', 'hostUserId', 'guestUserId', 'status')->get();
 
             return response()->json($rooms, 200);
         } catch (\Exception $e) {
@@ -32,13 +32,13 @@ class RoomController
     public function store(Request $request)
     {
         try {
-            $existingRoom = Room::where('host_user_id', $request->host_user_id)->first();
+            $existingRoom = Room::where('hostUserId', $request->hostUserId)->first();
 
             if ($existingRoom) {
                 return response()->json(['message' => '既に作成したルームが存在します'], 400);
             }
 
-            $characterIds = $request->input('character_id_list');
+            $characterIds = $request->input('characterIdList');
 
             if (empty($characterIds)) {
                 return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
@@ -46,8 +46,8 @@ class RoomController
 
             $room = Room::create([
                 'id' => Str::uuid(),
-                'host_user_id' => $request->host_user_id,
-                'guest_user_id' => $request->guest_user_id ?? null,
+                'hostUserId' => $request->hostUserId,
+                'guestUserId' => $request->guestUserId ?? null,
                 'status' => 'waiting',
             ]);
 
@@ -58,8 +58,8 @@ class RoomController
                     return response()->json(['message' => "Character {$characterId} not found"], 404);
                 }
 
-                $userCharacter = UserCharacter::where('user_id', $room->host_user_id)
-                    ->where('character_id', $characterId)
+                $userCharacter = UserCharacter::where('userId', $room->hostUserId)
+                    ->where('characterId', $characterId)
                     ->first();
 
                 if (!$userCharacter) {
@@ -67,9 +67,9 @@ class RoomController
                 }
 
                 RoomCharacter::create([
-                    'room_id' => $room->id,
-                    'character_id' => $characterId,
-                    'user_id' => $room->guest_user_id,
+                    'roomId' => $room->id,
+                    'characterId' => $characterId,
+                    'userId' => $room->guestUserId,
                     'level' => $userCharacter->level,
                     'life' => $userCharacter->life,
                     'power' => $userCharacter->power,
@@ -94,7 +94,7 @@ class RoomController
     {
         try {
             // 指定されたルームが存在するかチェック
-            $room = Room::where('id', $request->room_id)->first();
+            $room = Room::where('id', $request->roomId)->first();
 
             if (!$room) {
                 return response()->json([
@@ -110,7 +110,7 @@ class RoomController
             }
 
             // すでにゲストユーザーが設定されているか確認
-            if ($room->guest_user_id) {
+            if ($room->guestUserId) {
                 return response()->json([
                     'message' => 'このルームにはすでにゲストが参加しています',
                 ], 400);
@@ -118,7 +118,7 @@ class RoomController
 
 
 
-            $characterIds = $request->input('character_id_list');
+            $characterIds = $request->input('characterIdList');
 
             if (empty($characterIds)) {
                 return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
@@ -126,7 +126,7 @@ class RoomController
 
             // ゲストユーザーを登録
             $room->update([
-                'guest_user_id' => $request->guest_user_id,
+                'guestUserId' => $request->guestUserId,
                 'status' => 'in_progress', // ルームの状態を変更
             ]);
 
@@ -137,8 +137,8 @@ class RoomController
                     return response()->json(['message' => "Character {$characterId} not found"], 404);
                 }
 
-                $userCharacter = UserCharacter::where('user_id', $room->guest_user_id)
-                    ->where('character_id', $characterId)
+                $userCharacter = UserCharacter::where('userId', $room->guestUserId)
+                    ->where('characterId', $characterId)
                     ->first();
 
                 if (!$userCharacter) {
@@ -146,9 +146,9 @@ class RoomController
                 }
 
                 RoomCharacter::create([
-                    'room_id' => $room->id,
-                    'character_id' => $characterId,
-                    'user_id' => $room->guest_user_id,
+                    'roomId' => $room->id,
+                    'characterId' => $characterId,
+                    'userId' => $room->guestUserId,
                     'level' => $userCharacter->level,
                     'life' => $userCharacter->life,
                     'power' => $userCharacter->power,
@@ -169,13 +169,13 @@ class RoomController
         }
     }
 
-    public function show(Request $request, $room_id)
+    public function show(Request $request, $roomId)
     {
         try {
-            // 認証ユーザーを取得（フロントから `user_id` を渡す必要あり）
-            $user_id = $request->user_id;
+            // 認証ユーザーを取得（フロントから `userId` を渡す必要あり）
+            $userId = $request->userId;
 
-            if (!$user_id) {
+            if (!$userId) {
                 return response()->json([
                     'message' => 'ユーザーIDが必要です',
                 ], 401); // 401 Unauthorized
@@ -183,8 +183,8 @@ class RoomController
 
             // ルームを取得
             $room = Room::with(['roomCharacter']) // ルームに紐づくキャラ情報を取得
-                        ->select('id', 'host_user_id', 'guest_user_id', 'status')
-                        ->where('id', $room_id)
+                        ->select('id', 'hostUserId', 'guestUserId', 'status')
+                        ->where('id', $roomId)
                         ->first();
 
             if (!$room) {
@@ -193,8 +193,8 @@ class RoomController
                 ], 404);
             }
 
-            // **権限チェック (host_user_id もしくは guest_user_id のみ許可)**
-            if ($room->host_user_id !== $user_id && $room->guest_user_id !== $user_id) {
+            // **権限チェック (hostUserId もしくは guestUserId のみ許可)**
+            if ($room->hostUserId !== $userId && $room->guestUserId !== $userId) {
                 return response()->json([
                     'message' => 'このルームにアクセスする権限がありません',
                 ], 403); // 403 Forbidden
@@ -202,7 +202,7 @@ class RoomController
 
             return response()->json([
                 'room' => $room,
-                'room_characters' => $room->roomCharacters, // ルームキャラクターも返す
+                'roomCharacters' => $room->roomCharacters, // ルームキャラクターも返す
                 'message' => 'Room retrieved successfully',
             ], 200);
         } catch (\Exception $e) {
@@ -217,8 +217,8 @@ class RoomController
     {
         try {
             // リクエストからルームIDを取得
-            $roomId = $request->input('room_id');
-            $userId = $request->input('user_id'); // フロント側からホストの `user_id` を送る
+            $roomId = $request->input('roomId');
+            $userId = $request->input('userId'); // フロント側からホストの `userId` を送る
 
             // ルームを取得
             $room = Room::where('id', $roomId)->first();
@@ -230,7 +230,7 @@ class RoomController
             }
 
             // リクエストしたユーザーがホストであることを確認
-            if ($room->host_user_id !== $userId) {
+            if ($room->hostUserId !== $userId) {
                 return response()->json([
                     'message' => 'バトル開始の権限がありません',
                 ], 403);
@@ -261,8 +261,8 @@ class RoomController
     public function processAction(Request $request)
     {
         try {
-            $roomId = $request->input('room_id');
-            $userId = $request->input('user_id');
+            $roomId = $request->input('roomId');
+            $userId = $request->input('userId');
             $command = $request->input('command'); // "attack" or "defend"
 
             $room = Room::where('id', $roomId)->first();
@@ -271,13 +271,13 @@ class RoomController
                 return response()->json(['message' => 'バトルが進行中ではありません'], 400);
             }
 
-            if ($room->current_turn_user_id !== $userId) {
+            if ($room->currentTurnUserId !== $userId) {
                 return response()->json(['message' => 'あなたのターンではありません'], 403);
             }
 
             // ターンを切り替える
-            $nextTurnUserId = $room->host_user_id === $userId ? $room->guest_user_id : $room->host_user_id;
-            $room->update(['current_turn_user_id' => $nextTurnUserId]);
+            $nextTurnUserId = $room->hostUserId === $userId ? $room->guestUserId : $room->hostUserId;
+            $room->update(['currentTurnUserId' => $nextTurnUserId]);
 
             return response()->json(['message' => "{$userId} が {$command} を選択しました", 'room' => $room], 200);
         } catch (\Exception $e) {
@@ -288,7 +288,7 @@ class RoomController
     public function endBattle(Request $request)
     {
         try {
-            $roomId = $request->input('room_id');
+            $roomId = $request->input('roomId');
             $winner = $request->input('winner'); // "host" or "guest"
 
             // ルームを取得
@@ -308,10 +308,10 @@ class RoomController
             }
 
             // 勝者を保存（勝者のユーザーIDを設定）
-            $winnerUserId = $winner === 'host' ? $room->host_user_id : $room->guest_user_id;
+            $winnerUserId = $winner === 'host' ? $room->hostUserId : $room->guestUserId;
             $room->update([
                 'status' => 'finished',
-                'winner_id' => $winnerUserId, // 勝者のIDを記録（`rooms` テーブルに `winner_id` カラムが必要）
+                'winnerId' => $winnerUserId, // 勝者のIDを記録（`rooms` テーブルに `winnerId` カラムが必要）
             ]);
 
             return response()->json([

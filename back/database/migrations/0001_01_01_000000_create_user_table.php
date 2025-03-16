@@ -25,7 +25,7 @@ return new class extends Migration
 
         // Schema::create('sessions', function (Blueprint $table) {
         //     $table->string('id')->primary();
-        //     $table->string('user_id', 255)->nullable()->index();
+        //     $table->string('userId', 255)->nullable()->index();
         //     $table->string('ip_address', 45)->nullable();
         //     $table->text('user_agent')->nullable();
         //     $table->longText('payload');

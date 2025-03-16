@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 class RoomCharacter extends Model
 {
-    protected $table = 'room_character';
+    protected $table = 'roomCharacter';
 
     protected $keyType = 'string';
     public $incrementing = false;
@@ -16,8 +16,8 @@ class RoomCharacter extends Model
 
     protected $fillable = [
         'id',
-        'room_id',
-        'character_id',
+        'roomId',
+        'characterId',
         'level',
         'life',
         'power',

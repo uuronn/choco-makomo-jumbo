@@ -7,14 +7,14 @@ import Image from "next/image";
 
 type Room = {
 	id: string;
-	host_user_id: string;
-	guest_user_id: string;
+	hostUserId: string;
+	guestUserId: string;
 	status: string;
-	current_turn_user_id: string;
+	currentTurnUserId: string;
 };
 
 type Character = {
-	character_id: number;
+	characterId: number;
 	level: number;
 	character: {
 		id: number;
@@ -29,13 +29,13 @@ type Character = {
 };
 
 type SelectCharacter = {
-	character_id: number;
+	characterId: number;
 	level: number;
 	character: Character;
 };
 
 type ToggleCharacter = {
-	character_id: number;
+	characterId: number;
 };
 
 export default function RoomListPage() {
@@ -77,10 +77,10 @@ export default function RoomListPage() {
 	// キャラクター選択処理
 	const toggleCharacter = (character: Character) => {
 		if (
-			selectedCharacters.some((c) => c.character_id === character.character_id)
+			selectedCharacters.some((c) => c.characterId === character.characterId)
 		) {
 			setSelectedCharacters((prev) =>
-				prev.filter((c) => c.character_id !== character.character_id),
+				prev.filter((c) => c.characterId !== character.characterId),
 			);
 		} else {
 			if (selectedCharacters.length < 3) {
@@ -110,8 +110,8 @@ export default function RoomListPage() {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					guest_user_id: user.uid,
-					room_id: roomId,
+					guestUserId: user.uid,
+					roomId: roomId,
 					characters: selectedCharacters,
 				}),
 			});
@@ -123,7 +123,7 @@ export default function RoomListPage() {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					host_user_id: user.uid,
+					hostUserId: user.uid,
 					characters: selectedCharacters,
 				}),
 			});
@@ -145,17 +145,15 @@ export default function RoomListPage() {
 				{characters.map((char) => (
 					<button
 						type="button"
-						key={char.character_id}
+						key={char.characterId}
 						onClick={() => toggleCharacter(char)}
 						className={`p-4 border rounded-md ${
-							selectedCharacters.some(
-								(c) => c.character_id === char.character_id,
-							)
+							selectedCharacters.some((c) => c.characterId === char.characterId)
 								? "bg-blue-500 text-white"
 								: "bg-white"
 						}`}
 					>
-						<p>{char.character_id}</p>
+						<p>{char.characterId}</p>
 						<p>レベル: {char.level}</p>
 						<p>名前: {char.character.name}</p>
 						<Image

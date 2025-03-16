@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('room', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('host_user_id')->index();
-            $table->uuid('guest_user_id')->nullable()->index();
+            $table->uuid('hostUserId')->index();
+            $table->uuid('guestUserId')->nullable()->index();
             $table->string('status'); // ルームの状態（waiting, in_progress, finished など）
             $table->timestamps();
 
             // 外部キー制約（オプション）
-            $table->foreign('host_user_id')->references('id')->on('user')->onDelete('cascade');
-            $table->foreign('guest_user_id')->references('id')->on('user')->onDelete('set null'); // ゲストが抜けたらNULLにする
+            $table->foreign('hostUserId')->references('id')->on('user')->onDelete('cascade');
+            $table->foreign('guestUserId')->references('id')->on('user')->onDelete('set null'); // ゲストが抜けたらNULLにする
         });
     }
 

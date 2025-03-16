@@ -9,10 +9,10 @@ return new class extends Migration
 
     public function up()
     {
-        Schema::create('room_character', function (Blueprint $table) {
+        Schema::create('roomCharacter', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('room_id')->index();
-            $table->uuid('character_id');
+            $table->uuid('roomId')->index();
+            $table->uuid('characterId');
             $table->smallInteger('level');
             $table->smallInteger('life');
             $table->smallInteger('power');
@@ -20,12 +20,12 @@ return new class extends Migration
             $table->smallInteger('evasion');
             $table->timestamps();
 
-            $table->foreign('room_id')->references('id')->on('room')->onDelete('cascade');
+            $table->foreign('roomId')->references('id')->on('room')->onDelete('cascade');
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('room_character');
+        Schema::dropIfExists('roomCharacter');
     }
 };

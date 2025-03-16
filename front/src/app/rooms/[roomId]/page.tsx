@@ -7,10 +7,10 @@ import Link from "next/link";
 
 type Room = {
 	id: string;
-	host_user_id: string;
-	guest_user_id: string;
+	hostUserId: string;
+	guestUserId: string;
 	status: string;
-	current_turn_user_id: string;
+	currentTurnUserId: string;
 };
 
 export default function RoomDetailPage() {
@@ -34,7 +34,7 @@ export default function RoomDetailPage() {
 					{
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ user_id: user.uid }),
+						body: JSON.stringify({ userId: user.uid }),
 					},
 				);
 
@@ -47,7 +47,7 @@ export default function RoomDetailPage() {
 				setRoom(data.room);
 
 				// 自分のターンかどうかを確認
-				setIsMyTurn(data.room.current_turn_user_id === user.uid);
+				setIsMyTurn(data.room.currentTurnUserId === user.uid);
 			} catch (err) {
 				setError(err as string);
 			} finally {
@@ -67,7 +67,7 @@ export default function RoomDetailPage() {
 	const startBattle = async () => {
 		if (!user) return;
 
-		if (!room || room.host_user_id !== user.uid) {
+		if (!room || room.hostUserId !== user.uid) {
 			alert("ホストのみがバトルを開始できます");
 			return;
 		}
@@ -77,7 +77,7 @@ export default function RoomDetailPage() {
 			{
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ room_id: room.id, user_id: user.uid }),
+				body: JSON.stringify({ roomId: room.id, userId: user.uid }),
 			},
 		);
 
@@ -97,7 +97,7 @@ export default function RoomDetailPage() {
 			{
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ room_id: room.id, user_id: user.uid, command }),
+				body: JSON.stringify({ roomId: room.id, userId: user.uid, command }),
 			},
 		);
 
@@ -128,17 +128,17 @@ export default function RoomDetailPage() {
 					<strong>ルームID:</strong> {room.id}
 				</p>
 				<p>
-					<strong>ホスト:</strong> {room.host_user_id}
+					<strong>ホスト:</strong> {room.hostUserId}
 				</p>
 				<p>
-					<strong>ゲスト:</strong> {room.guest_user_id || "未参加"}
+					<strong>ゲスト:</strong> {room.guestUserId || "未参加"}
 				</p>
 				<p>
 					<strong>ステータス:</strong> {room.status}
 				</p>
 				<p>
 					<strong>現在のターン:</strong>{" "}
-					{room.current_turn_user_id === user.uid
+					{room.currentTurnUserId === user.uid
 						? "あなたのターン"
 						: "相手のターン"}
 				</p>

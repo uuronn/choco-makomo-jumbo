@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthProvider";
 import Image from "next/image";
 
 type Character = {
-	character_id: number;
+	characterId: number;
 	level: number;
 	life: number;
 	power: number;
@@ -22,7 +22,7 @@ type Character = {
 		base_speed: number;
 		skill: string;
 	};
-	user_id: string;
+	userId: string;
 };
 
 export default function CharacterListPage() {
@@ -55,7 +55,7 @@ export default function CharacterListPage() {
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 				{characterList.map((userCharacter: Character) => (
 					<div
-						key={`${userCharacter.user_id}-${userCharacter.character_id}`}
+						key={`${userCharacter.userId}-${userCharacter.characterId}`}
 						className="bg-white p-4 rounded-lg shadow"
 					>
 						<h2 className="text-xl font-semibold">

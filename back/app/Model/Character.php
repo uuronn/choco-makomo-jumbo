@@ -18,7 +18,7 @@ class Character extends Model
 
     protected $fillable = [
         'id', 'name', 'type', 'rarity', 'base_power', 'image_url', 'base_life', 'base_speed', 'base_evasion',
-        'active_skill_id', 'passive_skill_id', 'party_skill_id'
+        'activeSkillId', 'passiveSkillId', 'partySkillId'
     ];
 
     protected static function boot()
@@ -34,17 +34,17 @@ class Character extends Model
 
     public function activeSkill()
     {
-        return $this->belongsTo(Skill::class, 'active_skill_id');
+        return $this->belongsTo(Skill::class, 'activeSkillId');
     }
 
     public function passiveSkill()
     {
-        return $this->belongsTo(Skill::class, 'passive_skill_id');
+        return $this->belongsTo(Skill::class, 'passiveSkillId');
     }
 
     public function partySkill()
     {
-        return $this->belongsTo(Skill::class, 'party_skill_id');
+        return $this->belongsTo(Skill::class, 'partySkillId');
     }
 
     public function getSkillInstance($type)
