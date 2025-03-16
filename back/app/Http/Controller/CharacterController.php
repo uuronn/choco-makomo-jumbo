@@ -21,9 +21,9 @@ class CharacterController
     /**
      * 特定のキャラクターを取得
      */
-    public function find($id)
+    public function find($characterId)
     {
-        $character = Character::find($id);
+        $character = Character::find($characterId);
 
         if (!$character) return response()->json(['message' => 'Character not found'], 404);
 
