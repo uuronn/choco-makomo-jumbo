@@ -6,19 +6,23 @@ use App\Model\Character;
 use App\Model\Room;
 use App\Model\RoomCharacter;
 use App\Model\UserCharacter;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class RoomController
 {
-    public function index()
+    /**
+     * ルーム一覧を取得
+     */
+    public function list()
     {
         try {
             // ルーム一覧を取得（キャラクター情報を含めずに取得）
             $rooms = Room::select('id', 'hostUserId', 'guestUserId', 'status')->get();
 
             return response()->json($rooms, 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to retrieve rooms',
                 'error' => $e->getMessage(),
@@ -29,42 +33,34 @@ class RoomController
     /**
      * ルーム作成
      */
-    public function store(Request $request)
+    public function create(Request $request)
     {
         try {
             $existingRoom = Room::where('hostUserId', $request->hostUserId)->first();
 
-            if ($existingRoom) {
-                return response()->json(['message' => '既に作成したルームが存在します'], 400);
-            }
+            if ($existingRoom) return response()->json(['message' => '既に作成したルームが存在します'], 400);
 
             $characterIds = $request->input('characterIdList');
 
-            if (empty($characterIds)) {
-                return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
-            }
+            if (empty($characterIds)) return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
 
             $room = Room::create([
                 'id' => Str::uuid(),
                 'hostUserId' => $request->hostUserId,
-                'guestUserId' => $request->guestUserId ?? null,
+                'guestUserId' => null,
                 'status' => 'waiting',
             ]);
 
             foreach ($characterIds as $characterId) {
                 $character = Character::find($characterId);
 
-                if (!$character) {
-                    return response()->json(['message' => "Character {$characterId} not found"], 404);
-                }
+                if (!$character) return response()->json(['message' => "Character {$characterId} not found"], 404);
 
                 $userCharacter = UserCharacter::where('userId', $room->hostUserId)
                     ->where('characterId', $characterId)
                     ->first();
 
-                if (!$userCharacter) {
-                    return response()->json(['message' => "UserCharacter not found"], 404);
-                }
+                if (!$userCharacter) return response()->json(['message' => "UserCharacter not found"], 404);
 
                 RoomCharacter::create([
                     'roomId' => $room->id,
@@ -78,11 +74,8 @@ class RoomController
                 ]);
             }
 
-            return response()->json([
-                'room' => $room->load('roomCharacter'),
-                'message' => 'Room created successfully',
-            ], 201);
-        } catch (\Exception $e) {
+            return response()->json($room, 201);
+        } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to create room',
                 'error' => $e->getMessage(),
@@ -93,7 +86,6 @@ class RoomController
     public function join(Request $request)
     {
         try {
-            // 指定されたルームが存在するかチェック
             $room = Room::where('id', $request->roomId)->first();
 
             if (!$room) {
@@ -102,32 +94,27 @@ class RoomController
                 ], 404);
             }
 
-            // ルームの状態が "waiting" であることを確認
             if ($room->status !== 'waiting') {
                 return response()->json([
                     'message' => 'このルームには参加できません',
                 ], 400);
             }
 
-            // すでにゲストユーザーが設定されているか確認
             if ($room->guestUserId) {
                 return response()->json([
                     'message' => 'このルームにはすでにゲストが参加しています',
                 ], 400);
             }
 
-
-
-            $characterIds = $request->input('characterIdList');
+            $characterIds = $request->characterIds;
 
             if (empty($characterIds)) {
                 return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
             }
 
-            // ゲストユーザーを登録
             $room->update([
                 'guestUserId' => $request->guestUserId,
-                'status' => 'in_progress', // ルームの状態を変更
+                'status' => 'in_progress',
             ]);
 
             foreach ($characterIds as $characterId) {
@@ -157,11 +144,8 @@ class RoomController
                 ]);
             }
 
-            return response()->json([
-                'room' => $room->load('roomCharacter'),
-                'message' => 'Room joined successfully',
-            ], 200);
-        } catch (\Exception $e) {
+            return response()->json($room, 200);
+        } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to join room',
                 'error' => $e->getMessage(),
