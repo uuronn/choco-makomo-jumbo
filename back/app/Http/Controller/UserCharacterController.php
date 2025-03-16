@@ -74,11 +74,11 @@ class UserCharacterController
         try {
             // バリデーション
             $request->validate([
-                'user_id' => 'required|string|exists:users,id',
-                'character_id' => 'required|string|exists:character,id',
-                'life' => 'required|integer|min:0', // 増加値
-                'power' => 'required|integer|min:0', // 増加値
-                'speed' => 'required|integer|min:0', // 増加値
+                'user_id' => 'required',
+                'character_id' => 'required',
+                'life' => 'required|integer|min:0',
+                'power' => 'required|integer|min:0',
+                'speed' => 'required|integer|min:0',
             ]);
 
             // UserCharacterを取得
