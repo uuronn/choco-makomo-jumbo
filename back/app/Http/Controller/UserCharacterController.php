@@ -58,14 +58,13 @@ class UserCharacterController
     public function levelUp(Request $request)
     {
         try {
-            // TODO: 'userId'と'characterId'をクエリパラメータで受け取るように変更
-            // $request->validate([
-            //     'userId' => 'required|string|exists:user,id',
-            //     'characterId' => 'required|string|exists:character,id',
-            //     'life' => 'required|integer|min:0',
-            //     'power' => 'required|integer|min:0',
-            //     'speed' => 'required|integer|min:0',
-            // ]);
+            $request->validate([
+                'userId' => 'required|string|exists:user,id',
+                'characterId' => 'required|string|exists:character,id',
+                'life' => 'required|integer|min:0',
+                'power' => 'required|integer|min:0',
+                'speed' => 'required|integer|min:0',
+            ]);
 
             $userId = $request->route('userId');
             $characterId = $request->route('characterId');
