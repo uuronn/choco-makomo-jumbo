@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('room', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('host_user_id')->index(); // ホストのユーザーID
-            $table->uuid('guest_user_id')->nullable()->index(); // ゲストのユーザーID（対戦相手がいない場合はNULL）
+            $table->uuid('host_user_id')->index();
+            $table->uuid('guest_user_id')->nullable()->index();
             $table->string('status'); // ルームの状態（waiting, in_progress, finished など）
             $table->timestamps();
 
