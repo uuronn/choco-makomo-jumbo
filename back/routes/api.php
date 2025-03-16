@@ -7,22 +7,6 @@ use App\Http\Controller\UserCharacterController;
 use App\Http\Controller\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/rooms', [RoomController::class, 'index']);
-
-Route::post('/rooms', [RoomController::class, 'store']);
-
-Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
-
-Route::post('/rooms/join', [RoomController::class, 'join']);
-
-Route::post('/rooms/action', [RoomController::class, 'processAction']);
-
-Route::post('/rooms/end-battle', [RoomController::class, 'endBattle']);
-
-Route::post('/rooms/{roomId}', [RoomController::class, 'show']);
-
-Route::post('/rooms/simulate-battle', [RoomController::class, 'simulateBattle']);
-
 // ユーザーを作成する
 Route::post('/users', [UserController::class, 'create']);
 
@@ -52,3 +36,29 @@ Route::get('/characters/{characterId}', [CharacterController::class, 'find']);
 
 // ガチャを引く
 Route::post('/gacha', [GachaController::class, 'gacha']);
+
+
+// ルーム関連のAPI--------------------------------
+
+// ルーム一覧を取得する
+Route::get('/rooms', [RoomController::class, 'list']);
+
+// ルームを作成する
+Route::post('/rooms', [RoomController::class, 'create']);
+
+// ルームに参加する
+Route::post('/rooms/join', [RoomController::class, 'join']);
+
+
+
+
+Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
+
+
+Route::post('/rooms/action', [RoomController::class, 'processAction']);
+
+Route::post('/rooms/end-battle', [RoomController::class, 'endBattle']);
+
+Route::post('/rooms/{roomId}', [RoomController::class, 'show']);
+
+Route::post('/rooms/simulate-battle', [RoomController::class, 'simulateBattle']);
