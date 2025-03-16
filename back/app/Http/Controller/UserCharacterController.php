@@ -121,7 +121,6 @@ class UserCharacterController
                     'power' => $userCharacter->power,
                     'speed' => $userCharacter->speed,
                     'level' => $userCharacter->level,
-                    'updated_at' => now(),
                 ]);
 
             return $userCharacter;
