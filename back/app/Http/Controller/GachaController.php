@@ -25,8 +25,8 @@ class GachaController
                                     ->where('character_id', $character->id)
                                     ->first();
 
-        // すでに持っている場合、ポイントを加算
         if ($userCharacter) {
+            // すでに持っている場合、ポイントを加算
             $additionalPoint = 5;
             $this->updatePointInternal($user, $additionalPoint);
 
@@ -44,6 +44,7 @@ class GachaController
             'life' => $character->base_life,
             'power' => $character->base_power,
             'speed' => $character->base_speed,
+            'evasion' => $character->base_evasion,
             'level' => 1,
         ]);
 
@@ -59,52 +60,52 @@ class GachaController
     }
 
     public function characterList($id)
-{
-    $user = User::find($id);
-    if (!$user) {
-        return response()->json(['error' => 'User not found'], 404);
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $userCharacters = UserCharacter::where('user_id', $user->id)
+            ->with('character')
+            ->get();
+
+        return response()->json($userCharacters);
     }
 
-    $userCharacters = UserCharacter::where('user_id', $user->id)
-        ->with('character')
-        ->get();
+    public function trainCharacter(Request $request)
+    {
+        $userId = $request->input('user_id');
+        $characterId = $request->input('character_id');
+        $powerIncrement = $request->input('power', 0); // デフォルト0
+        $lifeIncrement = $request->input('life', 0);   // デフォルト0
+        $speedIncrement = $request->input('speed', 0); // デフォルト0
 
-    return response()->json($userCharacters);
-}
+        $userCharacter = UserCharacter::where('user_id', $userId)
+            ->where('character_id', $characterId)
+            ->first();
 
-public function trainCharacter(Request $request)
-{
-    $userId = $request->input('user_id');
-    $characterId = $request->input('character_id');
-    $powerIncrement = $request->input('power', 0); // デフォルト0
-    $lifeIncrement = $request->input('life', 0);   // デフォルト0
-    $speedIncrement = $request->input('speed', 0); // デフォルト0
+        if (!$userCharacter) {
+            return response()->json(['error' => 'キャラクターが見つかりません'], 404);
+        }
 
-    $userCharacter = UserCharacter::where('user_id', $userId)
-        ->where('character_id', $characterId)
-        ->first();
+        $userCharacter->power = ($userCharacter->power ?? 0) + $powerIncrement;
+        $userCharacter->life = ($userCharacter->life ?? 0) + $lifeIncrement;
+        $userCharacter->speed = ($userCharacter->speed ?? 0) + $speedIncrement;
 
-    if (!$userCharacter) {
-        return response()->json(['error' => 'キャラクターが見つかりません'], 404);
-    }
+        // 複合主キーで直接更新
+        UserCharacter::where('user_id', $userId)
+            ->where('character_id', $characterId)
+            ->update([
+                'power' => $userCharacter->power,
+                'life' => $userCharacter->life,
+                'speed' => $userCharacter->speed,
+                'updated_at' => now(), // タイムスタンプを手動で更新
+            ]);
 
-    $userCharacter->power = ($userCharacter->power ?? 0) + $powerIncrement;
-    $userCharacter->life = ($userCharacter->life ?? 0) + $lifeIncrement;
-    $userCharacter->speed = ($userCharacter->speed ?? 0) + $speedIncrement;
-
-    // 複合主キーで直接更新
-    UserCharacter::where('user_id', $userId)
-        ->where('character_id', $characterId)
-        ->update([
-            'power' => $userCharacter->power,
-            'life' => $userCharacter->life,
-            'speed' => $userCharacter->speed,
-            'updated_at' => now(), // タイムスタンプを手動で更新
+        return response()->json([
+            'message' => 'ステータスを強化しました！',
+            'userCharacter' => $userCharacter, // characterはレスポンス用に残す
         ]);
-
-    return response()->json([
-        'message' => 'ステータスを強化しました！',
-        'userCharacter' => $userCharacter, // characterはレスポンス用に残す
-    ]);
-}
+    }
 }
