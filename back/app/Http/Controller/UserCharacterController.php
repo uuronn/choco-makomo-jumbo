@@ -116,11 +116,12 @@ class UserCharacterController
      */
     public function destroy($userId)
     {
-        $deletedCount = UserCharacter::where('userId', $userId)->destroy();
+        $deletedCount = UserCharacter::where('userId', $userId)->delete();
 
         if ($deletedCount > 0) {
             return response()->json([
-                'message' => 'UserCharacters deleted successfully'
+                'message' => 'UserCharacters deleted successfully',
+                'deleted_count' => $deletedCount
             ], 200);
         } else {
             return response()->json([
