@@ -5,6 +5,7 @@ namespace App\Http\Controller;
 use App\Model\User;
 use App\Model\UserCharacter;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class UserCharacterController
 {
@@ -69,17 +70,17 @@ class UserCharacterController
      * 指定されたユーザーのキャラクターをレベルアップ
      * 各ステータスを個別に増加させ、levelは独立して100まで
      */
-    public function levelUp($request)
+    public function levelUp(Request $request)
     {
         try {
             // バリデーション
-            // $request->validate([
-            //     'user_id' => 'required',
-            //     'character_id' => 'required',
-            //     'life' => 'required|integer|min:0',
-            //     'power' => 'required|integer|min:0',
-            //     'speed' => 'required|integer|min:0',
-            // ]);
+            $request->validate([
+                'user_id' => 'required|string|exists:users,id',
+                'character_id' => 'required|string|exists:character,id',
+                'life' => 'required|integer|min:0', // 増加値
+                'power' => 'required|integer|min:0', // 増加値
+                'speed' => 'required|integer|min:0', // 増加値
+            ]);
 
             // UserCharacterを取得
             $userCharacter = UserCharacter::where('user_id', $request->user_id)
