@@ -2,24 +2,22 @@
 
 namespace App\Http\Controller;
 
+use App\Model\Character;
 use App\Model\Room;
 use App\Model\RoomCharacter;
+use App\Model\UserCharacter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class RoomController
 {
-
     public function index()
     {
         try {
             // ルーム一覧を取得（キャラクター情報を含めずに取得）
             $rooms = Room::select('id', 'host_user_id', 'guest_user_id', 'status')->get();
 
-            return response()->json([
-                'rooms' => $rooms,
-                'message' => 'Rooms retrieved successfully',
-            ], 200);
+            return response()->json($rooms, 200);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to retrieve rooms',
@@ -34,16 +32,11 @@ class RoomController
     public function store(Request $request)
     {
         try {
-            // すでに同じホストユーザーIDでルームが存在するかチェック
             $existingRoom = Room::where('host_user_id', $request->host_user_id)->first();
-
             if ($existingRoom) {
-                return response()->json([
-                    'message' => '既に作成したルームが存在します',
-                ], 400);
+                return response()->json(['message' => '既に作成したルームが存在します'], 400);
             }
 
-            // ルーム作成
             $room = Room::create([
                 'id' => Str::uuid(),
                 'host_user_id' => $request->host_user_id,
@@ -51,15 +44,36 @@ class RoomController
                 'status' => 'waiting',
             ]);
 
-            // ルームキャラクターの作成
-            foreach ($request->characters as $characterData) {
+            $characterIds = $request->input('character_id_list');
+
+            if (empty($characterIds)) {
+                return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
+            }
+
+            foreach ($characterIds as $characterId) {
+                $character = Character::find($characterId);
+
+                if (!$character) {
+                    return response()->json(['message' => "Character {$characterId} not found"], 404);
+                }
+
+                $userCharacter = UserCharacter::where('user_id', $room->guest_user_id)
+                    ->where('character_id', $characterId)
+                    ->first();
+
+                if (!$userCharacter) {
+                    return response()->json(['message' => "UserCharacter not found"], 404);
+                }
+
                 RoomCharacter::create([
                     'room_id' => $room->id,
-                    'character_id' => $characterData['character_id'],
-                    'level' => $characterData['level'],
-                    'life' => $characterData['life'],
-                    'power' => $characterData['power'],
-                    'speed' => $characterData['speed'],
+                    'character_id' => $characterId,
+                    'user_id' => $room->guest_user_id,
+                    'level' => $userCharacter->level,
+                    'life' => $userCharacter->life,
+                    'power' => $userCharacter->power,
+                    'speed' => $userCharacter->speed,
+                    'evasion' =>  $character->base_evasion,
                 ]);
             }
 
@@ -107,18 +121,37 @@ class RoomController
                 'status' => 'in_progress', // ルームの状態を変更
             ]);
 
-            // ルームキャラクターの作成（ゲストユーザーのキャラクター情報がある場合）
-            if (!empty($request->characters)) {
-                foreach ($request->characters as $characterData) {
-                    RoomCharacter::create([
-                        'room_id' => $room->id,
-                        'character_id' => $characterData['character_id'],
-                        'level' => $characterData['level'],
-                        'life' => $characterData['life'],
-                        'power' => $characterData['power'],
-                        'speed' => $characterData['speed'],
-                    ]);
+            $characterIds = $request->input('character_id_list');
+
+            if (empty($characterIds)) {
+                return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
+            }
+
+            foreach ($characterIds as $characterId) {
+                $character = Character::find($characterId);
+
+                if (!$character) {
+                    return response()->json(['message' => "Character {$characterId} not found"], 404);
                 }
+
+                $userCharacter = UserCharacter::where('user_id', $room->guest_user_id)
+                    ->where('character_id', $characterId)
+                    ->first();
+
+                if (!$userCharacter) {
+                    return response()->json(['message' => "UserCharacter not found"], 404);
+                }
+
+                RoomCharacter::create([
+                    'room_id' => $room->id,
+                    'character_id' => $characterId,
+                    'user_id' => $room->guest_user_id,
+                    'level' => $userCharacter->level,
+                    'life' => $userCharacter->life,
+                    'power' => $userCharacter->power,
+                    'speed' => $userCharacter->speed,
+                    'evasion' => $character->base_evasion,
+                ]);
             }
 
             return response()->json([
