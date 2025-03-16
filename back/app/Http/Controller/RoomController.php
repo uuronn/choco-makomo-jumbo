@@ -33,8 +33,15 @@ class RoomController
     {
         try {
             $existingRoom = Room::where('host_user_id', $request->host_user_id)->first();
+
             if ($existingRoom) {
                 return response()->json(['message' => '既に作成したルームが存在します'], 400);
+            }
+
+            $characterIds = $request->input('character_id_list');
+
+            if (empty($characterIds)) {
+                return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
             }
 
             $room = Room::create([
@@ -43,12 +50,6 @@ class RoomController
                 'guest_user_id' => $request->guest_user_id ?? null,
                 'status' => 'waiting',
             ]);
-
-            $characterIds = $request->input('character_id_list');
-
-            if (empty($characterIds)) {
-                return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
-            }
 
             foreach ($characterIds as $characterId) {
                 $character = Character::find($characterId);
