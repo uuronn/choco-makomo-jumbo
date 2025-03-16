@@ -58,7 +58,7 @@ class RoomController
                     return response()->json(['message' => "Character {$characterId} not found"], 404);
                 }
 
-                $userCharacter = UserCharacter::where('user_id', $room->guest_user_id)
+                $userCharacter = UserCharacter::where('user_id', $room->host_user_id)
                     ->where('character_id', $characterId)
                     ->first();
 
