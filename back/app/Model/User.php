@@ -14,6 +14,8 @@ class User extends Authenticatable
     protected $primaryKey = 'id';
 
     public $incrementing = false;
+    protected $hidden = ['created_at', 'updated_at'];
+
     protected $keyType = 'string';
 
     protected $fillable = [
