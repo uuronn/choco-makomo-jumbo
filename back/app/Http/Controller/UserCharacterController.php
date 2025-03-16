@@ -4,18 +4,22 @@ namespace App\Http\Controller;
 
 use App\Model\User;
 use App\Model\UserCharacter;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class UserCharacterController
 {
-    public function characterList($id)
+    /**
+     * 特定のユーザーのキャラクター一覧を取得
+     */
+    public function list($userId)
     {
-        $user = User::find($id);
+        $user = User::find($userId);
 
         if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            return response()->json(['message' => 'User not found'], 404);
         }
 
         $userCharacters = UserCharacter::where('user_id', $user->id)
@@ -27,14 +31,14 @@ class UserCharacterController
             $character = $userCharacter->character;
 
             return [
-                // UserCharacter由来（変動値）
+                // UserCharacter（変動値）
                 'user_id' => $userCharacter->user_id,
                 'character_id' => $userCharacter->character_id,
                 'level' => $userCharacter->level,
                 'life' => $userCharacter->life,
                 'power' => $userCharacter->power,
                 'speed' => $userCharacter->speed,
-                // Character由来（固定値）
+                // Character（固定値）
                 'name' => $character->name,
                 'type' => $character->type,
                 'rarity' => $character->rarity,
@@ -50,90 +54,79 @@ class UserCharacterController
     }
 
     /**
-     * 指定されたユーザーのキャラクターを全削除
+     * 特定のユーザーのキャラクターをレベルアップ
      */
-    public function destroy($userId, $characterId)
+    public function levelUp(Request $request)
     {
-        $deleted = UserCharacter::deleteUserCharacter($userId, $characterId);
+        try {
+            $request->validate([
+                'user_id' => 'required|string|exists:user,id',
+                'character_id' => 'required|string|exists:character,id',
+                'life' => 'required|integer|min:0',
+                'power' => 'required|integer|min:0',
+                'speed' => 'required|integer|min:0',
+            ]);
 
-        if ($deleted) {
+            $userId = $request->query('userId');
+            $characterId = $request->query('characterId');
+
+            $userCharacter = UserCharacter::where('user_id', $userId)
+                ->where('character_id', $characterId)
+                ->first();
+
+            if (!$userCharacter) return response()->json(['message' => 'UserCharacter not found'], 404);
+
+            // 現在のレベルが100未満かチェック（増加後の値も考慮）
+            $life = $request->life;
+            $power = $request->power;
+            $speed = $request->speed;
+            $totalIncrease = $life + $power + $speed;
+
+            if ($userCharacter->level + $totalIncrease > 100) return response()->json(['message' => 'レベルが最大値（100）を超えます'], 400);
+
+            // レベルアップ処理
+            $updated = DB::transaction(function () use ($userCharacter, $life, $power, $speed, $totalIncrease) {
+                $userCharacter->life += $life;
+                $userCharacter->power += $power;
+                $userCharacter->speed += $speed;
+                $userCharacter->level += $totalIncrease;
+
+                UserCharacter::where('user_id', $userCharacter->user_id)
+                    ->where('character_id', $userCharacter->character_id)
+                    ->update([
+                        'life' => $userCharacter->life,
+                        'power' => $userCharacter->power,
+                        'speed' => $userCharacter->speed,
+                        'level' => $userCharacter->level,
+                    ]);
+
+                return $userCharacter;
+            });
+
+            return response()->json($updated, 200);
+        } catch (Exception $e) {
             return response()->json([
-                'message' => 'UserCharacter deleted successfully'
-            ], 200);
-        } else {
-            return response()->json([
-                'message' => 'UserCharacter not found'
-            ], 404);
+                'message' => 'Failed to level up character',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 
     /**
-     * 指定されたユーザーのキャラクターをレベルアップ
-     * 各ステータスを個別に増加させ、levelは独立して100まで
+     * 特定のユーザーのキャラクターを全削除
      */
-    public function levelUp(Request $request)
-{
-    try {
-        // バリデーション（コメントアウトされているので、そのまま維持）
-        $request->validate([
-            'user_id' => 'required|string|exists:user,id',
-            'character_id' => 'required|string|exists:character,id',
-            'life' => 'required|integer|min:0',
-            'power' => 'required|integer|min:0',
-            'speed' => 'required|integer|min:0',
-        ]);
+    public function destroy($userId)
+    {
+        $deletedCount = UserCharacter::where('user_id', $userId)->delete();
 
-        // UserCharacterを取得
-        $userCharacter = UserCharacter::where('user_id', $request->user_id)
-            ->where('character_id', $request->character_id)
-            ->first();
-
-        if (!$userCharacter) {
-            return response()->json(['message' => 'UserCharacter not found'], 404);
+        if ($deletedCount > 0) {
+            return response()->json([
+                'message' => 'UserCharacters deleted successfully'
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'UserCharacters not found'
+            ], 404);
         }
-
-        // 現在のレベルが100未満かチェック（増加後の値も考慮）
-        $life = (int)$request->input('life');
-        $power = (int)$request->input('power');
-        $speed = (int)$request->input('speed');
-        $totalIncrease = $life + $power + $speed;
-
-        if ($userCharacter->level + $totalIncrease > 100) {
-            return response()->json(['message' => 'レベルが最大値（100）を超えます'], 400);
-        }
-
-        // レベルアップ処理
-        $updated = DB::transaction(function () use ($userCharacter, $life, $power, $speed, $totalIncrease) {
-            // 属性を更新
-            $userCharacter->life += $life;
-            $userCharacter->power += $power;
-            $userCharacter->speed += $speed;
-            $userCharacter->level += $totalIncrease;
-
-            // 保存前にデバッグ用ログ
-            Log::info('Before save:', $userCharacter->toArray());
-
-            // save() の代わりに update() を使用
-            UserCharacter::where('user_id', $userCharacter->user_id)
-                ->where('character_id', $userCharacter->character_id)
-                ->update([
-                    'life' => $userCharacter->life,
-                    'power' => $userCharacter->power,
-                    'speed' => $userCharacter->speed,
-                    'level' => $userCharacter->level,
-                ]);
-
-            return $userCharacter;
-        });
-
-        return response()->json($updated, 200);
-    } catch (\Exception $e) {
-        // エラー詳細をログに記録
-        Log::error('Level up failed: ' . $e->getMessage(), ['exception' => $e]);
-        return response()->json([
-            'message' => 'Failed to level up character',
-            'error' => $e->getMessage(),
-        ], 500);
     }
-}
 }
