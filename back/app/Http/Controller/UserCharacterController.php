@@ -58,22 +58,22 @@ class UserCharacterController
     public function levelUp(Request $request)
     {
         try {
+            $userId = $request->route('userId');
+            $characterId = $request->route('characterId');
+
+            if (!$userId || !$characterId) return response()->json(['message' => 'Missing userId or characterId'], 400);
+
             $request->validate([
-                'userId' => 'required|string|exists:user,id',
-                'characterId' => 'required|string|exists:character,id',
                 'life' => 'required|integer|min:0',
                 'power' => 'required|integer|min:0',
                 'speed' => 'required|integer|min:0',
             ]);
 
-            $userId = $request->route('userId');
-            $characterId = $request->route('characterId');
-
             $userCharacter = UserCharacter::where('userId', $userId)
                 ->where('characterId', $characterId)
                 ->first();
 
-            if (!$userCharacter) return response()->json(['message' => 'UserCharacter not found', 'userId' => $userId, 'characterId' => $characterId], 404);
+            if (!$userCharacter) return response()->json(['message' => 'UserCharacter not found'], 404);
 
             // 現在のレベルが100未満かチェック（増加後の値も考慮）
             $life = $request->life;
