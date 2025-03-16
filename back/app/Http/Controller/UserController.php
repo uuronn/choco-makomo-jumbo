@@ -3,6 +3,7 @@
 namespace App\Http\Controller;
 
 use App\Model\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -11,15 +12,15 @@ class UserController
     /**
      * すべてのユーザーを取得
      */
-    public function index(): JsonResponse
+    public function all(): JsonResponse
     {
         return response()->json(User::all());
     }
 
     /**
-     * 特定のユーザーデータを作成
+     * ユーザーを作成
      */
-    public function store(Request $request)
+    public function create(Request $request)
     {
         try {
             $user = User::create([
@@ -29,14 +30,11 @@ class UserController
                 'point' => $request->point
             ]);
 
-            return response()->json([
-                'message' => 'User created successfully',
-                'data' => $user
-            ], 201);
+            return response()->json($user, 201);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
-                'message' => 'Error creating user',
+                'message' => 'ユーザーが作成されませんでした',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -45,47 +43,31 @@ class UserController
     /**
      * ユーザーが存在するか確認
      */
-    public function checkUser($id)
+    public function checkUser(Request $request)
     {
-        // ユーザーを検索
-        $user = User::find($id);
+        $user = User::find($request->user_id);
 
-        // ユーザーが存在しない場合、404 Not Foundを返す
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
+        if (!$user) return response()->json(['message' => 'User not found'], 404);
 
-        // ユーザーが存在する場合、200 OKを返す
         return response()->json(['message' => 'User exists'], 200);
     }
 
     /**
      * ユーザーのpointを更新
      */
-    public function updatePoint(Request $request, $id)
+    public function updatePoint(Request $request)
     {
-        // ユーザーを検索
-        $user = User::find($id);
+        $user = User::find($request->user_id);
 
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
+        if (!$user) return response()->json(['message' => 'User not found'], 404);
 
-        $additionalPoint = $request->input('point');
+        $additionalPoint = $request->point;
 
-        // バリデーション
-        if (!is_numeric($additionalPoint)) {
-            return response()->json(['error' => 'Point must be a number'], 422);
-        }
+        if (!is_numeric($additionalPoint)) return response()->json(['message' => 'Point must be a number'], 422);
 
-        // 現在のpointに追加
         $user->point = $user->point + (int)$additionalPoint;
         $user->save();
 
-        return response()->json([
-            'message' => 'Point added successfully',
-            'user' => $user
-        ], 200);
+        return response()->json($user, 200);
     }
 }
-
