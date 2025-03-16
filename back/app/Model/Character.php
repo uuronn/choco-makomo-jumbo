@@ -14,6 +14,8 @@ class Character extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     protected $fillable = [
         'id', 'name', 'type', 'rarity', 'base_power', 'image_url', 'base_life', 'base_speed', 'base_evasion',
         'active_skill_id', 'passive_skill_id', 'party_skill_id'
