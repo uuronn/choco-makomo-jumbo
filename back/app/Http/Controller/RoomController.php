@@ -116,17 +116,19 @@ class RoomController
                 ], 400);
             }
 
-            // ゲストユーザーを登録
-            $room->update([
-                'guest_user_id' => $request->guest_user_id,
-                'status' => 'in_progress', // ルームの状態を変更
-            ]);
+
 
             $characterIds = $request->input('character_id_list');
 
             if (empty($characterIds)) {
                 return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
             }
+
+            // ゲストユーザーを登録
+            $room->update([
+                'guest_user_id' => $request->guest_user_id,
+                'status' => 'in_progress', // ルームの状態を変更
+            ]);
 
             foreach ($characterIds as $characterId) {
                 $character = Character::find($characterId);
