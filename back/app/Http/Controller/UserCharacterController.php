@@ -73,13 +73,13 @@ class UserCharacterController
     {
         try {
             // バリデーション
-            $request->validate([
-                'user_id' => 'required',
-                'character_id' => 'required',
-                'life' => 'required|integer|min:0',
-                'power' => 'required|integer|min:0',
-                'speed' => 'required|integer|min:0',
-            ]);
+            // $request->validate([
+            //     'user_id' => 'required',
+            //     'character_id' => 'required',
+            //     'life' => 'required|integer|min:0',
+            //     'power' => 'required|integer|min:0',
+            //     'speed' => 'required|integer|min:0',
+            // ]);
 
             // UserCharacterを取得
             $userCharacter = UserCharacter::where('user_id', $request->user_id)
