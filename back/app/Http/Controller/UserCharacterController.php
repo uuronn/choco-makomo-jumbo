@@ -6,6 +6,7 @@ use App\Model\User;
 use App\Model\UserCharacter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class UserCharacterController
 {
@@ -71,71 +72,62 @@ class UserCharacterController
      * 各ステータスを個別に増加させ、levelは独立して100まで
      */
     public function levelUp(Request $request)
-    {
-        try {
-            // バリデーション
-            $request->validate([
-                'user_id' => 'required|string|exists:user,id',
-                'character_id' => 'required|string|exists:character,id',
-                'life' => 'required|integer|min:0', // 増加値
-                'power' => 'required|integer|min:0', // 増加値
-                'speed' => 'required|integer|min:0', // 増加値
-            ]);
+{
+    try {
+        // バリデーション
+        $request->validate([
+            'user_id' => 'required|string|exists:user,id',
+            'character_id' => 'required|string|exists:character,id',
+            'life' => 'required|integer|min:0',
+            'power' => 'required|integer|min:0',
+            'speed' => 'required|integer|min:0',
+        ]);
 
-            // UserCharacterを取得
-            $userCharacter = UserCharacter::where('user_id', $request->user_id)
-                                        ->where('character_id', $request->character_id)
-                                        ->first();
+        // UserCharacterを取得
+        $userCharacter = UserCharacter::where('user_id', $request->user_id)
+            ->where('character_id', $request->character_id)
+            ->first();
 
-            if (!$userCharacter) {
-                return response()->json([
-                    'message' => 'UserCharacter not found'
-                ], 404);
-            }
-
-            // 現在のレベルが100未満かチェック
-            if ($userCharacter->level >= 100) {
-                return response()->json([
-                    'message' => 'レベルが最大値（100）に達しています'
-                ], 400);
-            }
-
-            // レベルアップ処理
-            $updated = DB::transaction(function () use ($userCharacter, $request) {
-                // レベルを1増やす
-                // $userCharacter->level += 1;
-
-                // ステータスを増加（上限なし）
-                // $userCharacter->life += $request->life;
-                // $userCharacter->power += $request->power;
-                // $userCharacter->speed += $request->speed;
-
-                $life = $request->input('life');
-                $power = $request->input('power');
-                $speed = $request->input('speed');
-
-                $totalIncrease = (int)$life + (int)$power + (int)$speed;
-
-                $userCharacter->life += (int)$life;
-                $userCharacter->power += (int)$power;
-                $userCharacter->speed += (int)$speed;
-
-                // レベルも合計値分増加
-                $userCharacter->level += $totalIncrease;
-                $userCharacter->save();
-
-                return $userCharacter;
-            });
-
-            return response()->json([
-                'user_character' => $updated,
-                'message' => 'Character leveled up successfully'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to level up character',
-                'error' => $e->getMessage(),
-            ], 500);
+        if (!$userCharacter) {
+            return response()->json(['message' => 'UserCharacter not found'], 404);
         }
+
+        // 現在のレベルが100未満かチェック（増加後の値も考慮）
+        $life = (int)$request->input('life');
+        $power = (int)$request->input('power');
+        $speed = (int)$request->input('speed');
+        $totalIncrease = $life + $power + $speed;
+
+        if ($userCharacter->level + $totalIncrease > 100) {
+            return response()->json(['message' => 'レベルが最大値（100）を超えます'], 400);
+        }
+
+        // レベルアップ処理
+        $updated = DB::transaction(function () use ($userCharacter, $life, $power, $speed, $totalIncrease) {
+            $userCharacter->life += $life;
+            $userCharacter->power += $power;
+            $userCharacter->speed += $speed;
+            $userCharacter->level += $totalIncrease;
+
+            // 保存前にデバッグ用ログ
+            Log::info('Before save:', $userCharacter->toArray());
+
+            $userCharacter->save();
+
+            return $userCharacter;
+        });
+
+        return response()->json([
+            'user_character' => $updated,
+            'message' => 'Character leveled up successfully'
+        ], 200);
+    } catch (\Exception $e) {
+        // エラー詳細をログに記録
+        Log::error('Level up failed: ' . $e->getMessage(), ['exception' => $e]);
+        return response()->json([
+            'message' => 'Failed to level up character',
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
 }
