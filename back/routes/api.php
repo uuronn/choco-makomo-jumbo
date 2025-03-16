@@ -25,7 +25,7 @@ Route::post('/users/{id}/gacha', [GachaController::class, 'gacha']);
 
 Route::get('/users/{id}/characters', [GachaController::class, 'characterList']);
 
-Route::put('/characters/training', [UserCharacterController::class, 'levelUp']);
+Route::put('/training', [UserCharacterController::class, 'levelUp']);
 
 Route::get('/rooms', [RoomController::class, 'index']);
 

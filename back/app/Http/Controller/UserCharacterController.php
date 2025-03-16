@@ -126,10 +126,7 @@ class UserCharacterController
             return $userCharacter;
         });
 
-        return response()->json([
-            'user_character' => $updated,
-            'message' => 'Character leveled up successfully'
-        ], 200);
+        return response()->json($updated, 200);
     } catch (\Exception $e) {
         // エラー詳細をログに記録
         Log::error('Level up failed: ' . $e->getMessage(), ['exception' => $e]);

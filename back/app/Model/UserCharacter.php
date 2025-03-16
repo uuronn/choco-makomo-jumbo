@@ -12,6 +12,8 @@ class UserCharacter extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     protected $fillable = [
         'user_id', 'character_id', 'level', 'life', 'power', 'speed', 'evasion'
     ];
