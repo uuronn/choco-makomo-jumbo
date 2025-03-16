@@ -9,13 +9,11 @@ class CharacterController
     /**
      * すべてのキャラクターを取得
      */
-    public function index()
+    public function all()
     {
         $characterList = Character::all();
 
-        if (!$characterList) {
-            return response()->json(['error' => 'CharacterList not found'], 404);
-        }
+        if (!$characterList) return response()->json(['error' => 'CharacterList not found'], 404);
 
         return response()->json($characterList, 200);
     }
@@ -23,15 +21,12 @@ class CharacterController
     /**
      * 特定のキャラクターを取得
      */
-    public function show($id)
+    public function find($id)
     {
         $character = Character::find($id);
 
-        if (!$character) {
-            return response()->json(['error' => 'Character not found'], 404);
-        }
+        if (!$character) return response()->json(['error' => 'Character not found'], 404);
 
         return response()->json($character, 200);
     }
-
 }

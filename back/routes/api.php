@@ -36,11 +36,13 @@ Route::post('/rooms/{roomId}', [RoomController::class, 'show']);
 
 Route::post('/rooms/simulate-battle', [RoomController::class, 'simulateBattle']);
 
-Route::get('/characters', [CharacterController::class, 'index']); // すべてのキャラクターを取得
-
-Route::get('/characters/{id}', [CharacterController::class, 'show']); // 特定のキャラクターを取得
-
 Route::delete('/users/{userId}/character', [UserCharacterController::class, 'destroy']);
 
 // ユーザーを作成するPOSTルート
 Route::post('/users', [UserController::class, 'store'])->withoutMiddleware([VerifyCsrfToken::class]);
+
+// すべてのキャラクターを取得する
+Route::get('/characters', [CharacterController::class, 'all']);
+
+// 特定のキャラクターを取得する
+Route::get('/characters/{characterId}', [CharacterController::class, 'find']);
