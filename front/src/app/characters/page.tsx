@@ -4,10 +4,31 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
 import Image from "next/image";
 
+type Character = {
+	character_id: number;
+	level: number;
+	life: number;
+	power: number;
+	speed: number;
+
+	character: {
+		id: number;
+		name: string;
+		type: string;
+		image_url: string;
+		rarity: number;
+		base_life: number;
+		base_power: number;
+		base_speed: number;
+		skill: string;
+	};
+	user_id: string;
+};
+
 export default function CharacterListPage() {
 	const { user } = useAuth();
 
-	const [characterList, setCharacterList] = useState<any>([]);
+	const [characterList, setCharacterList] = useState<Character[]>([]);
 
 	useEffect(() => {
 		if (user) {
@@ -32,7 +53,7 @@ export default function CharacterListPage() {
 			<h1 className="text-3xl font-bold mb-6">キャラ一覧</h1>
 
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-				{characterList.map((userCharacter: any) => (
+				{characterList.map((userCharacter: Character) => (
 					<div
 						key={`${userCharacter.user_id}-${userCharacter.character_id}`}
 						className="bg-white p-4 rounded-lg shadow"

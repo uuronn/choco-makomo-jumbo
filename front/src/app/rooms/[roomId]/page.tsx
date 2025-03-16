@@ -5,22 +5,23 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthProvider";
 import Link from "next/link";
 
+type Room = {
+	id: string;
+	host_user_id: string;
+	guest_user_id: string;
+	status: string;
+	current_turn_user_id: string;
+};
+
 export default function RoomDetailPage() {
 	const { user } = useAuth();
 	const { roomId } = useParams();
-	const router = useRouter();
 
-	console.info("room_id", roomId);
-
-	const [room, setRoom] = useState<any>(null);
+	const [room, setRoom] = useState<Room | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [battleLog, setBattleLog] = useState<string[]>([]);
 	const [isMyTurn, setIsMyTurn] = useState(false);
-	const [battleState, setBattleState] = useState<
-		"idle" | "in_progress" | "finished"
-	>("idle");
-	const [winner, setWinner] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (!roomId || !user) return;
@@ -47,8 +48,8 @@ export default function RoomDetailPage() {
 
 				// 自分のターンかどうかを確認
 				setIsMyTurn(data.room.current_turn_user_id === user.uid);
-			} catch (err: any) {
-				setError(err.message);
+			} catch (err) {
+				setError(err as string);
 			} finally {
 				setLoading(false);
 			}
@@ -89,7 +90,7 @@ export default function RoomDetailPage() {
 
 	// コマンドを送信する
 	const sendCommand = async (command: "attack" | "defend") => {
-		if (!room || !isMyTurn) return;
+		if (!room || !isMyTurn || !user) return;
 
 		const res = await fetch(
 			`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/action`,
@@ -148,12 +149,14 @@ export default function RoomDetailPage() {
 				<div className="mt-4">
 					<h2 className="text-xl font-bold">コマンドを選択</h2>
 					<button
+						type="button"
 						className="bg-red-500 text-white px-4 py-2 rounded-md m-2"
 						onClick={() => sendCommand("attack")}
 					>
 						攻撃する
 					</button>
 					<button
+						type="button"
 						className="bg-blue-500 text-white px-4 py-2 rounded-md m-2"
 						onClick={() => sendCommand("defend")}
 					>
@@ -166,7 +169,7 @@ export default function RoomDetailPage() {
 			<div className="bg-gray-800 text-white p-4 rounded-md mt-6 w-full max-w-md">
 				<h2 className="text-xl font-bold">バトルログ</h2>
 				{battleLog.map((log, index) => (
-					<p key={index}>{log}</p>
+					<p key={`${index + log}`}>{log}</p>
 				))}
 			</div>
 

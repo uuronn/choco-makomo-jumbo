@@ -5,13 +5,48 @@ import { useAuth } from "../context/AuthProvider";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+type Room = {
+	id: string;
+	host_user_id: string;
+	guest_user_id: string;
+	status: string;
+	current_turn_user_id: string;
+};
+
+type Character = {
+	character_id: number;
+	level: number;
+	character: {
+		id: number;
+		name: string;
+		image_url: string;
+		rarity: number;
+		base_life: number;
+		base_power: number;
+		base_speed: number;
+		skill: string;
+	};
+};
+
+type SelectCharacter = {
+	character_id: number;
+	level: number;
+	character: Character;
+};
+
+type ToggleCharacter = {
+	character_id: number;
+};
+
 export default function RoomListPage() {
 	const { user } = useAuth();
 	const router = useRouter();
 
-	const [roomList, setRoomList] = useState<any[]>([]);
-	const [characters, setCharacters] = useState<any[]>([]);
-	const [selectedCharacters, setSelectedCharacters] = useState<any[]>([]);
+	const [roomList, setRoomList] = useState<Room[]>([]);
+	const [characters, setCharacters] = useState<Character[]>([]);
+	const [selectedCharacters, setSelectedCharacters] = useState<
+		SelectCharacter[]
+	>([]);
 	const [error, setError] = useState<string | null>(null);
 
 	// キャラクター一覧取得
@@ -40,7 +75,7 @@ export default function RoomListPage() {
 	}, [user]);
 
 	// キャラクター選択処理
-	const toggleCharacter = (character: any) => {
+	const toggleCharacter = (character: Character) => {
 		if (
 			selectedCharacters.some((c) => c.character_id === character.character_id)
 		) {
@@ -49,7 +84,9 @@ export default function RoomListPage() {
 			);
 		} else {
 			if (selectedCharacters.length < 3) {
-				setSelectedCharacters((prev) => [...prev, character]);
+				setSelectedCharacters(
+					(prev) => [...prev, character] as SelectCharacter[],
+				);
 			}
 		}
 	};

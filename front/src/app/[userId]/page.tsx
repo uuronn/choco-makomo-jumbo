@@ -5,11 +5,23 @@ import { auth } from "~/lib/firebase";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+type Character = {
+	id: number;
+	name: string;
+	image_url: string;
+	rarity: number;
+	base_life: number;
+	base_power: number;
+	base_speed: number;
+	skill: string;
+	level: number;
+};
+
 export default function HomePage() {
 	const [user, setUser] = useState(auth.currentUser);
 	const router = useRouter();
 	// TODO: 型つけたい
-	const [characters, setCharacters] = useState([]);
+	const [characters, setCharacters] = useState<Character[]>([]);
 
 	useEffect(() => {
 		const fetchCharacters = async () => {
