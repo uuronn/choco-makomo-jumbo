@@ -6,13 +6,11 @@ use App\Http\Controller\RoomController;
 use App\Http\Controller\UserCharacterController;
 use App\Http\Controller\UserController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 
-Route::get('/users', [UserController::class, 'index']);
 
-Route::get('/users/{id}', [UserController::class, 'checkUser']);
 
-Route::put('/users/{id}/point', [UserController::class, 'updatePoint']);
+
+
 
 Route::post('/users/{id}/gacha', [GachaController::class, 'gacha']);
 
@@ -38,8 +36,17 @@ Route::post('/rooms/simulate-battle', [RoomController::class, 'simulateBattle'])
 
 Route::delete('/users/{userId}/character', [UserCharacterController::class, 'destroy']);
 
-// ユーザーを作成するPOSTルート
-Route::post('/users', [UserController::class, 'store'])->withoutMiddleware([VerifyCsrfToken::class]);
+// ユーザーを作成する
+Route::post('/users', [UserController::class, 'create']);
+
+// すべてのユーザーを取得する
+Route::get('/users', [UserController::class, 'all']);
+
+// ユーザーが存在するか確認
+Route::get('/users/{userId}', [UserController::class, 'checkUser']);
+
+// ユーザーのpointを更新
+Route::put('/users/{userId}/point', [UserController::class, 'updatePoint']);
 
 // すべてのキャラクターを取得する
 Route::get('/characters', [CharacterController::class, 'all']);
