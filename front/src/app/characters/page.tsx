@@ -31,7 +31,7 @@ const typeColors: Record<CharacterType, string> = {
 export default function CharacterDevelopment() {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
-    null
+    null,
   );
   const [availablePoints, setAvailablePoints] = useState(0);
   const [lifePoints, setLifePoints] = useState(0);
@@ -46,7 +46,7 @@ export default function CharacterDevelopment() {
       (async () => {
         // キャラクター一覧を取得
         const charRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
         );
         const charData = await charRes.json();
         setCharacters(charData);
@@ -54,7 +54,7 @@ export default function CharacterDevelopment() {
       (async () => {
         // キャラクター一覧を取得
         const pointRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`,
         );
         const pointData = await pointRes.json();
         setAvailablePoints(pointData);
@@ -88,7 +88,7 @@ export default function CharacterDevelopment() {
             power: powerPoints,
             speed: speedPoints,
           }),
-        }
+        },
       );
     })();
 
@@ -104,7 +104,7 @@ export default function CharacterDevelopment() {
 
     // Update available points
     setAvailablePoints(
-      availablePoints - (lifePoints + powerPoints + speedPoints)
+      availablePoints - (lifePoints + powerPoints + speedPoints),
     );
 
     // Reset allocated points
@@ -169,7 +169,7 @@ export default function CharacterDevelopment() {
                             <span key={i} className="text-emerald-400">
                               ★
                             </span>
-                          )
+                          ),
                         )}
                       </div>
                     </div>
