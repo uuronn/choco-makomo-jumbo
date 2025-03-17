@@ -44,13 +44,13 @@ Route::post('/gacha', [GachaController::class, 'gacha']);
 Route::get('/rooms', [RoomController::class, 'list']);
 
 // ルームを作成する
-Route::post('/rooms', [RoomController::class, 'create']);
+Route::post('/rooms/create', [RoomController::class, 'create']);
 
 // ルームに参加する
 Route::post('/rooms/join', [RoomController::class, 'join']);
 
-// ルームのステータスを変更する
-Route::get('/{userId}/rooms/{roomId}/status', [RoomController::class, 'status']);
+// ルームのステータスを取得する
+Route::get('/{userId}/{roomId}/status', [RoomController::class, 'status']);
 
 
 Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
