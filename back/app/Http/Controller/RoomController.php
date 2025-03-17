@@ -244,7 +244,7 @@ class RoomController
                 return response()->json(['message' => 'ゲストが申請していません'], 400);
             }
 
-            DB::transaction(function () use ($roomId, &$room) {
+            DB::transaction(function () use ($roomId, $room) {
                 RoomCharacter::where('roomId', $roomId)->update(['isActive' => 1]);
                 $characters = RoomCharacter::where('roomId', $roomId)
                     ->orderBy('speed', 'desc')
