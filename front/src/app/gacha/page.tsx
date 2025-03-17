@@ -321,22 +321,24 @@ export default function GachaScreen() {
                   className={`w-full h-full  bg-gradient-to-br ${rarityColors[result?.rarity as keyof typeof rarityColors]} p-6 rounded-xl border-2 border-green-400/50 shadow-[0_0_20px_rgba(0,255,128,0.4)]`}
                 >
                   <div className="text-center">
-                    <div className="mb-2 px-3 py-1 bg-black/30 rounded-full inline-block">
+                    <div className="mb-1 px-3 py-1 bg-black/30 rounded-full inline-block">
                       <p className="text-xs font-mono text-white tracking-widest">
                         {rarityText[result?.rarity as keyof typeof rarityText]}
                       </p>
                     </div>
-                    <h3 className="text-3xl font-bold text-white mb-1">
+                    <h3 className="text-2xl font-bold text-white mb-1">
                       {result?.name}
                     </h3>
-                    {result?.image_url && (
-                      <Image
-                        alt=""
-                        height={200}
-                        width={200}
-                        src={result.image_url}
-                      />
-                    )}
+                    <div className="flex justify-center">
+                      {result?.image_url && (
+                        <Image
+                          alt=""
+                          height={140}
+                          width={140}
+                          src={result.image_url}
+                        />
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               )}
