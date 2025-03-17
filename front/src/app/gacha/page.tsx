@@ -23,8 +23,9 @@ export default function GachaScreen() {
       color: string;
     }>
   >([]);
+  const [binaryCode, setBinaryCode] = useState<string[]>([]);
 
-  const { user } = useAuth();
+  const { user, fetchCharacters } = useAuth();
 
   const router = useRouter();
 
@@ -45,6 +46,18 @@ export default function GachaScreen() {
       setParticles([]);
     }
   }, [isAnimating]);
+
+  useEffect(() => {
+    const generateBinaryCode = () => {
+      return Array.from({ length: 50 }).map(() =>
+        Array.from({ length: 120 })
+          .map(() => (Math.random() > 0.5 ? "1" : "0"))
+          .join(""),
+      );
+    };
+
+    setBinaryCode(generateBinaryCode());
+  }, []);
 
   const pullGacha = async () => {
     try {
@@ -70,6 +83,7 @@ export default function GachaScreen() {
 
       setIsAnimating(false);
       setShowResult(true);
+      fetchCharacters();
     } catch (error) {
       console.error("ガチャの取得に失敗しました", error);
     }
@@ -109,11 +123,9 @@ export default function GachaScreen() {
       {/* Binary code background effect */}
       <div className="absolute inset-0 overflow-hidden opacity-5">
         <div className="font-mono text-xs text-green-500 whitespace-nowrap animate-scrollUp">
-          {Array.from({ length: 50 }).map((_, i) => (
+          {binaryCode.map((line, i) => (
             <div key={i} className="my-2">
-              {Array.from({ length: 120 })
-                .map((_, j) => (Math.random() > 0.5 ? "1" : "0"))
-                .join("")}
+              {line}
             </div>
           ))}
         </div>

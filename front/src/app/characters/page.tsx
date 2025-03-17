@@ -29,7 +29,6 @@ const typeColors: Record<CharacterType, string> = {
 };
 
 export default function CharacterDevelopment() {
-  const [characters, setCharacters] = useState<Character[]>([]);
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
   );
@@ -38,19 +37,11 @@ export default function CharacterDevelopment() {
   const [powerPoints, setPowerPoints] = useState(0);
   const [speedPoints, setSpeedPoints] = useState(0);
 
-  const { user } = useAuth();
+  const { user, havingCharacters } = useAuth();
 
   // キャラクター一覧取得
   useEffect(() => {
     if (user) {
-      (async () => {
-        // キャラクター一覧を取得
-        const charRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
-        );
-        const charData = await charRes.json();
-        setCharacters(charData);
-      })();
       (async () => {
         // キャラクター一覧を取得
         const pointRes = await fetch(
@@ -303,7 +294,7 @@ export default function CharacterDevelopment() {
             <div className="h-px flex-grow ml-4 bg-gradient-to-r from-emerald-400 to-transparent"></div>
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {characters.map((character) => (
+            {havingCharacters.map((character) => (
               <div
                 key={character.characterId}
                 className={`cursor-pointer p-2 rounded-lg transition-all ${

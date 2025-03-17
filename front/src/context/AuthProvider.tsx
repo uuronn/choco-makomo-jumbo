@@ -9,17 +9,21 @@ import {
   useEffect,
   useState,
 } from "react";
-import Loading from "~/components/Loading";
 import { auth, googleProvider } from "~/lib/firebase";
+import { Character } from "~/type/character";
 
 const AuthContext = createContext<{
   handleSignIn: () => void;
   handleSignOut: () => void;
   user: User | null | undefined;
+  havingCharacters: Character[];
+  fetchCharacters: () => void;
 }>({
   handleSignIn: () => {},
   handleSignOut: () => {},
   user: null,
+  havingCharacters: [],
+  fetchCharacters: () => {},
 });
 
 export function useAuth() {
@@ -33,6 +37,7 @@ type AuthProviderProps = {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>();
   const [authenticating, setAuthenticating] = useState<boolean>(true);
+  const [havingCharacters, setHavingCharacters] = useState<Character[]>([]);
 
   const router = useRouter();
 
@@ -44,7 +49,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
       // 既存ユーザーか確認
       const checkUser = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}`,
       );
 
       if (checkUser.ok) {
@@ -77,10 +82,30 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(null);
   };
 
+  const fetchCharacters = async () => {
+    (async () => {
+      if (!user) return;
+      // キャラクター一覧を取得
+      const charRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
+      );
+      const charData = await charRes.json();
+      setHavingCharacters(charData);
+    })();
+  };
+
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
         setUser(user);
+        (async () => {
+          // キャラクター一覧を取得
+          const charRes = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
+          );
+          const charData = await charRes.json();
+          setHavingCharacters(charData);
+        })();
       } else {
         setUser(null);
       }
@@ -96,12 +121,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, [user, router]);
 
-  if (authenticating === true) {
-    return <Loading message="認証中" />;
-  }
-
   return (
-    <AuthContext.Provider value={{ handleSignIn, handleSignOut, user }}>
+    <AuthContext.Provider
+      value={{
+        handleSignIn,
+        handleSignOut,
+        user,
+        havingCharacters,
+        fetchCharacters,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
