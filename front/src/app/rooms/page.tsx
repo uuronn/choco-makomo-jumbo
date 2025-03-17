@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthProvider";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Character } from "~/type/character";
+import Loading from "~/components/Loading";
 
 type Room = {
   id: string;
@@ -118,7 +119,7 @@ export default function RoomListPage() {
     }
   };
 
-  if (!user) return <p>...loading</p>;
+  if (!user) return <Loading message="認証中" />;
 
   console.info("characters", characters);
 

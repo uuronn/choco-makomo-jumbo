@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useAuth } from "./context/AuthProvider";
+import Loading from "~/components/Loading";
 
 export default function HomePage() {
   const { handleSignOut, user } = useAuth();
 
-  if (!user) return <p>...loading</p>;
+  if (!user) return <Loading message="認証中" />;
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">

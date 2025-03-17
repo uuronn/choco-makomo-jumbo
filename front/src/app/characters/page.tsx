@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
 import Image from "next/image";
 import { Character } from "~/type/character";
+import Loading from "~/components/Loading";
 
 export default function CharacterListPage() {
   const { user } = useAuth();
@@ -14,7 +15,7 @@ export default function CharacterListPage() {
     if (user) {
       (async () => {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`
         );
         if (!res.ok) {
           throw new Error("キャラクターの取得に失敗しました");
@@ -27,7 +28,7 @@ export default function CharacterListPage() {
     }
   }, [user]);
 
-  if (!user) return <p>...loading</p>;
+  if (!user) return <Loading message="認証中" />;
 
   return (
     <div className="min-h-screen text-black flex flex-col items-center justify-center bg-gray-100 p-4">

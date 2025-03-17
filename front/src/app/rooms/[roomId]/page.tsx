@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthProvider";
 import Link from "next/link";
+import Loading from "~/components/Loading";
 
 type Room = {
   id: string;
@@ -112,9 +113,7 @@ export default function RoomDetailPage() {
     setIsMyTurn(false);
   };
 
-  if (!user) return <p>...loading</p>;
-  if (loading) return <p>ルーム情報を取得中...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (!user || loading) return <Loading message="認証中" />;
   if (!room) return <p>ルームが見つかりません</p>;
 
   console.info("room", room);
