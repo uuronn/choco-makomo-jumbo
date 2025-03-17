@@ -27,7 +27,8 @@ class UserController
                 'id' => $request->id,
                 'name' => $request->name,
                 'email' => $request->email,
-                'point' => 100
+                'point' => 100,
+                'photoUrl' => $request->photoUrl,
             ]);
 
             return response()->json($user, 201);

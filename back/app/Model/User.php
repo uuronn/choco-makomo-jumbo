@@ -19,6 +19,6 @@ class User extends Authenticatable
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'name', 'email', 'point', 'created_at', 'updated_at'
+        'id', 'name', 'email', 'point', 'photoUrl', 'created_at', 'updated_at'
     ];
 }

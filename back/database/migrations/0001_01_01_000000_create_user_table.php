@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->integer('point')->default(50);
+            $table->string('photoUrl');
             $table->timestamps();
         });
     }
