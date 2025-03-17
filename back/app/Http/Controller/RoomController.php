@@ -100,7 +100,7 @@ class RoomController
                     RoomCharacter::create([
                         'roomId' => $room->id,
                         'characterId' => $characterId,
-                        'userId' => $room->guestUserId,
+                        'userId' => $room->hostUserId,
                         'level' => $userCharacter->level,
                         'life' => $userCharacter->life,
                         'power' => $userCharacter->power,
