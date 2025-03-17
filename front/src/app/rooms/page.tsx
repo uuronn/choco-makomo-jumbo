@@ -1,196 +1,260 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthProvider";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Shield, Plus, Users, ChevronRight } from "lucide-react";
 
-type Room = {
-	id: string;
-	hostUserId: string;
-	guestUserId: string;
-	status: string;
-	currentTurnUserId: string;
-};
+import { Button } from "~/components/ui/button";
+import { cn } from "~/lib/utils";
+import { useAuth } from "~/context/AuthProvider";
+import { Character } from "~/type/character";
+import { Room } from "~/type/room";
+import { FaLaptopCode } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
-type Character = {
-	characterId: number;
-	level: number;
-	character: {
-		id: number;
-		name: string;
-		image_url: string;
-		rarity: number;
-		base_life: number;
-		base_power: number;
-		base_speed: number;
-		skill: string;
-	};
-};
+export default function GameInterface() {
+  const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [rooms, setRooms] = useState<Room[]>([]);
 
-type SelectCharacter = {
-	characterId: number;
-	level: number;
-	character: Character;
-};
+  const { user, havingCharacters } = useAuth();
 
-type ToggleCharacter = {
-	characterId: number;
-};
+  const router = useRouter();
 
-export default function RoomListPage() {
-	const { user } = useAuth();
-	const router = useRouter();
+  const handleSelectCharacter = (character: Character) => {
+    if (
+      selectedCharacters.find((c) => c.characterId === character.characterId)
+    ) {
+      setSelectedCharacters(
+        selectedCharacters.filter(
+          (c) => c.characterId !== character.characterId,
+        ),
+      );
+    } else if (selectedCharacters.length < 3) {
+      setSelectedCharacters([...selectedCharacters, character]);
+    }
+  };
 
-	const [roomList, setRoomList] = useState<Room[]>([]);
-	const [characters, setCharacters] = useState<Character[]>([]);
-	const [selectedCharacters, setSelectedCharacters] = useState<
-		SelectCharacter[]
-	>([]);
-	const [error, setError] = useState<string | null>(null);
+  const handleSelectRoom = (room: Room) => {
+    setSelectedRoom(room);
+  };
 
-	// キャラクター一覧取得
-	useEffect(() => {
-		if (user) {
-			(async () => {
-				// ルーム一覧を取得
-				const res = await fetch(
-					`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
-				);
-				if (!res.ok) {
-					throw new Error("ルームの取得に失敗しました");
-				}
-				const data = await res.json();
-				setRoomList(data.rooms);
+  const isButtonDisabled = selectedCharacters.length === 0;
 
-				// キャラクター一覧を取得
-				const charRes = await fetch(
-					`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
-				);
-				const charData = await charRes.json();
-				console.info("charData", charData);
-				setCharacters(charData);
-			})();
-		}
-	}, [user]);
+  const craeteRoom = async () => {
+    if (!user) return;
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/create`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          hostUserId: user.uid,
+          characterIdList: selectedCharacters.map(
+            (character) => character.characterId,
+          ),
+        }),
+      },
+    );
+    const data = res.json();
+    router.push(`/rooms/${data}`);
+  };
 
-	// キャラクター選択処理
-	const toggleCharacter = (character: Character) => {
-		if (
-			selectedCharacters.some((c) => c.characterId === character.characterId)
-		) {
-			setSelectedCharacters((prev) =>
-				prev.filter((c) => c.characterId !== character.characterId),
-			);
-		} else {
-			if (selectedCharacters.length < 3) {
-				setSelectedCharacters(
-					(prev) => [...prev, character] as SelectCharacter[],
-				);
-			}
-		}
-	};
+  const joinRoom = async () => {
+    if (!user) return;
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/join`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          roomId: selectedRoom?.id,
+          characterIdList: selectedCharacters.map(
+            (character) => character.characterId,
+          ),
+          guestUserId: user.uid,
+        }),
+      },
+    );
 
-	// キャラセットしてルームに参加 or 作成
-	const handleRoomAction = async (roomId?: string) => {
-		if (!user) return;
+    router.push(`/rooms/${selectedRoom?.id}`);
+  };
 
-		console.info("roomId", roomId);
+  useEffect(() => {
+    (async () => {
+      // 技術一覧を取得
+      const roomsRas = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
+      );
+      const roomsData = await roomsRas.json();
+      console.log(roomsData, "🥴");
+      setRooms(roomsData);
+    })();
+  }, []);
 
-		if (selectedCharacters.length < 1 || selectedCharacters.length > 3) {
-			setError("パーティは 1 〜 3 体まで選択してください");
-			return;
-		}
-		setError(null);
+  useEffect(() => {
+    console.log(user?.uid, "😄");
+  }, [user]);
 
-		// ルームに参加（既存のルーム）
-		if (roomId) {
-			console.info("tst", roomId);
-			await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/join`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					guestUserId: user.uid,
-					roomId: roomId,
-					characters: selectedCharacters,
-				}),
-			});
-			router.push(`/rooms/${roomId}`);
-		}
-		// ルームを新規作成（ホスト）
-		else {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					hostUserId: user.uid,
-					characters: selectedCharacters,
-				}),
-			});
-			const data = await res.json();
-			router.push(`/rooms/${data.room.id}`);
-		}
-	};
+  return (
+    <div className="h-screen bg-gray-900 text-white p-3 flex flex-col overflow-hidden pl-20">
+      {/* 技術選択セクション */}
+      <section className="border border-green-400/30 rounded-lg p-3 backdrop-blur-sm backdrop-filter bg-black/20 h-[55%] overflow-hidden mb-3">
+        <h2 className="text-lg font-bold mb-2 text-green-400 flex items-center">
+          <FaLaptopCode className="mr-2 h-5 w-5" /> 技術選択{" "}
+          <span className="text-sm ml-2 text-green-400/70">(最大3体)</span>
+        </h2>
 
-	if (!user) return <p>...loading</p>;
+        <div className="grid grid-cols-2 gap-3 h-[calc(100%-30px)]">
+          {/* 選択された技術 */}
+          <div className="space-y-1 overflow-auto">
+            <h3 className="text-xs font-semibold text-green-400/80">
+              選択中の技術
+            </h3>
+            <div className="h-[calc(100%-22px)] border border-green-400/20 rounded-lg p-2 bg-black/30 overflow-auto">
+              {selectedCharacters.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-gray-500">
+                  <p>技術が選択されていません</p>
+                </div>
+              ) : (
+                selectedCharacters.map((character) => (
+                  <div
+                    key={character.characterId}
+                    className="flex h-[calc(33.33%-6px)] items-center p-1.5 rounded-md bg-green-400/10 border border-green-400/30 hover:bg-green-400/20 transition-all cursor-pointer mb-2 last:mb-0"
+                    onClick={() => handleSelectCharacter(character)}
+                  >
+                    <div className="relative h-10 w-10 mr-3 rounded-md overflow-hidden border border-green-400/50">
+                      <Image
+                        src={character.image_url || "/placeholder.svg"}
+                        alt={character.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-green-400">
+                        {character.name}
+                      </h4>
+                      <p className="text-xs text-green-400/70">
+                        レベル {character.level}
+                      </p>
+                    </div>
+                    <div className="ml-auto">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 rounded-full text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                      >
+                        <Plus className="rotate-45 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
 
-	console.info("characters", characters);
+          {/* 技術一覧 */}
+          <div className="space-y-1 overflow-hidden">
+            <h3 className="text-xs font-semibold text-green-400/80">
+              利用可能な技術
+            </h3>
+            <div className="h-[calc(100%-22px)] overflow-auto pb-2">
+              <div className="flex flex-wrap gap-3 content-start">
+                {havingCharacters.map((character) => (
+                  <div
+                    key={character.characterId}
+                    className={cn(
+                      "flex flex-col justify-center items-center p-1.5 rounded-lg border transition-all cursor-pointer h-[150px] w-[150px]",
+                      selectedCharacters.find(
+                        (c) => c.characterId === character.characterId,
+                      )
+                        ? "bg-green-400/20 border-green-400"
+                        : "bg-black/30 border-green-400/20 hover:bg-green-400/10",
+                    )}
+                    onClick={() => handleSelectCharacter(character)}
+                  >
+                    <div className="relative h-12 w-12 mb-1 rounded-full overflow-hidden border-2 border-green-400/50">
+                      <Image
+                        src={character.image_url || "/placeholder.svg"}
+                        alt={character.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <h4 className="font-bold text-center text-green-400 text-sm">
+                      {character.name}
+                    </h4>
+                    <p className="text-xs text-green-400/70">
+                      レベル {character.level}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-	return (
-		<div className="min-h-screen text-black flex flex-col items-center justify-center bg-gray-100 p-4">
-			<h1 className="text-3xl font-bold mb-6">キャラクターを選択</h1>
+      {/* ルーム選択セクション */}
+      <section className="border border-green-400/30 rounded-lg p-3 backdrop-blur-sm backdrop-filter bg-black/20 h-[42%] overflow-hidden">
+        <h2 className="text-lg font-bold mb-2 text-green-400 flex items-center">
+          <Users className="mr-2 h-5 w-5" /> ルーム選択
+        </h2>
 
-			{/* キャラクター一覧 */}
-			<div className="grid grid-cols-3 gap-4">
-				{characters.map((char) => (
-					<button
-						type="button"
-						key={char.characterId}
-						onClick={() => toggleCharacter(char)}
-						className={`p-4 border rounded-md ${
-							selectedCharacters.some((c) => c.characterId === char.characterId)
-								? "bg-blue-500 text-white"
-								: "bg-white"
-						}`}
-					>
-						<p>{char.characterId}</p>
-						<p>レベル: {char.level}</p>
-						<p>名前: {char.character.name}</p>
-						<Image
-							src={char.character.image_url}
-							alt={char.character.name}
-							width={100}
-							height={100}
-						/>
-					</button>
-				))}
-			</div>
+        <div className="space-y-3 h-[calc(100%-40px)]">
+          {/* ルーム一覧 */}
+          <div className="overflow-x-auto h-[calc(100%-40px)]">
+            <div className="flex h-full gap-4 items-center">
+              {rooms.map((room) => (
+                <div
+                  key={room.id}
+                  className={cn(
+                    "flex flex-col rounded-lg border transition-all cursor-pointer min-w-[200px]  min-h-[160px] overflow-hidden",
+                    selectedRoom?.id === room.id
+                      ? "bg-green-400/20 border-green-400"
+                      : "bg-black/30 border-green-400/20 hover:bg-green-400/10",
+                  )}
+                  onClick={() => handleSelectRoom(room)}
+                >
+                  <div className="relative h-[90px] w-full">
+                    <Image
+                      src={"/placeholder.svg"}
+                      alt={room.id}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="p-2">
+                    <h4 className="font-bold text-green-400 text-sm">
+                      {room.id}
+                    </h4>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-			<p className="mt-4">選択中: {selectedCharacters.length} / 3</p>
-			{error && <p className="text-red-500">{error}</p>}
-
-			{/* ルームを作成する */}
-			<button
-				type="button"
-				className="mt-4 bg-green-500 text-white px-4 py-2 rounded-md"
-				onClick={() => handleRoomAction()}
-			>
-				新しいルームを作成
-			</button>
-
-			<h2 className="text-2xl font-bold mt-8">ルーム一覧</h2>
-
-			{/* ルーム一覧（参加用） */}
-			{roomList.map((room) => (
-				<button
-					type="button"
-					onClick={() => handleRoomAction(room.id)}
-					key={room.id}
-					className="bg-white p-4 rounded-md shadow-md mb-4"
-				>
-					<p>{room.id}</p>
-				</button>
-			))}
-		</div>
-	);
+          {/* アクションボタン */}
+          <div className="flex gap-4 justify-end">
+            <Button
+              onClick={craeteRoom}
+              variant="outline"
+              className="bg-green-400 text-black hover:bg-green-500 text-sm h-9"
+              disabled={isButtonDisabled}
+            >
+              <Plus className="mr-1 h-4 w-4" /> ルーム作成
+            </Button>
+            <Button
+              onClick={joinRoom}
+              className="bg-green-400 text-black hover:bg-green-500 text-sm h-9"
+              disabled={isButtonDisabled || !selectedRoom}
+            >
+              入室 <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
 }

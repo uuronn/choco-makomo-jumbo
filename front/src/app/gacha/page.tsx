@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Code2, Sparkles, Terminal, Cpu, Zap, ArrowLeft } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import { useAuth } from "../context/AuthProvider";
+import { useAuth } from "../../context/AuthProvider";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -23,8 +23,9 @@ export default function GachaScreen() {
       color: string;
     }>
   >([]);
+  const [binaryCode, setBinaryCode] = useState<string[]>([]);
 
-  const { user } = useAuth();
+  const { user, fetchCharacters } = useAuth();
 
   const router = useRouter();
 
@@ -46,19 +47,31 @@ export default function GachaScreen() {
     }
   }, [isAnimating]);
 
+  useEffect(() => {
+    const generateBinaryCode = () => {
+      return Array.from({ length: 50 }).map(() =>
+        Array.from({ length: 120 })
+          .map(() => (Math.random() > 0.5 ? "1" : "0"))
+          .join(""),
+      );
+    };
+
+    setBinaryCode(generateBinaryCode());
+  }, []);
+
   const pullGacha = async () => {
     try {
       if (!user) return;
 
       setIsAnimating(true);
       setShowResult(false);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/gacha`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/gacha`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.uid,
+        }),
+      });
 
       if (!res.ok) {
         throw new Error("ガチャの取得に失敗しました");
@@ -70,6 +83,7 @@ export default function GachaScreen() {
 
       setIsAnimating(false);
       setShowResult(true);
+      fetchCharacters();
     } catch (error) {
       console.error("ガチャの取得に失敗しました", error);
     }
@@ -109,11 +123,9 @@ export default function GachaScreen() {
       {/* Binary code background effect */}
       <div className="absolute inset-0 overflow-hidden opacity-5">
         <div className="font-mono text-xs text-green-500 whitespace-nowrap animate-scrollUp">
-          {Array.from({ length: 50 }).map((_, i) => (
+          {binaryCode.map((line, i) => (
             <div key={i} className="my-2">
-              {Array.from({ length: 120 })
-                .map((_, j) => (Math.random() > 0.5 ? "1" : "0"))
-                .join("")}
+              {line}
             </div>
           ))}
         </div>
@@ -321,22 +333,24 @@ export default function GachaScreen() {
                   className={`w-full h-full  bg-gradient-to-br ${rarityColors[result?.rarity as keyof typeof rarityColors]} p-6 rounded-xl border-2 border-green-400/50 shadow-[0_0_20px_rgba(0,255,128,0.4)]`}
                 >
                   <div className="text-center">
-                    <div className="mb-2 px-3 py-1 bg-black/30 rounded-full inline-block">
+                    <div className="mb-1 px-3 py-1 bg-black/30 rounded-full inline-block">
                       <p className="text-xs font-mono text-white tracking-widest">
                         {rarityText[result?.rarity as keyof typeof rarityText]}
                       </p>
                     </div>
-                    <h3 className="text-3xl font-bold text-white mb-1">
+                    <h3 className="text-2xl font-bold text-white mb-1">
                       {result?.name}
                     </h3>
-                    {result?.image_url && (
-                      <Image
-                        alt=""
-                        height={200}
-                        width={200}
-                        src={result.image_url}
-                      />
-                    )}
+                    <div className="flex justify-center">
+                      {result?.image_url && (
+                        <Image
+                          alt=""
+                          height={140}
+                          width={140}
+                          src={result.image_url}
+                        />
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               )}

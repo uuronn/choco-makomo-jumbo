@@ -1,0 +1,16 @@
+export type Character = {
+  userId: string;
+  characterId: string;
+  level: number;
+  life: number;
+  power: number;
+  speed: number;
+  name: string;
+  type: string;
+  rarity: number;
+  base_evasion: number;
+  activeSkillId: string | null;
+  passiveSkillId: string | null;
+  partySkillId: string | null;
+  image_url: string;
+};
