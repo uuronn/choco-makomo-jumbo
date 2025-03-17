@@ -15,6 +15,11 @@ class GachaController
 
         if (!$user) return response()->json(['message' => 'User not found'], 404);
 
+        // ガチャコスト
+        $gachaCost = 10;
+
+        if ($user->point < $gachaCost) return response()->json(['message' => 'ポイントが不足しています'], 400);
+
         $character = Character::inRandomOrder()->first();
 
         // 既に所持しているか確認
@@ -27,6 +32,7 @@ class GachaController
             $additionalPoint = 5;
 
             $user->point += $additionalPoint;
+            $user->point -= $gachaCost;
             $user->save();
 
             return response()->json([
@@ -35,6 +41,9 @@ class GachaController
                 'new_point' => $user->point
             ]);
         }
+
+        $user->point -= $gachaCost;
+        $user->save();
 
         $userCharacter = new UserCharacter([
             'userId' => $user->id,
