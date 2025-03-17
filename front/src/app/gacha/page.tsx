@@ -53,10 +53,13 @@ export default function GachaScreen() {
       setIsAnimating(true);
       setShowResult(false);
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/gacha`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/gacha`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: user.uid
+          })
         },
       );
 
