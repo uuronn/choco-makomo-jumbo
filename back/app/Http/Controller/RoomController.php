@@ -225,7 +225,7 @@ class RoomController
     {
         try {
             $roomId = $request->route('roomId'); // ルートから取得（routes/api.php に合わせる）
-            $userId = $request->input('userId');
+            $userId = $request->route('userId');
 
             $room = Room::where('id', $roomId)->first();
 
