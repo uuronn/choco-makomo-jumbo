@@ -48,7 +48,7 @@ class RoomController
                 ->first();
 
             if ($existingRoom) {
-                return response()->json(['message' => '既に作成されたルームが存在します', 'room' => $existingRoom], 409);
+                return response()->json(['message' => '既に作成されたルームが存在します'], 409);
             }
 
             $room = DB::transaction(function () use ($request, $characterIdList) {
