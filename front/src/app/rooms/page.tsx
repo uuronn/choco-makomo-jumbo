@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Character } from "~/type/character";
 
 type Room = {
   id: string;
@@ -13,29 +14,14 @@ type Room = {
   currentTurnUserId: string;
 };
 
-type Character = {
-  characterId: number;
-  level: number;
-  character: {
-    id: number;
-    name: string;
-    image_url: string;
-    rarity: number;
-    base_life: number;
-    base_power: number;
-    base_speed: number;
-    skill: string;
-  };
-};
-
 type SelectCharacter = {
-  characterId: number;
+  characterId: string;
   level: number;
   character: Character;
 };
 
 type ToggleCharacter = {
-  characterId: number;
+  characterId: string;
 };
 
 export default function RoomListPage() {
@@ -55,7 +41,7 @@ export default function RoomListPage() {
       (async () => {
         // ルーム一覧を取得
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`
         );
         if (!res.ok) {
           throw new Error("ルームの取得に失敗しました");
@@ -65,7 +51,7 @@ export default function RoomListPage() {
 
         // キャラクター一覧を取得
         const charRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`
         );
         const charData = await charRes.json();
         console.info("charData", charData);
@@ -80,12 +66,12 @@ export default function RoomListPage() {
       selectedCharacters.some((c) => c.characterId === character.characterId)
     ) {
       setSelectedCharacters((prev) =>
-        prev.filter((c) => c.characterId !== character.characterId),
+        prev.filter((c) => c.characterId !== character.characterId)
       );
     } else {
       if (selectedCharacters.length < 3) {
         setSelectedCharacters(
-          (prev) => [...prev, character] as SelectCharacter[],
+          (prev) => [...prev, character] as SelectCharacter[]
         );
       }
     }
@@ -153,12 +139,12 @@ export default function RoomListPage() {
                 : "bg-white"
             }`}
           >
-            <p>{char.characterId}</p>
+            {/* <p>{char.characterId}</p> */}
             <p>レベル: {char.level}</p>
-            <p>名前: {char.character.name}</p>
+            <p>名前: {char.name}</p>
             <Image
-              src={char.character.image_url}
-              alt={char.character.name}
+              src={char.image_url}
+              alt={char.name}
               width={100}
               height={100}
             />
