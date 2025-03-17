@@ -9,6 +9,7 @@ use App\Model\UserCharacter;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class RoomController
 {
@@ -36,43 +37,52 @@ class RoomController
     public function create(Request $request)
     {
         try {
-            $existingRoom = Room::where('hostUserId', $request->hostUserId)->first();
 
             $characterIdList = $request->characterIdList;
 
-            if ($existingRoom) throw new Exception("既に作成したルームが存在します", 400);
-
-            if (empty($characterIdList)) throw new Exception("キャラクターIDリストが必要です", 400);
-
-            $room = Room::create([
-                'id' => Str::uuid(),
-                'hostUserId' => $request->hostUserId,
-                'guestUserId' => null,
-                'status' => 'waiting',
-            ]);
-
-            foreach ($characterIdList as $characterId) {
-                $character = Character::find($characterId);
-
-                if (!$character) throw new Exception("Character {$characterId} not found", 404);
-
-                $userCharacter = UserCharacter::where('userId', $room->hostUserId)
-                    ->where('characterId', $characterId)
-                    ->first();
-
-                if (!$userCharacter) throw new Exception("UserCharacter not found", 404);
-
-                RoomCharacter::create([
-                    'roomId' => $room->id,
-                    'characterId' => $characterId,
-                    'userId' => $room->guestUserId,
-                    'level' => $userCharacter->level,
-                    'life' => $userCharacter->life,
-                    'power' => $userCharacter->power,
-                    'speed' => $userCharacter->speed,
-                    'evasion' =>  $character->base_evasion,
-                ]);
+            if (empty($characterIdList)) {
+                return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
             }
+
+            $room = DB::transaction(function () use ($request, $characterIdList) {
+                // ルームを作成
+                $room = Room::create([
+                    'id' => Str::uuid(),
+                    'hostUserId' => $request->hostUserId,
+                    'guestUserId' => null,
+                    'status' => 'waiting',
+                ]);
+
+                // キャラクターをループ処理
+                foreach ($characterIdList as $characterId) {
+                    $character = Character::find($characterId);
+
+                    if (!$character) {
+                        throw new \Exception("Character {$characterId} not found", 404);
+                    }
+
+                    $userCharacter = UserCharacter::where('userId', $room->hostUserId)
+                        ->where('characterId', $characterId)
+                        ->first();
+
+                    if (!$userCharacter) {
+                        throw new \Exception("UserCharacter not found", 404);
+                    }
+
+                    RoomCharacter::create([
+                        'roomId' => $room->id,
+                        'characterId' => $characterId,
+                        'userId' => $room->guestUserId,
+                        'level' => $userCharacter->level,
+                        'life' => $userCharacter->life,
+                        'power' => $userCharacter->power,
+                        'speed' => $userCharacter->speed,
+                        'evasion' => $character->base_evasion,
+                    ]);
+                }
+
+                return $room;
+            });
 
             return response()->json($room, 201);
         } catch (Exception $e) {
