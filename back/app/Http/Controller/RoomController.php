@@ -37,15 +37,21 @@ class RoomController
     public function create(Request $request)
     {
         try {
-
             $characterIdList = $request->characterIdList;
 
             if (empty($characterIdList)) {
                 return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
             }
 
+            // 既存のルームをチェック
+            $existingRoom = Room::where('hostUserId', $request->hostUserId)
+                ->first();
+
+            if ($existingRoom) {
+                return response()->json(['message' => '既に作成されたルームが存在します', 'room' => $existingRoom], 409);
+            }
+
             $room = DB::transaction(function () use ($request, $characterIdList) {
-                // ルームを作成
                 $room = Room::create([
                     'id' => Str::uuid(),
                     'hostUserId' => $request->hostUserId,
@@ -53,20 +59,19 @@ class RoomController
                     'status' => 'waiting',
                 ]);
 
-                // キャラクターをループ処理
                 foreach ($characterIdList as $characterId) {
                     $character = Character::find($characterId);
 
                     if (!$character) {
-                        throw new \Exception("Character {$characterId} not found", 404);
+                        throw new Exception("Character {$characterId} not found", 404);
                     }
 
-                    $userCharacter = UserCharacter::where('userId', $room->hostUserId)
+                    $userCharacter = UserCharacter::where('userId', $request->hostUserId)
                         ->where('characterId', $characterId)
                         ->first();
 
                     if (!$userCharacter) {
-                        throw new \Exception("UserCharacter not found", 404);
+                        throw new Exception("UserCharacter not found", 404);
                     }
 
                     RoomCharacter::create([
@@ -86,7 +91,8 @@ class RoomController
 
             return response()->json($room, 201);
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], $e->getCode() ?: 500);
+            $statusCode = $e->getCode() === 404 ? 404 : 500;
+            return response()->json(['message' => $e->getMessage()], $statusCode);
         }
     }
 
