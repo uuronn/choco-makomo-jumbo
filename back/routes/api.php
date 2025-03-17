@@ -7,6 +7,11 @@ use App\Http\Controller\UserCharacterController;
 use App\Http\Controller\UserController;
 use Illuminate\Support\Facades\Route;
 
+
+
+
+// ユーザー関連のAPI--------------------------------
+
 // ユーザーを作成する
 Route::post('/users', [UserController::class, 'create']);
 
@@ -34,14 +39,18 @@ Route::delete('/users/{userId}/characters', [UserCharacterController::class, 'de
 // ユーザーのキャラクターをレベルアップする
 Route::put('/users/{userId}/characters/{characterId}', [UserCharacterController::class, 'levelUp']);
 
+
+
+
+// キャラクター関連のAPI--------------------------------
+
 // すべてのキャラクターを取得する
 Route::get('/characters', [CharacterController::class, 'all']);
 
 // 特定のキャラクターを取得する
 Route::get('/characters/{characterId}', [CharacterController::class, 'find']);
 
-// ガチャを引く
-Route::post('/gacha', [GachaController::class, 'gacha']);
+
 
 
 // ルーム関連のAPI--------------------------------
@@ -58,9 +67,16 @@ Route::post('/rooms/join', [RoomController::class, 'join']);
 // ルームのステータスを取得する
 Route::get('/{userId}/{roomId}/status', [RoomController::class, 'status']);
 
-
 Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
 
 Route::post('/rooms/action', [RoomController::class, 'processAction']);
 
 Route::post('/rooms/end-battle', [RoomController::class, 'endBattle']);
+
+
+
+
+// ガチャ関連のAPI--------------------------------
+
+// ガチャを引く
+Route::post('/gacha', [GachaController::class, 'gacha']);
