@@ -18,12 +18,16 @@ class RoomCharacter extends Model
         'id',
         'roomId',
         'characterId',
+        'userId',
         'level',
         'life',
         'power',
         'speed',
         'evasion',
+        'isActive',
     ];
+
+    protected $casts = ['isActive' => 'boolean'];
 
     protected static function boot()
     {
@@ -31,6 +35,9 @@ class RoomCharacter extends Model
         static::creating(function ($model) {
             if (empty($model->id)) {
                 $model->id = (string) Str::uuid();
+            }
+            if (is_null($model->isActive)) {
+                $model->isActive = true;
             }
         });
     }
