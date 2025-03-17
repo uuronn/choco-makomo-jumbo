@@ -224,8 +224,8 @@ class RoomController
     public function approve(Request $request)
     {
         try {
-            $roomId = $request->route('roomId');
-            $userId = $request->route('userId'); // 承認するホストのユーザーID
+            $roomId = $request->route('roomId'); // ルートから取得（routes/api.php に合わせる）
+            $userId = $request->input('userId');
 
             $room = Room::where('id', $roomId)->first();
 
@@ -240,22 +240,26 @@ class RoomController
             if ($room->status !== 'pending') {
                 return response()->json(['message' => '現在承認を受け付けていません'], 400);
             }
-
             if (!$room->guestUserId) {
                 return response()->json(['message' => 'ゲストが申請していません'], 400);
             }
 
-            $characters = RoomCharacter::where('roomId', $roomId)
-                ->orderBy('speed', 'desc')
-                ->get();
+            DB::transaction(function () use ($roomId, &$room) {
+                RoomCharacter::where('roomId', $roomId)->update(['isActive' => 1]);
+                $characters = RoomCharacter::where('roomId', $roomId)
+                    ->orderBy('speed', 'desc')
+                    ->get();
 
-            if ($characters->isEmpty()) {
-                return response()->json(['message' => 'ルームにキャラクターが存在しません'], 400);
-            }
+                if ($characters->isEmpty()) {
+                    throw new Exception('ルームにキャラクターが存在しません');
+                }
 
-            DB::transaction(function () use ($roomId, $characters, $room) {
-                RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
                 $firstTurn = $characters->first();
+                if (!$firstTurn->userId) {
+                    throw new Exception('最初のターンユーザーIDがnullです');
+                }
+
+                $room = Room::find($roomId);
                 $room->update([
                     'status' => 'battling',
                     'currentTurnUserId' => $firstTurn->userId
