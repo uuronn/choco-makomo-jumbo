@@ -19,8 +19,33 @@ class RoomController
     public function list()
     {
         try {
-            // ルーム一覧を取得（キャラクター情報を含めずに取得）
-            $rooms = Room::select('id', 'hostUserId', 'guestUserId', 'status')->get();
+            // ルーム一覧を取得し、関連するUserデータを一緒に取得
+            $rooms = Room::with([
+                'hostUser' => function ($query) {
+                    $query->select('id', 'name', 'photoUrl'); // 必要なカラムだけ取得
+                },
+                'guestUser' => function ($query) {
+                    $query->select('id', 'name', 'image'); // 必要なカラムだけ取得
+                }
+            ])->get();
+
+            // レスポンスをカスタマイズ（必要に応じて）
+            $rooms->transform(function ($room) {
+                return [
+                    'id' => $room->id,
+                    'host_user' => $room->hostUser ? [
+                        'id' => $room->hostUser->id,
+                        'name' => $room->hostUser->name,
+                        'image' => $room->hostUser->image,
+                    ] : null,
+                    'guest_user' => $room->guestUser ? [
+                        'id' => $room->guestUser->id,
+                        'name' => $room->guestUser->name,
+                        'image' => $room->guestUser->image,
+                    ] : null,
+                    'status' => $room->status, // その他のRoomカラムも必要なら追加
+                ];
+            });
 
             return response()->json($rooms, 200);
         } catch (Exception $e) {
@@ -311,7 +336,7 @@ class RoomController
     /**
      * ルームを全て削除（テスト用）
      */
-    public function delete()
+    public function allDelete()
     {
         try {
             DB::beginTransaction();
