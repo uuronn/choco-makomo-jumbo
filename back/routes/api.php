@@ -11,10 +11,16 @@ use Illuminate\Support\Facades\Route;
 Route::post('/users', [UserController::class, 'create']);
 
 // すべてのユーザーを取得する
-Route::get('/users', [UserController::class, 'all']);
+// Route::get('/users', [UserController::class, 'all']);
+
+// すべてのユーザーを取得する
+Route::get('/users/{userId}', [UserController::class, 'getUser']);
 
 // ユーザーが存在するか確認する
-Route::get('/users/{userId}', [UserController::class, 'checkUser']);
+Route::get('/users/{userId}/checkUser', [UserController::class, 'checkUser']);
+
+// ユーザーのpointを取得する
+// Route::get('/users/{userId}/point', [UserController::class, 'updatePoint']);
 
 // ユーザーのpointを更新する
 Route::put('/users/{userId}/point', [UserController::class, 'updatePoint']);
