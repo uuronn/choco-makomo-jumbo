@@ -245,7 +245,7 @@ class RoomController
             }
 
             DB::transaction(function () use ($roomId, $room) {
-                RoomCharacter::where('roomId', $roomId)->update(['is_active' => 1]); // isActive → is_active に修正
+                RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
                 $characters = RoomCharacter::where('roomId', $roomId)
                     ->orderBy('speed', 'desc')
                     ->get();
