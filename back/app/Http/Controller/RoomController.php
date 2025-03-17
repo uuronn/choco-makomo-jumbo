@@ -34,12 +34,12 @@ class RoomController
                     'host_user' => $room->hostUser ? [
                         'id' => $room->hostUser->id,
                         'name' => $room->hostUser->name,
-                        'image' => $room->hostUser->photoUrl,
+                        'photoUrl' => $room->hostUser->photoUrl,
                     ] : null,
                     'guest_user' => $room->guestUser ? [
                         'id' => $room->guestUser->id,
                         'name' => $room->guestUser->name,
-                        'image' => $room->guestUser->photoUrl,
+                        'photoUrl' => $room->guestUser->photoUrl,
                     ] : null,
                     'status' => $room->status
                 ];
@@ -118,7 +118,6 @@ class RoomController
             return response()->json(['message' => $e->getMessage()], $statusCode);
         }
     }
-
     /**
      * ルームに参加
      */
@@ -127,7 +126,14 @@ class RoomController
         try {
             DB::beginTransaction();
 
-            $room = Room::where('id', $request->roomId)->first();
+            $room = Room::with([
+                'hostUser' => function ($query) {
+                    $query->select('id', 'name', 'photoUrl');
+                },
+                'guestUser' => function ($query) {
+                    $query->select('id', 'name', 'photoUrl');
+                }
+            ])->where('id', $request->roomId)->first();
 
             if (!$room) {
                 return response()->json(['message' => '指定されたルームが見つかりません'], 404);
@@ -178,7 +184,31 @@ class RoomController
 
             DB::commit();
 
-            return response()->json($room, 200);
+            $room->load([
+                'hostUser' => function ($query) {
+                    $query->select('id', 'name', 'photoUrl');
+                },
+                'guestUser' => function ($query) {
+                    $query->select('id', 'name', 'photoUrl');
+                }
+            ]);
+
+            $response = [
+                'id' => $room->id,
+                'host_user' => $room->hostUser ? [
+                    'id' => $room->hostUser->id,
+                    'name' => $room->hostUser->name,
+                    'photoUrl' => $room->hostUser->photoUrl,
+                ] : null,
+                'guest_user' => $room->guestUser ? [
+                    'id' => $room->guestUser->id,
+                    'name' => $room->guestUser->name,
+                    'photoUrl' => $room->guestUser->photoUrl,
+                ] : null,
+                'status' => $room->status,
+            ];
+
+            return response()->json($response, 200);
         } catch (Exception $e) {
             DB::rollBack();
 
