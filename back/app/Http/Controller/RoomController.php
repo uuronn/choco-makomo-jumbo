@@ -175,8 +175,8 @@ class RoomController
     public function status(Request $request)
     {
         try {
-            $userId = $request->route('userId');
-            $roomId = $request->route('roomId');
+            $userId = $request->query('userId');
+            $roomId = $request->query('roomId');
 
             if (!$userId)  return response()->json(['message' => 'ユーザーIDが必要です'], 401);
             if (!$roomId)  return response()->json(['message' => 'ルームIDが必要です'], 401);
