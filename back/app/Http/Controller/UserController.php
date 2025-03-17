@@ -67,14 +67,14 @@ class UserController
     /**
      * ユーザーのpointを取得
      */
-    // public function getPoint($userId)
-    // {
-    //     $user = User::find($userId);
+    public function getPoint($userId)
+    {
+        $user = User::find($userId);
 
-    //     if (!$user) return response()->json(['message' => 'User not found'], 404);
+        if (!$user) return response()->json(['message' => 'User not found'], 404);
 
-    //     return response()->json($user->, 200);
-    // }
+        return response()->json($user->point, 200);
+    }
 
     /**
      * ユーザーのpointを更新
