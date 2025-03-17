@@ -49,16 +49,12 @@ Route::post('/rooms', [RoomController::class, 'create']);
 // ルームに参加する
 Route::post('/rooms/join', [RoomController::class, 'join']);
 
-
+// ルームのステータスを変更する
+Route::get('/{userId}/rooms/{roomId}/status', [RoomController::class, 'status']);
 
 
 Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
 
-
 Route::post('/rooms/action', [RoomController::class, 'processAction']);
 
 Route::post('/rooms/end-battle', [RoomController::class, 'endBattle']);
-
-Route::post('/rooms/{roomId}', [RoomController::class, 'show']);
-
-Route::post('/rooms/simulate-battle', [RoomController::class, 'simulateBattle']);
