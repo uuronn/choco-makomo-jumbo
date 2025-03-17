@@ -307,4 +307,30 @@ class RoomController
             ], 500);
         }
     }
+
+    /**
+     * ルームを全て削除（テスト用）
+     */
+    public function delete()
+    {
+        try {
+            DB::beginTransaction();
+
+            $deletedCount = Room::query()->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'All rooms deleted successfully',
+                'deleted_count' => $deletedCount
+            ], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Failed to delete rooms',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

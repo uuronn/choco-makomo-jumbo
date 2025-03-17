@@ -58,6 +58,9 @@ Route::get('/characters/{characterId}', [CharacterController::class, 'find']);
 // ルーム一覧を取得する
 Route::get('/rooms', [RoomController::class, 'list']);
 
+// ルームを全て削除する（テスト用）
+Route::delete('/rooms', [RoomController::class, 'delete']);
+
 // ルームを作成する
 Route::post('/rooms/create', [RoomController::class, 'create']);
 
