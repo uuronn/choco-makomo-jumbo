@@ -224,7 +224,7 @@ class RoomController
     public function approve(Request $request)
     {
         try {
-            $roomId = $request->route('roomId'); // ルートから取得（routes/api.php に合わせる）
+            $roomId = $request->route('roomId');
             $userId = $request->route('userId');
 
             $room = Room::where('id', $roomId)->first();
@@ -245,7 +245,7 @@ class RoomController
             }
 
             DB::transaction(function () use ($roomId, $room) {
-                RoomCharacter::where('roomId', $roomId)->update(['isActive' => 1]);
+                RoomCharacter::where('roomId', $roomId)->update(['is_active' => 1]); // isActive → is_active に修正
                 $characters = RoomCharacter::where('roomId', $roomId)
                     ->orderBy('speed', 'desc')
                     ->get();
@@ -259,12 +259,13 @@ class RoomController
                     throw new Exception('最初のターンユーザーIDがnullです');
                 }
 
-                $room = Room::find($roomId);
                 $room->update([
                     'status' => 'battling',
                     'currentTurnUserId' => $firstTurn->userId
                 ]);
             });
+
+            $room->refresh(); // DBから最新状態を再取得
 
             return response()->json([
                 'message' => '参加申請が承認されました',
