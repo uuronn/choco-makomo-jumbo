@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
       // 既存ユーザーか確認
       const checkUser = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}`
       );
 
       if (checkUser.ok) {
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           id: res.user.uid,
           name: res.user.displayName,
           email: res.user.email,
-          point: 50,
+          photoUrl: res.user.photoURL,
         }),
       });
       setUser(res.user);
