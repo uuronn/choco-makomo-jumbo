@@ -40,9 +40,9 @@ class RoomController
 
             if ($existingRoom) return response()->json(['message' => '既に作成したルームが存在します'], 400);
 
-            $characterIds = $request->input('characterIdList');
+            $characterIdList = $request->characterIdList;
 
-            if (empty($characterIds)) return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
+            if (empty($characterIdList)) return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
 
             $room = Room::create([
                 'id' => Str::uuid(),
@@ -51,7 +51,7 @@ class RoomController
                 'status' => 'waiting',
             ]);
 
-            foreach ($characterIds as $characterId) {
+            foreach ($characterIdList as $characterId) {
                 $character = Character::find($characterId);
 
                 if (!$character) return response()->json(['message' => "Character {$characterId} not found"], 404);
@@ -156,16 +156,10 @@ class RoomController
     public function show(Request $request, $roomId)
     {
         try {
-            // 認証ユーザーを取得（フロントから `userId` を渡す必要あり）
             $userId = $request->userId;
 
-            if (!$userId) {
-                return response()->json([
-                    'message' => 'ユーザーIDが必要です',
-                ], 401); // 401 Unauthorized
-            }
+            if (!$userId)  return response()->json(['message' => 'ユーザーIDが必要です'], 401);
 
-            // ルームを取得
             $room = Room::with(['roomCharacter']) // ルームに紐づくキャラ情報を取得
                         ->select('id', 'hostUserId', 'guestUserId', 'status')
                         ->where('id', $roomId)
@@ -177,19 +171,15 @@ class RoomController
                 ], 404);
             }
 
-            // **権限チェック (hostUserId もしくは guestUserId のみ許可)**
+            // 権限チェック (hostUserId もしくは guestUserId のみ許可)
             if ($room->hostUserId !== $userId && $room->guestUserId !== $userId) {
                 return response()->json([
                     'message' => 'このルームにアクセスする権限がありません',
-                ], 403); // 403 Forbidden
+                ], 403);
             }
 
-            return response()->json([
-                'room' => $room,
-                'roomCharacters' => $room->roomCharacters, // ルームキャラクターも返す
-                'message' => 'Room retrieved successfully',
-            ], 200);
-        } catch (\Exception $e) {
+            return response()->json($room, 200);
+        } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to retrieve room',
                 'error' => $e->getMessage(),

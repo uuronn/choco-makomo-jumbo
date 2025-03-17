@@ -30,14 +30,13 @@ class UserCharacter extends Model
         return $this->belongsTo(Character::class, 'characterId', 'id');
     }
 
-    // 複合主キーの場合、getKeyメソッドをオーバーライド
-    public function getKey()
-    {
-        return [
-            'userId' => $this->userId,
-            'characterId' => $this->characterId,
-        ];
-    }
+    // public function getKey()
+    // {
+    //     return [
+    //         'userId' => $this->userId,
+    //         'characterId' => $this->characterId,
+    //     ];
+    // }
 
     protected static function boot()
     {
