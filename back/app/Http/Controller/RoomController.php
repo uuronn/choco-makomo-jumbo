@@ -237,7 +237,7 @@ class RoomController
                 return response()->json(['message' => '承認の権限がありません'], 403);
             }
 
-            if ($room->status !== 'waiting') {
+            if ($room->status !== 'pending') {
                 return response()->json(['message' => '現在承認を受け付けていません'], 400);
             }
 
@@ -352,7 +352,7 @@ class RoomController
             }
 
             // ルームが待機状態で、guestUserIdが既に入っていることを確認
-            if ($room->status !== 'waiting') {
+            if ($room->status !== 'pending') {
                 return response()->json(['message' => '現在拒否を受け付けていません'], 400);
             }
             if (!$room->guestUserId) {
