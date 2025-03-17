@@ -10,11 +10,11 @@ class SkillSeeder extends Seeder
     public function run(): void
     {
         $skills = [
-            ['id' => 'skill_uuid1', 'name' => 'Fire Blast', 'effect_type' => 'attack', 'effect_amount' => 50, 'description' => '強力な火炎を放つ攻撃'],
-            ['id' => 'skill_uuid2', 'name' => 'Quick Slash', 'effect_type' => 'attack', 'effect_amount' => 30, 'description' => '素早い斬撃で敵を切り裂く'],
-            ['id' => 'skill_uuid3', 'name' => 'Swift Strike', 'effect_type' => 'attack', 'effect_amount' => 40, 'description' => '迅速かつ鋭い一撃を放つ'],
-            ['id' => 'skill_uuid4', 'name' => 'Weak Jab', 'effect_type' => 'attack', 'effect_amount' => 10, 'description' => '弱いが素早い突き攻撃'],
-            ['id' => 'skill_uuid5', 'name' => 'Thunder Bolt', 'effect_type' => 'attack', 'effect_amount' => 60, 'description' => '雷を落として敵を攻撃'],
+            ['id' => 'skill_uuid1', 'name' => '三大フレームワーク', 'effect_type' => 'attack', 'effect_amount' => 50, 'description' => '自分のキャラ全体のステータスを10%アップする'],
+            ['id' => 'skill_uuid2', 'name' => '三大クラウド', 'effect_type' => 'attack', 'effect_amount' => 30, 'description' => '自分のキャラ全体のステータスを10%アップする'],
+            ['id' => 'skill_uuid3', 'name' => 'SQLインジェクション', 'effect_type' => 'attack', 'effect_amount' => 40, 'description' => '相手キャラ一体を3ターン行動不能にする'],
+            ['id' => 'skill_uuid4', 'name' => 'Angularシールド', 'effect_type' => 'attack', 'effect_amount' => 10, 'description' => '自分のキャラ全員2ターンの間、攻撃を防ぐ'],
+            ['id' => 'skill_uuid5', 'name' => 'セマンティックHTML', 'effect_type' => 'attack', 'effect_amount' => 60, 'description' => '雷を落として敵を攻撃'],
             ['id' => 'skill_uuid6', 'name' => 'Hyper Beam', 'effect_type' => 'attack', 'effect_amount' => 80, 'description' => '超強力なエネルギービーム'],
             ['id' => 'skill_uuid7', 'name' => 'Mega Punch', 'effect_type' => 'attack', 'effect_amount' => 70, 'description' => '巨大な拳で敵を殴る'],
             ['id' => 'skill_uuid8', 'name' => 'React Burst', 'effect_type' => 'attack', 'effect_amount' => 45, 'description' => '反応速度を活かした爆発攻撃'],
