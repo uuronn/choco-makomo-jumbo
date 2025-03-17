@@ -57,7 +57,7 @@ export default function GachaScreen() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
 
       if (!res.ok) {
