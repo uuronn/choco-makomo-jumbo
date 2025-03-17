@@ -70,6 +70,17 @@ Route::post('/rooms/join', [RoomController::class, 'join']);
 // ルームのステータスを取得する
 Route::get('/{userId}/{roomId}/status', [RoomController::class, 'status']);
 
+// 参加申請を承認
+Route::post('/{userId}/{roomId}/approve', [RoomController::class, 'approve']);
+
+// 参加申請を拒否
+Route::post('/{userId}/{roomId}/reject', [RoomController::class, 'reject']);
+
+// 次のターンに進む
+Route::post('/{userId}/{roomId}/nextTurn', [RoomController::class, 'nextTurn']);
+
+
+
 Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
 
 Route::post('/rooms/action', [RoomController::class, 'processAction']);
