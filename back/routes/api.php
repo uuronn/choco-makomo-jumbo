@@ -20,7 +20,7 @@ Route::get('/users/{userId}', [UserController::class, 'getUser']);
 Route::get('/users/{userId}/checkUser', [UserController::class, 'checkUser']);
 
 // ユーザーのpointを取得する
-// Route::get('/users/{userId}/point', [UserController::class, 'updatePoint']);
+Route::get('/users/{userId}/point', [UserController::class, 'getPoint']);
 
 // ユーザーのpointを更新する
 Route::put('/users/{userId}/point', [UserController::class, 'updatePoint']);
