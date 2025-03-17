@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Code2, Sparkles, Terminal, Cpu, Zap, ArrowLeft } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import { useAuth } from "../context/AuthProvider";
+import { useAuth } from "../../context/AuthProvider";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 

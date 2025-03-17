@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { LucideShieldAlert } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
-import { useAuth } from "~/app/context/AuthProvider";
+import { useAuth } from "~/context/AuthProvider";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
