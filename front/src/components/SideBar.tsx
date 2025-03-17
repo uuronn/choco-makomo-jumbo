@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import { Home, Swords, Users, Gift, LogOut } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
+import { SlEnergy } from "react-icons/sl";
+import { FaLaptopCode } from "react-icons/fa";
 
 type NavItem = {
   title: string;
@@ -45,13 +47,13 @@ export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
     },
     {
       title: "キャラクター",
-      icon: <Users className="size-5" />,
+      icon: <SlEnergy className="size-5" />,
       href: "/characters",
       isActive: activeItem === "characters",
     },
     {
       title: "ガチャ",
-      icon: <Gift className="size-5" />,
+      icon: <FaLaptopCode className="size-5" />,
       href: "/gacha",
       isActive: activeItem === "gacha",
     },

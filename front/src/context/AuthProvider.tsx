@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
           );
           const charData = await charRes.json();
-          setHavingCharacters(charData);
+          setHavingCharacters(charData ?? []);
         })();
       } else {
         setUser(null);

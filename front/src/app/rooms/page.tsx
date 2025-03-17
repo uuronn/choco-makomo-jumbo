@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Shield, Plus, Users, ChevronRight } from "lucide-react";
 
@@ -8,51 +8,18 @@ import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 import { useAuth } from "~/context/AuthProvider";
 import { Character } from "~/type/character";
-
-type Room = {
-  id: number;
-  name: string;
-  image: string;
-  players: number;
-  maxPlayers: number;
-};
-
-const rooms: Room[] = [
-  {
-    id: 1,
-    name: "ナイトシティ強盗",
-    image: "/placeholder.svg?height=120&width=200",
-    players: 2,
-    maxPlayers: 4,
-  },
-  {
-    id: 2,
-    name: "荒坂タワー",
-    image: "/placeholder.svg?height=120&width=200",
-    players: 1,
-    maxPlayers: 3,
-  },
-  {
-    id: 3,
-    name: "バッドランズラン",
-    image: "/placeholder.svg?height=120&width=200",
-    players: 0,
-    maxPlayers: 4,
-  },
-  {
-    id: 4,
-    name: "カブキ市場",
-    image: "/placeholder.svg?height=120&width=200",
-    players: 3,
-    maxPlayers: 6,
-  },
-];
+import { Room } from "~/type/room";
+import { FaLaptopCode } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 export default function GameInterface() {
   const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [rooms, setRooms] = useState<Room[]>([]);
 
-  const { havingCharacters } = useAuth();
+  const { user, havingCharacters } = useAuth();
+
+  const router = useRouter();
 
   const handleSelectCharacter = (character: Character) => {
     if (
@@ -74,25 +41,80 @@ export default function GameInterface() {
 
   const isButtonDisabled = selectedCharacters.length === 0;
 
+  const craeteRoom = async () => {
+    if (!user) return;
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/create`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          hostUserId: user.uid,
+          characterIdList: selectedCharacters.map(
+            (character) => character.characterId,
+          ),
+        }),
+      },
+    );
+    const data = res.json();
+    router.push(`/rooms/${data}`);
+  };
+
+  const joinRoom = async () => {
+    if (!user) return;
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/join`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          roomId: selectedRoom?.id,
+          characterIdList: selectedCharacters.map(
+            (character) => character.characterId,
+          ),
+          guestUserId: user.uid,
+        }),
+      },
+    );
+
+    router.push(`/rooms/${selectedRoom?.id}`);
+  };
+
+  useEffect(() => {
+    (async () => {
+      // 技術一覧を取得
+      const roomsRas = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
+      );
+      const roomsData = await roomsRas.json();
+      console.log(roomsData, "🥴");
+      setRooms(roomsData);
+    })();
+  }, []);
+
+  useEffect(() => {
+    console.log(user?.uid, "😄");
+  }, [user]);
+
   return (
     <div className="h-screen bg-gray-900 text-white p-3 flex flex-col overflow-hidden pl-20">
-      {/* キャラクター選択セクション */}
+      {/* 技術選択セクション */}
       <section className="border border-green-400/30 rounded-lg p-3 backdrop-blur-sm backdrop-filter bg-black/20 h-[55%] overflow-hidden mb-3">
         <h2 className="text-lg font-bold mb-2 text-green-400 flex items-center">
-          <Shield className="mr-2 h-5 w-5" /> キャラクター選択{" "}
+          <FaLaptopCode className="mr-2 h-5 w-5" /> 技術選択{" "}
           <span className="text-sm ml-2 text-green-400/70">(最大3体)</span>
         </h2>
 
         <div className="grid grid-cols-2 gap-3 h-[calc(100%-30px)]">
-          {/* 選択されたキャラクター */}
+          {/* 選択された技術 */}
           <div className="space-y-1 overflow-auto">
             <h3 className="text-xs font-semibold text-green-400/80">
-              選択中のキャラクター
+              選択中の技術
             </h3>
             <div className="h-[calc(100%-22px)] border border-green-400/20 rounded-lg p-2 bg-black/30 overflow-auto">
               {selectedCharacters.length === 0 ? (
                 <div className="h-full flex items-center justify-center text-gray-500">
-                  <p>キャラクターが選択されていません</p>
+                  <p>技術が選択されていません</p>
                 </div>
               ) : (
                 selectedCharacters.map((character) => (
@@ -132,10 +154,10 @@ export default function GameInterface() {
             </div>
           </div>
 
-          {/* キャラクター一覧 */}
+          {/* 技術一覧 */}
           <div className="space-y-1 overflow-hidden">
             <h3 className="text-xs font-semibold text-green-400/80">
-              利用可能なキャラクター
+              利用可能な技術
             </h3>
             <div className="h-[calc(100%-22px)] overflow-auto pb-2">
               <div className="flex flex-wrap gap-3 content-start">
@@ -197,18 +219,15 @@ export default function GameInterface() {
                 >
                   <div className="relative h-[90px] w-full">
                     <Image
-                      src={room.image || "/placeholder.svg"}
-                      alt={room.name}
+                      src={"/placeholder.svg"}
+                      alt={room.id}
                       fill
                       className="object-cover"
                     />
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-3 py-1 text-xs text-green-400">
-                      プレイヤー: {room.players}/{room.maxPlayers}
-                    </div>
                   </div>
                   <div className="p-2">
                     <h4 className="font-bold text-green-400 text-sm">
-                      {room.name}
+                      {room.id}
                     </h4>
                   </div>
                 </div>
@@ -219,13 +238,15 @@ export default function GameInterface() {
           {/* アクションボタン */}
           <div className="flex gap-4 justify-end">
             <Button
+              onClick={craeteRoom}
               variant="outline"
-              className="border-green-400 text-green-400 hover:bg-green-400/20 text-sm h-9"
+              className="bg-green-400 text-black hover:bg-green-500 text-sm h-9"
               disabled={isButtonDisabled}
             >
               <Plus className="mr-1 h-4 w-4" /> ルーム作成
             </Button>
             <Button
+              onClick={joinRoom}
               className="bg-green-400 text-black hover:bg-green-500 text-sm h-9"
               disabled={isButtonDisabled || !selectedRoom}
             >
