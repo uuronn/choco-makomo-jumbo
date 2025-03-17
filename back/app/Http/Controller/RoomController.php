@@ -102,50 +102,43 @@ class RoomController
     public function join(Request $request)
     {
         try {
+            DB::beginTransaction();
+
             $room = Room::where('id', $request->roomId)->first();
 
             if (!$room) {
-                return response()->json([
-                    'message' => '指定されたルームが見つかりません',
-                ], 404);
+                return response()->json(['message' => '指定されたルームが見つかりません'], 404);
             }
 
             if ($room->status !== 'waiting') {
-                return response()->json([
-                    'message' => 'このルームには参加できません',
-                ], 400);
+                return response()->json(['message' => 'このルームには参加できません'], 400);
             }
 
             if ($room->guestUserId) {
-                return response()->json([
-                    'message' => 'このルームにはすでにゲストが参加しています',
-                ], 400);
+                return response()->json(['message' => 'このルームにはすでにゲストが参加しています'], 400);
             }
 
             $characterIdList = $request->characterIdList;
-
             if (empty($characterIdList)) {
                 return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
             }
 
             $room->update([
                 'guestUserId' => $request->guestUserId,
-                'status' => 'in_progress',
+                'status' => 'inProgress',
             ]);
 
             foreach ($characterIdList as $characterId) {
                 $character = Character::find($characterId);
-
                 if (!$character) {
-                    return response()->json(['message' => "Character {$characterId} not found"], 404);
+                    throw new Exception("Character {$characterId} not found", 404);
                 }
 
                 $userCharacter = UserCharacter::where('userId', $room->guestUserId)
                     ->where('characterId', $characterId)
                     ->first();
-
                 if (!$userCharacter) {
-                    return response()->json(['message' => "UserCharacter not found"], 404);
+                    throw new Exception("UserCharacter not found", 404);
                 }
 
                 RoomCharacter::create([
@@ -160,12 +153,15 @@ class RoomController
                 ]);
             }
 
+            DB::commit();
+
             return response()->json($room, 200);
         } catch (Exception $e) {
+            DB::rollBack();
+
             return response()->json([
-                'message' => 'Failed to join room',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => $e->getMessage(),
+            ], $e->getCode() ?: 500);
         }
     }
 
