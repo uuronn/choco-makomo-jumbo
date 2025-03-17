@@ -41,7 +41,7 @@ export default function RoomListPage() {
       (async () => {
         // ルーム一覧を取得
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
         );
         if (!res.ok) {
           throw new Error("ルームの取得に失敗しました");
@@ -51,7 +51,7 @@ export default function RoomListPage() {
 
         // キャラクター一覧を取得
         const charRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
         );
         const charData = await charRes.json();
         console.info("charData", charData);
@@ -66,12 +66,12 @@ export default function RoomListPage() {
       selectedCharacters.some((c) => c.characterId === character.characterId)
     ) {
       setSelectedCharacters((prev) =>
-        prev.filter((c) => c.characterId !== character.characterId)
+        prev.filter((c) => c.characterId !== character.characterId),
       );
     } else {
       if (selectedCharacters.length < 3) {
         setSelectedCharacters(
-          (prev) => [...prev, character] as SelectCharacter[]
+          (prev) => [...prev, character] as SelectCharacter[],
         );
       }
     }

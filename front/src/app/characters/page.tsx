@@ -14,7 +14,7 @@ export default function CharacterListPage() {
     if (user) {
       (async () => {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
         );
         if (!res.ok) {
           throw new Error("キャラクターの取得に失敗しました");

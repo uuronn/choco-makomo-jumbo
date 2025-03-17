@@ -9,6 +9,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import Loading from "~/components/Loading";
 import { auth, googleProvider } from "~/lib/firebase";
 
 const AuthContext = createContext<{
@@ -96,7 +97,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [user, router]);
 
   if (authenticating === true) {
-    return <>認証中...</>;
+    return <Loading message="認証中" />;
   }
 
   return (

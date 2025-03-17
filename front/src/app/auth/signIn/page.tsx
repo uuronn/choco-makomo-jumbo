@@ -102,47 +102,6 @@ export default function Home() {
     };
   }, []);
 
-  useEffect(() => {
-    // Define the callback function for Google Sign-In
-    window.handleSignInWithGoogle = async (response: any) => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        // Here you would normally use Supabase or another auth provider
-        // For this example, we'll just simulate a successful login
-        console.log("Google Sign-In successful", response);
-
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Redirect or update UI after successful login
-        // window.location.href = "/dashboard"
-
-        // For demo purposes, just log success
-        console.log("Login successful, would redirect to dashboard");
-      } catch (err: any) {
-        console.error("Login error:", err);
-        setError(err.message || "Failed to sign in with Google");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    // Initialize Google Sign-In button when script is loaded
-    const interval = setInterval(() => {
-      if (window.google && document.getElementById("g_id_onload")) {
-        clearInterval(interval);
-      }
-    }, 100);
-
-    return () => {
-      clearInterval(interval);
-      // @ts-ignore
-      delete window.handleSignInWithGoogle;
-    };
-  }, []);
-
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4 overflow-hidden">
       <canvas ref={canvasRef} className="absolute inset-0 z-0" />
@@ -208,12 +167,4 @@ export default function Home() {
       </div>
     </div>
   );
-}
-
-// Add TypeScript declaration for the global function
-declare global {
-  interface Window {
-    handleSignInWithGoogle: (response: any) => Promise<void>;
-    google?: any;
-  }
 }
