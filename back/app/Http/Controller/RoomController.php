@@ -122,9 +122,9 @@ class RoomController
                 ], 400);
             }
 
-            $characterIds = $request->characterIds;
+            $characterIdList = $request->characterIdList;
 
-            if (empty($characterIds)) {
+            if (empty($characterIdList)) {
                 return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
             }
 
@@ -133,7 +133,7 @@ class RoomController
                 'status' => 'in_progress',
             ]);
 
-            foreach ($characterIds as $characterId) {
+            foreach ($characterIdList as $characterId) {
                 $character = Character::find($characterId);
 
                 if (!$character) {
