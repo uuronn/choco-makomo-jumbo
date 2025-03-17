@@ -83,6 +83,9 @@ class RoomController
         }
     }
 
+    /**
+     * ルームに参加
+     */
     public function join(Request $request)
     {
         try {
@@ -153,12 +156,17 @@ class RoomController
         }
     }
 
-    public function show(Request $request, $roomId)
+    /**
+     * ルーム情報を取得
+     */
+    public function status(Request $request)
     {
         try {
-            $userId = $request->userId;
+            $userId = $request->route('userId');
+            $roomId = $request->route('roomId');
 
             if (!$userId)  return response()->json(['message' => 'ユーザーIDが必要です'], 401);
+            if (!$roomId)  return response()->json(['message' => 'ルームIDが必要です'], 401);
 
             $room = Room::with(['roomCharacter']) // ルームに紐づくキャラ情報を取得
                         ->select('id', 'hostUserId', 'guestUserId', 'status')
@@ -190,18 +198,12 @@ class RoomController
     public function startBattle(Request $request)
     {
         try {
-            // リクエストからルームIDを取得
-            $roomId = $request->input('roomId');
-            $userId = $request->input('userId'); // フロント側からホストの `userId` を送る
+            $roomId = $request->roomId;
+            $userId = $request->userId;
 
-            // ルームを取得
             $room = Room::where('id', $roomId)->first();
 
-            if (!$room) {
-                return response()->json([
-                    'message' => 'ルームが見つかりません',
-                ], 404);
-            }
+            if (!$room) return response()->json(['message' => 'ルームが見つかりません'], 404);
 
             // リクエストしたユーザーがホストであることを確認
             if ($room->hostUserId !== $userId) {
@@ -220,11 +222,8 @@ class RoomController
             // バトル開始（status を `battling` に更新）
             $room->update(['status' => 'battling']);
 
-            return response()->json([
-                'message' => 'バトルが開始されました',
-                'room' => $room,
-            ], 200);
-        } catch (\Exception $e) {
+            return response()->json($room, 200);
+        } catch (Exception $e) {
             return response()->json([
                 'message' => 'バトル開始に失敗しました',
                 'error' => $e->getMessage(),
