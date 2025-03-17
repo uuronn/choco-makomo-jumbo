@@ -38,11 +38,11 @@ class RoomController
         try {
             $existingRoom = Room::where('hostUserId', $request->hostUserId)->first();
 
-            if ($existingRoom) return response()->json(['message' => '既に作成したルームが存在します'], 400);
-
             $characterIdList = $request->characterIdList;
 
-            if (empty($characterIdList)) return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
+            if ($existingRoom) throw new Exception("既に作成したルームが存在します", 400);
+
+            if (empty($characterIdList)) throw new Exception("キャラクターIDリストが必要です", 400);
 
             $room = Room::create([
                 'id' => Str::uuid(),
@@ -54,13 +54,13 @@ class RoomController
             foreach ($characterIdList as $characterId) {
                 $character = Character::find($characterId);
 
-                if (!$character) return response()->json(['message' => "Character {$characterId} not found"], 404);
+                if (!$character) throw new Exception("Character {$characterId} not found", 404);
 
                 $userCharacter = UserCharacter::where('userId', $room->hostUserId)
                     ->where('characterId', $characterId)
                     ->first();
 
-                if (!$userCharacter) return response()->json(['message' => "UserCharacter not found"], 404);
+                if (!$userCharacter) throw new Exception("UserCharacter not found", 404);
 
                 RoomCharacter::create([
                     'roomId' => $room->id,
@@ -76,10 +76,7 @@ class RoomController
 
             return response()->json($room, 201);
         } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Failed to create room',
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(['message' => $e->getMessage()], $e->getCode() ?: 500);
         }
     }
 
