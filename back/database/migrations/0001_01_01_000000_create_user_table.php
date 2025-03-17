@@ -13,30 +13,12 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->integer('point')->default(50);
-            // $table->rememberToken();
             $table->timestamps();
         });
-
-        // Schema::create('password_reset_tokens', function (Blueprint $table) {
-        //     $table->string('email')->primary();
-        //     $table->string('token');
-        //     $table->timestamp('created_at')->nullable();
-        // });
-
-        // Schema::create('sessions', function (Blueprint $table) {
-        //     $table->string('id')->primary();
-        //     $table->string('userId', 255)->nullable()->index();
-        //     $table->string('ip_address', 45)->nullable();
-        //     $table->text('user_agent')->nullable();
-        //     $table->longText('payload');
-        //     $table->integer('last_activity')->index();
-        // });
     }
 
     public function down(): void
     {
         Schema::dropIfExists('user');
-        // Schema::dropIfExists('password_reset_tokens');
-        // Schema::dropIfExists('sessions');
     }
 };
