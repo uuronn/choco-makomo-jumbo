@@ -136,16 +136,16 @@ export default function CharacterDevelopment() {
         </h1>
 
         {/* Character Status Section */}
-        <div className="flex-1 mb-4 overflow-auto">
+        <div className="flex-1 mb-4">
           {selectedCharacter ? (
             <Card className="w-full border border-emerald-500/50 bg-gray-900/90">
-              <CardContent className="py-2 px-6">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+              <CardContent className="py-1 px-4">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                   {/* Character Image and Basic Info */}
                   <div className="flex flex-col items-center justify-center md:col-span-5">
                     <div
-                      className="relative w-40 h-40 mb-4 border-2 border-emerald-500 rounded-lg overflow-hidden shadow-lg"
-                      style={{ boxShadow: "0 0 15px rgba(16, 185, 129, 0.5)" }}
+                      className="relative w-32 h-32 mb-2 border-2 border-emerald-500 rounded-lg overflow-hidden shadow-lg"
+                      style={{ boxShadow: "0 0 10px rgba(16, 185, 129, 0.5)" }}
                     >
                       <Image
                         src={selectedCharacter.image_url || "/placeholder.svg"}
@@ -154,10 +154,10 @@ export default function CharacterDevelopment() {
                         className="object-cover"
                       />
                     </div>
-                    <h2 className="text-xl font-bold text-green-400">
+                    <h2 className="text-lg font-bold text-green-400">
                       {selectedCharacter.name}
                     </h2>
-                    <div className="flex items-center gap-2 mt-2">
+                    <div className="flex items-center gap-1 mt-1">
                       <Badge
                         className={`${typeColors[selectedCharacter.type as CharacterType]} text-white`}
                       >
@@ -173,15 +173,15 @@ export default function CharacterDevelopment() {
                         )}
                       </div>
                     </div>
-                    <div className="mt-2 text-green-200">
+                    <div className="mt-1 text-green-200">
                       レベル: {selectedCharacter.level}
                     </div>
                   </div>
 
                   {/* Character Stats */}
                   <div className="col-span-2 md:col-span-7">
-                    <div className="mb-4">
-                      <div className="text-lg font-semibold mb-2 text-green-400">
+                    <div className="mb-2">
+                      <div className="text-md font-semibold mb-1 text-green-400">
                         所持ポイント:{" "}
                         <span className="text-emerald-400">
                           {remainingPoints}
@@ -189,18 +189,18 @@ export default function CharacterDevelopment() {
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between bg-gray-800/80 p-3 rounded-md border border-emerald-500/30">
-                        <div className="w-24 text-green-200">ライフ:</div>
-                        <div className="flex-1 mx-4">
-                          <div className="text-lg text-green-400">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
+                        <div className="w-20 text-green-200">ライフ:</div>
+                        <div className="flex-1 mx-2">
+                          <div className="text-md text-green-400">
                             {selectedCharacter.life}
                             {lifePoints > 0 && (
                               <span className="text-emerald-400">{` (+${lifePoints})`}</span>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
                             size="icon"
@@ -210,25 +210,25 @@ export default function CharacterDevelopment() {
                             }
                             disabled={remainingPoints <= 0}
                           >
-                            <Plus className="h-4 w-4" />
+                            <Plus className="h-3 w-3" />
                           </Button>
-                          <div className="w-8 text-center text-emerald-400">
+                          <div className="w-6 text-center text-emerald-400">
                             {lifePoints}
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between bg-gray-800/80 p-3 rounded-md border border-emerald-500/30">
-                        <div className="w-24 text-green-200">パワー:</div>
-                        <div className="flex-1 mx-4">
-                          <div className="text-lg text-green-400">
+                      <div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
+                        <div className="w-20 text-green-200">パワー:</div>
+                        <div className="flex-1 mx-2">
+                          <div className="text-md text-green-400">
                             {selectedCharacter.power}
                             {powerPoints > 0 && (
                               <span className="text-emerald-400">{` (+${powerPoints})`}</span>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
                             size="icon"
@@ -238,25 +238,25 @@ export default function CharacterDevelopment() {
                             }
                             disabled={remainingPoints <= 0}
                           >
-                            <Plus className="h-4 w-4" />
+                            <Plus className="h-3 w-3" />
                           </Button>
-                          <div className="w-8 text-center text-emerald-400">
+                          <div className="w-6 text-center text-emerald-400">
                             {powerPoints}
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between bg-gray-800/80 p-3 rounded-md border border-emerald-500/30">
-                        <div className="w-24 text-green-200">スピード:</div>
-                        <div className="flex-1 mx-4">
-                          <div className="text-lg text-green-400">
+                      <div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
+                        <div className="w-20 text-green-200">スピード:</div>
+                        <div className="flex-1 mx-2">
+                          <div className="text-md text-green-400">
                             {selectedCharacter.speed}
                             {speedPoints > 0 && (
                               <span className="text-emerald-400">{` (+${speedPoints})`}</span>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
                             size="icon"
@@ -266,9 +266,9 @@ export default function CharacterDevelopment() {
                             }
                             disabled={remainingPoints <= 0}
                           >
-                            <Plus className="h-4 w-4" />
+                            <Plus className="h-3 w-3" />
                           </Button>
-                          <div className="w-8 text-center text-emerald-400">
+                          <div className="w-6 text-center text-emerald-400">
                             {speedPoints}
                           </div>
                         </div>
@@ -276,8 +276,8 @@ export default function CharacterDevelopment() {
                     </div>
 
                     <Button
-                      className="mt-6 w-full bg-emerald-500 text-gray-900 hover:bg-green-400 font-bold"
-                      style={{ boxShadow: "0 0 10px rgba(16, 185, 129, 0.5)" }}
+                      className="mt-4 w-full bg-emerald-500 text-gray-900 hover:bg-green-400 font-bold"
+                      style={{ boxShadow: "0 0 8px rgba(16, 185, 129, 0.5)" }}
                       onClick={handleDevelop}
                       disabled={usedPoints === 0}
                     >
@@ -288,8 +288,8 @@ export default function CharacterDevelopment() {
               </CardContent>
             </Card>
           ) : (
-            <div className="flex items-center justify-center h-full border-2 border-dashed border-emerald-500/30 rounded-lg p-8 bg-gray-900/80">
-              <p className="text-green-200 text-lg">
+            <div className="flex items-center justify-center h-full border-2 border-dashed border-emerald-500/30 rounded-lg p-6 bg-gray-900/80">
+              <p className="text-green-200 text-md">
                 キャラクターを選択してください
               </p>
             </div>
@@ -297,7 +297,7 @@ export default function CharacterDevelopment() {
         </div>
 
         {/* Character List Section */}
-        <div className="h-1/3 overflow-auto border rounded-lg p-4 border-emerald-500/30 bg-gray-900/80">
+        <div className="h-1/2 overflow-auto border rounded-lg p-4 border-emerald-500/30 bg-gray-900/80">
           <h2 className="text-xl font-bold mb-4 text-green-400 flex items-center">
             キャラクター一覧
             <div className="h-px flex-grow ml-4 bg-gradient-to-r from-emerald-400 to-transparent"></div>
