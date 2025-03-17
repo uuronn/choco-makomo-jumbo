@@ -38,6 +38,6 @@ class Room extends Model
 
     public function roomCharacter()
     {
-        return $this->hasMany(RoomCharacter::class);
+        return $this->hasMany(RoomCharacter::class, 'roomId');
     }
 }
