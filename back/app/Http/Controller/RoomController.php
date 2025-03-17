@@ -219,6 +219,163 @@ class RoomController
     }
 
     /**
+     * ルームへの参加申請を承認
+     */
+    public function approve(Request $request)
+    {
+        try {
+            $roomId = $request->route('roomId');
+            $userId = $request->route('userId'); // 承認するホストのユーザーID
+
+            $room = Room::where('id', $roomId)->first();
+
+            if (!$room) {
+                return response()->json(['message' => 'ルームが見つかりません'], 404);
+            }
+
+            if ($room->hostUserId !== $userId) {
+                return response()->json(['message' => '承認の権限がありません'], 403);
+            }
+
+            if ($room->status !== 'waiting') {
+                return response()->json(['message' => '現在承認を受け付けていません'], 400);
+            }
+            if (!$room->guestUserId) {
+                return response()->json(['message' => 'ゲストが申請していません'], 400);
+            }
+
+            $characters = RoomCharacter::where('roomId', $roomId)
+                ->orderBy('speed', 'desc')
+                ->get();
+
+            if ($characters->isEmpty()) {
+                return response()->json(['message' => 'ルームにキャラクターが存在しません'], 400);
+            }
+
+            DB::transaction(function () use ($roomId, $characters, $room) {
+                RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
+                $firstTurn = $characters->first();
+                $room->update([
+                    'status' => 'battling',
+                    'currentTurnUserId' => $firstTurn->userId
+                ]);
+            });
+
+            return response()->json([
+                'message' => '参加申請が承認されました',
+                'room' => $room
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => '承認処理に失敗しました',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * 次のターンに進む
+     */
+    public function nextTurn(Request $request)
+    {
+        try {
+            $roomId = $request->route('roomId');
+            $userId = $request->route('userId'); // 現在の行動ユーザー
+
+            $room = Room::where('id', $roomId)->first();
+
+            if (!$room || $room->status !== 'battling') {
+                return response()->json(['message' => 'バトルが進行中ではありません'], 400);
+            }
+
+            if ($room->currentTurnUserId !== $userId) {
+                return response()->json(['message' => 'あなたのターンではありません'], 403);
+            }
+
+            return DB::transaction(function () use ($roomId, $userId, $room) {
+                // 現在のユーザーの最速キャラクターを行動不能に
+                RoomCharacter::where('roomId', $roomId)
+                    ->where('userId', $userId)
+                    ->where('isActive', true)
+                    ->orderBy('speed', 'desc')
+                    ->limit(1)
+                    ->update(['isActive' => false]);
+
+                $nextTurn = RoomCharacter::where('roomId', $roomId)
+                    ->where('isActive', true)
+                    ->orderBy('speed', 'desc')
+                    ->first();
+
+                if (!$nextTurn) {
+                    RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
+                    $nextTurn = RoomCharacter::where('roomId', $roomId)
+                        ->where('isActive', true)
+                        ->orderBy('speed', 'desc')
+                        ->first();
+                }
+
+                $room->update(['currentTurnUserId' => $nextTurn->userId]);
+
+                return response()->json([
+                    'message' => '次のターンに進みました',
+                    'room' => $room,
+                    'next_turn_user_id' => $nextTurn->userId
+                ], 200);
+            });
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'ターン進行に失敗しました',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * ルームへの参加申請を拒否
+     */
+    public function reject(Request $request)
+    {
+        try {
+            $roomId = $request->route('roomId');
+            $userId = $request->route('userId'); // 拒否するホストのユーザーID
+
+            $room = Room::where('id', $roomId)->first();
+
+            if (!$room) {
+                return response()->json(['message' => 'ルームが見つかりません'], 404);
+            }
+
+            // ホストのみが拒否可能
+            if ($room->hostUserId !== $userId) {
+                return response()->json(['message' => '拒否の権限がありません'], 403);
+            }
+
+            // ルームが待機状態で、guestUserIdが既に入っていることを確認
+            if ($room->status !== 'waiting') {
+                return response()->json(['message' => '現在拒否を受け付けていません'], 400);
+            }
+            if (!$room->guestUserId) {
+                return response()->json(['message' => 'ゲストが申請していません'], 400);
+            }
+
+            // ゲストを拒否してguestUserIdをnullにリセット
+            $room->update([
+                'guestUserId' => null
+            ]);
+
+            return response()->json([
+                'message' => '参加申請が拒否されました',
+                'room' => $room
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => '拒否処理に失敗しました',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * ルーム情報を取得
      */
     public function status(Request $request)
