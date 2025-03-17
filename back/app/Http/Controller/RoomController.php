@@ -154,7 +154,7 @@ class RoomController
 
             $room->update([
                 'guestUserId' => $request->guestUserId,
-                'status' => 'inProgress',
+                'status' => 'pending',
             ]);
 
             foreach ($characterIdList as $characterId) {
@@ -240,6 +240,7 @@ class RoomController
             if ($room->status !== 'waiting') {
                 return response()->json(['message' => '現在承認を受け付けていません'], 400);
             }
+
             if (!$room->guestUserId) {
                 return response()->json(['message' => 'ゲストが申請していません'], 400);
             }
