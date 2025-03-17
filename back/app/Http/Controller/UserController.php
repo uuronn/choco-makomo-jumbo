@@ -41,6 +41,18 @@ class UserController
     }
 
     /**
+     * ユーザー情報を取得する
+     */
+    public function getUser($userId)
+    {
+        $user = User::find($userId);
+
+        if (!$user) return response()->json(['message' => 'User not found'], 404);
+
+        return response()->json($user, 200);
+    }
+
+    /**
      * ユーザーが存在するか確認
      */
     public function checkUser($userId)
@@ -51,6 +63,18 @@ class UserController
 
         return response()->json(['message' => 'User exists'], 200);
     }
+
+    /**
+     * ユーザーのpointを取得
+     */
+    // public function getPoint($userId)
+    // {
+    //     $user = User::find($userId);
+
+    //     if (!$user) return response()->json(['message' => 'User not found'], 404);
+
+    //     return response()->json($user->, 200);
+    // }
 
     /**
      * ユーザーのpointを更新
