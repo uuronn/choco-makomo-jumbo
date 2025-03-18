@@ -366,6 +366,7 @@ class RoomController
 
             // ゲストを拒否してguestUserIdをnullにリセット
             $room->update([
+                'status' => 'waiting',
                 'guestUserId' => null
             ]);
 
