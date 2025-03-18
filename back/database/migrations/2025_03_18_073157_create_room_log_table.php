@@ -9,15 +9,15 @@ return new class extends Migration
     public function up()
     {
         Schema::create('roomLog', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->id();
             $table->uuid('roomId');
-            $table->string('actionType', 50);
-            $table->bigInteger('actorUserId')->unsigned();
-            $table->string('actorCharacterId');
-            $table->bigInteger('targetUserId')->unsigned()->nullable();
-            $table->string('targetCharacterId')->nullable();
+            $table->string('actionType');
+            $table->string('actorUserId')->nullable(); // UUID対応
+            $table->unsignedBigInteger('actorCharacterId')->nullable();
+            $table->string('targetUserId')->nullable(); // UUID対応
+            $table->unsignedBigInteger('targetCharacterId')->nullable();
             $table->integer('value')->nullable();
-            $table->text('description')->nullable();
+            $table->string('description');
             $table->timestamps();
 
             $table->foreign('roomId')->references('id')->on('room')->onDelete('cascade');
