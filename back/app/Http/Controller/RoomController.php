@@ -83,6 +83,8 @@ class RoomController
                     'status' => 'waiting',
                 ]);
 
+                // キャラクター名を取得
+                $characterNames = [];
                 foreach ($characterIdList as $characterId) {
                     $character = Character::find($characterId);
 
@@ -98,15 +100,58 @@ class RoomController
                         throw new Exception("UserCharacter not found", 404);
                     }
 
+                    $characterNames[] = $character->name;
+                }
+
+                // 基本倍率（パーティ全体用）
+                $powerMultiplier = 1.0;
+                $speedMultiplier = 1.0;
+                // $defenseMultiplier = 1.0;
+                $lifeMultiplier = 1.0;
+
+                // パーティ全体の組み合わせボーナス
+                if (!array_diff(['html', 'css', 'javascript'], $characterNames)) {
+                    $powerMultiplier = 3;  // powerを20%増
+                    $speedMultiplier = 3;  // speedを10%増
+                } elseif (!array_diff(['react', 'vue', 'angular'], $characterNames)) {
+                    $powerMultiplier = 5;   // powerを10%増
+                    // $defenseMultiplier = 6; // defenseを30%増
+                    $lifeMultiplier = 5;
+                }
+
+                // AとBが揃っているかチェック
+                $hasA = in_array('A', $characterNames);
+                $hasB = in_array('B', $characterNames);
+                $shouldBoostB = $hasA && $hasB;
+
+                // RoomCharacterの作成
+                foreach ($characterIdList as $characterId) {
+                    $character = Character::find($characterId);
+                    $userCharacter = UserCharacter::where('userId', $request->hostUserId)
+                        ->where('characterId', $characterId)
+                        ->first();
+
+                    // 個別倍率（パーティ全体の倍率をベースに調整）
+                    $specificPowerMultiplier = $powerMultiplier;
+                    $specificSpeedMultiplier = $speedMultiplier;
+                    // $specificDefenseMultiplier = $defenseMultiplier;
+                    $specificLifeMultiplier = $lifeMultiplier;
+
+                    // AがいてAとBが揃った場合、Bのステータスをさらに向上
+                    if ($shouldBoostB && $character->name === 'B') {
+                        $specificPowerMultiplier *= 1.2;  // Bのpowerをさらに20%増
+                        $specificSpeedMultiplier *= 1.15; // Bのspeedをさらに15%増
+                    }
+
                     RoomCharacter::create([
                         'roomId' => $room->id,
                         'characterId' => $characterId,
                         'userId' => $room->hostUserId,
                         'level' => $userCharacter->level,
-                        'life' => $userCharacter->life,
-                        'maxLife' => $userCharacter->life,
-                        'power' => $userCharacter->power,
-                        'speed' => $userCharacter->speed,
+                        'life' => $userCharacter->life * $specificLifeMultiplier,
+                        'maxLife' => $userCharacter->life * $specificLifeMultiplier,
+                        'power' => $userCharacter->power * $specificPowerMultiplier,
+                        'speed' => $userCharacter->speed * $specificSpeedMultiplier,
                         'evasion' => $character->base_evasion,
                     ]);
                 }
@@ -248,14 +293,58 @@ class RoomController
                 return response()->json(['message' => 'ゲストが申請していません'], 400);
             }
 
-            // $characters = RoomCharacter::where('roomId', $roomId)->where('userId', $room->hostUserId);
-
-            if ($room->guest) {
-                RoomCharacter::where('roomId', $roomId)->where('userId', $room->guestUserId);
-            }
-
             DB::transaction(function () use ($roomId, $room) {
+                // 自分（ホスト）と味方（ゲスト）のキャラクター一覧を取得
+                $hostCharacters = RoomCharacter::where('roomId', $roomId)
+                    ->where('userId', $room->hostUserId)
+                    ->with('character') // Characterモデルとのリレーション
+                    ->get();
+
+                $guestCharacters = $room->guestUserId
+                    ? RoomCharacter::where('roomId', $roomId)
+                        ->where('userId', $room->guestUserId)
+                        ->with('character')
+                        ->get()
+                    : [];
+
+                // ホストのキャラクター名でステータス向上処理
+                $hostCharacterNames = $hostCharacters->pluck('character.name')->toArray();
+                if (!array_diff(['Warrior', 'Mage', 'Healer'], $hostCharacterNames)) {
+                    RoomCharacter::where('roomId', $roomId)
+                        ->where('userId', $room->hostUserId)
+                        ->update([
+                            'power' => DB::raw('power * 1.2'),  // powerを20%増
+                            'speed' => DB::raw('speed * 1.1')   // speedを10%増
+                        ]);
+                } elseif (!array_diff(['Knight', 'Wizard', 'Priest'], $hostCharacterNames)) {
+                    RoomCharacter::where('roomId', $roomId)
+                        ->where('userId', $room->hostUserId)
+                        ->update([
+                            'power' => DB::raw('power * 1.1'),   // powerを10%増
+                            'evasion' => DB::raw('evasion * 1.3') // defenseを30%増
+                        ]);
+                }
+
+                // ゲストのキャラクター名でステータス向上処理
+                $guestCharacterNames = $guestCharacters->pluck('character.name')->toArray();
+                if (!array_diff(['Archer', 'Tank', 'Support'], $guestCharacterNames)) {
+                    RoomCharacter::where('roomId', $roomId)
+                        ->where('userId', $room->guestUserId)
+                        ->update([
+                            'speed' => DB::raw('speed * 1.25'), // speedを25%増
+                            'power' => DB::raw('power * 1.15')  // powerを15%増
+                        ]);
+                } elseif (!array_diff(['Rogue', 'Berserker', 'Cleric'], $guestCharacterNames)) {
+                    RoomCharacter::where('roomId', $roomId)
+                        ->where('userId', $room->guestUserId)
+                        ->update([
+                            'evasion' => DB::raw('evasion * 1.2'), // defenseを20%増
+                            'maxLife' => DB::raw('hp * 1.2')           // hpを20%増
+                        ]);
+                }
+
                 RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
+
                 $characters = RoomCharacter::where('roomId', $roomId)
                     ->orderBy('speed', 'desc')
                     ->get();
