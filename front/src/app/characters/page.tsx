@@ -218,7 +218,7 @@ export default function CharacterDevelopment() {
 
                     <div className="space-y-2">
                       <div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
-                        <div className="w-20 text-green-200">ライフ:</div>
+                        <div className="w-20 text-green-200">HP :</div>
                         <div className="flex-1 mx-2">
                           <div className="text-md text-green-400">
                             {selectedCharacter.life}
@@ -239,7 +239,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={lifePoints <= 0}
                           >
-                            <Minus className="h-3 w-3" />
+                            <Minus  />
                           </Button>
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
@@ -253,7 +253,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={remainingPoints <= 0}
                           >
-                            <Plus className="h-3 w-3" />
+                            <Plus  />
                           </Button>
                           <div className="w-6 text-center text-emerald-400">
                             {lifePoints}
@@ -280,7 +280,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={powerPoints <= 0}
                           >
-                            <Minus className="h-3 w-3" />
+                            <Minus  />
                           </Button>
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
@@ -291,7 +291,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={remainingPoints <= 0}
                           >
-                            <Plus className="h-3 w-3" />
+                            <Plus  />
                           </Button>
                           <div className="w-6 text-center text-emerald-400">
                             {powerPoints}
@@ -318,7 +318,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={speedPoints <= 0}
                           >
-                            <Minus className="h-3 w-3" />
+                            <Minus  />
                           </Button>
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
@@ -329,11 +329,22 @@ export default function CharacterDevelopment() {
                             }
                             disabled={remainingPoints <= 0}
                           >
-                            <Plus className="h-3 w-3" />
+                            <Plus  />
                           </Button>
                           <div className="w-6 text-center text-emerald-400">
                             {speedPoints}
                           </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
+                        <div className="w-20 text-green-200">回避率 :</div>
+                        <div className="flex-1 mx-2">
+                          <div className="text-md text-green-400">
+                            {selectedCharacter.base_evasion}%
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
                         </div>
                       </div>
                     </div>

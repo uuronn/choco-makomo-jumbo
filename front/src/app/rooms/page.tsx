@@ -136,23 +136,26 @@ export default function GameInterface() {
                       />
                     </div>
                     <div>
-                      <h4 className="font-bold text-green-400">
+                      <h5 className="font-bold text-green-400">
                         {character.name}
-                      </h4>
-                      <p className="text-xs text-green-400/70">
+                      </h5>
+                      <p className="text-xs font-bold text-green-400/70">
                         レベル {character.level}
                       </p>
                     </div>
                     <div className="flex justify-around items-center ml-auto gap-4">
-                      <h4 className="font-bold text-green-400">
+                      <h5 className="font-bold text-green-400 text-xs">
                         HP {character.life}
-                      </h4>
-                      <h4 className="font-bold text-green-400">
+                      </h5>
+                      <h5 className="font-bold text-green-400 text-xs">
                         パワー {character.power}
-                      </h4>
-                      <h4 className="font-bold text-green-400">
+                      </h5>
+                      <h5 className="font-bold text-green-400 text-xs">
                         スピード {character.speed}
-                      </h4>
+                      </h5>
+                      <h5 className="font-bold text-green-400 text-xs">
+                        回避率 {character.base_evasion}%
+                      </h5>
                     </div>
                     <div className="ml-auto">
                       <Button

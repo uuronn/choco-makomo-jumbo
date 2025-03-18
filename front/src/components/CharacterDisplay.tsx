@@ -73,6 +73,8 @@ export const CharacterDisplay = React.memo(
           <span className="text-xs">パワー {character.power}</span>
 
           <span className="text-xs">スピード {character.speed}</span>
+
+          <span className="text-xs">回避率 {character.evasion}%</span>
         </div>
       </div>
     );
