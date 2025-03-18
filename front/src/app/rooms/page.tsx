@@ -8,14 +8,14 @@ import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 import { useAuth } from "~/context/AuthProvider";
 import { Character } from "~/type/character";
-import { Room } from "~/type/room";
+import { Room, SelectingRoom } from "~/type/room";
 import { FaLaptopCode } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
 export default function GameInterface() {
   const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [rooms, setRooms] = useState<Room[]>([]);
+  const [selectedRoom, setSelectedRoom] = useState<SelectingRoom | null>(null);
+  const [rooms, setRooms] = useState<SelectingRoom[]>([]);
 
   const { user, havingCharacters } = useAuth();
 
@@ -35,7 +35,7 @@ export default function GameInterface() {
     }
   };
 
-  const handleSelectRoom = (room: Room) => {
+  const handleSelectRoom = (room: SelectingRoom) => {
     setSelectedRoom(room);
   };
 
@@ -87,6 +87,7 @@ export default function GameInterface() {
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
       );
       const roomsData = await roomsRas.json();
+      console.log(roomsData);
       setRooms(roomsData);
     })();
   }, []);
@@ -205,24 +206,25 @@ export default function GameInterface() {
                 <div
                   key={room.id}
                   className={cn(
-                    "flex flex-col rounded-lg border transition-all cursor-pointer min-w-[200px]  min-h-[160px] overflow-hidden",
+                    "flex flex-col rounded-lg border transition-all justify-center items-center cursor-pointer min-w-[200px]  min-h-[160px] overflow-hidden",
                     selectedRoom?.id === room.id
                       ? "bg-green-400/20 border-green-400"
                       : "bg-black/30 border-green-400/20 hover:bg-green-400/10",
                   )}
                   onClick={() => handleSelectRoom(room)}
                 >
-                  <div className="relative h-[90px] w-full">
+                  <div className="relative h-[90px] w-full flex items-center justify-center">
                     <Image
-                      src={"/placeholder.svg"}
+                      src={room.host_user.photoUrl || "/placeholder.svg"}
                       alt={room.id}
-                      fill
-                      className="object-cover"
+                      width={80}
+                      height={80}
+                      className="object-cover rounded-full"
                     />
                   </div>
-                  <div className="p-2">
+                  <div className="p-2 text-center">
                     <h4 className="font-bold text-green-400 text-sm">
-                      {room.id}
+                      {room.host_user.name}
                     </h4>
                   </div>
                 </div>
