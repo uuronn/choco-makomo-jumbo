@@ -13,6 +13,7 @@ return new class extends Migration
             $table->uuid('hostUserId')->index();
             $table->uuid('guestUserId')->nullable()->index();
             $table->string('currentTurnUserId')->nullable();
+            $table->uuid('currentTurnCharacterId')->nullable();
             $table->string('winUserId')->nullable();
             $table->string('status'); // ルームの状態（waiting, pending, battling, finished）
             $table->timestamps();

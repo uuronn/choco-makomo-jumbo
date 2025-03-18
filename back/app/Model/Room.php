@@ -14,7 +14,7 @@ class Room extends Model
 
     protected $hidden = ['created_at', 'updated_at'];
 
-    protected $fillable = ['id', 'hostUserId', 'guestUserId', 'status', 'winUserId', 'currentTurnUserId'];
+    protected $fillable = ['id', 'hostUserId', 'guestUserId', 'status', 'winUserId', 'currentTurnUserId', 'currentTurnCharacterId'];
 
     protected static function boot()
     {
