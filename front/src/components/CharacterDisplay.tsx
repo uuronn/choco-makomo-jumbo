@@ -10,12 +10,14 @@ export const CharacterDisplay = React.memo(
     character,
     isEnemy,
     isActive,
+    effect,
     onClick,
   }: {
     character: RoomCharacter;
     isSelected?: boolean;
     isEnemy: boolean;
     isActive?: boolean;
+    effect?: "blink" | string;
     onClick: () => void;
   }) => {
     const hpPercentage = (character.life / character.maxLife) * 100;
@@ -30,9 +32,24 @@ export const CharacterDisplay = React.memo(
       ? "shadow-[0_0_15px_5px_rgba(239,68,68,0.5)]"
       : "shadow-[0_0_15px_5px_rgba(59,130,246,0.5)]";
 
+    // Define the blink animation variants
+    const blinkVariants = {
+      blink: {
+        x: [0, -3, 3, -2, 2, 0],
+        transition: {
+          duration: 0.5,
+          repeat: Number.POSITIVE_INFINITY,
+          repeatType: "loop" as const,
+        },
+      },
+      idle: {
+        x: 0,
+      },
+    };
+
     return (
       <div
-        className={`flex flex-col items-center rounded-lg transition-all `}
+        className={`flex flex-col items-center rounded-lg transition-all`}
         onClick={onClick}
       >
         <div className="relative w-full h-32 mb-2 flex items-center justify-center">
@@ -123,12 +140,17 @@ export const CharacterDisplay = React.memo(
             </div>
           )}
 
-          <div
-            className={`absolute inset-0 rounded-lg overflow-hidden flex justify-center items-center `}
+          <motion.div
+            className={`absolute inset-0 rounded-lg overflow-hidden flex justify-center items-center`}
             style={{
               animation:
-                character.life > 0 ? `float 3s ease-in-out infinite` : "none",
+                character.life > 0 && !effect
+                  ? `float 3s ease-in-out infinite`
+                  : "none",
             }}
+            // Apply the blink animation when effect is "blink"
+            animate={effect === "blink" ? "blink" : "idle"}
+            variants={blinkVariants}
           >
             <Image
               src={character.character.image_url || "/placeholder.svg"}
@@ -140,7 +162,7 @@ export const CharacterDisplay = React.memo(
                 filter: character.life === 0 ? "grayscale(100%)" : "none",
               }}
             />
-          </div>
+          </motion.div>
         </div>
         <div className="w-[200px] text-green-400 flex justify-center items-center">
           <span className="text-lg">{character.character.name}</span>
@@ -168,7 +190,8 @@ export const CharacterDisplay = React.memo(
       prevProps.character === nextProps.character &&
       prevProps.isSelected === nextProps.isSelected &&
       prevProps.isEnemy === nextProps.isEnemy &&
-      prevProps.isActive === nextProps.isActive
+      prevProps.isActive === nextProps.isActive &&
+      prevProps.effect === nextProps.effect
     );
   },
 );

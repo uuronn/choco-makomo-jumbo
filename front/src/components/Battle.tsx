@@ -2,15 +2,18 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Loader2, Sword, Zap } from "lucide-react";
-import { Room, RoomCharacter } from "~/type/room";
+import type { Room, RoomCharacter } from "~/type/room";
 import { useUserContext } from "~/context/UserProvider";
-import Image from "next/image";
-import React from "react";
 import { CharacterDisplay } from "./CharacterDisplay";
-import { log } from "console";
 
 type BattleProps = {
   room: Room;
+};
+
+type EffectInfo = {
+  type: "blink" | string;
+  endTime: number;
+  resolve?: () => void; // Promise の resolve 関数を保存
 };
 
 export default function Battle({ room }: BattleProps) {
@@ -25,9 +28,67 @@ export default function Battle({ room }: BattleProps) {
   const [battleLog, setBattleLog] = useState<string[]>([]);
   const [isSelectingAction, setIsSelectingAction] = useState<boolean>(false);
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
+  const [characterEffects, setCharacterEffects] = useState<
+    Record<string, EffectInfo>
+  >({});
   const { user } = useUserContext();
 
   const isSelectingEnemy = isMyTurn && selectedAction === "attack";
+
+  // Promise を返す showEffect 関数
+  const showEffect = useCallback(
+    (
+      roomCharacterId: string,
+      effectType: "blink" | string,
+      durationMs: number,
+    ): Promise<void> => {
+      return new Promise<void>((resolve) => {
+        const now = Date.now();
+        setCharacterEffects((prev) => ({
+          ...prev,
+          [roomCharacterId]: {
+            type: effectType,
+            endTime: now + durationMs,
+            resolve, // Promise の resolve 関数を保存
+          },
+        }));
+      });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (Object.keys(characterEffects).length === 0) return;
+
+    const checkEffectsInterval = setInterval(() => {
+      const now = Date.now();
+      let hasExpired = false;
+
+      Object.entries(characterEffects).forEach(([characterId, effectInfo]) => {
+        if (effectInfo.endTime <= now) {
+          hasExpired = true;
+        }
+      });
+
+      if (hasExpired) {
+        setCharacterEffects((prev) => {
+          const newEffects = { ...prev };
+          Object.keys(newEffects).forEach((characterId) => {
+            if (newEffects[characterId].endTime <= now) {
+              // エフェクトが終了したら Promise を解決
+              if (newEffects[characterId].resolve) {
+                newEffects[characterId].resolve();
+              }
+              delete newEffects[characterId];
+            }
+          });
+          return newEffects;
+        });
+      }
+    }, 100);
+
+    return () => clearInterval(checkEffectsInterval);
+  }, [characterEffects]);
 
   useEffect(() => {
     if (!preventRoom) {
@@ -47,7 +108,14 @@ export default function Battle({ room }: BattleProps) {
             return prevCharacter && character.life < prevCharacter.life;
           },
         );
-        console.log(decreasedLifeCharacters, "😄");
+
+        if (decreasedLifeCharacters.length > 0) {
+          console.log(decreasedLifeCharacters, "😄");
+          // エフェクトを表示して完了を待つ
+          (async () => {
+            await showEffect(decreasedLifeCharacters[0].id, "blink", 1000);
+          })();
+        }
       }
 
       setPreventRoom(room);
@@ -69,7 +137,7 @@ export default function Battle({ room }: BattleProps) {
     setIsMyTurn(isMyTurn);
     setBattleLog(room.room_log.map((log) => log.description));
     setLoading(false);
-  }, [room]);
+  }, [room, showEffect, user?.uid]);
 
   useEffect(() => {
     const logContainer = document.getElementById("battle-log");
@@ -79,7 +147,7 @@ export default function Battle({ room }: BattleProps) {
   }, [battleLog]);
 
   const attackEnemy = async (characterId: string) => {
-    if (!isSelectingEnemy) return;
+    if (!isSelectingEnemy) return; // エフェクト完了後に攻撃処理を実行
     (async () => {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/attack`,
@@ -94,6 +162,7 @@ export default function Battle({ room }: BattleProps) {
         },
       );
     })();
+
     setLoading(true);
     setSelectedAction(null);
     setIsSelectingAction(false);
@@ -139,6 +208,7 @@ export default function Battle({ room }: BattleProps) {
             } border-2 border-transparent rounded-md`}
           >
             <CharacterDisplay
+              effect={characterEffects[character.id]?.type}
               isEnemy={true}
               key={character.id}
               character={character}
@@ -158,6 +228,7 @@ export default function Battle({ room }: BattleProps) {
       <div className="flex justify-center gap-4 mb-4">
         {playerTeam.map((character) => (
           <CharacterDisplay
+            effect={characterEffects[character.id]?.type}
             isEnemy={false}
             key={character.id}
             character={character}
