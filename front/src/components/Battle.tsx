@@ -18,7 +18,7 @@ type EffectInfo = {
 
 export default function Battle({ room }: BattleProps) {
   const [activeCharacter, setActiveCharacter] = useState<RoomCharacter | null>(
-    null
+    null,
   );
   const [preventRoom, setPreventRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -42,7 +42,7 @@ export default function Battle({ room }: BattleProps) {
     (
       roomCharacterId: string,
       effectType: "blink" | string,
-      durationMs: number
+      durationMs: number,
     ): Promise<void> => {
       return new Promise<void>((resolve) => {
         const now = Date.now();
@@ -56,7 +56,7 @@ export default function Battle({ room }: BattleProps) {
         }));
       });
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -98,8 +98,8 @@ export default function Battle({ room }: BattleProps) {
         (character) =>
           character.characterId === room.currentTurnCharacterId &&
           character.userId === user?.uid &&
-          room.currentTurnUserId === user?.uid
-      ) || null
+          room.currentTurnUserId === user?.uid,
+      ) || null,
     );
     if (!preventRoom) {
       setPreventRoom(room);
@@ -116,10 +116,10 @@ export default function Battle({ room }: BattleProps) {
         const decreasedLifeCharacters = room.room_character.filter(
           (character) => {
             const prevCharacter = preventRoom.room_character.find(
-              (prevChar) => prevChar.characterId === character.characterId
+              (prevChar) => prevChar.characterId === character.characterId,
             );
             return prevCharacter && character.life < prevCharacter.life;
-          }
+          },
         );
         if (decreasedLifeCharacters.length > 0) {
           (async () => {
@@ -127,7 +127,7 @@ export default function Battle({ room }: BattleProps) {
               decreasedLifeCharacters.map(async (character) => {
                 await showEffect(character.id, "explosion", 600);
                 await showEffect(character.id, "blink", 1000);
-              })
+              }),
             );
           })();
         }
@@ -136,10 +136,10 @@ export default function Battle({ room }: BattleProps) {
       setIsSelectingAction(false);
     }
     setPlayerTeam(
-      room.room_character.filter((character) => character.userId === user?.uid)
+      room.room_character.filter((character) => character.userId === user?.uid),
     );
     setEnemyTeam(
-      room.room_character.filter((character) => character.userId !== user?.uid)
+      room.room_character.filter((character) => character.userId !== user?.uid),
     );
     const isMyTurn = room.currentTurnUserId === user?.uid;
 
@@ -173,7 +173,7 @@ export default function Battle({ room }: BattleProps) {
             body: JSON.stringify({
               targetCharacterId: characterId,
             }),
-          }
+          },
         );
       })();
     }
@@ -183,7 +183,7 @@ export default function Battle({ room }: BattleProps) {
         {
           method: "POST",
           body: JSON.stringify({ targetCharacterId: characterId }),
-        }
+        },
       );
     }
     setLoading(true);
@@ -202,7 +202,7 @@ export default function Battle({ room }: BattleProps) {
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/skill`,
         {
           method: "POST",
-        }
+        },
       );
     }
   };
