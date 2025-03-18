@@ -405,7 +405,7 @@ class RoomController
             if (!$userId)  return response()->json(['message' => 'ユーザーIDが必要です'], 401);
             if (!$roomId)  return response()->json(['message' => 'ルームIDが必要です'], 401);
 
-            $room = Room::with(['roomCharacter']) // ルームに紐づくキャラ情報を取得
+            $room = Room::with(['roomCharacter.character']) // ルームに紐づくキャラ情報を取得
                         ->select('id', 'hostUserId', 'guestUserId', 'status')
                         ->where('id', $roomId)
                         ->first();
@@ -432,109 +432,109 @@ class RoomController
         }
     }
 
-    public function startBattle(Request $request)
-    {
-        try {
-            $roomId = $request->roomId;
-            $userId = $request->userId;
+    // public function startBattle(Request $request)
+    // {
+    //     try {
+    //         $roomId = $request->roomId;
+    //         $userId = $request->userId;
 
-            $room = Room::where('id', $roomId)->first();
+    //         $room = Room::where('id', $roomId)->first();
 
-            if (!$room) return response()->json(['message' => 'ルームが見つかりません'], 404);
+    //         if (!$room) return response()->json(['message' => 'ルームが見つかりません'], 404);
 
-            // リクエストしたユーザーがホストであることを確認
-            if ($room->hostUserId !== $userId) {
-                return response()->json([
-                    'message' => 'バトル開始の権限がありません',
-                ], 403);
-            }
+    //         // リクエストしたユーザーがホストであることを確認
+    //         if ($room->hostUserId !== $userId) {
+    //             return response()->json([
+    //                 'message' => 'バトル開始の権限がありません',
+    //             ], 403);
+    //         }
 
-            // ルームの状態が `waiting` であることを確認
-            if ($room->status !== 'waiting') {
-                return response()->json([
-                    'message' => 'バトルを開始できる状態ではありません',
-                ], 400);
-            }
+    //         // ルームの状態が `waiting` であることを確認
+    //         if ($room->status !== 'waiting') {
+    //             return response()->json([
+    //                 'message' => 'バトルを開始できる状態ではありません',
+    //             ], 400);
+    //         }
 
-            // バトル開始（status を `battling` に更新）
-            $room->update(['status' => 'battling']);
+    //         // バトル開始（status を `battling` に更新）
+    //         $room->update(['status' => 'battling']);
 
-            return response()->json($room, 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'バトル開始に失敗しました',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
+    //         return response()->json($room, 200);
+    //     } catch (Exception $e) {
+    //         return response()->json([
+    //             'message' => 'バトル開始に失敗しました',
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
-    public function processAction(Request $request)
-    {
-        try {
-            $roomId = $request->input('roomId');
-            $userId = $request->input('userId');
-            $command = $request->input('command'); // "attack" or "defend"
+    // public function processAction(Request $request)
+    // {
+    //     try {
+    //         $roomId = $request->input('roomId');
+    //         $userId = $request->input('userId');
+    //         $command = $request->input('command'); // "attack" or "defend"
 
-            $room = Room::where('id', $roomId)->first();
+    //         $room = Room::where('id', $roomId)->first();
 
-            if (!$room || $room->status !== 'battling') {
-                return response()->json(['message' => 'バトルが進行中ではありません'], 400);
-            }
+    //         if (!$room || $room->status !== 'battling') {
+    //             return response()->json(['message' => 'バトルが進行中ではありません'], 400);
+    //         }
 
-            if ($room->currentTurnUserId !== $userId) {
-                return response()->json(['message' => 'あなたのターンではありません'], 403);
-            }
+    //         if ($room->currentTurnUserId !== $userId) {
+    //             return response()->json(['message' => 'あなたのターンではありません'], 403);
+    //         }
 
-            // ターンを切り替える
-            $nextTurnUserId = $room->hostUserId === $userId ? $room->guestUserId : $room->hostUserId;
-            $room->update(['currentTurnUserId' => $nextTurnUserId, ]);
+    //         // ターンを切り替える
+    //         $nextTurnUserId = $room->hostUserId === $userId ? $room->guestUserId : $room->hostUserId;
+    //         $room->update(['currentTurnUserId' => $nextTurnUserId, ]);
 
-            return response()->json(['message' => "{$userId} が {$command} を選択しました", 'room' => $room], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => '処理に失敗しました', 'error' => $e->getMessage()], 500);
-        }
-    }
+    //         return response()->json(['message' => "{$userId} が {$command} を選択しました", 'room' => $room], 200);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['message' => '処理に失敗しました', 'error' => $e->getMessage()], 500);
+    //     }
+    // }
 
-    public function endBattle(Request $request)
-    {
-        try {
-            $roomId = $request->input('roomId');
-            $winner = $request->input('winner'); // "host" or "guest"
+    // public function endBattle(Request $request)
+    // {
+    //     try {
+    //         $roomId = $request->input('roomId');
+    //         $winner = $request->input('winner'); // "host" or "guest"
 
-            // ルームを取得
-            $room = Room::where('id', $roomId)->first();
+    //         // ルームを取得
+    //         $room = Room::where('id', $roomId)->first();
 
-            if (!$room) {
-                return response()->json([
-                    'message' => 'ルームが見つかりません',
-                ], 404);
-            }
+    //         if (!$room) {
+    //             return response()->json([
+    //                 'message' => 'ルームが見つかりません',
+    //             ], 404);
+    //         }
 
-            // ルームの状態が `battling` でなければ処理しない
-            if ($room->status !== 'battling') {
-                return response()->json([
-                    'message' => 'バトルが進行中ではありません',
-                ], 400);
-            }
+    //         // ルームの状態が `battling` でなければ処理しない
+    //         if ($room->status !== 'battling') {
+    //             return response()->json([
+    //                 'message' => 'バトルが進行中ではありません',
+    //             ], 400);
+    //         }
 
-            // 勝者を保存（勝者のユーザーIDを設定）
-            $winnerUserId = $winner === 'host' ? $room->hostUserId : $room->guestUserId;
-            $room->update([
-                'status' => 'finished',
-                'winnerId' => $winnerUserId, // 勝者のIDを記録（`rooms` テーブルに `winnerId` カラムが必要）
-            ]);
+    //         // 勝者を保存（勝者のユーザーIDを設定）
+    //         $winnerUserId = $winner === 'host' ? $room->hostUserId : $room->guestUserId;
+    //         $room->update([
+    //             'status' => 'finished',
+    //             'winnerId' => $winnerUserId, // 勝者のIDを記録（`rooms` テーブルに `winnerId` カラムが必要）
+    //         ]);
 
-            return response()->json([
-                'message' => 'バトル結果が保存されました',
-                'room' => $room,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'バトル結果の保存に失敗しました',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'message' => 'バトル結果が保存されました',
+    //             'room' => $room,
+    //         ], 200);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'message' => 'バトル結果の保存に失敗しました',
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
     /**
      * ルームを全て削除（テスト用）
