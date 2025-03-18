@@ -16,7 +16,7 @@ export default function Battle({ room }: BattleProps) {
   const [playerTeam, setPlayerTeam] = useState<RoomCharacter[]>([]);
   const [enemyTeam, setEnemyTeam] = useState<RoomCharacter[]>([]);
   const [charactersBySpeed, setCharactersBySpeed] = useState<RoomCharacter[]>(
-    [],
+    []
   );
   const [isMyTurn, setIsMyTurn] = useState<boolean>(true);
   const [battleLog, setBattleLog] = useState<string[]>(["バトル開始！"]);
@@ -32,10 +32,10 @@ export default function Battle({ room }: BattleProps) {
 
   useEffect(() => {
     setPlayerTeam(
-      room.room_character.filter((character) => character.userId === user?.uid),
+      room.room_character.filter((character) => character.userId === user?.uid)
     );
     setEnemyTeam(
-      room.room_character.filter((character) => character.userId !== user?.uid),
+      room.room_character.filter((character) => character.userId !== user?.uid)
     );
     setCharactersBySpeed(room.room_character.sort((a, b) => b.speed - a.speed));
     const isMyTurn = room.currentTurnUserId === user?.uid;
@@ -65,7 +65,7 @@ export default function Battle({ room }: BattleProps) {
           body: JSON.stringify({
             targetCharacterId: characterId,
           }),
-        },
+        }
       );
     })();
     setSelectedAction(null);
@@ -106,7 +106,7 @@ export default function Battle({ room }: BattleProps) {
             onClick={() => attackEnemy(enemy.id)}
             key={enemy.id}
             className={`${
-              isSelectingEnemy ? "hover:border-green-500" : ""
+              isSelectingEnemy && enemy.life > 0 ? "hover:border-green-500" : ""
             } border-2 border-transparent rounded-md`}
           >
             <CharacterDisplay
@@ -115,7 +115,9 @@ export default function Battle({ room }: BattleProps) {
               character={enemy}
               onClick={() => {}}
             />
-            {isSelectingEnemy && <p className="w-full blink text-center">▲</p>}
+            {isSelectingEnemy && enemy.life > 0 && (
+              <p className="w-full blink text-center">▲</p>
+            )}
           </div>
         ))}
       </div>
