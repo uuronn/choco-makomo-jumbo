@@ -655,6 +655,31 @@ class RoomController
                     'currentTurnCharacterId' => $nextTurn->characterId
                 ]);
 
+                // 終了条件のチェック
+                $hostCharacters = RoomCharacter::where('roomId', $roomId)
+                    ->where('userId', $room->hostUserId)
+                    ->get();
+                $guestCharacters = RoomCharacter::where('roomId', $roomId)
+                    ->where('userId', $room->guestUserId)
+                    ->get();
+
+                $hostAlive = $hostCharacters->where('life', '>', 0)->count() > 0;
+                $guestAlive = $guestCharacters->where('life', '>', 0)->count() > 0;
+
+                if (!$hostAlive || !$guestAlive) {
+                    $room->update(['status' => 'finish']);
+                    RoomLog::create([
+                        'roomId' => $roomId,
+                        'actionType' => 'finish',
+                        'actorUserId' => null,
+                        'actorCharacterId' => null,
+                        'targetUserId' => null,
+                        'targetCharacterId' => null,
+                        'value' => null,
+                        'description' => !$hostAlive ? "ホスト側が全滅し、バトルが終了しました" : "ゲスト側が全滅し、バトルが終了しました",
+                    ]);
+                }
+
                 $room->refresh();
 
                 return response()->json([
