@@ -691,15 +691,16 @@ class RoomController
                 $hostAlive = $hostCharacters->where('isDead', false)->count() > 0;
                 $guestAlive = $guestCharacters->where('isDead', false)->count() > 0;
 
-                $winUserId = !$hostAlive ? $room->guestUserId : $room->hostUserId;
 
-                $room->update([
-                    'status' => 'finish',
-                    'winUserId' => $winUserId
-                ]);
 
                 if (!$hostAlive || !$guestAlive) {
-                    $room->update(['status' => 'finish']);
+                    $winUserId = !$hostAlive ? $room->guestUserId : $room->hostUserId;
+
+                    $room->update([
+                        'status' => 'finish',
+                        'winUserId' => $winUserId
+                    ]);
+
                     RoomLog::create([
                         'roomId' => $roomId,
                         'actionType' => 'finish',
