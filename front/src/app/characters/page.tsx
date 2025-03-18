@@ -131,6 +131,8 @@ export default function CharacterDevelopment() {
     setPowerPoints(0);
     setSpeedPoints(0);
 
+    fetchCharacters();
+
     // const updatedCharacter = havingCharacters.find(
     //   (character) => character.characterId === selectedCharacter.characterId
     // );
@@ -239,7 +241,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={lifePoints <= 0}
                           >
-                            <Minus  />
+                            <Minus />
                           </Button>
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
@@ -253,7 +255,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={remainingPoints <= 0}
                           >
-                            <Plus  />
+                            <Plus />
                           </Button>
                           <div className="w-6 text-center text-emerald-400">
                             {lifePoints}
@@ -280,7 +282,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={powerPoints <= 0}
                           >
-                            <Minus  />
+                            <Minus />
                           </Button>
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
@@ -291,7 +293,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={remainingPoints <= 0}
                           >
-                            <Plus  />
+                            <Plus />
                           </Button>
                           <div className="w-6 text-center text-emerald-400">
                             {powerPoints}
@@ -318,7 +320,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={speedPoints <= 0}
                           >
-                            <Minus  />
+                            <Minus />
                           </Button>
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
@@ -329,7 +331,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={remainingPoints <= 0}
                           >
-                            <Plus  />
+                            <Plus />
                           </Button>
                           <div className="w-6 text-center text-emerald-400">
                             {speedPoints}
@@ -344,8 +346,7 @@ export default function CharacterDevelopment() {
                             {selectedCharacter.base_evasion}%
                           </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                        </div>
+                        <div className="flex items-center gap-1"></div>
                       </div>
                     </div>
 
@@ -377,36 +378,37 @@ export default function CharacterDevelopment() {
             <div className="h-px flex-grow ml-4 bg-gradient-to-r from-emerald-400 to-transparent"></div>
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {havingCharacters.map((character) => (
-              <div
-                key={character.characterId}
-                className={`cursor-pointer p-2 rounded-lg transition-all ${
-                  selectedCharacter?.characterId === character.characterId
-                    ? "bg-emerald-500/20 border border-emerald-500"
-                    : "hover:bg-gray-800 border border-emerald-500/10 hover:border-emerald-500/50"
-                }`}
-                style={
-                  selectedCharacter?.characterId === character.characterId
-                    ? { boxShadow: "0 0 10px rgba(16, 185, 129, 0.3)" }
-                    : {}
-                }
-                onClick={() => handleCharacterSelect(character)}
-              >
-                <div className="flex flex-col items-center">
-                  <div className="relative w-16 h-16 mb-2 overflow-hidden rounded-lg">
-                    <Image
-                      src={character.image_url || "/placeholder.svg"}
-                      alt={character.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="text-center font-medium text-green-200">
-                    {character.name}
+            {havingCharacters &&
+              havingCharacters.map((character) => (
+                <div
+                  key={character.characterId}
+                  className={`cursor-pointer p-2 rounded-lg transition-all ${
+                    selectedCharacter?.characterId === character.characterId
+                      ? "bg-emerald-500/20 border border-emerald-500"
+                      : "hover:bg-gray-800 border border-emerald-500/10 hover:border-emerald-500/50"
+                  }`}
+                  style={
+                    selectedCharacter?.characterId === character.characterId
+                      ? { boxShadow: "0 0 10px rgba(16, 185, 129, 0.3)" }
+                      : {}
+                  }
+                  onClick={() => handleCharacterSelect(character)}
+                >
+                  <div className="flex flex-col items-center">
+                    <div className="relative w-16 h-16 mb-2 overflow-hidden rounded-lg">
+                      <Image
+                        src={character.image_url || "/placeholder.svg"}
+                        alt={character.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="text-center font-medium text-green-200">
+                      {character.name}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </div>

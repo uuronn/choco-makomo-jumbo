@@ -179,35 +179,36 @@ export default function GameInterface() {
             </h3>
             <div className="h-[calc(100%-22px)] overflow-auto pb-2">
               <div className="flex flex-wrap gap-3 content-start">
-                {havingCharacters.map((character) => (
-                  <div
-                    key={character.characterId}
-                    className={cn(
-                      "flex flex-col justify-center items-center p-1.5 rounded-lg border transition-all cursor-pointer h-[150px] w-[150px]",
-                      selectedCharacters.find(
-                        (c) => c.characterId === character.characterId,
-                      )
-                        ? "bg-green-400/20 border-green-400"
-                        : "bg-black/30 border-green-400/20 hover:bg-green-400/10",
-                    )}
-                    onClick={() => handleSelectCharacter(character)}
-                  >
-                    <div className="relative h-12 w-12 mb-1 rounded-full overflow-hidden border-2 border-green-400/50">
-                      <Image
-                        src={character.image_url || "/placeholder.svg"}
-                        alt={character.name}
-                        fill
-                        className="object-cover"
-                      />
+                {havingCharacters &&
+                  havingCharacters.map((character) => (
+                    <div
+                      key={character.characterId}
+                      className={cn(
+                        "flex flex-col justify-center items-center p-1.5 rounded-lg border transition-all cursor-pointer h-[150px] w-[150px]",
+                        selectedCharacters.find(
+                          (c) => c.characterId === character.characterId,
+                        )
+                          ? "bg-green-400/20 border-green-400"
+                          : "bg-black/30 border-green-400/20 hover:bg-green-400/10",
+                      )}
+                      onClick={() => handleSelectCharacter(character)}
+                    >
+                      <div className="relative h-12 w-12 mb-1 rounded-full overflow-hidden border-2 border-green-400/50">
+                        <Image
+                          src={character.image_url || "/placeholder.svg"}
+                          alt={character.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <h4 className="font-bold text-center text-green-400 text-sm">
+                        {character.name}
+                      </h4>
+                      <p className="text-xs text-green-400/70">
+                        レベル {character.level}
+                      </p>
                     </div>
-                    <h4 className="font-bold text-center text-green-400 text-sm">
-                      {character.name}
-                    </h4>
-                    <p className="text-xs text-green-400/70">
-                      レベル {character.level}
-                    </p>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           </div>
