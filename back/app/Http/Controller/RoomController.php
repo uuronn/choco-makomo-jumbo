@@ -403,7 +403,7 @@ class RoomController
         try {
             $roomId = $request->route('roomId');
             $userId = $request->route('userId');
-            $targetCharacterId = $request->input('targetCharacterId'); // RoomCharacterのid
+            $targetCharacterId = $request->targetCharacterId; // RoomCharacterのid
 
             $room = Room::where('id', $roomId)->first();
 

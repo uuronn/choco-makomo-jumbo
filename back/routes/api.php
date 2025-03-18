@@ -76,6 +76,9 @@ Route::post('/{userId}/{roomId}/approve', [RoomController::class, 'approve']);
 // 参加申請を拒否
 Route::post('/{userId}/{roomId}/reject', [RoomController::class, 'reject']);
 
+// 通常攻撃を行う
+Route::post('{userId}/{roomId}/attack', [RoomController::class, 'attack']);
+
 // 次のターンに進む
 Route::post('/{userId}/{roomId}/nextTurn', [RoomController::class, 'nextTurn']);
 
