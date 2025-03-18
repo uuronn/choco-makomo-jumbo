@@ -46,4 +46,10 @@ class RoomCharacter extends Model
     {
         return $this->belongsTo(Room::class);
     }
+
+    // ここにcharacterリレーションを追加
+    public function character()
+    {
+        return $this->belongsTo(Character::class, 'characterId', 'id');
+    }
 }
