@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Sword, Zap } from "lucide-react";
+import { Loader2, Sword, Zap } from "lucide-react";
 import { Room, RoomCharacter } from "~/type/room";
 import { useUserContext } from "~/context/UserProvider";
 import Image from "next/image";
@@ -14,6 +14,8 @@ type BattleProps = {
 };
 
 export default function Battle({ room }: BattleProps) {
+  const [preventRoom, setPreventRoom] = useState<Room | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [playerTeam, setPlayerTeam] = useState<RoomCharacter[]>([]);
   const [enemyTeam, setEnemyTeam] = useState<RoomCharacter[]>([]);
   const [charactersBySpeed, setCharactersBySpeed] = useState<RoomCharacter[]>(
@@ -28,6 +30,28 @@ export default function Battle({ room }: BattleProps) {
   const isSelectingEnemy = isMyTurn && selectedAction === "attack";
 
   useEffect(() => {
+    if (!preventRoom) {
+      setPreventRoom(room);
+    }
+    if (
+      room.currentTurnCharacterId !== preventRoom?.currentTurnCharacterId &&
+      room.currentTurnUserId !== preventRoom?.currentTurnUserId
+    ) {
+      if (preventRoom) {
+        // status更新時の処理
+        const decreasedLifeCharacters = room.room_character.filter(
+          (character) => {
+            const prevCharacter = preventRoom.room_character.find(
+              (prevChar) => prevChar.characterId === character.characterId,
+            );
+            return prevCharacter && character.life < prevCharacter.life;
+          },
+        );
+        console.log(decreasedLifeCharacters, "😄");
+      }
+
+      setPreventRoom(room);
+    }
     setPlayerTeam(
       room.room_character.filter((character) => character.userId === user?.uid),
     );
@@ -43,11 +67,8 @@ export default function Battle({ room }: BattleProps) {
       if (selectedAction === null) setIsSelectingAction(true);
     }
     setIsMyTurn(isMyTurn);
-    console.log(
-      room.room_log.map((log) => log.description),
-      "😄",
-    );
     setBattleLog(room.room_log.map((log) => log.description));
+    setLoading(false);
   }, [room]);
 
   useEffect(() => {
@@ -73,6 +94,7 @@ export default function Battle({ room }: BattleProps) {
         },
       );
     })();
+    setLoading(true);
     setSelectedAction(null);
     setIsSelectingAction(false);
   };
@@ -112,7 +134,7 @@ export default function Battle({ room }: BattleProps) {
             key={character.id}
             className={`${
               isSelectingEnemy && character.life > 0
-                ? "hover:border-green-500"
+                ? "hover:border-green-500 cursor-pointer"
                 : ""
             } border-2 border-transparent rounded-md`}
           >
@@ -147,19 +169,26 @@ export default function Battle({ room }: BattleProps) {
         ))}
       </div>
 
-      <div
-        id="battle-log"
-        className="bg-gray-800 border border-green-500/50 rounded-lg p-2 h-44 overflow-y-auto mb-4"
-      >
-        {/* <h3 className="text-green-400 font-bold mb-1 text-sm">バトルログ</h3> */}
-        <div className="space-y-1">
-          {battleLog.map((log, index) => (
-            <div key={index} className="text-sm font-mono text-green-300">
-              <br />
-              {log}
-            </div>
-          ))}
+      <div className="relative">
+        <div
+          id="battle-log"
+          className="bg-gray-800 border border-green-500/50 rounded-lg p-2 h-44 overflow-y-hidden mb-4"
+        >
+          <div className="space-y-1">
+            {battleLog.map((log, index) => (
+              <div key={index} className="text-sm font-mono text-green-300">
+                <br />
+                {log}
+              </div>
+            ))}
+          </div>
         </div>
+
+        {loading && (
+          <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+            <Loader2 className="h-8 w-8 text-green-400 animate-spin" />
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
