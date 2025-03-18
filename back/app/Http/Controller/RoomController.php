@@ -721,7 +721,7 @@ class RoomController
 
                 $description = '';
                 $targets = [];
-                $isSingleTarget = in_array($skillType, ['全体攻撃', '味方全体回復']);
+                $isSingleTarget = in_array($skillType, ['boost_attack', 'sacrifice', 'single_heal']);
 
                 if ($isSingleTarget && !$targetCharacterId) {
                     throw new Exception('単体スキルの場合、ターゲットを指定してください');
