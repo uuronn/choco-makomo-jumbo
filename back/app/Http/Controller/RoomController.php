@@ -248,9 +248,11 @@ class RoomController
                 return response()->json(['message' => 'ゲストが申請していません'], 400);
             }
 
-            // if ($room->guest) {
-            //     RoomCharacter::where('roomId', $roomId)->where('userId', $room->guestUserId)
-            // }
+            // $characters = RoomCharacter::where('roomId', $roomId)->where('userId', $room->hostUserId);
+
+            if ($room->guest) {
+                RoomCharacter::where('roomId', $roomId)->where('userId', $room->guestUserId);
+            }
 
             DB::transaction(function () use ($roomId, $room) {
                 RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
@@ -425,7 +427,7 @@ class RoomController
                 // 現在の行動キャラクターを取得
                 $attacker = RoomCharacter::where('roomId', $roomId)
                     ->where('userId', $userId)
-                    ->where('id', $room->currentTurnCharacterId)
+                    ->where('characterId', $room->currentTurnCharacterId)
                     ->where('isActive', true)
                     ->first();
 
