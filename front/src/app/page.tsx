@@ -192,10 +192,8 @@ export default function HomeScreen() {
           <div className="flex justify-between items-center">
             <div className="text-xs text-green-500/70 font-mono flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>SYSTEM ONLINE</span>
+              <span>ONLINE</span>
             </div>
-
-            <div className="text-xs text-green-500/70 font-mono">VER 1.0.4</div>
           </div>
         </div>
       </div>

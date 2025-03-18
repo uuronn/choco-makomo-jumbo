@@ -164,10 +164,6 @@ export default function GachaScreen() {
             </motion.div>
           </div>
 
-          <p className="text-green-400 mt-1 text-sm tracking-widest uppercase">
-            PROGRAMMING LANGUAGE SYSTEM
-          </p>
-
           {/* Tech decorations */}
           <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-20 h-6 bg-black/50 rounded-t-full border-t border-l border-r border-green-500/30"></div>
         </div>
@@ -175,7 +171,7 @@ export default function GachaScreen() {
         <div className="p-6 flex flex-col items-center relative">
           {/* Digital counter */}
           <div className="absolute top-2 right-2 font-mono text-xs text-green-500 bg-black/50 px-2 py-1 rounded border border-green-500/30">
-            SYS:READY_
+            <span>技術ガチャ </span>
             <motion.span
               animate={{ opacity: [1, 0, 1] }}
               transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
@@ -408,7 +404,14 @@ export default function GachaScreen() {
 
           <div className="mt-6 text-xs text-green-500/70 font-mono flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span>SYSTEM READY FOR LANGUAGE EXTRACTION</span>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
           </div>
         </div>
