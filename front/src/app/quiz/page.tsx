@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "~/components/ui/button";
-import { Cpu, Terminal, ArrowRight } from "lucide-react";
+import { Cpu, Terminal, ArrowRight, Coins } from "lucide-react";
 import { BiQuestionMark } from "react-icons/bi";
 
 export default function CyberQuiz() {
@@ -149,7 +149,7 @@ export default function CyberQuiz() {
                 ease: "linear",
               }}
             >
-              <Terminal className="h-6 w-6 text-green-300" />
+              <Coins className="h-6 w-6 text-green-300" />
             </motion.div>
           </div>
 

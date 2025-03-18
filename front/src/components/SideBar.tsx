@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import { Home, Swords, LogOut } from "lucide-react";
+import { Home, Swords, LogOut, Coins } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
 import { SlEnergy } from "react-icons/sl";
@@ -59,7 +59,7 @@ export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
     },
     {
       title: "ポイ活",
-      icon: <FaRegQuestionCircle className="size-5" />,
+      icon: <Coins className="size-5" />,
       href: "/quiz",
       isActive: activeItem === "quiz",
     },

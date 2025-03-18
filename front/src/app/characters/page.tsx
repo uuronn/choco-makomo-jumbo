@@ -12,14 +12,14 @@ import { Character } from "~/type/character";
 // Character type definition
 type CharacterType =
   | "バージョン管理"
-  | "データベース"      // Database
-  | "フレームワーク"    // Framework
-  | "言語"            // Programming Language
-  | "クラウド"        // Cloud
-  | "オペレーティングシステム"  // Operating System
-  | "実行環境"        // Runtime Environment
-  | "ゲームエンジン"    // Game Engine
-  | "コンテナー";      // Container
+  | "データベース" // Database
+  | "フレームワーク" // Framework
+  | "言語" // Programming Language
+  | "クラウド" // Cloud
+  | "オペレーティングシステム" // Operating System
+  | "実行環境" // Runtime Environment
+  | "ゲームエンジン" // Game Engine
+  | "コンテナー"; // Container
 
 // Type color mapping
 const typeColors: Record<CharacterType, string> = {
@@ -36,7 +36,7 @@ const typeColors: Record<CharacterType, string> = {
 
 export default function CharacterDevelopment() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
-    null
+    null,
   );
   const [availablePoints, setAvailablePoints] = useState(0);
   const [lifePoints, setLifePoints] = useState(0);
@@ -51,7 +51,7 @@ export default function CharacterDevelopment() {
       (async () => {
         // キャラクター一覧を取得
         const pointRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`,
         );
         const pointData = await pointRes.json();
         setAvailablePoints(pointData);
@@ -85,7 +85,7 @@ export default function CharacterDevelopment() {
             power: powerPoints,
             speed: speedPoints,
           }),
-        }
+        },
       );
     })();
 
@@ -101,7 +101,7 @@ export default function CharacterDevelopment() {
 
     // Update available points
     setAvailablePoints(
-      availablePoints - (lifePoints + powerPoints + speedPoints)
+      availablePoints - (lifePoints + powerPoints + speedPoints),
     );
 
     // Reset allocated points
@@ -151,9 +151,12 @@ export default function CharacterDevelopment() {
                         className="object-cover"
                       />
                     </div>
-                      <h2 className="text-xl font-bold text-green-400">
-                        {selectedCharacter.name} <span className="text-sm">【レベル{selectedCharacter.level}】</span>
-                      </h2>
+                    <h2 className="text-xl font-bold text-green-400">
+                      {selectedCharacter.name}{" "}
+                      <span className="text-sm">
+                        【レベル{selectedCharacter.level}】
+                      </span>
+                    </h2>
                     <div className="flex items-center gap-1 mt-1">
                       <Badge
                         className={`${typeColors[selectedCharacter.type as CharacterType]} text-white`}
@@ -166,7 +169,7 @@ export default function CharacterDevelopment() {
                             <span key={i} className="text-emerald-400">
                               ★
                             </span>
-                          )
+                          ),
                         )}
                       </div>
                     </div>

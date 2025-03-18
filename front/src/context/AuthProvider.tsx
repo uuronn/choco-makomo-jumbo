@@ -80,6 +80,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const handleSignOut = async () => {
     await signOut(auth);
     setUser(null);
+    router.push("/auth/signIn");
   };
 
   const fetchCharacters = async () => {

@@ -27,8 +27,8 @@ export default function GameInterface() {
     ) {
       setSelectedCharacters(
         selectedCharacters.filter(
-          (c) => c.characterId !== character.characterId
-        )
+          (c) => c.characterId !== character.characterId,
+        ),
       );
     } else if (selectedCharacters.length < 3) {
       setSelectedCharacters([...selectedCharacters, character]);
@@ -51,10 +51,10 @@ export default function GameInterface() {
         body: JSON.stringify({
           hostUserId: user.uid,
           characterIdList: selectedCharacters.map(
-            (character) => character.characterId
+            (character) => character.characterId,
           ),
         }),
-      }
+      },
     );
     const data = await res.json();
     router.push(`/rooms/${data.id}`);
@@ -70,11 +70,11 @@ export default function GameInterface() {
         body: JSON.stringify({
           roomId: selectedRoom?.id,
           characterIdList: selectedCharacters.map(
-            (character) => character.characterId
+            (character) => character.characterId,
           ),
           guestUserId: user.uid,
         }),
-      }
+      },
     );
 
     router.push(`/rooms/${selectedRoom?.id}`);
@@ -84,7 +84,7 @@ export default function GameInterface() {
     (async () => {
       // 技術一覧を取得
       const roomsRas = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
       );
       const roomsData = await roomsRas.json();
       console.log(roomsData);
@@ -174,10 +174,10 @@ export default function GameInterface() {
                     className={cn(
                       "flex flex-col justify-center items-center p-1.5 rounded-lg border transition-all cursor-pointer h-[150px] w-[150px]",
                       selectedCharacters.find(
-                        (c) => c.characterId === character.characterId
+                        (c) => c.characterId === character.characterId,
                       )
                         ? "bg-green-400/20 border-green-400"
-                        : "bg-black/30 border-green-400/20 hover:bg-green-400/10"
+                        : "bg-black/30 border-green-400/20 hover:bg-green-400/10",
                     )}
                     onClick={() => handleSelectCharacter(character)}
                   >
@@ -220,7 +220,7 @@ export default function GameInterface() {
                     "flex flex-col rounded-lg border transition-all justify-center items-center cursor-pointer min-w-[200px]  min-h-[160px] overflow-hidden",
                     selectedRoom?.id === room.id
                       ? "bg-green-400/20 border-green-400"
-                      : "bg-black/30 border-green-400/20 hover:bg-green-400/10"
+                      : "bg-black/30 border-green-400/20 hover:bg-green-400/10",
                   )}
                   onClick={() => handleSelectRoom(room)}
                 >
