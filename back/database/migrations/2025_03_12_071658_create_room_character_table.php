@@ -21,6 +21,7 @@ return new class extends Migration
             $table->smallInteger('speed');
             $table->smallInteger('evasion');
             $table->boolean('isActive')->default(true);
+            $table->boolean('isDead')->default(false);
             $table->timestamps();
 
             $table->foreign('roomId')->references('id')->on('room')->onDelete('cascade');

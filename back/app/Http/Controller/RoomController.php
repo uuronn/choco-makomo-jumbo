@@ -573,7 +573,7 @@ class RoomController
         try {
             $roomId = $request->route('roomId');
             $userId = $request->route('userId');
-            $targetCharacterId = $request->targetCharacterId; // RoomCharacterのid
+            $targetCharacterId = $request->targetCharacterId;
 
             $room = Room::where('id', $roomId)->first();
 
@@ -590,6 +590,7 @@ class RoomController
                     ->where('userId', $userId)
                     ->where('characterId', $room->currentTurnCharacterId)
                     ->where('isActive', true)
+                    ->where('isDead', false)
                     ->first();
 
                 if (!$attacker) {
@@ -599,14 +600,11 @@ class RoomController
                 $target = RoomCharacter::where('roomId', $roomId)
                     ->where('id', $targetCharacterId)
                     ->where('userId', '!=', $userId)
+                    ->where('isDead', false)
                     ->first();
 
                 if (!$target) {
                     throw new Exception('攻撃対象のキャラクターが見つかりません');
-                }
-
-                if ($target->life <= 0) {
-                    throw new Exception('対象キャラクターは既に倒されています');
                 }
 
                 $damage = max(0, $attacker->power);
@@ -616,44 +614,71 @@ class RoomController
                     'roomId' => $roomId,
                     'actionType' => 'attack',
                     'actorUserId' => $attacker->userId,
-                    'actorCharacterId' => $attacker->characterId, // CharacterのID
+                    'actorCharacterId' => $attacker->characterId,
                     'targetUserId' => $target->userId,
-                    'targetCharacterId' => $target->characterId,  // CharacterのID
+                    'targetCharacterId' => $target->characterId,
                     'value' => $damage,
                     'description' => "キャラクター {$attacker->characterId} が キャラクター {$target->characterId} に {$damage} ダメージを与えました",
                 ]);
 
-                $target->update(['life' => $newLife]);
+                $target->update([
+                    'life' => $newLife,
+                    'isDead' => $newLife <= 0
+                ]);
+
+                // 死んだ場合のログを追加
+                if ($newLife <= 0) {
+                    RoomLog::create([
+                        'roomId' => $roomId,
+                        'actionType' => 'death',
+                        'actorUserId' => null,
+                        'actorCharacterId' => null,
+                        'targetUserId' => $target->userId,
+                        'targetCharacterId' => $target->characterId,
+                        'value' => null,
+                        'description' => "キャラクター {$target->characterId} が死にました",
+                    ]);
+                }
+
                 $attacker->update(['isActive' => false]);
 
                 $nextTurn = RoomCharacter::where('roomId', $roomId)
                     ->where('isActive', true)
+                    ->where('isDead', false)
                     ->orderBy('speed', 'desc')
                     ->first();
 
                 if (!$nextTurn) {
-                    RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
+                    RoomCharacter::where('roomId', $roomId)
+                        ->where('isDead', false)
+                        ->update(['isActive' => true]);
+
                     $nextTurn = RoomCharacter::where('roomId', $roomId)
                         ->where('isActive', true)
+                        ->where('isDead', false)
                         ->orderBy('speed', 'desc')
                         ->first();
 
-                    RoomLog::create([
-                        'roomId' => $roomId,
-                        'actionType' => 'turnReset',
-                        'actorUserId' => null,
-                        'actorCharacterId' => null,
-                        'targetUserId' => null,
-                        'targetCharacterId' => null,
-                        'value' => null,
-                        'description' => 'ターンがリセットされました',
-                    ]);
+                    if ($nextTurn) {
+                        RoomLog::create([
+                            'roomId' => $roomId,
+                            'actionType' => 'turnReset',
+                            'actorUserId' => null,
+                            'actorCharacterId' => null,
+                            'targetUserId' => null,
+                            'targetCharacterId' => null,
+                            'value' => null,
+                            'description' => 'ターンがリセットされました',
+                        ]);
+                    }
                 }
 
-                $room->update([
-                    'currentTurnUserId' => $nextTurn->userId,
-                    'currentTurnCharacterId' => $nextTurn->characterId
-                ]);
+                if ($nextTurn) {
+                    $room->update([
+                        'currentTurnUserId' => $nextTurn->userId,
+                        'currentTurnCharacterId' => $nextTurn->characterId
+                    ]);
+                }
 
                 // 終了条件のチェック
                 $hostCharacters = RoomCharacter::where('roomId', $roomId)
@@ -663,8 +688,8 @@ class RoomController
                     ->where('userId', $room->guestUserId)
                     ->get();
 
-                $hostAlive = $hostCharacters->where('life', '>', 0)->count() > 0;
-                $guestAlive = $guestCharacters->where('life', '>', 0)->count() > 0;
+                $hostAlive = $hostCharacters->where('isDead', false)->count() > 0;
+                $guestAlive = $guestCharacters->where('isDead', false)->count() > 0;
 
                 if (!$hostAlive || !$guestAlive) {
                     $room->update(['status' => 'finish']);
@@ -689,10 +714,11 @@ class RoomController
                     'target' => [
                         'id' => $target->id,
                         'userId' => $target->userId,
-                        'life' => $newLife
+                        'life' => $newLife,
+                        'isDead' => $newLife <= 0
                     ],
-                    'next_turn_user_id' => $nextTurn->userId,
-                    'next_turn_character_id' => $nextTurn->characterId
+                    'next_turn_user_id' => $nextTurn ? $nextTurn->userId : null,
+                    'next_turn_character_id' => $nextTurn ? $nextTurn->characterId : null
                 ], 200);
             });
         } catch (Exception $e) {
@@ -763,59 +789,59 @@ class RoomController
     /**
      * 次のターンに進む
      */
-    public function nextTurn(Request $request)
-    {
-        try {
-            $roomId = $request->route('roomId');
-            $userId = $request->route('userId'); // 現在の行動ユーザー
+    // public function nextTurn(Request $request)
+    // {
+    //     try {
+    //         $roomId = $request->route('roomId');
+    //         $userId = $request->route('userId'); // 現在の行動ユーザー
 
-            $room = Room::where('id', $roomId)->first();
+    //         $room = Room::where('id', $roomId)->first();
 
-            if (!$room || $room->status !== 'battling') {
-                return response()->json(['message' => 'バトルが進行中ではありません'], 400);
-            }
+    //         if (!$room || $room->status !== 'battling') {
+    //             return response()->json(['message' => 'バトルが進行中ではありません'], 400);
+    //         }
 
-            if ($room->currentTurnUserId !== $userId) {
-                return response()->json(['message' => 'あなたのターンではありません'], 403);
-            }
+    //         if ($room->currentTurnUserId !== $userId) {
+    //             return response()->json(['message' => 'あなたのターンではありません'], 403);
+    //         }
 
-            return DB::transaction(function () use ($roomId, $userId, $room) {
-                // 現在のユーザーの最速キャラクターを行動不能に
-                RoomCharacter::where('roomId', $roomId)
-                    ->where('userId', $userId)
-                    ->where('isActive', true)
-                    ->orderBy('speed', 'desc')
-                    ->limit(1)
-                    ->update(['isActive' => false]);
+    //         return DB::transaction(function () use ($roomId, $userId, $room) {
+    //             // 現在のユーザーの最速キャラクターを行動不能に
+    //             RoomCharacter::where('roomId', $roomId)
+    //                 ->where('userId', $userId)
+    //                 ->where('isActive', true)
+    //                 ->orderBy('speed', 'desc')
+    //                 ->limit(1)
+    //                 ->update(['isActive' => false]);
 
-                $nextTurn = RoomCharacter::where('roomId', $roomId)
-                    ->where('isActive', true)
-                    ->orderBy('speed', 'desc')
-                    ->first();
+    //             $nextTurn = RoomCharacter::where('roomId', $roomId)
+    //                 ->where('isActive', true)
+    //                 ->orderBy('speed', 'desc')
+    //                 ->first();
 
-                if (!$nextTurn) {
-                    RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
-                    $nextTurn = RoomCharacter::where('roomId', $roomId)
-                        ->where('isActive', true)
-                        ->orderBy('speed', 'desc')
-                        ->first();
-                }
+    //             if (!$nextTurn) {
+    //                 RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
+    //                 $nextTurn = RoomCharacter::where('roomId', $roomId)
+    //                     ->where('isActive', true)
+    //                     ->orderBy('speed', 'desc')
+    //                     ->first();
+    //             }
 
-                $room->update(['currentTurnUserId' => $nextTurn->userId, 'currentTurnCharacterId' => $nextTurn->characterId]);
+    //             $room->update(['currentTurnUserId' => $nextTurn->userId, 'currentTurnCharacterId' => $nextTurn->characterId]);
 
-                return response()->json([
-                    'message' => '次のターンに進みました',
-                    'room' => $room,
-                    'next_turn_user_id' => $nextTurn->userId
-                ], 200);
-            });
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'ターン進行に失敗しました',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+    //             return response()->json([
+    //                 'message' => '次のターンに進みました',
+    //                 'room' => $room,
+    //                 'next_turn_user_id' => $nextTurn->userId
+    //             ], 200);
+    //         });
+    //     } catch (Exception $e) {
+    //         return response()->json([
+    //             'message' => 'ターン進行に失敗しました',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
 
     // public function startBattle(Request $request)

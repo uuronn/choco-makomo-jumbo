@@ -26,9 +26,13 @@ class RoomCharacter extends Model
         'speed',
         'evasion',
         'isActive',
+        'isDead', // 追加
     ];
 
-    protected $casts = ['isActive' => 'boolean'];
+    protected $casts = [
+        'isActive' => 'boolean',
+        'isDead' => 'boolean', // 追加
+    ];
 
     protected static function boot()
     {
@@ -39,6 +43,9 @@ class RoomCharacter extends Model
             }
             if (is_null($model->isActive)) {
                 $model->isActive = true;
+            }
+            if (is_null($model->isDead)) {
+                $model->isDead = false; // 初期値設定
             }
         });
     }
