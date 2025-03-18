@@ -31,7 +31,7 @@ export default function RoomDetailPage() {
           },
         );
         const data = await res.json();
-        console.log(data);
+        console.log("更新😊", data);
 
         if (
           data.message == "このルームにアクセスする権限がありません" ||
@@ -45,11 +45,10 @@ export default function RoomDetailPage() {
         console.log(e);
       }
     };
-
     fetchRoom();
 
     // ルームの状態をリアルタイム監視
-    const interval = setInterval(fetchRoom, 10000); // 3秒ごとにチェック
+    const interval = setInterval(fetchRoom, 2000); // 3秒ごとにチェック
 
     return () => clearInterval(interval);
   }, [roomId, user]);
@@ -77,30 +76,6 @@ export default function RoomDetailPage() {
       console.error(await res.json());
       return;
     }
-  };
-
-  // コマンドを送信する
-  const sendCommand = async (command: "attack" | "defend") => {
-    if (!room || !isMyTurn || !user) return;
-
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/action`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roomId: room.id, userId: user.uid, command }),
-      },
-    );
-
-    if (!res.ok) {
-      alert("コマンドの送信に失敗しました");
-      console.error(await res.json());
-      return;
-    }
-
-    const data = await res.json();
-    setBattleLog([...battleLog, data.message]);
-    setIsMyTurn(false);
   };
 
   if (!user) return <Loading message="認証中" />;

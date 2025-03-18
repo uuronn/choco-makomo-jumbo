@@ -6,84 +6,11 @@ import { Room, RoomCharacter } from "~/type/room";
 import { useUserContext } from "~/context/UserProvider";
 import Image from "next/image";
 import React from "react";
+import { CharacterDisplay } from "./CharacterDisplay";
 
 type BattleProps = {
   room: Room;
 };
-
-const CharacterDisplay = React.memo(
-  ({
-    character,
-    isSelected,
-    isEnemy,
-    onClick,
-  }: {
-    character: RoomCharacter;
-    isSelected: boolean;
-    isEnemy: boolean;
-    onClick: () => void;
-  }) => {
-    const hpPercentage = (character.life / character.maxLife) * 100;
-    let hpColor = "bg-green-500";
-    if (hpPercentage < 30) {
-      hpColor = "bg-red-500";
-    } else if (hpPercentage < 70) {
-      hpColor = "bg-yellow-500";
-    }
-
-    const auraColor = isEnemy
-      ? "shadow-[0_0_15px_5px_rgba(239,68,68,0.5)]"
-      : "shadow-[0_0_15px_5px_rgba(59,130,246,0.5)]";
-
-    return (
-      <div
-        className={`flex flex-col items-center p-2 rounded-lg transition-all ${isSelected ? "scale-105" : ""}`}
-        onClick={onClick}
-      >
-        <div className="relative w-full h-32 mb-2 flex items-center justify-center">
-          <div
-            className={`absolute inset-0 rounded-lg overflow-hidden flex justify-center items-center `}
-            style={{ animation: `float 3s ease-in-out infinite` }}
-          >
-            <Image
-              src={character.character.image_url || "/placeholder.svg"}
-              alt=""
-              width={120}
-              height={120}
-              className={`object-cover rounded-4xl ${auraColor}`}
-            />
-          </div>
-          {isSelected && (
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-black font-bold z-10">
-              ✓
-            </div>
-          )}
-        </div>
-        <div className="w-[200px] text-green-400 mt-1 flex justify-center items-center">
-          <span className="text-lg">{character.character.name}</span>
-        </div>
-        <div className="w-[200px] flex flex-col justify-center items-center text-center">
-          <div className="w-[150px] bg-gray-800 rounded-full h-2 mt-1">
-            <div
-              className={`${hpColor} h-2 rounded-full transition-all duration-500`}
-              style={{ width: `${hpPercentage}%` }}
-            ></div>
-          </div>
-          HP {character.life}
-        </div>
-      </div>
-    );
-  },
-  (prevProps, nextProps) => {
-    return (
-      prevProps.character === nextProps.character &&
-      prevProps.isSelected === nextProps.isSelected &&
-      prevProps.isEnemy === nextProps.isEnemy
-    );
-  },
-);
-
-CharacterDisplay.displayName = "CharacterDisplay";
 
 export default function Battle({ room }: BattleProps) {
   const [playerTeam, setPlayerTeam] = useState<RoomCharacter[]>([]);
@@ -91,6 +18,17 @@ export default function Battle({ room }: BattleProps) {
   const [charactersBySpeed, setCharactersBySpeed] = useState<RoomCharacter[]>(
     [],
   );
+  const [isMyTurn, setIsMyTurn] = useState<boolean>(true);
+  const [battleLog, setBattleLog] = useState<string[]>(["バトル開始！"]);
+  const [isSelectingAction, setIsSelectingAction] = useState<boolean>(false);
+  const [selectedAction, setSelectedAction] = useState<string | null>(null);
+  const { user } = useUserContext();
+
+  const isSelectingEnemy = isMyTurn && selectedAction === "attack";
+
+  useEffect(() => {
+    console.log("selectedAction", selectedAction);
+  }, [selectedAction]);
 
   useEffect(() => {
     setPlayerTeam(
@@ -100,49 +38,38 @@ export default function Battle({ room }: BattleProps) {
       room.room_character.filter((character) => character.userId !== user?.uid),
     );
     setCharactersBySpeed(room.room_character.sort((a, b) => b.speed - a.speed));
-  }, []);
+    const isMyTurn = room.currentTurnUserId === user?.uid;
 
-  const { user } = useUserContext();
+    if (!isMyTurn) {
+      setIsSelectingAction(false);
+    } else {
+      if (selectedAction === null) setIsSelectingAction(true);
+    }
+    setIsMyTurn(isMyTurn);
+  }, [room]);
 
-  const [battleLog, setBattleLog] = useState<string[]>(["バトル開始！"]);
-  const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
-  const [selectedEnemy, setSelectedEnemy] = useState<string | null>(null);
-  const [currentAction, setCurrentAction] = useState<"attack" | "skill" | null>(
-    null,
-  );
-
-  // Handle player selection
-  const selectPlayer = (id: string) => {};
-
-  // Handle enemy selection
-  const selectEnemy = (id: string) => {
-    if (!selectedPlayer || !currentAction) return;
-
-    setSelectedEnemy(id);
-
-    // Reset selections after action
-    setTimeout(() => {
-      setSelectedPlayer(null);
-      setSelectedEnemy(null);
-      setCurrentAction(null);
-
-      // Enemy turn
-      performEnemyTurn();
-    }, 1000);
-  };
-
-  // Add message to battle log
   const addLogMessage = (message: string) => {
     setBattleLog((prev) => [message, ...prev].slice(0, 10));
   };
 
-  // Enemy turn logic
-  const performEnemyTurn = () => {};
-
-  // Set action type
-  const setAction = (action: "attack" | "skill") => {
-    setCurrentAction(action);
-    addLogMessage(`${action === "attack" ? "攻撃" : "スキル"}を選択`);
+  const attackEnemy = async (characterId: string) => {
+    if (!isSelectingEnemy) return;
+    (async () => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/attack`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            targetCharacterId: characterId,
+          }),
+        },
+      );
+    })();
+    setSelectedAction(null);
+    setIsSelectingAction(false);
   };
 
   return (
@@ -159,37 +86,51 @@ export default function Battle({ room }: BattleProps) {
             transform: translateY(0px);
           }
         }
+        @keyframes blink {
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0;
+          }
+        }
+        .blink {
+          animation: blink 1s infinite;
+        }
       `}</style>
 
-      {/* Enemy Team */}
       <div className="flex justify-center gap-4 mb-auto">
         {enemyTeam.map((enemy) => (
-          <CharacterDisplay
-            isEnemy={true}
+          <div
+            onClick={() => attackEnemy(enemy.id)}
             key={enemy.id}
-            character={enemy}
-            isSelected={selectedEnemy === enemy.id}
-            onClick={() =>
-              currentAction && selectedPlayer ? selectEnemy(enemy.id) : null
-            }
-          />
+            className={`${
+              isSelectingEnemy ? "hover:border-green-500" : ""
+            } border-2 border-transparent rounded-md`}
+          >
+            <CharacterDisplay
+              isEnemy={true}
+              key={enemy.id}
+              character={enemy}
+              onClick={() => {}}
+            />
+            {isSelectingEnemy && <p className="w-full blink text-center">▲</p>}
+          </div>
         ))}
       </div>
 
-      {/* Player Team */}
       <div className="flex justify-center gap-4 mb-4">
         {playerTeam.map((player) => (
           <CharacterDisplay
             isEnemy={false}
             key={player.id}
             character={player}
-            isSelected={selectedPlayer === player.id}
             onClick={() => {}}
           />
         ))}
       </div>
 
-      {/* Battle Log */}
       <div className="bg-gray-800 border border-green-500/50 rounded-lg p-2 h-32 overflow-y-auto mb-4">
         {/* <h3 className="text-green-400 font-bold mb-1 text-sm">バトルログ</h3> */}
         <div className="space-y-1">
@@ -201,32 +142,33 @@ export default function Battle({ room }: BattleProps) {
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="grid grid-cols-2 gap-4">
         <button
+          onClick={() => {
+            setSelectedAction("attack");
+            setIsSelectingAction(false);
+          }}
           className={`flex items-center justify-center gap-2 p-3 rounded-lg ${
-            selectedPlayer && !currentAction
+            isSelectingAction
               ? "bg-green-700 hover:bg-green-600 text-white"
               : "bg-gray-700 text-gray-400 cursor-not-allowed"
           } transition-colors`}
-          onClick={() =>
-            selectedPlayer && !currentAction ? setAction("attack") : null
-          }
-          disabled={!selectedPlayer || currentAction !== null}
+          disabled={!isSelectingAction}
         >
           <Sword size={20} />
           <span>攻撃</span>
         </button>
         <button
+          onClick={() => {
+            setSelectedAction("skill");
+            setIsSelectingAction(false);
+          }}
           className={`flex items-center justify-center gap-2 p-3 rounded-lg ${
-            selectedPlayer && !currentAction
+            isSelectingAction
               ? "bg-green-700 hover:bg-green-600 text-white"
               : "bg-gray-700 text-gray-400 cursor-not-allowed"
           } transition-colors`}
-          onClick={() =>
-            selectedPlayer && !currentAction ? setAction("skill") : null
-          }
-          disabled={!selectedPlayer || currentAction !== null}
+          disabled={!isSelectingAction}
         >
           <Zap size={20} />
           <span>スキル</span>
