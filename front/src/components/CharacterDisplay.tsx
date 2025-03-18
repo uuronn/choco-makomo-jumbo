@@ -36,7 +36,7 @@ export const CharacterDisplay = React.memo(
         <div className="relative w-full h-32 mb-2 flex items-center justify-center">
           <div
             className={`absolute inset-0 rounded-lg overflow-hidden flex justify-center items-center `}
-            style={{ animation: `float 3s ease-in-out infinite` }}
+            style={{ animation: character.life > 0 ? `float 3s ease-in-out infinite` : 'none' }}
           >
             <Image
               src={character.character.image_url || "/placeholder.svg"}
@@ -44,6 +44,7 @@ export const CharacterDisplay = React.memo(
               width={120}
               height={120}
               className={`object-cover rounded-4xl ${auraColor}`}
+              style={{ filter: character.life === 0 ? 'grayscale(100%)' : 'none' }}
             />
           </div>
           {isSelected && (
