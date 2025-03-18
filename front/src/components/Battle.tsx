@@ -172,10 +172,12 @@ export default function Battle({ room }: BattleProps) {
 
       if (decreasedLifeCharacters.length > 0) {
         (async () => {
-          for (const character of decreasedLifeCharacters) {
-            await showEffect(character.id, "explosion", 600);
-            await showEffect(character.id, "blink", 1000);
-          }
+          await Promise.all(
+            decreasedLifeCharacters.map(async (character) => {
+              await showEffect(character.id, "explosion", 600);
+              await showEffect(character.id, "blink", 1000);
+            })
+          );
         })();
       }
 
@@ -185,11 +187,11 @@ export default function Battle({ room }: BattleProps) {
       setIsSelectingAction(false);
     }
 
-    // “今のターンは自分か？” フラグを更新
+    // "今のターンは自分か？" フラグを更新
     const nowMyTurn = room.currentTurnUserId === user?.uid;
     setIsMyTurn(nowMyTurn);
 
-    // “まだ行動を選択中ではない” かつ “自分のターン” の場合は、行動選択可能にする
+    // "まだ行動を選択中ではない" かつ "自分のターン" の場合は、行動選択可能にする
     if (nowMyTurn) {
       // まだ何も選んでないなら
       if (selectedAction === null) {
