@@ -55,7 +55,7 @@ class CharacterSeeder extends Seeder
                 'base_speed' => 10,
                 'base_evasion' => 2,
                 'specialSkillType' => null, // スキルなし
-                'specialTurnRequirement' => null,
+                'specialTurnRequirement' => 0,
                 'image_url' => '/character/css.webp',
             ],
             [
