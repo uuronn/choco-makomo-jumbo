@@ -40,4 +40,5 @@ export type RoomCharacter = {
   speed: number;
   userId: string;
   character: Character;
+  specialSkillType: string;
 };

@@ -38,12 +38,13 @@ export default function RoomDetailPage() {
           router.push("/rooms");
           return;
         }
-        setRoom(data);
-
-        // state が finish ならポーリングを停止
         if (data.status === "finish") {
-          clearInterval(interval);
+          setTimeout(() => {
+            clearInterval(interval);
+          }, 5000); // 5秒間一時停止
         }
+        console.log(data, "🥴");
+        setRoom(data);
       } catch (e) {
         console.log(e);
       }

@@ -226,7 +226,10 @@ export default function GameInterface() {
           <div className="overflow-x-auto h-[calc(100%-40px)]">
             <div className="flex h-full gap-4 items-center">
               {rooms
-                .filter((room) => room.guest_user === null)
+                .filter(
+                  (room) =>
+                    room.guest_user === null && room.host_user.id !== user?.uid,
+                )
                 .map((room) => (
                   <div
                     key={room.id}

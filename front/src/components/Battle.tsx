@@ -17,13 +17,13 @@ type EffectInfo = {
 };
 
 export default function Battle({ room }: BattleProps) {
+  const [activeCharacter, setActiveCharacter] = useState<RoomCharacter | null>(
+    null,
+  );
   const [preventRoom, setPreventRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [playerTeam, setPlayerTeam] = useState<RoomCharacter[]>([]);
   const [enemyTeam, setEnemyTeam] = useState<RoomCharacter[]>([]);
-  const [charactersBySpeed, setCharactersBySpeed] = useState<RoomCharacter[]>(
-    [],
-  );
   const [isMyTurn, setIsMyTurn] = useState<boolean>(true);
   const [battleLog, setBattleLog] = useState<string[]>([]);
   const [isSelectingAction, setIsSelectingAction] = useState<boolean>(false);
@@ -33,9 +33,11 @@ export default function Battle({ room }: BattleProps) {
   >({});
   const { user } = useUserContext();
 
-  const isSelectingEnemy = isMyTurn && selectedAction === "attack";
+  const isSelectingEnemy =
+    (isMyTurn && selectedAction === "attack") ||
+    (selectedAction === "skill" &&
+      activeCharacter?.character.specialSkillType.includes("単体"));
 
-  // Promise を返す showEffect 関数
   const showEffect = useCallback(
     (
       roomCharacterId: string,
@@ -49,7 +51,7 @@ export default function Battle({ room }: BattleProps) {
           [roomCharacterId]: {
             type: effectType,
             endTime: now + durationMs,
-            resolve, // Promise の resolve 関数を保存
+            resolve,
           },
         }));
       });
@@ -91,6 +93,14 @@ export default function Battle({ room }: BattleProps) {
   }, [characterEffects]);
 
   useEffect(() => {
+    setActiveCharacter(
+      room.room_character.find(
+        (character) =>
+          character.characterId === room.currentTurnCharacterId &&
+          character.userId === user?.uid &&
+          room.currentTurnUserId === user?.uid,
+      ) || null,
+    );
     if (!preventRoom) {
       setPreventRoom(room);
     }
@@ -100,8 +110,8 @@ export default function Battle({ room }: BattleProps) {
         room.currentTurnUserId == preventRoom?.currentTurnUserId
       )
     ) {
+      // ターンが変わった時
       if (preventRoom) {
-        // status更新時の処理
         const decreasedLifeCharacters = room.room_character.filter(
           (character) => {
             const prevCharacter = preventRoom.room_character.find(
@@ -120,6 +130,7 @@ export default function Battle({ room }: BattleProps) {
       }
 
       setPreventRoom(room);
+      setLoading(false);
     }
     setPlayerTeam(
       room.room_character.filter((character) => character.userId === user?.uid),
@@ -127,7 +138,6 @@ export default function Battle({ room }: BattleProps) {
     setEnemyTeam(
       room.room_character.filter((character) => character.userId !== user?.uid),
     );
-    setCharactersBySpeed(room.room_character.sort((a, b) => b.speed - a.speed));
     const isMyTurn = room.currentTurnUserId === user?.uid;
 
     if (!isMyTurn) {
@@ -137,7 +147,6 @@ export default function Battle({ room }: BattleProps) {
     }
     setIsMyTurn(isMyTurn);
     setBattleLog(room.room_log.map((log) => log.description));
-    setLoading(false);
   }, [room, showEffect, user?.uid]);
 
   useEffect(() => {
@@ -147,26 +156,53 @@ export default function Battle({ room }: BattleProps) {
     }
   }, [battleLog]);
 
-  const attackEnemy = async (characterId: string) => {
-    if (!isSelectingEnemy) return; // エフェクト完了後に攻撃処理を実行
-    (async () => {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/attack`,
+  const selectEnemy = async (characterId: string) => {
+    setLoading(true);
+    if (!isSelectingEnemy) return;
+    if (selectedAction === "attack") {
+      (async () => {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/attack`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              targetCharacterId: characterId,
+            }),
+          },
+        );
+      })();
+    }
+    if (selectedAction === "skill") {
+      fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/skill`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            targetCharacterId: characterId,
-          }),
+          body: JSON.stringify({ targetCharacterId: characterId }),
         },
       );
-    })();
+    }
 
-    setLoading(true);
     setSelectedAction(null);
     setIsSelectingAction(false);
+  };
+
+  const selectSkill = async () => {
+    setSelectedAction("skill");
+    setIsSelectingAction(false);
+    const skillType = activeCharacter?.character.specialSkillType;
+    const requireTarget = skillType?.includes("単体");
+    if (!requireTarget) {
+      setLoading(true);
+      fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/skill`,
+        {
+          method: "POST",
+        },
+      );
+    }
   };
 
   return (
@@ -200,7 +236,7 @@ export default function Battle({ room }: BattleProps) {
       <div className="flex justify-center gap-4 mb-auto">
         {enemyTeam.map((character) => (
           <div
-            onClick={() => attackEnemy(character.id)}
+            onClick={() => selectEnemy(character.id)}
             key={character.id}
             className={`${
               isSelectingEnemy && character.life > 0
@@ -270,26 +306,23 @@ export default function Battle({ room }: BattleProps) {
             setIsSelectingAction(false);
           }}
           className={`flex items-center justify-center gap-2 p-3 rounded-lg ${
-            isSelectingAction
+            isSelectingAction && !loading
               ? "bg-green-700 hover:bg-green-600 text-white"
               : "bg-gray-700 text-gray-400 cursor-not-allowed"
           } transition-colors`}
-          disabled={!isSelectingAction}
+          disabled={!isSelectingAction && !loading}
         >
           <Sword size={20} />
           <span>攻撃</span>
         </button>
         <button
-          onClick={() => {
-            setSelectedAction("skill");
-            setIsSelectingAction(false);
-          }}
+          onClick={selectSkill}
           className={`flex items-center justify-center gap-2 p-3 rounded-lg ${
-            isSelectingAction
+            isSelectingAction && !loading
               ? "bg-green-700 hover:bg-green-600 text-white"
               : "bg-gray-700 text-gray-400 cursor-not-allowed"
           } transition-colors`}
-          disabled={!isSelectingAction}
+          disabled={!isSelectingAction && !loading}
         >
           <Zap size={20} />
           <span>スキル</span>
