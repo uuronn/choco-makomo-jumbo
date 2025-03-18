@@ -23,4 +23,14 @@ class RoomLog extends Model
     {
         return $this->belongsTo(Room::class, 'roomId');
     }
+
+    public function actorCharacter()
+    {
+        return $this->belongsTo(Character::class, 'actorCharacterId', 'id');
+    }
+
+    public function targetCharacter()
+    {
+        return $this->belongsTo(Character::class, 'targetCharacterId', 'id');
+    }
 }
