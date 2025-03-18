@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "../../../context/AuthProvider";
 import Link from "next/link";
 import Loading from "~/components/Loading";
@@ -13,10 +13,10 @@ export default function RoomDetailPage() {
   const { roomId } = useParams();
 
   const [room, setRoom] = useState<Room | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [battleLog, setBattleLog] = useState<string[]>([]);
   const [isMyTurn, setIsMyTurn] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     if (!roomId || !user) return;
@@ -30,21 +30,20 @@ export default function RoomDetailPage() {
             headers: { "Content-Type": "application/json" },
           },
         );
-
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.message || "ルームの取得に失敗しました");
-        }
-
         const data = await res.json();
+        console.log(data);
+
+        if (data.message == "このルームにアクセスする権限がありません") {
+          alert("参加が拒否されました");
+          router.push("/rooms");
+          return;
+        }
         setRoom(data);
 
         // 自分のターンかどうかを確認
         setIsMyTurn(data.room.currentTurnUserId === user.uid);
-      } catch (err) {
-        setError(err as string);
-      } finally {
-        setLoading(false);
+      } catch (e) {
+        console.log(e);
       }
     };
 
@@ -105,13 +104,15 @@ export default function RoomDetailPage() {
     setIsMyTurn(false);
   };
 
-  if (!user || loading) return <Loading message="認証中" />;
+  if (!user) return <Loading message="認証中" />;
   if (!room) return <p>ルームが見つかりません</p>;
 
-  return room.status === "pending" && room.hostUserId == user.uid ? (
+  return room.status === "waiting" ? (
+    <Loading message="マッチング中" />
+  ) : room.status === "pending" && room.hostUserId == user.uid ? (
     <Pending room={room} />
   ) : room.status === "pending" && room.hostUserId !== user.uid ? (
-    <></>
+    <Loading message="参加中" />
   ) : (
     <Loading message="承認待ち" />
   );

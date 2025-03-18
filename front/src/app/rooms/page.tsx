@@ -56,8 +56,8 @@ export default function GameInterface() {
         }),
       },
     );
-    const data = res.json();
-    router.push(`/rooms/${data}`);
+    const data = await res.json();
+    router.push(`/rooms/${data.id}`);
   };
 
   const joinRoom = async () => {
@@ -87,21 +87,16 @@ export default function GameInterface() {
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
       );
       const roomsData = await roomsRas.json();
-      console.log(roomsData, "🥴");
       setRooms(roomsData);
     })();
   }, []);
-
-  useEffect(() => {
-    console.log(user?.uid, "😄");
-  }, [user]);
 
   return (
     <div className="h-screen bg-gray-900 text-white p-3 flex flex-col overflow-hidden pl-20">
       {/* 技術選択セクション */}
       <section className="border border-green-400/30 rounded-lg p-3 backdrop-blur-sm backdrop-filter bg-black/20 h-[55%] overflow-hidden mb-3">
         <h2 className="text-lg font-bold mb-2 text-green-400 flex items-center">
-          <FaLaptopCode className="mr-2 h-5 w-5" /> 技術選択{" "}
+          <FaLaptopCode className="mr-2 h-5 w-5" /> 技術選択
           <span className="text-sm ml-2 text-green-400/70">(最大3体)</span>
         </h2>
 

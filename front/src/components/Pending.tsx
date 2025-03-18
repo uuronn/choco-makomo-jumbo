@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, X, User, Loader2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import Image from "next/image";
 import { Room } from "~/type/room";
+import { useAuth } from "~/context/AuthProvider";
 
 type Player = {
   id: string;
@@ -18,9 +19,35 @@ type PendingProps = {
 };
 
 export default function Pending({ room }: PendingProps) {
-  const handleAccept = () => {};
+  const [img, setImg] = useState<string>("/placeholder.svg");
 
-  const handleReject = () => {};
+  const { user } = useAuth();
+
+  useEffect(() => {
+    (async () => {
+      // キャラクター一覧を取得
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${room.guestUserId}`,
+      );
+      const data = await res.json();
+
+      setImg(data.photoUrl);
+    })();
+  }, []);
+
+  const handleAccept = async () => {};
+
+  const handleReject = async () => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/reject`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+    const data = await res.json();
+    console.log(data);
+  };
 
   return (
     <div className="relative w-full h-screen flex items-center justify-center bg-black/90 rounded-lg overflow-hidden">
@@ -46,12 +73,12 @@ export default function Pending({ room }: PendingProps) {
           <CardContent className="p-6">
             <div className="flex flex-col items-center">
               <Image
-                src={"/placeholder.svg"}
+                width={100}
+                height={100}
+                src={img}
                 alt={room.guestUserId ?? "Guest"}
-                fill
-                className="object-cover"
+                className="object-cover rounded-full"
               />
-
               <div className="mt-6 flex gap-4 w-full">
                 <Button
                   onClick={handleReject}
