@@ -80,6 +80,9 @@ Route::post('/{userId}/{roomId}/reject', [RoomController::class, 'reject']);
 // 通常攻撃を行う
 Route::post('{userId}/{roomId}/attack', [RoomController::class, 'attack']);
 
+// スペシャルスキル発動
+Route::post('{userId}/{roomId}/skill', [RoomController::class, 'skill']);
+
 // ルームを削除する
 Route::delete('{userId}/{roomId}/delete', [RoomController::class, 'delete']);
 
