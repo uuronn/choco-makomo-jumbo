@@ -7,6 +7,7 @@ import { useUserContext } from "~/context/UserProvider";
 import Image from "next/image";
 import React from "react";
 import { CharacterDisplay } from "./CharacterDisplay";
+import { log } from "console";
 
 type BattleProps = {
   room: Room;
@@ -16,10 +17,10 @@ export default function Battle({ room }: BattleProps) {
   const [playerTeam, setPlayerTeam] = useState<RoomCharacter[]>([]);
   const [enemyTeam, setEnemyTeam] = useState<RoomCharacter[]>([]);
   const [charactersBySpeed, setCharactersBySpeed] = useState<RoomCharacter[]>(
-    [],
+    []
   );
   const [isMyTurn, setIsMyTurn] = useState<boolean>(true);
-  const [battleLog, setBattleLog] = useState<string[]>(["バトル開始！"]);
+  const [battleLog, setBattleLog] = useState<string[]>([]);
   const [isSelectingAction, setIsSelectingAction] = useState<boolean>(false);
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const { user } = useUserContext();
@@ -27,15 +28,11 @@ export default function Battle({ room }: BattleProps) {
   const isSelectingEnemy = isMyTurn && selectedAction === "attack";
 
   useEffect(() => {
-    console.log("selectedAction", selectedAction);
-  }, [selectedAction]);
-
-  useEffect(() => {
     setPlayerTeam(
-      room.room_character.filter((character) => character.userId === user?.uid),
+      room.room_character.filter((character) => character.userId === user?.uid)
     );
     setEnemyTeam(
-      room.room_character.filter((character) => character.userId !== user?.uid),
+      room.room_character.filter((character) => character.userId !== user?.uid)
     );
     setCharactersBySpeed(room.room_character.sort((a, b) => b.speed - a.speed));
     const isMyTurn = room.currentTurnUserId === user?.uid;
@@ -46,11 +43,19 @@ export default function Battle({ room }: BattleProps) {
       if (selectedAction === null) setIsSelectingAction(true);
     }
     setIsMyTurn(isMyTurn);
+    console.log(
+      room.room_log.map((log) => log.description),
+      "😄"
+    );
+    setBattleLog(room.room_log.map((log) => log.description));
   }, [room]);
 
-  const addLogMessage = (message: string) => {
-    setBattleLog((prev) => [message, ...prev].slice(0, 10));
-  };
+  useEffect(() => {
+    const logContainer = document.getElementById("battle-log");
+    if (logContainer) {
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+  }, [battleLog]);
 
   const attackEnemy = async (characterId: string) => {
     if (!isSelectingEnemy) return;
@@ -65,7 +70,7 @@ export default function Battle({ room }: BattleProps) {
           body: JSON.stringify({
             targetCharacterId: characterId,
           }),
-        },
+        }
       );
     })();
     setSelectedAction(null);
@@ -142,11 +147,15 @@ export default function Battle({ room }: BattleProps) {
         ))}
       </div>
 
-      <div className="bg-gray-800 border border-green-500/50 rounded-lg p-2 h-32 overflow-y-auto mb-4">
+      <div
+        id="battle-log"
+        className="bg-gray-800 border border-green-500/50 rounded-lg p-2 h-44 overflow-y-auto mb-4"
+      >
         {/* <h3 className="text-green-400 font-bold mb-1 text-sm">バトルログ</h3> */}
         <div className="space-y-1">
           {battleLog.map((log, index) => (
             <div key={index} className="text-sm font-mono text-green-300">
+              <br />
               {log}
             </div>
           ))}

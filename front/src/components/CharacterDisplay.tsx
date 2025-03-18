@@ -133,8 +133,8 @@ export const CharacterDisplay = React.memo(
             <Image
               src={character.character.image_url || "/placeholder.svg"}
               alt=""
-              width={120}
-              height={120}
+              width={100}
+              height={100}
               className={`object-cover rounded-4xl ${auraColor}`}
               style={{
                 filter: character.life === 0 ? "grayscale(100%)" : "none",
