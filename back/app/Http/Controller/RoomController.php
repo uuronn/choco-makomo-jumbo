@@ -396,6 +396,104 @@ class RoomController
     }
 
     /**
+     * キャラクターが別のキャラクターに攻撃する
+     */
+    public function attack(Request $request)
+    {
+        try {
+            $roomId = $request->route('roomId');
+            $userId = $request->route('userId');
+            $targetCharacterId = $request->input('targetCharacterId'); // RoomCharacterのid
+
+            $room = Room::where('id', $roomId)->first();
+
+            if (!$room || $room->status !== 'battling') {
+                return response()->json(['message' => 'バトルが進行中ではありません'], 400);
+            }
+
+            if ($room->currentTurnUserId !== $userId) {
+                return response()->json(['message' => 'あなたのターンではありません'], 403);
+            }
+
+            return DB::transaction(function () use ($roomId, $userId, $targetCharacterId, $room) {
+                // 現在の行動キャラクターを取得
+                $attacker = RoomCharacter::where('roomId', $roomId)
+                    ->where('userId', $userId)
+                    ->where('id', $room->currentTurnCharacterId)
+                    ->where('isActive', true)
+                    ->first();
+
+                if (!$attacker) {
+                    throw new Exception('行動可能なキャラクターが見つかりません');
+                }
+
+                // 攻撃対象を取得（相手側のuserIdを考慮）
+                $target = RoomCharacter::where('roomId', $roomId)
+                    ->where('id', $targetCharacterId)
+                    ->where('userId', '!=', $userId) // 自分以外のキャラクターに限定
+                    ->first();
+
+                if (!$target) {
+                    throw new Exception('攻撃対象のキャラクターが見つかりません');
+                }
+
+                if ($target->life <= 0) {
+                    throw new Exception('対象キャラクターは既に倒されています');
+                }
+
+                // 回避
+                $damage = max(0, $attacker->power);
+                $newLife = max(0, $target->life - $damage);
+
+                // 対象のライフを更新
+                $target->update(['life' => $newLife]);
+
+                // 行動済みにする
+                $attacker->update(['isActive' => false]);
+
+                // 次のターンへ
+                $nextTurn = RoomCharacter::where('roomId', $roomId)
+                    ->where('isActive', true)
+                    ->orderBy('speed', 'desc')
+                    ->first();
+
+                if (!$nextTurn) {
+                    RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
+                    $nextTurn = RoomCharacter::where('roomId', $roomId)
+                        ->where('isActive', true)
+                        ->orderBy('speed', 'desc')
+                        ->first();
+                }
+
+                $room->update([
+                    'currentTurnUserId' => $nextTurn->userId,
+                    'currentTurnCharacterId' => $nextTurn->id
+                ]);
+
+                $room->refresh();
+
+                return response()->json([
+                    'message' => "キャラクター {$attacker->id} が キャラクター {$target->id} に {$damage} ダメージを与えました",
+                    'room' => $room,
+                    'attacker' => $attacker,
+                    'target' => [
+                        'id' => $target->id,
+                        'userId' => $target->userId,
+                        'life' => $newLife
+                    ],
+                    'next_turn_user_id' => $nextTurn->userId,
+                    'next_turn_character_id' => $nextTurn->id
+                ], 200);
+            });
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => '攻撃処理に失敗しました',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * ルーム情報を取得
      */
     public function status(Request $request)
