@@ -9,6 +9,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import Loading from "~/components/Loading";
 import { auth, googleProvider } from "~/lib/firebase";
 import { Character } from "~/type/character";
 
@@ -121,6 +122,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setAuthenticating(false);
     }
   }, [user, router]);
+
+  if(user === undefined) return <Loading message="認証中"/>;
 
   return (
     <AuthContext.Provider

@@ -108,8 +108,9 @@ export default function HomeScreen() {
               <Image
                 src={user?.photoURL || "/placeholder.svg"}
                 alt={""}
-                fill
-                className="object-cover"
+                width={50}
+                height={50}
+                className="object-cover rounded-4xl"
               />
             </div>
 
