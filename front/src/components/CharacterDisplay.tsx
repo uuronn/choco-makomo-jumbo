@@ -179,7 +179,7 @@ export const CharacterDisplay = React.memo(
                 <Image
                   width={120}
                   height={120}
-                  src="/public/heart.gif"
+                  src="/effect/heart.gif"
                   alt="Heal Effect"
                   objectFit="cover"
                 />
