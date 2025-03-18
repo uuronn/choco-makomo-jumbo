@@ -112,6 +112,7 @@ export default function Battle({ room }: BattleProps) {
     ) {
       // ターンが変わった時
       if (preventRoom) {
+        setPreventRoom(room);
         const decreasedLifeCharacters = room.room_character.filter(
           (character) => {
             const prevCharacter = preventRoom.room_character.find(
@@ -120,18 +121,17 @@ export default function Battle({ room }: BattleProps) {
             return prevCharacter && character.life < prevCharacter.life;
           }
         );
-
         if (decreasedLifeCharacters.length > 0) {
           (async () => {
-            for (const character of decreasedLifeCharacters) {
-              await showEffect(character.id, "explosion", 600);
-              await showEffect(character.id, "blink", 1000);
-            }
+            await Promise.all(
+              decreasedLifeCharacters.map(async (character) => {
+                await showEffect(character.id, "explosion", 600);
+                await showEffect(character.id, "blink", 1000);
+              })
+            );
           })();
         }
       }
-
-      setPreventRoom(room);
       setLoading(false);
       setIsSelectingAction(false);
     }
