@@ -5,6 +5,8 @@ export type Room = {
   hostUserId: string;
   guestUserId: string | null;
   status: string;
+  currentTurnCharacterId: string;
+  currentTurnUserId: string;
   room_character: RoomCharacter[];
 };
 
