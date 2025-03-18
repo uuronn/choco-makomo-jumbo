@@ -6,6 +6,7 @@ use App\Model\Character;
 use App\Model\Room;
 use App\Model\RoomCharacter;
 use App\Model\RoomLog;
+use App\Model\User;
 use App\Model\UserCharacter;
 use Exception;
 use Illuminate\Http\Request;
@@ -72,7 +73,9 @@ class RoomController
                 return response()->json(['message' => '既に作成されたルームが存在します'], 409);
             }
 
-            $room = DB::transaction(function () use ($request, $characterIdList) {
+            $hostUser = User::find($request->hostUserId); // ユーザー名取得用
+
+            $room = DB::transaction(function () use ($request, $characterIdList, $hostUser) {
                 $room = Room::create([
                     'id' => Str::uuid(),
                     'hostUserId' => $request->hostUserId,
@@ -84,14 +87,14 @@ class RoomController
                 foreach ($characterIdList as $characterId) {
                     $character = Character::find($characterId);
                     if (!$character) {
-                        throw new Exception("Character {$characterId} not found", 404);
+                        throw new Exception("キャラクター {$characterId} が見つかりません", 404);
                     }
 
                     $userCharacter = UserCharacter::where('userId', $request->hostUserId)
                         ->where('characterId', $characterId)
                         ->first();
                     if (!$userCharacter) {
-                        throw new Exception("UserCharacter not found", 404);
+                        throw new Exception("ユーザーのキャラクター {$characterId} が見つかりません", 404);
                     }
 
                     $characterNames[] = $character->name;
@@ -101,7 +104,6 @@ class RoomController
                 $speedMultiplier = 1.0;
                 $lifeMultiplier = 1.0;
 
-                // パーティ全体の組み合わせボーナス
                 if (!array_diff(['html', 'CSS', 'javascript'], $characterNames)) {
                     $powerMultiplier = 3;
                     $speedMultiplier = 3;
@@ -113,7 +115,7 @@ class RoomController
                         'targetUserId' => null,
                         'targetCharacterId' => null,
                         'value' => null,
-                        'description' => "ホストのパーティ ['html', 'CSS', 'javascript'] で power と speed が3倍に向上",
+                        'description' => "{$hostUser->name} のパーティ ['html', 'CSS', 'javascript'] で攻撃力とスピードが3倍に向上",
                     ]);
                 } elseif (!array_diff(['react', 'vue', 'angular'], $characterNames)) {
                     $powerMultiplier = 5;
@@ -126,7 +128,7 @@ class RoomController
                         'targetUserId' => null,
                         'targetCharacterId' => null,
                         'value' => null,
-                        'description' => "ホストのパーティ ['react', 'vue', 'angular'] で power と life が5倍に向上",
+                        'description' => "{$hostUser->name} のパーティ ['react', 'vue', 'angular'] で攻撃力と生命力が5倍に向上",
                     ]);
                 }
 
@@ -155,7 +157,7 @@ class RoomController
                             'targetUserId' => null,
                             'targetCharacterId' => null,
                             'value' => null,
-                            'description' => "キャラクター 'B' の power が20%増、speed が15%増",
+                            'description' => "{$character->name} の攻撃力が20%増、スピードが15%増",
                         ]);
                     }
 
@@ -190,14 +192,7 @@ class RoomController
         try {
             DB::beginTransaction();
 
-            $room = Room::with([
-                'hostUser' => function ($query) {
-                    $query->select('id', 'name', 'photoUrl');
-                },
-                'guestUser' => function ($query) {
-                    $query->select('id', 'name', 'photoUrl');
-                }
-            ])->where('id', $request->roomId)->first();
+            $room = Room::with(['hostUser', 'guestUser'])->where('id', $request->roomId)->first();
 
             if (!$room) {
                 return response()->json(['message' => '指定されたルームが見つかりません'], 404);
@@ -216,6 +211,8 @@ class RoomController
                 return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
             }
 
+            $guestUser = User::find($request->guestUserId); // ユーザー名取得用
+
             $room->update([
                 'guestUserId' => $request->guestUserId,
                 'status' => 'pending',
@@ -225,14 +222,14 @@ class RoomController
             foreach ($characterIdList as $characterId) {
                 $character = Character::find($characterId);
                 if (!$character) {
-                    throw new Exception("Character {$characterId} not found", 404);
+                    throw new Exception("キャラクター {$characterId} が見つかりません", 404);
                 }
 
                 $userCharacter = UserCharacter::where('userId', $request->guestUserId)
                     ->where('characterId', $characterId)
                     ->first();
                 if (!$userCharacter) {
-                    throw new Exception("UserCharacter not found", 404);
+                    throw new Exception("ユーザーのキャラクター {$characterId} が見つかりません", 404);
                 }
 
                 $characterNames[] = $character->name;
@@ -253,7 +250,7 @@ class RoomController
                     'targetUserId' => null,
                     'targetCharacterId' => null,
                     'value' => null,
-                    'description' => "ゲストのパーティ ['html', 'CSS', 'javascript'] で power と speed が3倍に向上",
+                    'description' => "{$guestUser->name} のパーティ ['html', 'CSS', 'javascript'] で攻撃力とスピードが3倍に向上",
                 ]);
             } elseif (!array_diff(['react', 'vue', 'angular'], $characterNames)) {
                 $powerMultiplier = 5;
@@ -266,7 +263,7 @@ class RoomController
                     'targetUserId' => null,
                     'targetCharacterId' => null,
                     'value' => null,
-                    'description' => "ゲストのパーティ ['react', 'vue', 'angular'] で power と life が5倍に向上",
+                    'description' => "{$guestUser->name} のパーティ ['react', 'vue', 'angular'] で攻撃力と生命力が5倍に向上",
                 ]);
             }
 
@@ -295,7 +292,7 @@ class RoomController
                         'targetUserId' => null,
                         'targetCharacterId' => null,
                         'value' => null,
-                        'description' => "キャラクター 'B' の power が20%増、speed が15%増",
+                        'description' => "{$character->name} の攻撃力が20%増、スピードが15%増",
                     ]);
                 }
 
@@ -314,15 +311,7 @@ class RoomController
 
             DB::commit();
 
-            $room->load([
-                'hostUser' => function ($query) {
-                    $query->select('id', 'name', 'photoUrl');
-                },
-                'guestUser' => function ($query) {
-                    $query->select('id', 'name', 'photoUrl');
-                }
-            ]);
-
+            $room->load(['hostUser', 'guestUser']);
             $response = [
                 'id' => $room->id,
                 'host_user' => $room->hostUser ? [
@@ -354,7 +343,7 @@ class RoomController
             $roomId = $request->route('roomId');
             $userId = $request->route('userId');
 
-            $room = Room::where('id', $roomId)->first();
+            $room = Room::with(['hostUser', 'guestUser'])->where('id', $roomId)->first();
 
             if (!$room) {
                 return response()->json(['message' => 'ルームが見つかりません'], 404);
@@ -400,7 +389,7 @@ class RoomController
                         'targetUserId' => null,
                         'targetCharacterId' => null,
                         'value' => null,
-                        'description' => "ホストのパーティ ['Warrior', 'Mage', 'Healer'] で power が20%増、speed が10%増",
+                        'description' => "{$room->hostUser->name} のパーティ ['Warrior', 'Mage', 'Healer'] で攻撃力が20%増、スピードが10%増",
                     ]);
                 } elseif (!array_diff(['Knight', 'Wizard', 'Priest'], $hostCharacterNames)) {
                     RoomCharacter::where('roomId', $roomId)
@@ -417,7 +406,7 @@ class RoomController
                         'targetUserId' => null,
                         'targetCharacterId' => null,
                         'value' => null,
-                        'description' => "ホストのパーティ ['Knight', 'Wizard', 'Priest'] で power が10%増、evasion が30%増",
+                        'description' => "{$room->hostUser->name} のパーティ ['Knight', 'Wizard', 'Priest'] で攻撃力が10%増、回避率が30%増",
                     ]);
                 }
 
@@ -437,14 +426,14 @@ class RoomController
                         'targetUserId' => null,
                         'targetCharacterId' => null,
                         'value' => null,
-                        'description' => "ゲストのパーティ ['Archer', 'Tank', 'Support'] で speed が25%増、power が15%増",
+                        'description' => "{$room->guestUser->name} のパーティ ['Archer', 'Tank', 'Support'] でスピードが25%増、攻撃力が15%増",
                     ]);
                 } elseif (!array_diff(['Rogue', 'Berserker', 'Cleric'], $guestCharacterNames)) {
                     RoomCharacter::where('roomId', $roomId)
                         ->where('userId', $room->guestUserId)
                         ->update([
                             'evasion' => DB::raw('evasion * 1.2'),
-                            'maxLife' => DB::raw('maxLife * 1.2') // hpをmaxLifeに修正
+                            'maxLife' => DB::raw('maxLife * 1.2')
                         ]);
                     RoomLog::create([
                         'roomId' => $roomId,
@@ -454,7 +443,7 @@ class RoomController
                         'targetUserId' => null,
                         'targetCharacterId' => null,
                         'value' => null,
-                        'description' => "ゲストのパーティ ['Rogue', 'Berserker', 'Cleric'] で evasion が20%増、maxLife が20%増",
+                        'description' => "{$room->guestUser->name} のパーティ ['Rogue', 'Berserker', 'Cleric'] で回避率が20%増、最大HPが20%増",
                     ]);
                 }
 
@@ -479,16 +468,16 @@ class RoomController
                     'currentTurnCharacterId' => $firstTurn->characterId
                 ]);
 
-                RoomLog::create([
-                    'roomId' => $roomId,
-                    'actionType' => 'approve',
-                    'actorUserId' => $room->hostUserId,
-                    'actorCharacterId' => null,
-                    'targetUserId' => $room->guestUserId,
-                    'targetCharacterId' => null,
-                    'value' => null,
-                    'description' => "ホストがゲストの参加申請を承認しました",
-                ]);
+                // RoomLog::create([
+                //     'roomId' => $roomId,
+                //     'actionType' => 'approve',
+                //     'actorUserId' => $room->hostUserId,
+                //     'actorCharacterId' => null,
+                //     'targetUserId' => $room->guestUserId,
+                //     'targetCharacterId' => null,
+                //     'value' => null,
+                //     'description' => "{$room->hostUser->name} が {$room->guestUser->name} の参加申請を承認しました",
+                // ]);
             });
 
             $room->refresh();
@@ -539,23 +528,6 @@ class RoomController
                 return response()->json(['message' => 'このルームにアクセスする権限がありません'], 403);
             }
 
-            // $logs = $room->roomLog->map(function ($log) {
-            //     return [
-            //         'actionType' => $log->actionType,
-            //         'actor' => $log->actorCharacter ? [
-            //             'id' => $log->actorCharacter->id,
-            //             'name' => $log->actorCharacter->name
-            //         ] : null,
-            //         'target' => $log->targetCharacter ? [
-            //             'id' => $log->targetCharacter->id,
-            //             'name' => $log->targetCharacter->name
-            //         ] : null,
-            //         'value' => $log->value,
-            //         'description' => $log->description,
-            //         'created_at' => $log->created_at
-            //     ];
-            // });
-
             return response()->json($room, 200);
         } catch (Exception $e) {
             return response()->json([
@@ -573,13 +545,13 @@ class RoomController
         try {
             $roomId = $request->route('roomId');
             $userId = $request->route('userId');
-            $targetCharacterId = $request->input('targetCharacterId'); // 明確に input で取得
+            $targetCharacterId = $request->input('targetCharacterId');
 
             if (!$targetCharacterId) {
                 return response()->json(['message' => '攻撃対象を指定してください'], 400);
             }
 
-            $room = Room::where('id', $roomId)->first();
+            $room = Room::with(['hostUser', 'guestUser'])->where('id', $roomId)->first();
 
             if (!$room || $room->status !== 'battling') {
                 return response()->json(['message' => 'バトルが進行中ではありません'], 400);
@@ -590,7 +562,8 @@ class RoomController
             }
 
             return DB::transaction(function () use ($roomId, $userId, $targetCharacterId, $room) {
-                $attacker = RoomCharacter::where('roomId', $roomId)
+                $attacker = RoomCharacter::with('character')
+                    ->where('roomId', $roomId)
                     ->where('userId', $userId)
                     ->where('characterId', $room->currentTurnCharacterId)
                     ->where('isActive', true)
@@ -601,7 +574,8 @@ class RoomController
                     throw new Exception('行動可能なキャラクターが見つかりません');
                 }
 
-                $target = RoomCharacter::where('roomId', $roomId)
+                $target = RoomCharacter::with('character')
+                    ->where('roomId', $roomId)
                     ->where('id', $targetCharacterId)
                     ->where('userId', '!=', $userId)
                     ->where('isDead', false)
@@ -622,7 +596,7 @@ class RoomController
                     'targetUserId' => $target->userId,
                     'targetCharacterId' => $target->characterId,
                     'value' => $damage,
-                    'description' => "キャラクター {$attacker->characterId} が キャラクター {$target->characterId} に {$damage} ダメージを与えました",
+                    'description' => "{$attacker->character->name} が {$target->character->name} に {$damage} ダメージを与えました",
                 ]);
 
                 $target->update([
@@ -639,11 +613,10 @@ class RoomController
                         'targetUserId' => $target->userId,
                         'targetCharacterId' => $target->characterId,
                         'value' => null,
-                        'description' => "キャラクター {$target->characterId} が死にました",
+                        'description' => "{$target->character->name} が死にました",
                     ]);
                 }
 
-                // ターン終了処理
                 $attacker->update(['isActive' => false]);
                 $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
 
@@ -654,10 +627,10 @@ class RoomController
                 $room->refresh();
 
                 return response()->json([
-                    'message' => "キャラクター {$attacker->characterId} が キャラクター {$target->characterId} に {$damage} ダメージを与えました",
+                    'message' => "{$attacker->character->name} が {$target->character->name} に {$damage} ダメージを与えました",
                     'room' => $room,
                     'attacker' => $attacker,
-                    'targets' => [[ // skill と形式を統一
+                    'targets' => [[
                         'id' => $target->id,
                         'userId' => $target->userId,
                         'life' => $newLife,
@@ -683,9 +656,9 @@ class RoomController
         try {
             $roomId = $request->route('roomId');
             $userId = $request->route('userId');
-            $targetCharacterId = $request->input('targetCharacterId'); // オプショナル
+            $targetCharacterId = $request->input('targetCharacterId');
 
-            $room = Room::where('id', $roomId)->first();
+            $room = Room::with(['hostUser', 'guestUser'])->where('id', $roomId)->first();
 
             if (!$room || $room->status !== 'battling') {
                 return response()->json(['message' => 'バトルが進行中ではありません'], 400);
@@ -696,7 +669,8 @@ class RoomController
             }
 
             return DB::transaction(function () use ($roomId, $userId, $targetCharacterId, $room) {
-                $attacker = RoomCharacter::with('character')->where('roomId', $roomId)
+                $attacker = RoomCharacter::with('character')
+                    ->where('roomId', $roomId)
                     ->where('userId', $userId)
                     ->where('characterId', $room->currentTurnCharacterId)
                     ->where('isActive', true)
@@ -729,19 +703,21 @@ class RoomController
 
                 switch ($skillType) {
                     case 'boost_attack':
-                        $target = RoomCharacter::where('roomId', $roomId)
+                        $target = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
                             ->where('userId', $userId)
                             ->where('id', $targetCharacterId)
                             ->where('isDead', false)
                             ->first();
                         if (!$target) throw new Exception('対象が見つかりません');
                         $target->update(['power' => $target->power * 2]);
-                        $description = "キャラクター {$attacker->characterId} が {$target->characterId} の攻撃力を2倍に強化";
+                        $description = "{$attacker->character->name} が {$target->character->name} の攻撃力を2倍に強化";
                         $targets = [$target];
                         break;
 
                     case 'sacrifice':
-                        $target = RoomCharacter::where('roomId', $roomId)
+                        $target = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
                             ->where('id', $targetCharacterId)
                             ->where('userId', '!=', $userId)
                             ->where('isDead', false)
@@ -757,7 +733,7 @@ class RoomController
                             'life' => 0,
                             'isDead' => true,
                         ]);
-                        $description = "キャラクター {$attacker->characterId} が自爆し {$target->characterId} に {$damage} ダメージ";
+                        $description = "{$attacker->character->name} が自爆し {$target->character->name} に {$damage} ダメージ";
                         $targets = [$target];
                         if ($newLife <= 0) {
                             RoomLog::create([
@@ -765,7 +741,7 @@ class RoomController
                                 'actionType' => 'death',
                                 'targetUserId' => $target->userId,
                                 'targetCharacterId' => $target->characterId,
-                                'description' => "キャラクター {$target->characterId} が死にました",
+                                'description' => "{$target->character->name} が死にました",
                             ]);
                         }
                         RoomLog::create([
@@ -773,12 +749,13 @@ class RoomController
                             'actionType' => 'death',
                             'targetUserId' => $attacker->userId,
                             'targetCharacterId' => $attacker->characterId,
-                            'description' => "キャラクター {$attacker->characterId} が死にました",
+                            'description' => "{$attacker->character->name} が死にました",
                         ]);
                         break;
 
                     case '全体攻撃':
-                        $targets = RoomCharacter::where('roomId', $roomId)
+                        $targets = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
                             ->where('userId', '!=', $userId)
                             ->where('isDead', false)
                             ->get();
@@ -795,15 +772,16 @@ class RoomController
                                     'actionType' => 'death',
                                     'targetUserId' => $target->userId,
                                     'targetCharacterId' => $target->characterId,
-                                    'description' => "キャラクター {$target->characterId} が死にました",
+                                    'description' => "{$target->character->name} が死にました",
                                 ]);
                             }
                         }
-                        $description = "キャラクター {$attacker->characterId} が全体攻撃で {$damage} ダメージ";
+                        $description = "{$attacker->character->name} が全体攻撃で {$damage} ダメージ";
                         break;
 
                     case '味方全体回復':
-                        $targets = RoomCharacter::where('roomId', $roomId)
+                        $targets = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
                             ->where('userId', $userId)
                             ->where('isDead', false)
                             ->get();
@@ -811,18 +789,33 @@ class RoomController
                             $newLife = $target->maxLife;
                             $target->update(['life' => $newLife]);
                         }
-                        $description = "キャラクター {$attacker->characterId} が味方全員を全回復";
+                        $description = "{$attacker->character->name} が味方全員を全回復";
                         break;
 
                     case 'stun_all':
-                        $targets = RoomCharacter::where('roomId', $roomId)
+                        $targets = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
                             ->where('userId', '!=', $userId)
                             ->where('isDead', false)
                             ->get();
                         foreach ($targets as $target) {
                             $target->update(['isActive' => false]);
                         }
-                        $description = "キャラクター {$attacker->characterId} が敵全員を次ターン行動不能に";
+                        $description = "{$attacker->character->name} が敵全員を次ターン行動不能に";
+                        break;
+
+                    case 'single_heal':
+                        $target = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
+                            ->where('userId', $userId)
+                            ->where('id', $targetCharacterId)
+                            ->where('isDead', false)
+                            ->first();
+                        if (!$target) throw new Exception('対象が見つかりません');
+                        $newLife = min($target->maxLife, $target->life + 1000);
+                        $target->update(['life' => $newLife]);
+                        $description = "{$attacker->character->name} が {$target->character->name} を1000回復";
+                        $targets = [$target];
                         break;
 
                     default:
@@ -838,7 +831,6 @@ class RoomController
                     'description' => $description,
                 ]);
 
-                // ターン終了処理
                 $attacker->update(['isActive' => false]);
                 $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
 
@@ -881,7 +873,7 @@ class RoomController
             $roomId = $request->route('roomId');
             $userId = $request->route('userId');
 
-            $room = Room::where('id', $roomId)->first();
+            $room = Room::with(['hostUser', 'guestUser'])->where('id', $roomId)->first();
 
             if (!$room) {
                 return response()->json(['message' => 'ルームが見つかりません'], 404);
@@ -899,19 +891,24 @@ class RoomController
             }
 
             DB::transaction(function () use ($room) {
-                // 更新前にguestUserIdを取得
                 $guestUserId = $room->guestUserId;
 
-                // guestUserIdに紐づくRoomCharacterを削除
                 RoomCharacter::where('roomId', $room->id)
                     ->where('userId', $guestUserId)
                     ->delete();
 
-                // ルームの更新
                 $room->update([
                     'status' => 'waiting',
                     'guestUserId' => null
                 ]);
+
+                // RoomLog::create([
+                //     'roomId' => $room->id,
+                //     'actionType' => 'reject',
+                //     'actorUserId' => $room->hostUserId,
+                //     'targetUserId' => $guestUserId,
+                //     'description' => "{$room->hostUser->name} が {$room->guestUser->name} の参加申請を拒否しました",
+                // ]);
             });
 
             $room->refresh();
@@ -992,7 +989,7 @@ class RoomController
             RoomLog::create([
                 'roomId' => $room->id,
                 'actionType' => 'finish',
-                'description' => !$hostAlive ? "ホスト側が全滅し、バトルが終了しました" : "ゲスト側が全滅し、バトルが終了しました",
+                'description' => !$hostAlive ? "{$room->hostUser->name} 側が全滅し、バトルが終了しました" : "{$room->guestUser->name} 側が全滅し、バトルが終了しました",
             ]);
         }
     }
