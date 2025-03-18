@@ -32,7 +32,7 @@ export const CharacterDisplay = React.memo(
 
     return (
       <div
-        className={`flex flex-col items-center p-2 rounded-lg transition-all `}
+        className={`flex flex-col items-center rounded-lg transition-all `}
         onClick={onClick}
       >
         <div className="relative w-full h-32 mb-2 flex items-center justify-center">
@@ -47,7 +47,7 @@ export const CharacterDisplay = React.memo(
                     width: 130 + i * 5,
                     height: 130 + i * 5,
                     border: "1px solid rgba(16, 185, 129, 0.7)",
-                    borderRadius: "50%",
+                    borderRadius: "5%",
                     zIndex: -1,
                   }}
                   animate={{
@@ -71,7 +71,7 @@ export const CharacterDisplay = React.memo(
                     width: 140 + i * 20,
                     height: 140 + i * 20,
                     borderRadius: "40% 60% 70% 30% / 40% 50% 60% 50%",
-                    background: `radial-gradient(circle, rgba(34, 197, 94, ${0.7 - i * 0.1}) 0%, rgba(21, 128, 61, ${0.4 - i * 0.05}) 70%, transparent 100%)`,
+                    background: `radial-gradient(circle, rgba(34, 197, 94, ${0.4 - i * 0.1}) 0%, rgba(21, 128, 61, ${0.4 - i * 0.05}) 70%, transparent 100%)`,
                     filter: "blur(8px)",
                     zIndex: -1,
                   }}
