@@ -29,7 +29,7 @@ export default function Pending({ room, setRoom }: PendingProps) {
     (async () => {
       // キャラクター一覧を取得
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${room.guestUserId}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${room.guestUserId}`,
       );
       const data = await res.json();
 
@@ -43,7 +43,7 @@ export default function Pending({ room, setRoom }: PendingProps) {
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/approve`,
       {
         method: "POST",
-      }
+      },
     );
     const data = await res.json();
   };
@@ -53,7 +53,7 @@ export default function Pending({ room, setRoom }: PendingProps) {
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/reject`,
       {
         method: "POST",
-      }
+      },
     );
     const data = await res.json();
     console.log(data);

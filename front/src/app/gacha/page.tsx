@@ -46,7 +46,6 @@ export default function GachaScreen() {
     }
   }, [isAnimating]);
 
-
   const pullGacha = async () => {
     try {
       if (!user) return;
@@ -107,7 +106,6 @@ export default function GachaScreen() {
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse"></div>
         <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse"></div>
       </div>
-
 
       <div className="py-3 gap-0 w-full h-full max-w-md bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden relative z-10">
         {/* Header */}

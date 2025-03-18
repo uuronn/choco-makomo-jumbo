@@ -63,8 +63,6 @@ export default function HomeScreen() {
     },
   ];
 
-
-
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 overflow-hidden">
       {/* Background grid effect */}
@@ -77,7 +75,6 @@ export default function HomeScreen() {
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse"></div>
         <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse"></div>
       </div>
-
 
       <div className="w-full max-w-2xl bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden relative z-10">
         {/* User Profile */}

@@ -113,10 +113,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           const res = await fetch(
             `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
           );
-          const data = await res.json() as SelectingRoom[];
+          const data = (await res.json()) as SelectingRoom[];
 
           // ルームのホストユーザーIDと自分のUIDを比較
-          const matchingRoom = data.find(room => room.host_user.id === user.uid || room.guest_user?.id === user.uid);
+          const matchingRoom = data.find(
+            (room) =>
+              room.host_user.id === user.uid ||
+              room.guest_user?.id === user.uid,
+          );
           if (matchingRoom) {
             router.push(`/rooms/${matchingRoom.id}`);
           }
@@ -136,7 +140,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, [user, router]);
 
-  if(user === undefined) return <Loading message="認証中"/>;
+  if (user === undefined) return <Loading message="認証中" />;
 
   return (
     <AuthContext.Provider

@@ -27,7 +27,7 @@ export default function RoomDetailPage() {
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user.uid}/${roomId}/status`,
           {
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
         const data = await res.json();
         console.log(data);
@@ -68,7 +68,7 @@ export default function RoomDetailPage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roomId: room.id, userId: user.uid }),
-      }
+      },
     );
 
     if (!res.ok) {
@@ -88,7 +88,7 @@ export default function RoomDetailPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roomId: room.id, userId: user.uid, command }),
-      }
+      },
     );
 
     if (!res.ok) {
