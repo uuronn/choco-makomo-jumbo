@@ -12,10 +12,10 @@ return new class extends Migration
             $table->id();
             $table->uuid('roomId');
             $table->string('actionType');
-            $table->string('actorUserId')->nullable(); // UUID対応
-            $table->unsignedBigInteger('actorCharacterId')->nullable();
-            $table->string('targetUserId')->nullable(); // UUID対応
-            $table->unsignedBigInteger('targetCharacterId')->nullable();
+            $table->string('actorUserId')->nullable();
+            $table->string('actorCharacterId')->nullable();
+            $table->string('targetUserId')->nullable();
+            $table->string('targetCharacterId')->nullable();
             $table->integer('value')->nullable();
             $table->string('description');
             $table->timestamps();
