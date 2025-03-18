@@ -336,7 +336,7 @@ class RoomController
         }
     }
 
-    /**
+ /**
  * ルームへの参加申請を拒否
  */
 public function reject(Request $request)
@@ -362,10 +362,21 @@ public function reject(Request $request)
             return response()->json(['message' => 'ゲストが申請していません'], 400);
         }
 
-        $room->update([
-            'status' => 'waiting',
-            'guestUserId' => null
-        ]);
+        DB::transaction(function () use ($room) {
+            // 更新前にguestUserIdを取得
+            $guestUserId = $room->guestUserId;
+
+            // guestUserIdに紐づくRoomCharacterを削除
+            RoomCharacter::where('roomId', $room->id)
+                ->where('userId', $guestUserId)
+                ->delete();
+
+            // ルームの更新
+            $room->update([
+                'status' => 'waiting',
+                'guestUserId' => null
+            ]);
+        });
 
         $room->refresh(); // 更新後の状態を再取得
 
