@@ -149,7 +149,7 @@ export default function GachaScreen() {
             </motion.div>
 
             <h1 className="text-2xl font-bold text-green-300 tracking-wider">
-              技術大戦争
+              技術ガチャ
             </h1>
 
             <motion.div

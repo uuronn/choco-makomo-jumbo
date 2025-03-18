@@ -2,11 +2,11 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import { Home, Swords, Users, Gift, LogOut } from "lucide-react";
+import { Home, Swords, LogOut } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
 import { SlEnergy } from "react-icons/sl";
-import { FaLaptopCode } from "react-icons/fa";
+import { FaLaptopCode, FaRegQuestionCircle } from "react-icons/fa";
 
 type NavItem = {
   title: string;
@@ -57,6 +57,12 @@ export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
       href: "/gacha",
       isActive: activeItem === "gacha",
     },
+    {
+      title: "ポイ活",
+      icon: <FaRegQuestionCircle className="size-5" />,
+      href: "/quiz",
+      isActive: activeItem === "quiz",
+    },
   ];
 
   return (
@@ -95,7 +101,11 @@ export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
                         ? "battle"
                         : item.title === "キャラクター"
                           ? "characters"
-                          : "gacha",
+                          : item.title === "ガチャ"
+                            ? "gacha"
+                            : item.title === "ポイ活"
+                              ? "quiz"
+                              : "",
                   );
                 }}
               >
