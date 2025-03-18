@@ -61,9 +61,13 @@ export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
       title: "ポイ活",
       icon: <Coins className="size-5" />,
       href: "/quiz",
-      isActive: activeItem === "quiz",
+      isActive: activeItem === "ïquiz",
     },
   ];
+
+  if (pathname === "/auth/signIn" || pathname.startsWith("/rooms/")) {
+    return null;
+  }
 
   return (
     <div
