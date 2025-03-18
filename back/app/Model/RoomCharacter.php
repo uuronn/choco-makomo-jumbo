@@ -20,6 +20,7 @@ class RoomCharacter extends Model
         'characterId',
         'userId',
         'level',
+        'maxLife',
         'life',
         'power',
         'speed',

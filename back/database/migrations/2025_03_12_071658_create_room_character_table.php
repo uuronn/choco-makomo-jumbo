@@ -16,6 +16,7 @@ return new class extends Migration
             $table->uuid('userId');
             $table->smallInteger('level');
             $table->smallInteger('life');
+            $table->smallInteger('maxLife');
             $table->smallInteger('power');
             $table->smallInteger('speed');
             $table->smallInteger('evasion');
