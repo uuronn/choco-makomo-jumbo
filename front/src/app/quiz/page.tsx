@@ -2,14 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "~/components/ui/button";
-import { Cpu, Terminal, ArrowRight, Coins } from "lucide-react";
+import { Coins, User } from "lucide-react";
 import { BiQuestionMark } from "react-icons/bi";
+import { enqueueSnackbar } from "notistack";
+import { useUserContext } from "~/context/UserProvider";
+import { quizData } from "~/const/quiz";
+import { shuffle } from "lodash";
 
 export default function CyberQuiz() {
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [buttonsDisabled, setButtonsDisabled] = useState(false);
   const [particles, setParticles] = useState<
     Array<{
       id: number;
@@ -21,29 +24,14 @@ export default function CyberQuiz() {
     }>
   >([]);
 
-  // サンプルクイズデータ
-  const quizData = [
-    {
-      question: "ブロックチェーンに主に使用されるテクノロジーは？",
-      options: ["量子コンピューティング", "暗号技術", "人工知能", "仮想現実"],
-      correctAnswer: "暗号技術",
-    },
-    {
-      question: "CPUとは何の略ですか？",
-      options: [
-        "Central Processing Unit",
-        "Computer Personal Unit",
-        "Central Program Utility",
-        "Core Processing Unit",
-      ],
-      correctAnswer: "Central Processing Unit",
-    },
-    {
-      question: "次のうちプログラミング言語ではないものは？",
-      options: ["Python", "Java", "HTML", "Nexus"],
-      correctAnswer: "Nexus",
-    },
-  ];
+  const { user } = useUserContext();
+
+  const [shuffledQuizData, setShuffledQuizData] = useState(quizData);
+
+  useEffect(() => {
+    // quizDataをシャッフルして状態に設定
+    setShuffledQuizData(shuffle(quizData));
+  }, []);
 
   useEffect(() => {
     if (isAnimating) {
@@ -61,7 +49,7 @@ export default function CyberQuiz() {
 
       const timer = setTimeout(() => {
         setIsAnimating(false);
-      }, 1000);
+      }, 10);
 
       return () => clearTimeout(timer);
     } else {
@@ -70,17 +58,50 @@ export default function CyberQuiz() {
   }, [isAnimating]);
 
   const handleSelectAnswer = (answer: string) => {
-    setSelectedAnswer(answer);
-  };
+    // Disable buttons immediately
+    setButtonsDisabled(true);
 
-  const handleNextQuestion = () => {
-    if (currentQuestion < quizData.length - 1) {
-      setIsAnimating(true);
-      setTimeout(() => {
-        setCurrentQuestion(currentQuestion + 1);
-        setSelectedAnswer(null);
-      }, 500);
+    // Check if the answer is correct
+    const isCorrect =
+      answer === shuffledQuizData[currentQuestion].correctAnswer;
+
+    // Show appropriate alert
+    if (isCorrect) {
+      fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user?.uid}/point`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            point: 2,
+          }),
+        },
+      );
+      enqueueSnackbar("正解！ 2 ポイントGET", {
+        variant: "success",
+      });
+    } else {
+      enqueueSnackbar("不正解！", {
+        variant: "error",
+      });
     }
+
+    // Trigger animation
+    setIsAnimating(true);
+
+    // Move to next question after a short delay
+    setTimeout(() => {
+      // If we're at the last question, loop back to the first
+      if (currentQuestion === shuffledQuizData.length - 1) {
+        setCurrentQuestion(0);
+      } else {
+        // Otherwise, go to the next question
+        setCurrentQuestion(currentQuestion + 1);
+      }
+
+      // Re-enable buttons for the next question
+      setButtonsDisabled(false);
+    }, 10);
   };
 
   return (
@@ -173,7 +194,7 @@ export default function CyberQuiz() {
                 transition={{ duration: 0.3 }}
                 className="text-xl font-mono leading-tight tracking-wide text-green-300 py-2"
               >
-                {quizData[currentQuestion].question}
+                {shuffledQuizData[currentQuestion].question}
               </motion.div>
 
               {/* Scan line effect */}
@@ -200,69 +221,47 @@ export default function CyberQuiz() {
                 transition={{ duration: 0.3 }}
                 className="grid gap-3"
               >
-                {quizData[currentQuestion].options.map((option, index) => (
-                  <motion.button
-                    key={index}
-                    onClick={() => handleSelectAnswer(option)}
-                    initial={{ x: -10, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                    whileTap={{
-                      scale: 1.1,
-                      boxShadow: "0 0 15px rgba(0, 255, 128, 0.5)",
-                    }}
-                    className={`
+                {shuffledQuizData[currentQuestion].options.map(
+                  (option, index) => (
+                    <motion.button
+                      key={index}
+                      onClick={() => handleSelectAnswer(option)}
+                      disabled={buttonsDisabled}
+                      initial={{ x: -10, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 }}
+                      whileTap={{
+                        scale: 1.1,
+                        boxShadow: "0 0 15px rgba(0, 255, 128, 0.5)",
+                      }}
+                      className={`
+                      ${buttonsDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
                       relative overflow-hidden group flex items-center p-4 border border-green-500/30 rounded-md 
                       bg-black/50 text-left font-mono transition-all
-                      hover:bg-green-900/20 hover:border-green-400/50 hover:shadow-[0_0_10px_rgba(0,255,128,0.2)]
-                      ${selectedAnswer === option ? "bg-green-900/30 border-green-400/70 shadow-[0_0_15px_rgba(0,255,128,0.3)]" : ""}
+                      ${!buttonsDisabled && "hover:bg-green-900/20 hover:border-green-400/50 hover:shadow-[0_0_10px_rgba(0,255,128,0.2)]"}
                     `}
-                  >
-                    <span className="text-white">{option}</span>
+                    >
+                      <span className="text-white">{option}</span>
 
-                    {/* Button glow effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                      {/* Button glow effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
-                    {/* Scan line */}
-                    <motion.div
-                      className="absolute inset-0 bg-green-400/10 mix-blend-overlay pointer-events-none"
-                      animate={{ top: ["100%", "-100%"] }}
-                      transition={{
-                        duration: 2,
-                        repeat: Number.POSITIVE_INFINITY,
-                        ease: "linear",
-                      }}
-                    ></motion.div>
-                  </motion.button>
-                ))}
+                      {/* Scan line */}
+                      <motion.div
+                        className="absolute inset-0 bg-green-400/10 mix-blend-overlay pointer-events-none"
+                        animate={{ top: ["100%", "-100%"] }}
+                        transition={{
+                          duration: 2,
+                          repeat: Number.POSITIVE_INFINITY,
+                          ease: "linear",
+                        }}
+                      ></motion.div>
+                    </motion.button>
+                  ),
+                )}
               </motion.div>
             </AnimatePresence>
           </div>
-
-          {/* Next button */}
-          <Button
-            onClick={handleNextQuestion}
-            disabled={!selectedAnswer}
-            className="relative w-full bg-black hover:bg-green-900 text-green-400 border border-green-500/50 px-8 py-6 text-xl rounded-md shadow-[0_0_10px_rgba(0,255,128,0.3)] transition-all hover:shadow-[0_0_15px_rgba(0,255,128,0.5)] disabled:opacity-70 disabled:hover:shadow-[0_0_10px_rgba(0,255,128,0.3)] overflow-hidden group"
-          >
-            {/* Button glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-
-            {/* Button text with scan line */}
-            <div className="relative flex items-center justify-center gap-2">
-              <span className="tracking-wider font-mono">次の問題へ</span>
-              <ArrowRight className="h-5 w-5" />
-              <motion.div
-                className="absolute inset-0 bg-green-400/20 mix-blend-overlay"
-                animate={{ top: ["100%", "-100%"] }}
-                transition={{
-                  duration: 2,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "linear",
-                }}
-              ></motion.div>
-            </div>
-          </Button>
         </div>
       </div>
 

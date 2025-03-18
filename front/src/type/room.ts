@@ -8,6 +8,8 @@ export type Room = {
   currentTurnCharacterId: string;
   currentTurnUserId: string;
   room_character: RoomCharacter[];
+  winUserId: string | null;
+  room_log: { description: string }[];
 };
 
 export type SelectingRoom = {

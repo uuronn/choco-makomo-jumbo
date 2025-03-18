@@ -7,7 +7,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { useUserContext } from "../../context/UserProvider";
-import { Character } from "~/type/character";
+import { Character, LevelUpResult } from "~/type/character";
 
 type CharacterType =
   | "バージョン管理"
@@ -32,6 +32,23 @@ const typeColors: Record<CharacterType, string> = {
   コンテナー: "bg-teal-500",
 };
 
+const handleMouseDown = (
+  increment: boolean,
+  setPoints: React.Dispatch<React.SetStateAction<number>>,
+  points: number,
+) => {
+  const interval = setInterval(() => {
+    setPoints((prevPoints) => (increment ? prevPoints + 1 : prevPoints - 1));
+  }, 100);
+
+  const handleMouseUp = () => {
+    clearInterval(interval);
+    document.removeEventListener("mouseup", handleMouseUp);
+  };
+
+  document.addEventListener("mouseup", handleMouseUp);
+};
+
 export default function CharacterDevelopment() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
@@ -41,7 +58,7 @@ export default function CharacterDevelopment() {
   const [powerPoints, setPowerPoints] = useState(0);
   const [speedPoints, setSpeedPoints] = useState(0);
 
-  const { user, havingCharacters } = useUserContext();
+  const { user, havingCharacters, fetchCharacters } = useUserContext();
 
   useEffect(() => {
     if (user) {
@@ -69,6 +86,15 @@ export default function CharacterDevelopment() {
     (async () => {
       if (!user) return;
 
+      const updatedCharacter = {
+        ...selectedCharacter,
+        life: selectedCharacter.life + lifePoints,
+        power: selectedCharacter.power + powerPoints,
+        speed: selectedCharacter.speed + speedPoints,
+      };
+
+      setSelectedCharacter(updatedCharacter);
+
       const charRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters/${selectedCharacter.characterId}`,
         {
@@ -83,16 +109,19 @@ export default function CharacterDevelopment() {
           }),
         },
       );
+
+      const data = (await charRes.json()) as LevelUpResult;
+      setSelectedCharacter((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          level: data.level,
+          life: data.life,
+          power: data.power,
+          speed: data.speed,
+        };
+      });
     })();
-
-    const updatedCharacter = {
-      ...selectedCharacter,
-      life: selectedCharacter.life + lifePoints,
-      power: selectedCharacter.power + powerPoints,
-      speed: selectedCharacter.speed + speedPoints,
-    };
-
-    setSelectedCharacter(updatedCharacter);
 
     setAvailablePoints(
       availablePoints - (lifePoints + powerPoints + speedPoints),
@@ -101,6 +130,16 @@ export default function CharacterDevelopment() {
     setLifePoints(0);
     setPowerPoints(0);
     setSpeedPoints(0);
+
+    fetchCharacters();
+
+    // const updatedCharacter = havingCharacters.find(
+    //   (character) => character.characterId === selectedCharacter.characterId
+    // );
+
+    // if (updatedCharacter) {
+    //   setSelectedCharacter(updatedCharacter);
+    // }
   };
 
   const usedPoints = lifePoints + powerPoints + speedPoints;
@@ -172,7 +211,7 @@ export default function CharacterDevelopment() {
                   <div className="col-span-2 md:col-span-7">
                     <div className="mb-2">
                       <div className="text-md font-semibold mb-1 text-green-400">
-                        所持ポイント:{" "}
+                        所持ポイント:
                         <span className="text-emerald-400">
                           {remainingPoints}
                         </span>
@@ -181,7 +220,7 @@ export default function CharacterDevelopment() {
 
                     <div className="space-y-2">
                       <div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
-                        <div className="w-20 text-green-200">ライフ:</div>
+                        <div className="w-20 text-green-200">HP :</div>
                         <div className="flex-1 mx-2">
                           <div className="text-md text-green-400">
                             {selectedCharacter.life}
@@ -194,23 +233,29 @@ export default function CharacterDevelopment() {
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
                             size="icon"
+                            onMouseDown={() =>
+                              handleMouseDown(false, setLifePoints, lifePoints)
+                            }
                             onClick={() =>
                               lifePoints > 0 && setLifePoints(lifePoints - 1)
                             }
                             disabled={lifePoints <= 0}
                           >
-                            <Minus className="h-3 w-3" />
+                            <Minus />
                           </Button>
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
                             size="icon"
+                            onMouseDown={() =>
+                              handleMouseDown(true, setLifePoints, lifePoints)
+                            }
                             onClick={() =>
                               remainingPoints > 0 &&
                               setLifePoints(lifePoints + 1)
                             }
                             disabled={remainingPoints <= 0}
                           >
-                            <Plus className="h-3 w-3" />
+                            <Plus />
                           </Button>
                           <div className="w-6 text-center text-emerald-400">
                             {lifePoints}
@@ -237,7 +282,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={powerPoints <= 0}
                           >
-                            <Minus className="h-3 w-3" />
+                            <Minus />
                           </Button>
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
@@ -248,7 +293,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={remainingPoints <= 0}
                           >
-                            <Plus className="h-3 w-3" />
+                            <Plus />
                           </Button>
                           <div className="w-6 text-center text-emerald-400">
                             {powerPoints}
@@ -275,7 +320,7 @@ export default function CharacterDevelopment() {
                             }
                             disabled={speedPoints <= 0}
                           >
-                            <Minus className="h-3 w-3" />
+                            <Minus />
                           </Button>
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
@@ -286,12 +331,22 @@ export default function CharacterDevelopment() {
                             }
                             disabled={remainingPoints <= 0}
                           >
-                            <Plus className="h-3 w-3" />
+                            <Plus />
                           </Button>
                           <div className="w-6 text-center text-emerald-400">
                             {speedPoints}
                           </div>
                         </div>
+                      </div>
+
+                      <div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
+                        <div className="w-20 text-green-200">回避率 :</div>
+                        <div className="flex-1 mx-2">
+                          <div className="text-md text-green-400">
+                            {selectedCharacter.base_evasion}%
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1"></div>
                       </div>
                     </div>
 
@@ -323,36 +378,37 @@ export default function CharacterDevelopment() {
             <div className="h-px flex-grow ml-4 bg-gradient-to-r from-emerald-400 to-transparent"></div>
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {havingCharacters.map((character) => (
-              <div
-                key={character.characterId}
-                className={`cursor-pointer p-2 rounded-lg transition-all ${
-                  selectedCharacter?.characterId === character.characterId
-                    ? "bg-emerald-500/20 border border-emerald-500"
-                    : "hover:bg-gray-800 border border-emerald-500/10 hover:border-emerald-500/50"
-                }`}
-                style={
-                  selectedCharacter?.characterId === character.characterId
-                    ? { boxShadow: "0 0 10px rgba(16, 185, 129, 0.3)" }
-                    : {}
-                }
-                onClick={() => handleCharacterSelect(character)}
-              >
-                <div className="flex flex-col items-center">
-                  <div className="relative w-16 h-16 mb-2 overflow-hidden rounded-lg">
-                    <Image
-                      src={character.image_url || "/placeholder.svg"}
-                      alt={character.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="text-center font-medium text-green-200">
-                    {character.name}
+            {havingCharacters &&
+              havingCharacters.map((character) => (
+                <div
+                  key={character.characterId}
+                  className={`cursor-pointer p-2 rounded-lg transition-all ${
+                    selectedCharacter?.characterId === character.characterId
+                      ? "bg-emerald-500/20 border border-emerald-500"
+                      : "hover:bg-gray-800 border border-emerald-500/10 hover:border-emerald-500/50"
+                  }`}
+                  style={
+                    selectedCharacter?.characterId === character.characterId
+                      ? { boxShadow: "0 0 10px rgba(16, 185, 129, 0.3)" }
+                      : {}
+                  }
+                  onClick={() => handleCharacterSelect(character)}
+                >
+                  <div className="flex flex-col items-center">
+                    <div className="relative w-16 h-16 mb-2 overflow-hidden rounded-lg">
+                      <Image
+                        src={character.image_url || "/placeholder.svg"}
+                        alt={character.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="text-center font-medium text-green-200">
+                      {character.name}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </div>

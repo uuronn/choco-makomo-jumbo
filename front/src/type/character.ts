@@ -14,3 +14,13 @@ export type Character = {
   partySkillId: string | null;
   image_url: string;
 };
+
+export type LevelUpResult = {
+  characterId: string;
+  evasion: number;
+  level: number;
+  life: number;
+  power: number;
+  speed: number;
+  userId: string;
+};

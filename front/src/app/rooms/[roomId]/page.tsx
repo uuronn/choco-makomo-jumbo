@@ -31,7 +31,6 @@ export default function RoomDetailPage() {
           },
         );
         const data = await res.json();
-        console.log("更新😊", data);
 
         if (
           data.message == "このルームにアクセスする権限がありません" ||
@@ -52,31 +51,6 @@ export default function RoomDetailPage() {
 
     return () => clearInterval(interval);
   }, [roomId, user]);
-
-  // バトル開始（ホストのみ実行可能）
-  const startBattle = async () => {
-    if (!user) return;
-
-    if (!room || room.hostUserId !== user.uid) {
-      alert("ホストのみがバトルを開始できます");
-      return;
-    }
-
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/start-battle`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roomId: room.id, userId: user.uid }),
-      },
-    );
-
-    if (!res.ok) {
-      alert("バトル開始に失敗しました");
-      console.error(await res.json());
-      return;
-    }
-  };
 
   if (!user) return <Loading message="認証中" />;
   if (room == null) return <Loading message="ルーム情報取得中" />;

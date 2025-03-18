@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function GachaScreen() {
+  const [availablePoints, setAvailablePoints] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState<gachaResult | null>(null);
@@ -27,6 +28,18 @@ export default function GachaScreen() {
   const { user, fetchCharacters } = useUserContext();
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      (async () => {
+        const pointRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`,
+        );
+        const pointData = await pointRes.json();
+        setAvailablePoints(pointData);
+      })();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (isAnimating) {
@@ -71,6 +84,13 @@ export default function GachaScreen() {
       setIsAnimating(false);
       setShowResult(true);
       fetchCharacters();
+      (async () => {
+        const pointRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`,
+        );
+        const pointData = await pointRes.json();
+        setAvailablePoints(pointData);
+      })();
     } catch (error) {
       console.error("ガチャの取得に失敗しました", error);
     }
@@ -98,7 +118,10 @@ export default function GachaScreen() {
     <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 overflow-hidden">
       {/* Background grid effect */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djJoLTJ2LTJoMnptMC00aDJ2MmgtMnYtMnptLTQgMHYyaC0ydi0yaDJ6bTIgMGgydjJoLTJ2LTJ6bS02IDBoMnYyaC0ydi0yem0yLTRoMnYyaC0ydi0yem0yIDBIMzZ2Mmgtc3YtMnptMCA0aDJ2MmgtMnYtMnoiLz48L2c+PC9nPjwvc3ZnPg==')]"></div>
-
+      <div className="text-md font-semibold mb-1 text-green-400">
+        所持ポイント:
+        <span className="text-emerald-400">{availablePoints}</span>
+      </div>
       {/* Animated circuit lines */}
       <div className="absolute inset-0 overflow-hidden opacity-20">
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse"></div>
@@ -111,7 +134,6 @@ export default function GachaScreen() {
         {/* Header */}
         <div className="bg-gradient-to-r from-green-900/80 to-green-700/80 p-4 text-center relative">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 via-green-300 to-green-400"></div>
-
           <div className="flex items-center justify-center gap-3">
             <motion.div
               animate={{ rotate: 360 }}
@@ -313,7 +335,7 @@ export default function GachaScreen() {
                     <h3 className="text-2xl font-bold text-white mb-1">
                       {result?.name}
                     </h3>
-                    <div className="flex justify-center">
+                    <div className="flex justify-center items-center">
                       {result?.image_url && (
                         <Image
                           alt=""
@@ -321,6 +343,16 @@ export default function GachaScreen() {
                           width={140}
                           src={result.image_url}
                         />
+                      )}
+                      {result?.message ==
+                        "Character already owned! You received 5 points!" && (
+                        <h2 className="text-xl font-bold text-green-400">
+                          {result.character?.name}
+                          <br /> <br />
+                          (取得済み技術)
+                          <br /> <br />
+                          +5ポイント
+                        </h2>
                       )}
                     </div>
                   </div>
@@ -356,7 +388,7 @@ export default function GachaScreen() {
             </Button>
             <Button
               onClick={pullGacha}
-              disabled={isAnimating}
+              disabled={isAnimating || availablePoints < 1}
               className="w-1/2 relative bg-black hover:bg-green-900 text-green-400 border border-green-500/50 px-8 py-6 text-xl rounded-md shadow-[0_0_10px_rgba(0,255,128,0.3)] transition-all hover:shadow-[0_0_15px_rgba(0,255,128,0.5)] disabled:opacity-70 disabled:hover:shadow-[0_0_10px_rgba(0,255,128,0.3)] overflow-hidden group"
             >
               {/* Button glow effect */}
