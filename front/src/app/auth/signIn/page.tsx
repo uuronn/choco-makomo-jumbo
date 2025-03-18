@@ -4,14 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import { LucideShieldAlert } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
-import { useAuth } from "~/context/AuthProvider";
+import { useUserContext } from "~/context/UserProvider";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const { handleSignIn } = useAuth();
+  const { handleSignIn } = useUserContext();
 
   // Canvas Matrix Effect
   useEffect(() => {

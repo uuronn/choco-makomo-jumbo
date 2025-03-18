@@ -1,22 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { useAuth } from "../../../context/AuthProvider";
-import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useUserContext } from "../../../context/UserProvider";
 import Loading from "~/components/Loading";
 import Pending from "~/components/Pending";
 import { Room } from "~/type/room";
+import Battle from "~/components/Battle";
 
 export default function RoomDetailPage() {
-  const { user } = useAuth();
+  const { user } = useUserContext();
   const { roomId } = useParams();
 
   const [room, setRoom] = useState<Room | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [battleLog, setBattleLog] = useState<string[]>([]);
   const [isMyTurn, setIsMyTurn] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     if (!roomId || !user) return;
@@ -30,28 +30,26 @@ export default function RoomDetailPage() {
             headers: { "Content-Type": "application/json" },
           },
         );
-
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.message || "ルームの取得に失敗しました");
-        }
-
         const data = await res.json();
-        setRoom(data);
+        console.log(data);
 
-        // 自分のターンかどうかを確認
-        setIsMyTurn(data.room.currentTurnUserId === user.uid);
-      } catch (err) {
-        setError(err as string);
-      } finally {
-        setLoading(false);
+        if (
+          data.message == "このルームにアクセスする権限がありません" ||
+          data.message == "指定されたルームが見つかりません"
+        ) {
+          router.push("/rooms");
+          return;
+        }
+        setRoom(data);
+      } catch (e) {
+        console.log(e);
       }
     };
 
     fetchRoom();
 
     // ルームの状態をリアルタイム監視
-    const interval = setInterval(fetchRoom, 3000); // 3秒ごとにチェック
+    const interval = setInterval(fetchRoom, 10000); // 3秒ごとにチェック
 
     return () => clearInterval(interval);
   }, [roomId, user]);
@@ -105,14 +103,15 @@ export default function RoomDetailPage() {
     setIsMyTurn(false);
   };
 
-  if (!user || loading) return <Loading message="認証中" />;
-  if (!room) return <p>ルームが見つかりません</p>;
-
-  return room.status === "pending" && room.hostUserId == user.uid ? (
-    <Pending room={room} />
+  if (!user) return <Loading message="認証中" />;
+  if (room == null) return <Loading message="ルーム情報取得中" />;
+  return room.status === "waiting" ? (
+    <Loading message="マッチング中" />
+  ) : room.status === "pending" && room.hostUserId == user.uid ? (
+    <Pending room={room} setRoom={setRoom} />
   ) : room.status === "pending" && room.hostUserId !== user.uid ? (
-    <></>
+    <Loading message="参加中" />
   ) : (
-    <Loading message="承認待ち" />
+    <Battle room={room} />
   );
 }

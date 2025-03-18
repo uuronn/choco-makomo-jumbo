@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Code2, Sparkles, Terminal, Cpu, Zap, ArrowLeft } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import { useAuth } from "../../context/AuthProvider";
+import { useUserContext } from "../../context/UserProvider";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -23,9 +23,8 @@ export default function GachaScreen() {
       color: string;
     }>
   >([]);
-  const [binaryCode, setBinaryCode] = useState<string[]>([]);
 
-  const { user, fetchCharacters } = useAuth();
+  const { user, fetchCharacters } = useUserContext();
 
   const router = useRouter();
 
@@ -46,18 +45,6 @@ export default function GachaScreen() {
       setParticles([]);
     }
   }, [isAnimating]);
-
-  useEffect(() => {
-    const generateBinaryCode = () => {
-      return Array.from({ length: 50 }).map(() =>
-        Array.from({ length: 120 })
-          .map(() => (Math.random() > 0.5 ? "1" : "0"))
-          .join(""),
-      );
-    };
-
-    setBinaryCode(generateBinaryCode());
-  }, []);
 
   const pullGacha = async () => {
     try {
@@ -120,17 +107,6 @@ export default function GachaScreen() {
         <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse"></div>
       </div>
 
-      {/* Binary code background effect */}
-      <div className="absolute inset-0 overflow-hidden opacity-5">
-        <div className="font-mono text-xs text-green-500 whitespace-nowrap animate-scrollUp">
-          {binaryCode.map((line, i) => (
-            <div key={i} className="my-2">
-              {line}
-            </div>
-          ))}
-        </div>
-      </div>
-
       <div className="py-3 gap-0 w-full h-full max-w-md bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden relative z-10">
         {/* Header */}
         <div className="bg-gradient-to-r from-green-900/80 to-green-700/80 p-4 text-center relative">
@@ -149,7 +125,7 @@ export default function GachaScreen() {
             </motion.div>
 
             <h1 className="text-2xl font-bold text-green-300 tracking-wider">
-              技術大戦争
+              技術ガチャ
             </h1>
 
             <motion.div
@@ -164,10 +140,6 @@ export default function GachaScreen() {
             </motion.div>
           </div>
 
-          <p className="text-green-400 mt-1 text-sm tracking-widest uppercase">
-            PROGRAMMING LANGUAGE SYSTEM
-          </p>
-
           {/* Tech decorations */}
           <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-20 h-6 bg-black/50 rounded-t-full border-t border-l border-r border-green-500/30"></div>
         </div>
@@ -175,7 +147,7 @@ export default function GachaScreen() {
         <div className="p-6 flex flex-col items-center relative">
           {/* Digital counter */}
           <div className="absolute top-2 right-2 font-mono text-xs text-green-500 bg-black/50 px-2 py-1 rounded border border-green-500/30">
-            SYS:READY_
+            <span>技術ガチャ </span>
             <motion.span
               animate={{ opacity: [1, 0, 1] }}
               transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
@@ -408,22 +380,16 @@ export default function GachaScreen() {
 
           <div className="mt-6 text-xs text-green-500/70 font-mono flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span>SYSTEM READY FOR LANGUAGE EXTRACTION</span>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
           </div>
-        </div>
-      </div>
-
-      {/* Tech decorations around the card */}
-      <div className="absolute bottom-4 left-4 text-green-500/30 font-mono text-xs">
-        <div>SYS:ONLINE</div>
-        <div>VER:2.5.7</div>
-      </div>
-
-      <div className="absolute top-4 right-4 text-green-500/30 font-mono text-xs">
-        <div className="flex items-center gap-1">
-          <div className="w-1 h-1 bg-green-500 rounded-full"></div>
-          <span>NETWORK:ACTIVE</span>
         </div>
       </div>
 

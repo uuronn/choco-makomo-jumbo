@@ -2,30 +2,34 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Plus, Zap } from "lucide-react";
+import { Plus, Zap, Minus } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { useAuth } from "../../context/AuthProvider";
+import { useUserContext } from "../../context/UserProvider";
 import { Character } from "~/type/character";
 
-// Character type definition
 type CharacterType =
   | "バージョン管理"
-  | "Water"
-  | "Earth"
-  | "Wind"
-  | "Light"
-  | "Dark"; // あとでバリエーション追加
+  | "データベース"
+  | "フレームワーク"
+  | "言語"
+  | "クラウド"
+  | "オペレーティングシステム"
+  | "実行環境"
+  | "ゲームエンジン"
+  | "コンテナー";
 
-// Type color mapping
 const typeColors: Record<CharacterType, string> = {
   バージョン管理: "bg-red-500",
-  Water: "bg-blue-500",
-  Earth: "bg-amber-700",
-  Wind: "bg-green-500",
-  Light: "bg-yellow-400",
-  Dark: "bg-purple-800",
+  データベース: "bg-blue-500",
+  フレームワーク: "bg-amber-700",
+  言語: "bg-green-500",
+  クラウド: "bg-yellow-400",
+  オペレーティングシステム: "bg-purple-800",
+  実行環境: "bg-pink-500",
+  ゲームエンジン: "bg-indigo-500",
+  コンテナー: "bg-teal-500",
 };
 
 export default function CharacterDevelopment() {
@@ -37,13 +41,11 @@ export default function CharacterDevelopment() {
   const [powerPoints, setPowerPoints] = useState(0);
   const [speedPoints, setSpeedPoints] = useState(0);
 
-  const { user, havingCharacters } = useAuth();
+  const { user, havingCharacters } = useUserContext();
 
-  // キャラクター一覧取得
   useEffect(() => {
     if (user) {
       (async () => {
-        // キャラクター一覧を取得
         const pointRes = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`,
         );
@@ -55,7 +57,7 @@ export default function CharacterDevelopment() {
 
   const handleCharacterSelect = (character: Character) => {
     setSelectedCharacter(character);
-    // Reset points when selecting a new character
+
     setLifePoints(0);
     setPowerPoints(0);
     setSpeedPoints(0);
@@ -66,7 +68,7 @@ export default function CharacterDevelopment() {
 
     (async () => {
       if (!user) return;
-      // キャラクター一覧を取得
+
       const charRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters/${selectedCharacter.characterId}`,
         {
@@ -83,7 +85,6 @@ export default function CharacterDevelopment() {
       );
     })();
 
-    // Update character stats
     const updatedCharacter = {
       ...selectedCharacter,
       life: selectedCharacter.life + lifePoints,
@@ -93,12 +94,10 @@ export default function CharacterDevelopment() {
 
     setSelectedCharacter(updatedCharacter);
 
-    // Update available points
     setAvailablePoints(
       availablePoints - (lifePoints + powerPoints + speedPoints),
     );
 
-    // Reset allocated points
     setLifePoints(0);
     setPowerPoints(0);
     setSpeedPoints(0);
@@ -135,7 +134,7 @@ export default function CharacterDevelopment() {
                   {/* Character Image and Basic Info */}
                   <div className="flex flex-col items-center justify-center md:col-span-5">
                     <div
-                      className="relative w-32 h-32 mb-2 border-2 border-emerald-500 rounded-lg overflow-hidden shadow-lg"
+                      className="relative w-48 h-48 mb-2 border-2 border-emerald-500 rounded-lg overflow-hidden shadow-lg"
                       style={{ boxShadow: "0 0 10px rgba(16, 185, 129, 0.5)" }}
                     >
                       <Image
@@ -145,8 +144,11 @@ export default function CharacterDevelopment() {
                         className="object-cover"
                       />
                     </div>
-                    <h2 className="text-lg font-bold text-green-400">
-                      {selectedCharacter.name}
+                    <h2 className="text-xl font-bold text-green-400">
+                      {selectedCharacter.name}{" "}
+                      <span className="text-sm">
+                        【レベル{selectedCharacter.level}】
+                      </span>
                     </h2>
                     <div className="flex items-center gap-1 mt-1">
                       <Badge
@@ -163,9 +165,6 @@ export default function CharacterDevelopment() {
                           ),
                         )}
                       </div>
-                    </div>
-                    <div className="mt-1 text-green-200">
-                      レベル: {selectedCharacter.level}
                     </div>
                   </div>
 
@@ -192,6 +191,16 @@ export default function CharacterDevelopment() {
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
+                          <Button
+                            className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
+                            size="icon"
+                            onClick={() =>
+                              lifePoints > 0 && setLifePoints(lifePoints - 1)
+                            }
+                            disabled={lifePoints <= 0}
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
                             size="icon"
@@ -224,6 +233,16 @@ export default function CharacterDevelopment() {
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
                             size="icon"
                             onClick={() =>
+                              powerPoints > 0 && setPowerPoints(powerPoints - 1)
+                            }
+                            disabled={powerPoints <= 0}
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
+                            size="icon"
+                            onClick={() =>
                               remainingPoints > 0 &&
                               setPowerPoints(powerPoints + 1)
                             }
@@ -248,6 +267,16 @@ export default function CharacterDevelopment() {
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
+                          <Button
+                            className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
+                            size="icon"
+                            onClick={() =>
+                              speedPoints > 0 && setSpeedPoints(speedPoints - 1)
+                            }
+                            disabled={speedPoints <= 0}
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
                             size="icon"

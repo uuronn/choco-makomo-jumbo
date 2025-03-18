@@ -2,22 +2,22 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Shield, Plus, Users, ChevronRight } from "lucide-react";
+import { Plus, Users, ChevronRight } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
-import { useAuth } from "~/context/AuthProvider";
+import { useUserContext } from "~/context/UserProvider";
 import { Character } from "~/type/character";
-import { Room } from "~/type/room";
+import { SelectingRoom } from "~/type/room";
 import { FaLaptopCode } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
 export default function GameInterface() {
   const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [rooms, setRooms] = useState<Room[]>([]);
+  const [selectedRoom, setSelectedRoom] = useState<SelectingRoom | null>(null);
+  const [rooms, setRooms] = useState<SelectingRoom[]>([]);
 
-  const { user, havingCharacters } = useAuth();
+  const { user, havingCharacters } = useUserContext();
 
   const router = useRouter();
 
@@ -35,7 +35,7 @@ export default function GameInterface() {
     }
   };
 
-  const handleSelectRoom = (room: Room) => {
+  const handleSelectRoom = (room: SelectingRoom) => {
     setSelectedRoom(room);
   };
 
@@ -56,8 +56,8 @@ export default function GameInterface() {
         }),
       },
     );
-    const data = res.json();
-    router.push(`/rooms/${data}`);
+    const data = await res.json();
+    router.push(`/rooms/${data.id}`);
   };
 
   const joinRoom = async () => {
@@ -77,31 +77,35 @@ export default function GameInterface() {
       },
     );
 
+    const data = await res.json();
+
+    console.log(data);
+
     router.push(`/rooms/${selectedRoom?.id}`);
   };
 
   useEffect(() => {
-    (async () => {
-      // 技術一覧を取得
+    const fetchRooms = async () => {
       const roomsRas = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
       );
       const roomsData = await roomsRas.json();
-      console.log(roomsData, "🥴");
       setRooms(roomsData);
-    })();
-  }, []);
+    };
 
-  useEffect(() => {
-    console.log(user?.uid, "😄");
-  }, [user]);
+    fetchRooms(); // 初回フェッチ
+
+    const intervalId = setInterval(fetchRooms, 1000); // 1秒ごとにフェッチ
+
+    return () => clearInterval(intervalId); // クリーンアップ
+  }, []);
 
   return (
     <div className="h-screen bg-gray-900 text-white p-3 flex flex-col overflow-hidden pl-20">
       {/* 技術選択セクション */}
       <section className="border border-green-400/30 rounded-lg p-3 backdrop-blur-sm backdrop-filter bg-black/20 h-[55%] overflow-hidden mb-3">
         <h2 className="text-lg font-bold mb-2 text-green-400 flex items-center">
-          <FaLaptopCode className="mr-2 h-5 w-5" /> 技術選択{" "}
+          <FaLaptopCode className="mr-2 h-5 w-5" /> 技術選択
           <span className="text-sm ml-2 text-green-400/70">(最大3体)</span>
         </h2>
 
@@ -123,7 +127,7 @@ export default function GameInterface() {
                     className="flex h-[calc(33.33%-6px)] items-center p-1.5 rounded-md bg-green-400/10 border border-green-400/30 hover:bg-green-400/20 transition-all cursor-pointer mb-2 last:mb-0"
                     onClick={() => handleSelectCharacter(character)}
                   >
-                    <div className="relative h-10 w-10 mr-3 rounded-md overflow-hidden border border-green-400/50">
+                    <div className="relative h-16 w-16 mx-3 rounded-md overflow-hidden border border-green-400/50">
                       <Image
                         src={character.image_url || "/placeholder.svg"}
                         alt={character.name}
@@ -138,6 +142,17 @@ export default function GameInterface() {
                       <p className="text-xs text-green-400/70">
                         レベル {character.level}
                       </p>
+                    </div>
+                    <div className="flex justify-around items-center ml-auto gap-4">
+                      <h4 className="font-bold text-green-400">
+                        HP {character.life}
+                      </h4>
+                      <h4 className="font-bold text-green-400">
+                        パワー {character.power}
+                      </h4>
+                      <h4 className="font-bold text-green-400">
+                        スピード {character.speed}
+                      </h4>
                     </div>
                     <div className="ml-auto">
                       <Button
@@ -210,24 +225,25 @@ export default function GameInterface() {
                 <div
                   key={room.id}
                   className={cn(
-                    "flex flex-col rounded-lg border transition-all cursor-pointer min-w-[200px]  min-h-[160px] overflow-hidden",
+                    "flex flex-col rounded-lg border transition-all justify-center items-center cursor-pointer min-w-[200px]  min-h-[160px] overflow-hidden",
                     selectedRoom?.id === room.id
                       ? "bg-green-400/20 border-green-400"
                       : "bg-black/30 border-green-400/20 hover:bg-green-400/10",
                   )}
                   onClick={() => handleSelectRoom(room)}
                 >
-                  <div className="relative h-[90px] w-full">
+                  <div className="relative h-[90px] w-full flex items-center justify-center">
                     <Image
-                      src={"/placeholder.svg"}
+                      src={room.host_user.photoUrl || "/placeholder.svg"}
                       alt={room.id}
-                      fill
-                      className="object-cover"
+                      width={80}
+                      height={80}
+                      className="object-cover rounded-full"
                     />
                   </div>
-                  <div className="p-2">
+                  <div className="p-2 text-center">
                     <h4 className="font-bold text-green-400 text-sm">
-                      {room.id}
+                      {room.host_user.name}
                     </h4>
                   </div>
                 </div>
