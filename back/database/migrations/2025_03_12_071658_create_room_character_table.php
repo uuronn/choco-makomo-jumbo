@@ -23,7 +23,7 @@ return new class extends Migration
             $table->boolean('isActive')->default(true);
             $table->boolean('isDead')->default(false);
             $table->smallInteger('specialTurnRequirement')->default(5);
-            $table->boolean('specialUsed')->default(false)->after('specialTurnRequirement');
+            $table->boolean('specialUsed')->default(false);
             $table->timestamps();
 
             $table->foreign('roomId')->references('id')->on('room')->onDelete('cascade');
