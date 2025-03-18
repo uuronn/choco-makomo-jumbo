@@ -519,7 +519,7 @@ class RoomController
 
             $room = Room::with([
                 'roomCharacter.character',
-                'roomLogs' => function ($query) {
+                'roomLog' => function ($query) {
                     $query->with([
                         'actorCharacter' => function ($query) {
                             $query->select('id', 'name');
@@ -539,7 +539,7 @@ class RoomController
                 return response()->json(['message' => 'このルームにアクセスする権限がありません'], 403);
             }
 
-            $logs = $room->roomLogs->map(function ($log) {
+            $logs = $room->roomLog->map(function ($log) {
                 return [
                     'actionType' => $log->actionType,
                     'actor' => $log->actorCharacter ? [

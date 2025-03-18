@@ -27,7 +27,7 @@ class UserController
                 'id' => $request->id,
                 'name' => $request->name,
                 'email' => $request->email,
-                'point' => 100,
+                'point' => 1000,
                 'photoUrl' => $request->photoUrl,
             ]);
 
