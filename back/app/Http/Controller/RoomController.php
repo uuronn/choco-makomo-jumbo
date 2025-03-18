@@ -499,7 +499,7 @@ class RoomController
 
                 $room->update([
                     'currentTurnUserId' => $nextTurn->userId,
-                    'currentTurnCharacterId' => $nextTurn->id
+                    'currentTurnCharacterId' => $nextTurn->characterId
                 ]);
 
                 $room->refresh();
@@ -514,7 +514,7 @@ class RoomController
                         'life' => $newLife
                     ],
                     'next_turn_user_id' => $nextTurn->userId,
-                    'next_turn_character_id' => $nextTurn->id
+                    'next_turn_character_id' => $nextTurn->characterId
                 ], 200);
             });
         } catch (Exception $e) {
