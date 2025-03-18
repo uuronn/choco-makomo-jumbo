@@ -56,8 +56,6 @@ export default function Pending({ room, setRoom }: PendingProps) {
       },
     );
     const data = await res.json();
-    console.log(data);
-
     // roomのguestUserIdをnullに設定
     setRoom({ ...room, guestUserId: null });
   };
@@ -98,14 +96,14 @@ export default function Pending({ room, setRoom }: PendingProps) {
               <div className="mt-6 flex gap-4 w-full">
                 <Button
                   onClick={handleReject}
-                  className="flex-1 bg-red-900/60 hover:bg-red-800 text-red-200 border border-red-700 z-100"
+                  className="cursor-pointer flex-1 bg-red-900/60 hover:bg-red-800 text-red-200 border border-red-700 z-100"
                 >
                   <X className="mr-2 h-5 w-5" />
                   拒否
                 </Button>
                 <Button
                   onClick={handleAccept}
-                  className="flex-1 bg-green-900/60 hover:bg-green-800 text-green-200 border border-green-700 z-100"
+                  className="cursor-pointer flex-1 bg-green-900/60 hover:bg-green-800 text-green-200 border border-green-700 z-100"
                 >
                   <Check className="mr-2 h-5 w-5" />
                   承諾

@@ -7,14 +7,13 @@ import Loading from "~/components/Loading";
 import Pending from "~/components/Pending";
 import { Room } from "~/type/room";
 import Battle from "~/components/Battle";
+import Victory from "~/components/Victory";
+import Defeat from "~/components/Defeat";
 
 export default function RoomDetailPage() {
   const { user } = useUserContext();
   const { roomId } = useParams();
-
   const [room, setRoom] = useState<Room | null>(null);
-  const [battleLog, setBattleLog] = useState<string[]>([]);
-  const [isMyTurn, setIsMyTurn] = useState(false);
 
   const router = useRouter();
 
@@ -39,6 +38,12 @@ export default function RoomDetailPage() {
           router.push("/rooms");
           return;
         }
+        if (data.status === "finish") {
+          setTimeout(() => {
+            clearInterval(interval);
+          }, 5000); // 5秒間一時停止
+        }
+        console.log(data, "🥴");
         setRoom(data);
       } catch (e) {
         console.log(e);
@@ -47,7 +52,7 @@ export default function RoomDetailPage() {
     fetchRoom();
 
     // ルームの状態をリアルタイム監視
-    const interval = setInterval(fetchRoom, 2000); // 3秒ごとにチェック
+    const interval = setInterval(fetchRoom, 1000);
 
     return () => clearInterval(interval);
   }, [roomId, user]);
@@ -60,7 +65,11 @@ export default function RoomDetailPage() {
     <Pending room={room} setRoom={setRoom} />
   ) : room.status === "pending" && room.hostUserId !== user.uid ? (
     <Loading message="参加中" />
-  ) : (
+  ) : room.status === "battling" ? (
     <Battle room={room} />
+  ) : room.status === "finish" && room.winUserId == user.uid ? (
+    <Victory roomId={room.id} />
+  ) : (
+    <Defeat />
   );
 }

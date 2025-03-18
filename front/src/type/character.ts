@@ -13,6 +13,8 @@ export type Character = {
   passiveSkillId: string | null;
   partySkillId: string | null;
   image_url: string;
+  specialSkillType: string;
+  specialTurnRequirement: number;
 };
 
 export type LevelUpResult = {

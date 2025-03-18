@@ -8,6 +8,8 @@ import { Card } from "~/components/ui/card";
 import { useUserContext } from "../../context/UserProvider";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import GachaDialog from "~/components/GachaDialog";
+import { gachaResult } from "~/type/gacha";
 
 export default function GachaScreen() {
   const [availablePoints, setAvailablePoints] = useState(0);
@@ -129,7 +131,6 @@ export default function GachaScreen() {
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse"></div>
         <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse"></div>
       </div>
-
       <div className="py-3 gap-0 w-full h-full max-w-md bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden relative z-10">
         {/* Header */}
         <div className="bg-gradient-to-r from-green-900/80 to-green-700/80 p-4 text-center relative">
@@ -424,6 +425,7 @@ export default function GachaScreen() {
           </div>
         </div>
       </div>
+      <GachaDialog />
 
       {/* Add global styles for animations */}
       <style jsx global>{`

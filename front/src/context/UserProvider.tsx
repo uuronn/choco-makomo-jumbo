@@ -98,16 +98,38 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   };
 
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged(async (user) => {
       if (user) {
         setUser(user);
+
+        // ユーザーが存在するか確認
+        const checkUser = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}`,
+        );
+
+        if (!checkUser.ok) {
+          // ユーザーが存在しない場合、新しいユーザーを作成
+          await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: user.uid,
+              name: user.displayName,
+              email: user.email,
+              photoUrl: user.photoURL,
+            }),
+          });
+        }
+
         (async () => {
           // キャラクター一覧を取得
           const charRes = await fetch(
             `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
           );
           const charData = await charRes.json();
-          setHavingCharacters(charData ?? []);
+          setHavingCharacters(charData);
         })();
         (async () => {
           const res = await fetch(
