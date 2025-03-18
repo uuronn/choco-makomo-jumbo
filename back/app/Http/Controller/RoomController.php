@@ -721,7 +721,7 @@ class RoomController
 
                 $description = '';
                 $targets = [];
-                $isSingleTarget = in_array($skillType, ['boost_attack', 'sacrifice']);
+                $isSingleTarget = in_array($skillType, ['全体攻撃', '全体回復']);
 
                 if ($isSingleTarget && !$targetCharacterId) {
                     throw new Exception('単体スキルの場合、ターゲットを指定してください');
@@ -777,7 +777,7 @@ class RoomController
                         ]);
                         break;
 
-                    case 'area_attack':
+                    case '全体攻撃':
                         $targets = RoomCharacter::where('roomId', $roomId)
                             ->where('userId', '!=', $userId)
                             ->where('isDead', false)
@@ -802,7 +802,7 @@ class RoomController
                         $description = "キャラクター {$attacker->characterId} が全体攻撃で {$damage} ダメージ";
                         break;
 
-                    case 'heal_all':
+                    case '全体回復':
                         $targets = RoomCharacter::where('roomId', $roomId)
                             ->where('userId', $userId)
                             ->where('isDead', false)
