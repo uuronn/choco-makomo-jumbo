@@ -80,6 +80,10 @@ Route::post('/{userId}/{roomId}/reject', [RoomController::class, 'reject']);
 // 通常攻撃を行う
 Route::post('{userId}/{roomId}/attack', [RoomController::class, 'attack']);
 
+// ルームを削除する
+Route::delete('{userId}/{roomId}/delete', [RoomController::class, 'delete']);
+
+
 // 次のターンに進む
 Route::post('/{userId}/{roomId}/nextTurn', [RoomController::class, 'nextTurn']);
 
@@ -89,11 +93,11 @@ Route::get('/rooms/{roomId}/log', [roomLogController::class, 'logs']);
 
 
 
-Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
+// Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
 
-Route::post('/rooms/action', [RoomController::class, 'processAction']);
+// Route::post('/rooms/action', [RoomController::class, 'processAction']);
 
-Route::post('/rooms/end-battle', [RoomController::class, 'endBattle']);
+// Route::post('/rooms/end-battle', [RoomController::class, 'endBattle']);
 
 
 

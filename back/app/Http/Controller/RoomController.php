@@ -923,6 +923,51 @@ class RoomController
     // }
 
     /**
+     * 特定のルームを削除
+     */
+    public function delete(Request $request)
+    {
+        try {
+            $roomId = $request->route('roomId');
+            $userId = $request->route('userId');
+
+            // ルームを取得
+            $room = Room::where('id', $roomId)->first();
+
+            if (!$room) {
+                return response()->json(['message' => 'ルームが見つかりません'], 404);
+            }
+
+            // 削除権限の確認（ホストのみが削除可能）
+            if ($room->hostUserId !== $userId) {
+                return response()->json(['message' => 'ルームを削除する権限がありません'], 403);
+            }
+
+            // トランザクション内で削除
+            DB::transaction(function () use ($room) {
+                // 関連データの削除（必要に応じて）
+                RoomCharacter::where('roomId', $room->id)->delete();
+                // RoomLog::where('roomId', $room->id)->delete();
+
+                // ルーム自体の削除
+                $room->delete();
+
+                // 削除ログ（オプション）
+                // ※削除後にログを残す場合は別のテーブルに保存する必要あり
+            });
+
+            return response()->json([
+                'message' => "ルーム {$room->id} が正常に削除されました"
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'ルームの削除に失敗しました',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * ルームを全て削除（テスト用）
      */
     public function allDelete()
