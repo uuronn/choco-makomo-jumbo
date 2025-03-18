@@ -120,6 +120,7 @@ class RoomController
             return response()->json(['message' => $e->getMessage()], $statusCode);
         }
     }
+
     /**
      * ルームに参加
      */
@@ -247,6 +248,10 @@ class RoomController
                 return response()->json(['message' => 'ゲストが申請していません'], 400);
             }
 
+            // if ($room->guest) {
+            //     RoomCharacter::where('roomId', $roomId)->where('userId', $room->guestUserId)
+            // }
+
             DB::transaction(function () use ($roomId, $room) {
                 RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
                 $characters = RoomCharacter::where('roomId', $roomId)
@@ -269,7 +274,7 @@ class RoomController
                 ]);
             });
 
-            $room->refresh(); // DBから最新状態を再取得
+            $room->refresh();
 
             return response()->json([
                 'message' => '参加申請が承認されました',
@@ -531,7 +536,6 @@ class RoomController
             if (!$roomId)  return response()->json(['message' => 'ルームIDが必要です'], 401);
 
             $room = Room::with(['roomCharacter.character']) // ルームに紐づくキャラ情報を取得
-                        ->select('id', 'hostUserId', 'guestUserId', 'status')
                         ->where('id', $roomId)
                         ->first();
 
@@ -556,6 +560,8 @@ class RoomController
             ], 500);
         }
     }
+
+
 
     // public function startBattle(Request $request)
     // {
