@@ -539,27 +539,24 @@ class RoomController
                 return response()->json(['message' => 'このルームにアクセスする権限がありません'], 403);
             }
 
-            $logs = $room->roomLog->map(function ($log) {
-                return [
-                    'actionType' => $log->actionType,
-                    'actor' => $log->actorCharacter ? [
-                        'id' => $log->actorCharacter->id,
-                        'name' => $log->actorCharacter->name
-                    ] : null,
-                    'target' => $log->targetCharacter ? [
-                        'id' => $log->targetCharacter->id,
-                        'name' => $log->targetCharacter->name
-                    ] : null,
-                    'value' => $log->value,
-                    'description' => $log->description,
-                    'created_at' => $log->created_at
-                ];
-            });
+            // $logs = $room->roomLog->map(function ($log) {
+            //     return [
+            //         'actionType' => $log->actionType,
+            //         'actor' => $log->actorCharacter ? [
+            //             'id' => $log->actorCharacter->id,
+            //             'name' => $log->actorCharacter->name
+            //         ] : null,
+            //         'target' => $log->targetCharacter ? [
+            //             'id' => $log->targetCharacter->id,
+            //             'name' => $log->targetCharacter->name
+            //         ] : null,
+            //         'value' => $log->value,
+            //         'description' => $log->description,
+            //         'created_at' => $log->created_at
+            //     ];
+            // });
 
-            return response()->json([
-                'room' => $room,
-                'logs' => $logs
-            ], 200);
+            return response()->json($room, 200);
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to retrieve room',
