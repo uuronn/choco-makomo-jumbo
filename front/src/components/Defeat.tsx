@@ -48,7 +48,7 @@ export default function Defeat() {
           onClick={() => {
             router.push("/rooms");
           }}
-          className="cursor-pointer col-span-2 border border-emerald-500/30 bg-transparent text-emerald-400 hover:bg-emerald-500/10"
+          className="cursor-pointer col-span-2 border border-red-500/30 bg-transparent text-red-400 hover:bg-red-500/10"
         >
           <LuSwords />
           対戦へ
@@ -57,7 +57,7 @@ export default function Defeat() {
           onClick={() => {
             router.push("/");
           }}
-          className="cursor-pointer col-span-2 border border-emerald-500/30 bg-transparent text-emerald-400 hover:bg-emerald-500/10"
+          className="cursor-pointer col-span-2 border border-red-500/30 bg-transparent text-red-400 hover:bg-red-500/10"
         >
           <HomeIcon className=" h-4 w-4" />
           ホームへ

@@ -95,8 +95,10 @@ export default function Battle({ room }: BattleProps) {
       setPreventRoom(room);
     }
     if (
-      room.currentTurnCharacterId !== preventRoom?.currentTurnCharacterId &&
-      room.currentTurnUserId !== preventRoom?.currentTurnUserId
+      !(
+        room.currentTurnCharacterId == preventRoom?.currentTurnCharacterId &&
+        room.currentTurnUserId == preventRoom?.currentTurnUserId
+      )
     ) {
       if (preventRoom) {
         // status更新時の処理
@@ -110,9 +112,8 @@ export default function Battle({ room }: BattleProps) {
         );
 
         if (decreasedLifeCharacters.length > 0) {
-          console.log(decreasedLifeCharacters, "😄");
-          // エフェクトを表示して完了を待つ
           (async () => {
+            await showEffect(decreasedLifeCharacters[0].id, "explosion", 600);
             await showEffect(decreasedLifeCharacters[0].id, "blink", 1000);
           })();
         }

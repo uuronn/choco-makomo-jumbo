@@ -3,26 +3,23 @@
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import { Trophy, Star, RotateCcw, Home, Share2, Award } from "lucide-react";
+import { Trophy, HomeIcon } from "lucide-react";
 import confetti from "canvas-confetti";
+import { LuSwords } from "react-icons/lu";
+import { useRouter } from "next/navigation";
+import { useUserContext } from "~/context/UserProvider";
 
-export default function Victory({
-  score = 12500,
-  level = 5,
-  stars = 3,
-  onPlayAgain = () => console.log("Play again clicked"),
-  onMainMenu = () => console.log("Main menu clicked"),
-}) {
+export default function Victory({ roomId }: { roomId: string }) {
   const [showScreen, setShowScreen] = useState(false);
-  const [showScore, setShowScore] = useState(false);
-  const [showStars, setShowStars] = useState(false);
-  const [showButtons, setShowButtons] = useState(false);
+
+  const { user } = useUserContext();
+
+  const router = useRouter();
 
   useEffect(() => {
     // Trigger animations in sequence
     setTimeout(() => setShowScreen(true), 100);
     setTimeout(() => {
-      setShowScore(true);
       // Trigger confetti
       confetti({
         particleCount: 100,
@@ -31,8 +28,14 @@ export default function Victory({
         colors: ["#10B981", "#059669", "#34D399", "#A7F3D0"],
       });
     }, 600);
-    setTimeout(() => setShowStars(true), 1200);
-    setTimeout(() => setShowButtons(true), 1800);
+    (async () => {
+      await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${roomId}/delete`,
+        {
+          method: "DELETE",
+        },
+      );
+    })();
   }, []);
 
   return (
@@ -70,116 +73,27 @@ export default function Victory({
               ]
             </span>
           </h1>
-          <div className="mt-2 text-emerald-400">MISSION COMPLETE</div>
+          <div className="mt-2 text-emerald-400">勝利</div>
         </div>
 
-        {/* Score section */}
-        <div
-          className={`mb-6 rounded-lg border border-emerald-500/30 bg-gray-900/50 p-4 transition-all duration-500 ${
-            showScore ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-          }`}
+        <Button
+          onClick={() => {
+            router.push("/rooms");
+          }}
+          className="cursor-pointer col-span-2 border border-emerald-500/30 bg-transparent text-emerald-400 hover:bg-emerald-500/10"
         >
-          <div className="mb-2 text-center text-sm text-emerald-400">
-            FINAL SCORE
-          </div>
-          <div className="text-center font-mono text-4xl font-bold text-white">
-            {score.toLocaleString()}
-          </div>
-          <div className="mt-2 flex items-center justify-between border-t border-emerald-500/20 pt-2">
-            <div>
-              <div className="text-xs text-emerald-400">LEVEL</div>
-              <div className="font-mono text-xl text-white">{level}</div>
-            </div>
-            <div>
-              <div className="text-xs text-emerald-400">RANK</div>
-              <div className="font-mono text-xl text-white">S</div>
-            </div>
-            <div>
-              <div className="text-xs text-emerald-400">TIME</div>
-              <div className="font-mono text-xl text-white">02:45</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Stars rating */}
-        <div
-          className={`mb-6 flex justify-center space-x-4 transition-all duration-500 ${
-            showStars ? "scale-100 opacity-100" : "scale-50 opacity-0"
-          }`}
+          <LuSwords />
+          対戦へ
+        </Button>
+        <Button
+          onClick={() => {
+            router.push("/");
+          }}
+          className="cursor-pointer col-span-2 border border-emerald-500/30 bg-transparent text-emerald-400 hover:bg-emerald-500/10"
         >
-          {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className={`flex h-12 w-12 items-center justify-center rounded-full ${
-                i < stars ? "bg-emerald-500" : "bg-gray-700"
-              } transition-all duration-300 ${
-                showStars && i < stars
-                  ? "animate-[bounce_0.5s_ease-in-out_" + i * 0.1 + "s]"
-                  : ""
-              }`}
-            >
-              <Star
-                className={`h-7 w-7 ${i < stars ? "text-white" : "text-gray-500"}`}
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Achievements */}
-        <div
-          className={`mb-6 grid grid-cols-3 gap-2 transition-all duration-500 ${
-            showStars ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-          }`}
-        >
-          {[
-            { icon: Award, label: "PERFECT", active: true },
-            { icon: Award, label: "SPEEDY", active: true },
-            { icon: Award, label: "MASTER", active: false },
-          ].map((achievement, i) => (
-            <div
-              key={i}
-              className={`flex flex-col items-center rounded-md p-2 ${
-                achievement.active ? "text-emerald-400" : "text-gray-600"
-              }`}
-            >
-              <achievement.icon
-                className={`h-5 w-5 ${achievement.active ? "text-emerald-400" : "text-gray-600"}`}
-              />
-              <div className="mt-1 text-center text-xs">
-                {achievement.label}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Action buttons */}
-        <div
-          className={`grid grid-cols-2 gap-3 transition-all duration-500 ${
-            showButtons
-              ? "translate-y-0 opacity-100"
-              : "translate-y-10 opacity-0"
-          }`}
-        >
-          <Button
-            onClick={onPlayAgain}
-            className="border border-emerald-500 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-          >
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Play Again
-          </Button>
-          <Button
-            onClick={onMainMenu}
-            variant="outline"
-            className="border-emerald-500/50 bg-transparent text-emerald-400 hover:bg-emerald-500/10"
-          >
-            <Home className="mr-2 h-4 w-4" />
-            Main Menu
-          </Button>
-          <Button className="col-span-2 border border-emerald-500/30 bg-transparent text-emerald-400 hover:bg-emerald-500/10">
-            <Share2 className="mr-2 h-4 w-4" />
-            Share Score
-          </Button>
-        </div>
+          <HomeIcon className=" h-4 w-4" />
+          ホームへ
+        </Button>
 
         {/* Cyber decorative elements */}
         <div className="absolute bottom-0 left-0 h-1 w-1/3 bg-gradient-to-r from-emerald-500 to-transparent"></div>

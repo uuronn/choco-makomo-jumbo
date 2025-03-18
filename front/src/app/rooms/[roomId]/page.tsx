@@ -39,6 +39,11 @@ export default function RoomDetailPage() {
           return;
         }
         setRoom(data);
+
+        // state が finish ならポーリングを停止
+        if (data.status === "finish") {
+          clearInterval(interval);
+        }
       } catch (e) {
         console.log(e);
       }
@@ -62,7 +67,7 @@ export default function RoomDetailPage() {
   ) : room.status === "battling" ? (
     <Battle room={room} />
   ) : room.status === "finish" && room.winUserId == user.uid ? (
-    <Victory />
+    <Victory roomId={room.id} />
   ) : (
     <Defeat />
   );
