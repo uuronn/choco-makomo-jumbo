@@ -101,21 +101,27 @@ export default function Battle({ room }: BattleProps) {
       `}</style>
 
       <div className="flex justify-center gap-4 mb-auto">
-        {enemyTeam.map((enemy) => (
+        {enemyTeam.map((character) => (
           <div
-            onClick={() => attackEnemy(enemy.id)}
-            key={enemy.id}
+            onClick={() => attackEnemy(character.id)}
+            key={character.id}
             className={`${
-              isSelectingEnemy && enemy.life > 0 ? "hover:border-green-500" : ""
+              isSelectingEnemy && character.life > 0
+                ? "hover:border-green-500"
+                : ""
             } border-2 border-transparent rounded-md`}
           >
             <CharacterDisplay
               isEnemy={true}
-              key={enemy.id}
-              character={enemy}
+              key={character.id}
+              character={character}
               onClick={() => {}}
+              isActive={
+                room.currentTurnCharacterId === character.characterId &&
+                !isMyTurn
+              }
             />
-            {isSelectingEnemy && enemy.life > 0 && (
+            {isSelectingEnemy && character.life > 0 && (
               <p className="w-full blink text-center">▲</p>
             )}
           </div>
@@ -123,12 +129,15 @@ export default function Battle({ room }: BattleProps) {
       </div>
 
       <div className="flex justify-center gap-4 mb-4">
-        {playerTeam.map((player) => (
+        {playerTeam.map((character) => (
           <CharacterDisplay
             isEnemy={false}
-            key={player.id}
-            character={player}
+            key={character.id}
+            character={character}
             onClick={() => {}}
+            isActive={
+              room.currentTurnCharacterId === character.characterId && isMyTurn
+            }
           />
         ))}
       </div>
