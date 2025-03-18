@@ -14,351 +14,324 @@ class CharacterSeeder extends Seeder
                 'name' => 'Ruby',
                 'type' => '言語',
                 'rarity' => 5,
-                'base_power' => 1000, // 1000のまま（100単位）
+                'base_power' => 1000,
                 'base_life' => 2000,
                 'base_speed' => 80,
                 'base_evasion' => 7,
-                'activeSkillId' => 'skill_uuid1',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'boost_attack', // 味方単体の攻撃力アップ
+                'specialTurnRequirement' => 5,
                 'image_url' => '/character/ruby.webp',
             ],
             [
                 'name' => 'PHP',
                 'type' => '言語',
                 'rarity' => 3,
-                'base_power' => 600, // 600のまま（100単位）
-                'base_life' => 1000, // 400 -> 1000（1000単位）
+                'base_power' => 600,
+                'base_life' => 1000,
                 'base_speed' => 60,
                 'base_evasion' => 4,
-                'activeSkillId' => 'skill_uuid2',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'area_attack', // 敵全体にダメージ
+                'specialTurnRequirement' => 6,
                 'image_url' => '/character/php.webp',
             ],
             [
                 'name' => 'Swift',
                 'type' => '言語',
                 'rarity' => 4,
-                'base_power' => 800, // 800のまま（100単位）
-                'base_life' => 1000, // 300 -> 1000（1000単位）
+                'base_power' => 800,
+                'base_life' => 1000,
                 'base_speed' => 70,
                 'base_evasion' => 6,
-                'activeSkillId' => 'skill_uuid3',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'heal_all', // 味方全体を回復
+                'specialTurnRequirement' => 4,
                 'image_url' => '/character/swift.webp',
             ],
             [
                 'name' => 'CSS',
                 'type' => '言語',
                 'rarity' => 1,
-                'base_power' => 100, // 80 -> 100（100単位）
-                'base_life' => 1000, // 30 -> 1000（1000単位）
+                'base_power' => 100,
+                'base_life' => 1000,
                 'base_speed' => 10,
                 'base_evasion' => 2,
-                'activeSkillId' => null,
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => null, // スキルなし
+                'specialTurnRequirement' => null,
                 'image_url' => '/character/css.webp',
             ],
             [
                 'name' => 'Go',
                 'type' => '言語',
                 'rarity' => 6,
-                'base_power' => 1800, // 1800のまま（100単位）
-                'base_life' => 2000, // 310 -> 2000（1000単位）
+                'base_power' => 1800,
+                'base_life' => 2000,
                 'base_speed' => 100,
                 'base_evasion' => 9,
-                'activeSkillId' => 'skill_uuid5',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'sacrifice', // 単体大ダメージ + 自己犠牲
+                'specialTurnRequirement' => 7,
                 'image_url' => '/character/go.webp',
             ],
             [
                 'name' => 'html',
                 'type' => '言語',
                 'rarity' => 5,
-                'base_power' => 300, // 280 -> 300（100単位）
-                'base_life' => 1000, // 110 -> 1000（1000単位）
+                'base_power' => 300,
+                'base_life' => 1000,
                 'base_speed' => 100,
                 'base_evasion' => 8,
-                'activeSkillId' => 'skill_uuid6',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'boost_speed', // 味方単体のスピードアップ
+                'specialTurnRequirement' => 3,
                 'image_url' => '/character/html.webp',
             ],
             [
                 'name' => 'node.js',
                 'type' => '実行環境',
                 'rarity' => 6,
-                'base_power' => 3100, // 3080 -> 3100（100単位）
-                'base_life' => 4000, // 110 -> 4000（1000単位）
+                'base_power' => 3100,
+                'base_life' => 4000,
                 'base_speed' => 100,
                 'base_evasion' => 9,
-                'activeSkillId' => 'skill_uuid7',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'stun_all', // 敵全体をスタン
+                'specialTurnRequirement' => 8,
                 'image_url' => '/character/nodejs.webp',
             ],
             [
                 'name' => 'react',
                 'type' => 'フレームワーク',
                 'rarity' => 2,
-                'base_power' => 1100, // 1080 -> 1100（100単位）
-                'base_life' => 2000, // 100 -> 2000（1000単位）
+                'base_power' => 1100,
+                'base_life' => 2000,
                 'base_speed' => 200,
                 'base_evasion' => 10,
-                'activeSkillId' => 'skill_uuid8',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'boost_evasion', // 味方単体の回避率アップ
+                'specialTurnRequirement' => 4,
                 'image_url' => '/character/react.webp',
             ],
             [
                 'name' => 'rust',
                 'type' => '言語',
                 'rarity' => 3,
-                'base_power' => 1100, // 1080 -> 1100（100単位）
-                'base_life' => 2000, // 100 -> 2000（1000単位）
+                'base_power' => 1100,
+                'base_life' => 2000,
                 'base_speed' => 150,
                 'base_evasion' => 8,
-                'activeSkillId' => 'skill_uuid9',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'single_attack', // 敵単体に大ダメージ
+                'specialTurnRequirement' => 5,
                 'image_url' => '/character/rust.webp',
             ],
             [
                 'name' => 'angular',
                 'type' => 'フレームワーク',
                 'rarity' => 4,
-                'base_power' => 1000, // 950 -> 1000（100単位）
-                'base_life' => 2000, // 200 -> 2000（1000単位）
+                'base_power' => 1000,
+                'base_life' => 2000,
                 'base_speed' => 120,
                 'base_evasion' => 7,
-                'activeSkillId' => 'skill_uuid10',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'heal_single', // 味方単体を回復
+                'specialTurnRequirement' => 4,
                 'image_url' => '/character/angular.webp',
             ],
             [
                 'name' => 'aws',
                 'type' => 'クラウド',
                 'rarity' => 5,
-                'base_power' => 2000, // 2000のまま（100単位）
-                'base_life' => 3000, // 300 -> 3000（1000単位）
+                'base_power' => 2000,
+                'base_life' => 3000,
                 'base_speed' => 90,
                 'base_evasion' => 6,
-                'activeSkillId' => 'skill_uuid11',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'area_debuff_power', // 敵全体の攻撃力ダウン
+                'specialTurnRequirement' => 6,
                 'image_url' => '/character/aws.webp',
             ],
             [
                 'name' => 'docker',
                 'type' => 'コンテナー',
                 'rarity' => 4,
-                'base_power' => 700, // 700のまま（100単位）
-                'base_life' => 1000, // 250 -> 1000（1000単位）
+                'base_power' => 700,
+                'base_life' => 1000,
                 'base_speed' => 60,
                 'base_evasion' => 5,
-                'activeSkillId' => 'skill_uuid12',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'boost_all_power', // 味方全体の攻撃力アップ
+                'specialTurnRequirement' => 5,
                 'image_url' => '/character/docker.webp',
             ],
             [
                 'name' => 'mysql',
                 'type' => 'データベース',
                 'rarity' => 2,
-                'base_power' => 600, // 550 -> 600（100単位）
-                'base_life' => 1000, // 350 -> 1000（1000単位）
+                'base_power' => 600,
+                'base_life' => 1000,
                 'base_speed' => 50,
                 'base_evasion' => 3,
-                'activeSkillId' => 'skill_uuid13',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'single_debuff_power', // 敵単体の攻撃力ダウン
+                'specialTurnRequirement' => 3,
                 'image_url' => '/character/mysql.webp',
             ],
             [
                 'name' => 'azure',
                 'type' => 'クラウド',
                 'rarity' => 5,
-                'base_power' => 1500, // 1500のまま（100単位）
-                'base_life' => 2000, // 400 -> 2000（1000単位）
+                'base_power' => 1500,
+                'base_life' => 2000,
                 'base_speed' => 90,
                 'base_evasion' => 6,
-                'activeSkillId' => 'skill_uuid14',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'area_heal', // 味方全体に小回復
+                'specialTurnRequirement' => 5,
                 'image_url' => '/character/azure.webp',
             ],
             [
                 'name' => 'gcp',
                 'type' => 'クラウド',
                 'rarity' => 5,
-                'base_power' => 1000, // 1000のまま（100単位）
-                'base_life' => 2000, // 200 -> 2000（1000単位）
+                'base_power' => 1000,
+                'base_life' => 2000,
                 'base_speed' => 130,
                 'base_evasion' => 8,
-                'activeSkillId' => 'skill_uuid15',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'boost_all_speed', // 味方全体のスピードアップ
+                'specialTurnRequirement' => 6,
                 'image_url' => '/character/gcp.webp',
             ],
             [
                 'name' => 'git',
                 'type' => 'バージョン管理',
                 'rarity' => 2,
-                'base_power' => 300, // 300のまま（100単位）
-                'base_life' => 1000, // 150 -> 1000（1000単位）
+                'base_power' => 300,
+                'base_life' => 1000,
                 'base_speed' => 80,
                 'base_evasion' => 5,
-                'activeSkillId' => 'skill_uuid16',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'single_boost_life', // 味方単体の最大HPアップ
+                'specialTurnRequirement' => 3,
                 'image_url' => '/character/git.webp',
             ],
             [
                 'name' => 'github',
                 'type' => 'バージョン管理',
                 'rarity' => 4,
-                'base_power' => 900, // 900のまま（100単位）
-                'base_life' => 2000, // 400 -> 2000（1000単位）
+                'base_power' => 900,
+                'base_life' => 2000,
                 'base_speed' => 110,
                 'base_evasion' => 7,
-                'activeSkillId' => 'skill_uuid17',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'area_boost_evasion', // 味方全体の回避率アップ
+                'specialTurnRequirement' => 5,
                 'image_url' => '/character/github.webp',
             ],
             [
                 'name' => 'gitlab',
                 'type' => 'バージョン管理',
                 'rarity' => 3,
-                'base_power' => 700, // 650 -> 700（100単位）
-                'base_life' => 1000, // 170 -> 1000（1000単位）
+                'base_power' => 700,
+                'base_life' => 1000,
                 'base_speed' => 75,
                 'base_evasion' => 5,
-                'activeSkillId' => 'skill_uuid18',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'single_stun', // 敵単体をスタン
+                'specialTurnRequirement' => 4,
                 'image_url' => '/character/gitlab.webp',
             ],
             [
                 'name' => 'javascript',
                 'type' => '言語',
                 'rarity' => 4,
-                'base_power' => 1200, // 1200のまま（100単位）
-                'base_life' => 2000, // 220 -> 2000（1000単位）
+                'base_power' => 1200,
+                'base_life' => 2000,
                 'base_speed' => 130,
                 'base_evasion' => 8,
-                'activeSkillId' => 'skill_uuid19',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'area_attack', // 敵全体にダメージ
+                'specialTurnRequirement' => 7,
                 'image_url' => '/character/javascript.webp',
             ],
             [
                 'name' => 'postgresql',
                 'type' => 'データベース',
                 'rarity' => 3,
-                'base_power' => 700, // 700のまま（100単位）
-                'base_life' => 1000, // 360 -> 1000（1000単位）
+                'base_power' => 700,
+                'base_life' => 1000,
                 'base_speed' => 65,
                 'base_evasion' => 4,
-                'activeSkillId' => 'skill_uuid20',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'single_heal', // 味方単体を回復
+                'specialTurnRequirement' => 4,
                 'image_url' => '/character/postgresql.webp',
             ],
             [
                 'name' => 'supabase',
                 'type' => 'データベース',
                 'rarity' => 4,
-                'base_power' => 900, // 850 -> 900（100単位）
-                'base_life' => 1000, // 280 -> 1000（1000単位）
+                'base_power' => 900,
+                'base_life' => 1000,
                 'base_speed' => 75,
                 'base_evasion' => 5,
-                'activeSkillId' => 'skill_uuid21',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'boost_all_life', // 味方全体の最大HPアップ
+                'specialTurnRequirement' => 5,
                 'image_url' => '/character/supabase.webp',
             ],
             [
                 'name' => 'unity',
                 'type' => 'ゲームエンジン',
                 'rarity' => 5,
-                'base_power' => 1600, // 1600のまま（100単位）
-                'base_life' => 2000, // 450 -> 2000（1000単位）
+                'base_power' => 1600,
+                'base_life' => 2000,
                 'base_speed' => 95,
                 'base_evasion' => 6,
-                'activeSkillId' => 'skill_uuid22',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'area_debuff_speed', // 敵全体のスピードダウン
+                'specialTurnRequirement' => 6,
                 'image_url' => '/character/unity.webp',
             ],
             [
                 'name' => 'vue',
                 'type' => 'フレームワーク',
                 'rarity' => 4,
-                'base_power' => 1100, // 1100のまま（100単位）
-                'base_life' => 2000, // 190 -> 2000（1000単位）
+                'base_power' => 1100,
+                'base_life' => 2000,
                 'base_speed' => 140,
                 'base_evasion' => 8,
-                'activeSkillId' => 'skill_uuid23',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'single_boost_speed', // 味方単体のスピードアップ
+                'specialTurnRequirement' => 4,
                 'image_url' => '/character/vue.webp',
             ],
             [
                 'name' => 'linux',
                 'type' => 'オペレーティングシステム',
                 'rarity' => 4,
-                'base_power' => 900, // 900のまま（100単位）
-                'base_life' => 2000, // 350 -> 2000（1000単位）
+                'base_power' => 900,
+                'base_life' => 2000,
                 'base_speed' => 85,
                 'base_evasion' => 6,
-                'activeSkillId' => 'skill_uuid24',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'area_stun', // 敵全体をスタン
+                'specialTurnRequirement' => 6,
                 'image_url' => '/character/linux.webp',
             ],
             [
                 'name' => 'mac',
                 'type' => 'オペレーティングシステム',
                 'rarity' => 3,
-                'base_power' => 700, // 650 -> 700（100単位）
-                'base_life' => 1000, // 200 -> 1000（1000単位）
+                'base_power' => 700,
+                'base_life' => 1000,
                 'base_speed' => 70,
                 'base_evasion' => 5,
-                'activeSkillId' => 'skill_uuid25',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'single_debuff_evasion', // 敵単体の回避率ダウン
+                'specialTurnRequirement' => 4,
                 'image_url' => '/character/mac.webp',
             ],
             [
                 'name' => 'Ruby on Rails',
                 'type' => 'フレームワーク',
                 'rarity' => 5,
-                'base_power' => 1200, // 1200のまま（100単位）
-                'base_life' => 2000, // 450 -> 2000（1000単位）
+                'base_power' => 1200,
+                'base_life' => 2000,
                 'base_speed' => 90,
                 'base_evasion' => 6,
-                'activeSkillId' => 'skill_uuid26',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'boost_all_attack', // 味方全体の攻撃力アップ
+                'specialTurnRequirement' => 6,
                 'image_url' => '/character/rubyonrails.webp',
             ],
             [
                 'name' => 'windows',
                 'type' => 'オペレーティングシステム',
                 'rarity' => 3,
-                'base_power' => 700, // 700のまま（100単位）
-                'base_life' => 1000, // 300 -> 1000（1000単位）
+                'base_power' => 700,
+                'base_life' => 1000,
                 'base_speed' => 60,
                 'base_evasion' => 4,
-                'activeSkillId' => 'skill_uuid27',
-                'passiveSkillId' => null,
-                'partySkillId' => null,
+                'specialSkillType' => 'single_attack', // 敵単体に大ダメージ
+                'specialTurnRequirement' => 5,
                 'image_url' => '/character/windows.webp',
             ],
         ];
