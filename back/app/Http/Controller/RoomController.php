@@ -613,7 +613,7 @@ class RoomController
                         'targetUserId' => $target->userId,
                         'targetCharacterId' => $target->characterId,
                         'value' => null,
-                        'description' => "{$target->character->name} が死にました",
+                        'description' => "{$target->character->name} がダウンしました",
                     ]);
                 }
 
@@ -741,7 +741,7 @@ class RoomController
                                 'actionType' => 'death',
                                 'targetUserId' => $target->userId,
                                 'targetCharacterId' => $target->characterId,
-                                'description' => "{$target->character->name} が死にました",
+                                'description' => "{$target->character->name} がダウンしました",
                             ]);
                         }
                         RoomLog::create([
@@ -749,7 +749,7 @@ class RoomController
                             'actionType' => 'death',
                             'targetUserId' => $attacker->userId,
                             'targetCharacterId' => $attacker->characterId,
-                            'description' => "{$attacker->character->name} が死にました",
+                            'description' => "{$attacker->character->name} がダウンしました",
                         ]);
                         break;
 
@@ -772,7 +772,7 @@ class RoomController
                                     'actionType' => 'death',
                                     'targetUserId' => $target->userId,
                                     'targetCharacterId' => $target->characterId,
-                                    'description' => "{$target->character->name} が死にました",
+                                    'description' => "{$target->character->name} がダウンしました",
                                 ]);
                             }
                         }
