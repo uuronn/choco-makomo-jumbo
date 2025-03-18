@@ -17,7 +17,7 @@ export const CharacterDisplay = React.memo(
     isSelected?: boolean;
     isEnemy: boolean;
     isActive?: boolean;
-    effect?: "blink" | "explosion" | string;
+    effect?: "blink" | "explosion" | "heal" | string;
     onClick: () => void;
   }) => {
     const hpPercentage = (character.life / character.maxLife) * 100;
@@ -169,6 +169,18 @@ export const CharacterDisplay = React.memo(
                   height={120}
                   src="/effect/explosion.gif"
                   alt="Explosion Effect"
+                  objectFit="cover"
+                />
+              </div>
+            )}
+
+            {effect === "heal" && (
+              <div className="absolute inset-0 flex justify-center items-center">
+                <Image
+                  width={120}
+                  height={120}
+                  src="/public/heart.gif"
+                  alt="Heal Effect"
                   objectFit="cover"
                 />
               </div>
