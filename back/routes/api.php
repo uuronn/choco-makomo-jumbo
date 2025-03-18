@@ -83,6 +83,9 @@ Route::post('{userId}/{roomId}/attack', [RoomController::class, 'attack']);
 Route::post('/{userId}/{roomId}/nextTurn', [RoomController::class, 'nextTurn']);
 
 
+// ルームログ取得
+Route::post('/rooms/{roomId}/log', [RoomController::class, 'logs']);
+
 
 Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
 
