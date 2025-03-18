@@ -205,28 +205,70 @@ class RoomController
                 'status' => 'pending',
             ]);
 
+            // キャラクター名を取得
+            $characterNames = [];
             foreach ($characterIdList as $characterId) {
                 $character = Character::find($characterId);
                 if (!$character) {
                     throw new Exception("Character {$characterId} not found", 404);
                 }
 
-                $userCharacter = UserCharacter::where('userId', $room->guestUserId)
+                $userCharacter = UserCharacter::where('userId', $request->guestUserId)
                     ->where('characterId', $characterId)
                     ->first();
                 if (!$userCharacter) {
                     throw new Exception("UserCharacter not found", 404);
                 }
 
+                $characterNames[] = $character->name;
+            }
+
+            // 基本倍率（パーティ全体用）
+            $powerMultiplier = 1.0;
+            $speedMultiplier = 1.0;
+            $lifeMultiplier = 1.0;
+
+            // パーティ全体の組み合わせボーナス（createと同じ条件）
+            if (!array_diff(['html', 'CSS', 'javascript'], $characterNames)) {
+                $powerMultiplier = 3;  // powerを3倍
+                $speedMultiplier = 3;  // speedを3倍
+            } elseif (!array_diff(['react', 'vue', 'angular'], $characterNames)) {
+                $powerMultiplier = 5;   // powerを5倍
+                $lifeMultiplier = 5;    // lifeを5倍
+            }
+
+            // AとBが揃っているかチェック
+            $hasA = in_array('A', $characterNames);
+            $hasB = in_array('B', $characterNames);
+            $shouldBoostB = $hasA && $hasB;
+
+            // RoomCharacterの作成
+            foreach ($characterIdList as $characterId) {
+                $character = Character::find($characterId);
+                $userCharacter = UserCharacter::where('userId', $request->guestUserId)
+                    ->where('characterId', $characterId)
+                    ->first();
+
+                // 個別倍率（パーティ全体の倍率をベースに調整）
+                $specificPowerMultiplier = $powerMultiplier;
+                $specificSpeedMultiplier = $speedMultiplier;
+                $specificLifeMultiplier = $lifeMultiplier;
+
+                // AがいてAとBが揃った場合、Bのステータスをさらに向上
+                if ($shouldBoostB && $character->name === 'B') {
+                    $specificPowerMultiplier *= 1.2;  // Bのpowerをさらに20%増
+                    $specificSpeedMultiplier *= 1.15; // Bのspeedをさらに15%増
+                }
+
                 RoomCharacter::create([
                     'roomId' => $room->id,
                     'characterId' => $characterId,
-                    'userId' => $room->guestUserId,
+                    'userId' => $request->guestUserId,
                     'level' => $userCharacter->level,
-                    'life' => $userCharacter->life,
-                    'maxLife' => $userCharacter->life,
-                    'power' => $userCharacter->power,
-                    'speed' => $userCharacter->speed,
+                    'life' => $userCharacter->life * $specificLifeMultiplier,
+                    'maxLife' => $userCharacter->life * $specificLifeMultiplier,
+                    'power' => $userCharacter->power * $specificPowerMultiplier,
+                    'speed' => $userCharacter->speed * $specificSpeedMultiplier,
                     'evasion' => $character->base_evasion,
                 ]);
             }
@@ -260,10 +302,7 @@ class RoomController
             return response()->json($response, 200);
         } catch (Exception $e) {
             DB::rollBack();
-
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], $e->getCode() ?: 500);
+            return response()->json(['message' => $e->getMessage()], $e->getCode() ?: 500);
         }
     }
 
@@ -543,16 +582,16 @@ class RoomController
                 $newLife = max(0, $target->life - $damage);
 
                 // ログを記録
-                // RoomLog::create([
-                //     'roomId' => $roomId,
-                //     'actionType' => 'attack',
-                //     'actorUserId' => $attacker->userId,
-                //     'actorCharacterId' => $attacker->id,
-                //     'targetUserId' => $target->userId,
-                //     'targetCharacterId' => $target->id,
-                //     'value' => $damage,
-                //     'description' => "キャラクター {$attacker->id} が キャラクター {$target->id} に {$damage} ダメージを与えました",
-                // ]);
+                RoomLog::create([
+                    'roomId' => $roomId,
+                    'actionType' => 'attack',
+                    'actorUserId' => $attacker->userId,
+                    'actorCharacterId' => $attacker->id,
+                    'targetUserId' => $target->userId,
+                    'targetCharacterId' => $target->id,
+                    'value' => $damage,
+                    'description' => "キャラクター {$attacker->id} が キャラクター {$target->id} に {$damage} ダメージを与えました",
+                ]);
 
                 // 対象のライフを更新
                 $target->update(['life' => $newLife]);
@@ -574,16 +613,16 @@ class RoomController
                         ->first();
 
                     // ターンリセットのログ
-                    // RoomLog::create([
-                    //     'roomId' => $roomId,
-                    //     'actionType' => 'turnReset',
-                    //     'actorUserId' => null,
-                    //     'actorCharacterId' => null,
-                    //     'targetUserId' => null,
-                    //     'targetCharacterId' => null,
-                    //     'value' => null,
-                    //     'description' => 'ターンがリセットされました',
-                    // ]);
+                    RoomLog::create([
+                        'roomId' => $roomId,
+                        'actionType' => 'turnReset',
+                        'actorUserId' => null,
+                        'actorCharacterId' => null,
+                        'targetUserId' => null,
+                        'targetCharacterId' => null,
+                        'value' => null,
+                        'description' => 'ターンがリセットされました',
+                    ]);
                 }
 
                 $room->update([
