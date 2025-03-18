@@ -1,4 +1,5 @@
 type gachaResult = {
+  message?: string;
   id: string;
   name: string;
   rarity: number;
@@ -9,4 +10,5 @@ type gachaResult = {
   skill: string;
   created_at: string;
   updated_at: string;
+  character?: { name: string };
 };

@@ -172,7 +172,7 @@ export default function CharacterDevelopment() {
                   <div className="col-span-2 md:col-span-7">
                     <div className="mb-2">
                       <div className="text-md font-semibold mb-1 text-green-400">
-                        所持ポイント:{" "}
+                        所持ポイント:
                         <span className="text-emerald-400">
                           {remainingPoints}
                         </span>

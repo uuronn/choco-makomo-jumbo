@@ -58,17 +58,21 @@ export const CharacterDisplay = React.memo(
             </div>
           )}
         </div>
-        <div className="w-[200px] text-green-400 mt-1 flex justify-center items-center">
+        <div className="w-[200px] text-green-400 flex justify-center items-center">
           <span className="text-lg">{character.character.name}</span>
         </div>
         <div className="w-[200px] flex flex-col justify-center items-center text-center">
-          <div className="w-[150px] bg-gray-800 rounded-full h-2 mt-1">
+          <div className="w-[150px] bg-gray-800 rounded-full h-2">
             <div
               className={`${hpColor} h-2 rounded-full transition-all duration-500`}
               style={{ width: `${hpPercentage}%` }}
             ></div>
           </div>
-          HP {character.life}
+          <span className="text-xs mt-1">HP {character.life}</span>
+
+          <span className="text-xs">パワー {character.power}</span>
+
+          <span className="text-xs">スピード {character.speed}</span>
         </div>
       </div>
     );
