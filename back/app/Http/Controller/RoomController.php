@@ -110,7 +110,7 @@ class RoomController
                 $lifeMultiplier = 1.0;
 
                 // パーティ全体の組み合わせボーナス
-                if (!array_diff(['html', 'css', 'javascript'], $characterNames)) {
+                if (!array_diff(['html', 'CSS', 'javascript'], $characterNames)) {
                     $powerMultiplier = 3;  // powerを20%増
                     $speedMultiplier = 3;  // speedを10%増
                 } elseif (!array_diff(['react', 'vue', 'angular'], $characterNames)) {
