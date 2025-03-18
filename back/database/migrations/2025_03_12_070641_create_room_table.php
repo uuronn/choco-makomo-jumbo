@@ -16,6 +16,7 @@ return new class extends Migration
             $table->uuid('currentTurnCharacterId')->nullable();
             $table->string('winUserId')->nullable();
             $table->string('status'); // ルームの状態（waiting, pending, battling, finished）
+            $table->integer('totalTurns')->default(0);
             $table->timestamps();
 
             // 外部キー制約（オプション）

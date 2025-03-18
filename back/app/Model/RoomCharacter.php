@@ -26,7 +26,9 @@ class RoomCharacter extends Model
         'speed',
         'evasion',
         'isActive',
-        'isDead', // 追加
+        'isDead',
+        'specialTurnRequirement',
+        'specialUsed'
     ];
 
     protected $casts = [

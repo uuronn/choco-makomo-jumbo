@@ -18,7 +18,7 @@ class Character extends Model
 
     protected $fillable = [
         'id', 'name', 'type', 'rarity', 'base_power', 'image_url', 'base_life', 'base_speed', 'base_evasion',
-        'activeSkillId', 'passiveSkillId', 'partySkillId'
+        'specialSkillType', 'specialTurnRequirement'
     ];
 
     protected static function boot()
@@ -32,36 +32,36 @@ class Character extends Model
         });
     }
 
-    public function activeSkill()
-    {
-        return $this->belongsTo(Skill::class, 'activeSkillId');
-    }
+    // public function activeSkill()
+    // {
+    //     return $this->belongsTo(Skill::class, 'activeSkillId');
+    // }
 
-    public function passiveSkill()
-    {
-        return $this->belongsTo(Skill::class, 'passiveSkillId');
-    }
+    // public function passiveSkill()
+    // {
+    //     return $this->belongsTo(Skill::class, 'passiveSkillId');
+    // }
 
-    public function partySkill()
-    {
-        return $this->belongsTo(Skill::class, 'partySkillId');
-    }
+    // public function partySkill()
+    // {
+    //     return $this->belongsTo(Skill::class, 'partySkillId');
+    // }
 
-    public function getSkillInstance($type)
-    {
-        $skill = match ($type) {
-            'active' => $this->activeSkill,
-            'passive' => $this->passiveSkill,
-            'party' => $this->partySkill,
-            default => null,
-        };
+    // public function getSkillInstance($type)
+    // {
+    //     $skill = match ($type) {
+    //         'active' => $this->activeSkill,
+    //         'passive' => $this->passiveSkill,
+    //         'party' => $this->partySkill,
+    //         default => null,
+    //     };
 
-        if (!$skill) return null;
+    //     if (!$skill) return null;
 
-        $skillMap = [
-            'party_power_chain' => PartyPowerChainSkill::class,
-        ];
-        $skillClass = $skillMap[$skill->effect_type] ?? null;
-        return $skillClass ? new $skillClass($this, $skill->effect_amount) : null;
-    }
+    //     $skillMap = [
+    //         'party_power_chain' => PartyPowerChainSkill::class,
+    //     ];
+    //     $skillClass = $skillMap[$skill->effect_type] ?? null;
+    //     return $skillClass ? new $skillClass($this, $skill->effect_amount) : null;
+    // }
 }

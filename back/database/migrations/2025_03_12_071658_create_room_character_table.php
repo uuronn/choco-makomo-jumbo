@@ -22,6 +22,8 @@ return new class extends Migration
             $table->smallInteger('evasion');
             $table->boolean('isActive')->default(true);
             $table->boolean('isDead')->default(false);
+            $table->smallInteger('specialTurnRequirement')->default(5);
+            $table->boolean('specialUsed')->default(false)->after('specialTurnRequirement');
             $table->timestamps();
 
             $table->foreign('roomId')->references('id')->on('room')->onDelete('cascade');
