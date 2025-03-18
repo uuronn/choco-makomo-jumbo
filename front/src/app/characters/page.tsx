@@ -7,7 +7,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { useUserContext } from "../../context/UserProvider";
-import { Character } from "~/type/character";
+import { Character, LevelUpResult } from "~/type/character";
 
 type CharacterType =
   | "バージョン管理"
@@ -32,6 +32,23 @@ const typeColors: Record<CharacterType, string> = {
   コンテナー: "bg-teal-500",
 };
 
+const handleMouseDown = (
+  increment: boolean,
+  setPoints: React.Dispatch<React.SetStateAction<number>>,
+  points: number,
+) => {
+  const interval = setInterval(() => {
+    setPoints((prevPoints) => (increment ? prevPoints + 1 : prevPoints - 1));
+  }, 100);
+
+  const handleMouseUp = () => {
+    clearInterval(interval);
+    document.removeEventListener("mouseup", handleMouseUp);
+  };
+
+  document.addEventListener("mouseup", handleMouseUp);
+};
+
 export default function CharacterDevelopment() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
@@ -41,7 +58,7 @@ export default function CharacterDevelopment() {
   const [powerPoints, setPowerPoints] = useState(0);
   const [speedPoints, setSpeedPoints] = useState(0);
 
-  const { user, havingCharacters } = useUserContext();
+  const { user, havingCharacters, fetchCharacters } = useUserContext();
 
   useEffect(() => {
     if (user) {
@@ -69,6 +86,15 @@ export default function CharacterDevelopment() {
     (async () => {
       if (!user) return;
 
+      const updatedCharacter = {
+        ...selectedCharacter,
+        life: selectedCharacter.life + lifePoints,
+        power: selectedCharacter.power + powerPoints,
+        speed: selectedCharacter.speed + speedPoints,
+      };
+
+      setSelectedCharacter(updatedCharacter);
+
       const charRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters/${selectedCharacter.characterId}`,
         {
@@ -83,16 +109,19 @@ export default function CharacterDevelopment() {
           }),
         },
       );
+
+      const data = (await charRes.json()) as LevelUpResult;
+      setSelectedCharacter((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          level: data.level,
+          life: data.life,
+          power: data.power,
+          speed: data.speed,
+        };
+      });
     })();
-
-    const updatedCharacter = {
-      ...selectedCharacter,
-      life: selectedCharacter.life + lifePoints,
-      power: selectedCharacter.power + powerPoints,
-      speed: selectedCharacter.speed + speedPoints,
-    };
-
-    setSelectedCharacter(updatedCharacter);
 
     setAvailablePoints(
       availablePoints - (lifePoints + powerPoints + speedPoints),
@@ -101,6 +130,14 @@ export default function CharacterDevelopment() {
     setLifePoints(0);
     setPowerPoints(0);
     setSpeedPoints(0);
+
+    // const updatedCharacter = havingCharacters.find(
+    //   (character) => character.characterId === selectedCharacter.characterId
+    // );
+
+    // if (updatedCharacter) {
+    //   setSelectedCharacter(updatedCharacter);
+    // }
   };
 
   const usedPoints = lifePoints + powerPoints + speedPoints;
@@ -194,6 +231,9 @@ export default function CharacterDevelopment() {
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
                             size="icon"
+                            onMouseDown={() =>
+                              handleMouseDown(false, setLifePoints, lifePoints)
+                            }
                             onClick={() =>
                               lifePoints > 0 && setLifePoints(lifePoints - 1)
                             }
@@ -204,6 +244,9 @@ export default function CharacterDevelopment() {
                           <Button
                             className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
                             size="icon"
+                            onMouseDown={() =>
+                              handleMouseDown(true, setLifePoints, lifePoints)
+                            }
                             onClick={() =>
                               remainingPoints > 0 &&
                               setLifePoints(lifePoints + 1)
