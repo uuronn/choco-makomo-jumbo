@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Loader2, Sword, Zap } from "lucide-react";
 import type { Room, RoomCharacter } from "~/type/room";
 import { useUserContext } from "~/context/UserProvider";
@@ -17,13 +17,16 @@ type EffectInfo = {
 };
 
 export default function Battle({ room }: BattleProps) {
+  const { user } = useUserContext();
+
+  // 前回の room を保持したい場合は useRef を使う
+  // let で定義すると毎renderごとに初期化されるのでリファレンスができません。
+  const prevRoomRef = useRef<Room | null>(null);
+
+  const [loading, setLoading] = useState<boolean>(true);
   const [activeCharacter, setActiveCharacter] = useState<RoomCharacter | null>(
     null,
   );
-  // ここを "preventRoom" と呼んでいるが、前回の room を保持するために使うステート
-  const [preventRoom, setPreventRoom] = useState<Room | null>(null);
-
-  const [loading, setLoading] = useState<boolean>(true);
   const [playerTeam, setPlayerTeam] = useState<RoomCharacter[]>([]);
   const [enemyTeam, setEnemyTeam] = useState<RoomCharacter[]>([]);
   const [isMyTurn, setIsMyTurn] = useState<boolean>(true);
@@ -33,7 +36,6 @@ export default function Battle({ room }: BattleProps) {
   const [characterEffects, setCharacterEffects] = useState<
     Record<string, EffectInfo>
   >({});
-  const { user } = useUserContext();
 
   const isSelectingEnemy =
     (isMyTurn && selectedAction === "attack") ||
@@ -69,7 +71,7 @@ export default function Battle({ room }: BattleProps) {
       const now = Date.now();
       let hasExpired = false;
 
-      Object.entries(characterEffects).forEach(([characterId, effectInfo]) => {
+      Object.entries(characterEffects).forEach(([_, effectInfo]) => {
         if (effectInfo.endTime <= now) {
           hasExpired = true;
         }
@@ -105,14 +107,14 @@ export default function Battle({ room }: BattleProps) {
 
   // main effect: 部屋情報が変わるたびに実行
   useEffect(() => {
-    // まず「前回の room」をローカル変数に保存してから、最新の room をステートに入れる
-    const oldRoom = preventRoom;
-    setPreventRoom(room);
+    // まず oldRoom をローカル変数にとっておく（前回の room）
+    const oldRoom = prevRoomRef.current;
+    // 今回の room を参照として保持
+    prevRoomRef.current = room;
 
-    // 「前回の room」が null なら初回なので差分チェックをスキップ
+    // 初回 (oldRoom===null) の場合は差分チェック不要
     if (!oldRoom) {
       setLoading(false);
-      // ただし初回でも、チーム分けなどはやっておく
       setPlayerTeam(
         room.room_character.filter((ch) => ch.userId === user?.uid),
       );
@@ -121,9 +123,9 @@ export default function Battle({ room }: BattleProps) {
 
       setActiveCharacter(
         room.room_character.find(
-          (character) =>
-            character.characterId === room.currentTurnCharacterId &&
-            character.userId === user?.uid &&
+          (ch) =>
+            ch.characterId === room.currentTurnCharacterId &&
+            ch.userId === user?.uid &&
             room.currentTurnUserId === user?.uid,
         ) || null,
       );
@@ -136,7 +138,7 @@ export default function Battle({ room }: BattleProps) {
       return;
     }
 
-    // oldRoom がある => 差分チェック（ターン変わったかなど）
+    // oldRoom がある => 差分チェック
     const turnChanged =
       room.currentTurnCharacterId !== oldRoom.currentTurnCharacterId ||
       room.currentTurnUserId !== oldRoom.currentTurnUserId;
@@ -161,27 +163,44 @@ export default function Battle({ room }: BattleProps) {
     // ターンが変わった場合の処理
     if (turnChanged) {
       // ターンが変わった => ダメージ差分を調べる
-      const decreasedLifeCharacters = room.room_character.filter(
-        (character) => {
-          const prevCharacter = oldRoom.room_character.find(
-            (prevChar) => prevChar.characterId === character.characterId,
-          );
-          return prevCharacter && character.life < prevCharacter.life;
-        },
-      );
+      const decreasedLifeCharacters = room.room_character.filter((ch) => {
+        const prevCharacter = oldRoom.room_character.find(
+          (pCh) =>
+            pCh.characterId === ch.characterId && pCh.userId === ch.userId,
+        );
+        return prevCharacter && ch.life < prevCharacter.life;
+      });
+
+      const increasedLifeCharacters = room.room_character.filter((ch) => {
+        const prevCharacter = oldRoom.room_character.find(
+          (pCh) =>
+            pCh.characterId === ch.characterId && pCh.userId === ch.userId,
+        );
+        return prevCharacter && ch.life > prevCharacter.life;
+      });
 
       if (decreasedLifeCharacters.length > 0) {
         (async () => {
           await Promise.all(
-            decreasedLifeCharacters.map(async (character) => {
-              await showEffect(character.id, "explosion", 600);
-              await showEffect(character.id, "blink", 1000);
-            })
+            decreasedLifeCharacters.map(async (ch) => {
+              await showEffect(ch.id, "explosion", 600);
+              await showEffect(ch.id, "blink", 1000);
+            }),
           );
         })();
       }
 
-      // ターン変わり始めの演出などが終わったらロード解除するなど
+      if (increasedLifeCharacters.length > 0) {
+        (async () => {
+          await Promise.all(
+            increasedLifeCharacters.map(async (ch) => {
+              await showEffect(ch.id, "heal", 600);
+            }),
+          );
+        })();
+      }
+
+      // アニメーション後にロード解除
       setLoading(false);
       // いったん行動選択をキャンセル
       setIsSelectingAction(false);
@@ -191,7 +210,7 @@ export default function Battle({ room }: BattleProps) {
     const nowMyTurn = room.currentTurnUserId === user?.uid;
     setIsMyTurn(nowMyTurn);
 
-    // "まだ行動を選択中ではない" かつ "自分のターン" の場合は、行動選択可能にする
+    // 自分ターンなら行動選択可能にする
     if (nowMyTurn) {
       // まだ何も選んでないなら
       if (selectedAction === null) {
@@ -200,7 +219,7 @@ export default function Battle({ room }: BattleProps) {
     } else {
       setIsSelectingAction(false);
     }
-  }, [room, user?.uid, preventRoom, showEffect, selectedAction]);
+  }, [room, user?.uid, showEffect, selectedAction]);
 
   // 敵を選択する関数
   const selectEnemy = async (characterId: string) => {
@@ -243,7 +262,7 @@ export default function Battle({ room }: BattleProps) {
     const skillType = activeCharacter?.character.specialSkillType;
     const requireTarget = skillType?.includes("単体");
 
-    // 単体対象スキルでなければ即リクエスト送る
+    // 単体対象スキルでなければ即リクエスト
     if (!requireTarget) {
       setLoading(true);
       await fetch(
@@ -281,6 +300,7 @@ export default function Battle({ room }: BattleProps) {
           animation: blink 1s infinite;
         }
       `}</style>
+
       {/* 敵キャラ表示 */}
       <div className="flex justify-center gap-4 mb-auto">
         {enemyTeam.map((character) => (
@@ -310,6 +330,7 @@ export default function Battle({ room }: BattleProps) {
           </div>
         ))}
       </div>
+
       {/* 味方キャラ表示 */}
       <div className="flex justify-center gap-4 mb-4">
         {playerTeam.map((character) => (
@@ -325,6 +346,7 @@ export default function Battle({ room }: BattleProps) {
           />
         ))}
       </div>
+
       {/* ログ表示 */}
       <div className="relative">
         <div
@@ -348,6 +370,7 @@ export default function Battle({ room }: BattleProps) {
           </div>
         )}
       </div>
+
       {/* コマンドボタン */}
       <div className="grid grid-cols-2 gap-4">
         <button
@@ -402,30 +425,6 @@ export default function Battle({ room }: BattleProps) {
           </p>
         </button>
       </div>
-      {/* <div className="fixed top-0 right-0 w-48 h-full m-8">
-        <div className="border  bg-gray-900/60 rounded-sm p-3 border-emerald-500/70 transition-all duration-200">
-          <div className="flex flex-col items-center gap-4">
-            <div className=" flex-shrink-0 bg-gray-800 rounded-sm overflow-hidden border border-emerald-800">
-              <img
-                src={activeCharacter?.character.image_url || "/placeholder.svg"}
-                alt={""}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex-1 text-center">
-              <h3 className="text-emerald-300 font-bold">
-                {activeCharacter?.character.name}
-              </h3>
-              <div className="px-1.5 my-2 py-0.5 bg-emerald-900/60 rounded text-xs text-emerald-400">
-                {"★".repeat(activeCharacter?.character.rarity || 0)}
-              </div>
-              <div className="px-1.5 py-0.5 bg-emerald-900/60 rounded text-xs text-emerald-400">
-                {activeCharacter?.character.type}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 }

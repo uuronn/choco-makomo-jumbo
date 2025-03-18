@@ -43,7 +43,6 @@ export default function RoomDetailPage() {
             clearInterval(interval);
           }, 5000); // 5秒間一時停止
         }
-        console.log(data, "🥴");
         setRoom(data);
       } catch (e) {
         console.log(e);
