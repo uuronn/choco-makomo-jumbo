@@ -12,6 +12,10 @@ export type SelectingRoom = {
     name: string;
     photoUrl: string;
   };
-  guest_user: null;
+  guest_user: null | {
+    id: string;
+    name: string;
+    photoUrl: string;
+  };
   status: string;
 };

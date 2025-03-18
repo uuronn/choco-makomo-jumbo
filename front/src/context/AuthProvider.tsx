@@ -12,6 +12,7 @@ import {
 import Loading from "~/components/Loading";
 import { auth, googleProvider } from "~/lib/firebase";
 import { Character } from "~/type/character";
+import { Room, SelectingRoom } from "~/type/room";
 
 const AuthContext = createContext<{
   handleSignIn: () => void;
@@ -107,6 +108,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           );
           const charData = await charRes.json();
           setHavingCharacters(charData ?? []);
+        })();
+        (async () => {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
+          );
+          const data = await res.json() as SelectingRoom[];
+
+          // ルームのホストユーザーIDと自分のUIDを比較
+          const matchingRoom = data.find(room => room.host_user.id === user.uid || room.guest_user?.id === user.uid);
+          if (matchingRoom) {
+            router.push(`/rooms/${matchingRoom.id}`);
+          }
         })();
       } else {
         setUser(null);

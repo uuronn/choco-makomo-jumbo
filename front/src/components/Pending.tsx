@@ -16,9 +16,11 @@ type Player = {
 
 type PendingProps = {
   room: Room;
+  setRoom: (room: Room) => void;
 };
 
-export default function Pending({ room }: PendingProps) {
+export default function Pending({ room, setRoom }: PendingProps) {
+  const [name, setName] = useState<string>("Guest");
   const [img, setImg] = useState<string>("/placeholder.svg");
 
   const { user } = useAuth();
@@ -27,26 +29,37 @@ export default function Pending({ room }: PendingProps) {
     (async () => {
       // キャラクター一覧を取得
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${room.guestUserId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${room.guestUserId}`
       );
       const data = await res.json();
 
       setImg(data.photoUrl);
+      setName(data.name);
     })();
   }, []);
 
-  const handleAccept = async () => {};
+  const handleAccept = async () => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/approve`,
+      {
+        method: "POST",
+      }
+    );
+    const data = await res.json();
+  };
 
   const handleReject = async () => {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/reject`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-      },
+      }
     );
     const data = await res.json();
     console.log(data);
+
+    // roomのguestUserIdをnullに設定
+    setRoom({ ...room, guestUserId: null });
   };
 
   return (
@@ -70,7 +83,10 @@ export default function Pending({ room }: PendingProps) {
           <div className="h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent mt-2"></div>
         </div>
         <Card className="border-green-500/50 bg-black/60 backdrop-blur-sm shadow-[0_0_15px_rgba(0,255,170,0.3)]">
-          <CardContent className="p-6">
+          <CardContent className="p-6 flex flex-col items-center justify-center">
+            <h1 className="text-xl font-bold text-green-400 tracking-wider  mb-6">
+              {name}
+            </h1>
             <div className="flex flex-col items-center">
               <Image
                 width={100}

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "../../../context/AuthProvider";
-import Link from "next/link";
 import Loading from "~/components/Loading";
 import Pending from "~/components/Pending";
 import { Room } from "~/type/room";
@@ -28,20 +27,19 @@ export default function RoomDetailPage() {
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user.uid}/${roomId}/status`,
           {
             headers: { "Content-Type": "application/json" },
-          },
+          }
         );
         const data = await res.json();
         console.log(data);
 
-        if (data.message == "このルームにアクセスする権限がありません") {
-          alert("参加が拒否されました");
+        if (
+          data.message == "このルームにアクセスする権限がありません" ||
+          data.message == "指定されたルームが見つかりません"
+        ) {
           router.push("/rooms");
           return;
         }
         setRoom(data);
-
-        // 自分のターンかどうかを確認
-        setIsMyTurn(data.room.currentTurnUserId === user.uid);
       } catch (e) {
         console.log(e);
       }
@@ -70,7 +68,7 @@ export default function RoomDetailPage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roomId: room.id, userId: user.uid }),
-      },
+      }
     );
 
     if (!res.ok) {
@@ -90,7 +88,7 @@ export default function RoomDetailPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roomId: room.id, userId: user.uid, command }),
-      },
+      }
     );
 
     if (!res.ok) {
@@ -105,15 +103,14 @@ export default function RoomDetailPage() {
   };
 
   if (!user) return <Loading message="認証中" />;
-  if (!room) return <p>ルームが見つかりません</p>;
-
+  if (room == null) return <Loading message="ルーム情報取得中" />;
   return room.status === "waiting" ? (
     <Loading message="マッチング中" />
   ) : room.status === "pending" && room.hostUserId == user.uid ? (
-    <Pending room={room} />
+    <Pending room={room} setRoom={setRoom} />
   ) : room.status === "pending" && room.hostUserId !== user.uid ? (
     <Loading message="参加中" />
   ) : (
-    <Loading message="承認待ち" />
+    <>戦闘中</>
   );
 }
