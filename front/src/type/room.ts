@@ -29,6 +29,7 @@ export type RoomCharacter = {
   id: string;
   isActive: boolean;
   level: number;
+  maxLife: number;
   life: number;
   power: number;
   roomId: string;

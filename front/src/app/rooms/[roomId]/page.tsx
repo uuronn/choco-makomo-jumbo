@@ -49,7 +49,7 @@ export default function RoomDetailPage() {
     fetchRoom();
 
     // ルームの状態をリアルタイム監視
-    const interval = setInterval(fetchRoom, 3000); // 3秒ごとにチェック
+    const interval = setInterval(fetchRoom, 10000); // 3秒ごとにチェック
 
     return () => clearInterval(interval);
   }, [roomId, user]);
@@ -112,6 +112,6 @@ export default function RoomDetailPage() {
   ) : room.status === "pending" && room.hostUserId !== user.uid ? (
     <Loading message="参加中" />
   ) : (
-    <Battle room={room}/>
+    <Battle room={room} />
   );
 }

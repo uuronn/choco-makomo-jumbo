@@ -1,14 +1,87 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Sword, Zap } from "lucide-react";
 import { Room, RoomCharacter } from "~/type/room";
 import { useUserContext } from "~/context/UserProvider";
 import Image from "next/image";
+import React from "react";
 
 type BattleProps = {
   room: Room;
 };
+
+// CharacterDisplayをメモ化
+const CharacterDisplay = React.memo(
+  ({
+    character,
+    isSelected,
+    onClick,
+  }: {
+    character: RoomCharacter;
+    isSelected: boolean;
+    onClick: () => void;
+  }) => {
+    const hpPercentage = (character.life / character.maxLife) * 100;
+    let hpColor = "bg-green-500";
+    if (hpPercentage < 30) {
+      hpColor = "bg-red-500";
+    } else if (hpPercentage < 70) {
+      hpColor = "bg-yellow-500";
+    }
+
+    return (
+      <div
+        className={`flex flex-col items-center p-2 rounded-lg transition-all ${
+          isSelected ? "scale-105" : ""
+        }`}
+        onClick={onClick}
+      >
+        <div className="relative w-full h-32 mb-2 flex items-center justify-center">
+          <div
+            className={`absolute inset-0 rounded-lg overflow-hidden flex justify-center items-center ${
+              isSelected ? "shadow-[0_0_15px_5px_rgba(74,222,128,0.5)]" : ""
+            }`}
+            style={{ animation: `float 3s ease-in-out infinite` }}
+          >
+            <Image
+              src={character.character.image_url}
+              alt=""
+              width={120}
+              height={120}
+              className="object-cover rounded-4xl"
+            />
+          </div>
+          {isSelected && (
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-black font-bold z-10">
+              ✓
+            </div>
+          )}
+        </div>
+        <div className="w-[200px] text-green-400 mt-1 flex justify-center items-center">
+          <span className="text-lg">{character.character.name}</span>
+        </div>
+        <div className="w-[200px] flex flex-col justify-center items-center text-center">
+          <div className="w-[150px] bg-gray-800 rounded-full h-2 mt-1">
+            <div
+              className={`${hpColor} h-2 rounded-full transition-all duration-500`}
+              style={{ width: `${hpPercentage}%` }}
+            ></div>
+          </div>
+          HP {character.life}
+        </div>
+      </div>
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.character === nextProps.character &&
+      prevProps.isSelected === nextProps.isSelected
+    );
+  },
+);
+
+CharacterDisplay.displayName = "CharacterDisplay";
 
 export default function Battle({ room }: BattleProps) {
   const [playerTeam, setPlayerTeam] = useState<RoomCharacter[]>([]);
@@ -16,10 +89,10 @@ export default function Battle({ room }: BattleProps) {
 
   useEffect(() => {
     setPlayerTeam(
-      room.room_character.filter((character) => character.userId === user?.uid)
+      room.room_character.filter((character) => character.userId === user?.uid),
     );
     setEnemyTeam(
-      room.room_character.filter((character) => character.userId !== user?.uid)
+      room.room_character.filter((character) => character.userId !== user?.uid),
     );
   }, []);
 
@@ -29,7 +102,7 @@ export default function Battle({ room }: BattleProps) {
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
   const [selectedEnemy, setSelectedEnemy] = useState<string | null>(null);
   const [currentAction, setCurrentAction] = useState<"attack" | "skill" | null>(
-    null
+    null,
   );
 
   // Handle player selection
@@ -66,82 +139,6 @@ export default function Battle({ room }: BattleProps) {
     addLogMessage(`${action === "attack" ? "攻撃" : "スキル"}を選択`);
   };
 
-  // Character component with floating animation
-  const CharacterDisplay = ({
-    character,
-    isPlayer,
-    isSelected,
-    onClick,
-  }: {
-    character: RoomCharacter;
-    isPlayer: boolean;
-    isSelected: boolean;
-    onClick: () => void;
-  }) => {
-    const hpPercentage = 11;
-    let hpColor = "bg-green-500";
-
-    if (hpPercentage < 30) {
-      hpColor = "bg-red-500";
-    } else if (hpPercentage < 70) {
-      hpColor = "bg-yellow-500";
-    }
-
-    return (
-      <div
-        className={`flex flex-col items-center p-2 rounded-lg transition-all ${
-          isSelected ? "scale-105" : ""
-        }`}
-        onClick={onClick}
-      >
-        <div className="relative w-full h-32 mb-2 flex items-center justify-center">
-          <div
-            className={`absolute inset-0 rounded-lg overflow-hidden ${
-              isSelected ? "shadow-[0_0_15px_5px_rgba(74,222,128,0.5)]" : ""
-            }`}
-            style={{
-              animation: `float 3s ease-in-out infinite`,
-            }}
-          >
-            <div
-              className="absolute inset-0 flex items-center justify-center"
-              style={{
-                backgroundSize: "contain",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-              }}
-            >
-              <Image
-                src={character.character.image_url || "/placeholder.svg"}
-                alt={""}
-                width={120}
-                height={120}
-                className="object-cover rounded-4xl"
-              />
-            </div>
-          </div>
-          {isSelected && (
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-black font-bold z-10">
-              ✓
-            </div>
-          )}
-        </div>
-        <div className="w-[200px] flex flex-col justify-center items-center text-center">
-          <div className="font-bold text-green-300"></div>
-          <div className="w-[150px] bg-gray-800 rounded-full h-2 mt-1">
-            <div
-              className={`${hpColor} h-2 rounded-full transition-all duration-500`}
-              style={{ width: `${hpPercentage}%` }}
-            ></div>
-          </div>
-          <div className="w-[200px] text-green-400 mt-1 flex justify-center items-center">
-            <span className="text-lg">{character.character.name}</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-gray-900 text-green-300 p-4 flex flex-col">
       <style jsx global>{`
@@ -164,7 +161,6 @@ export default function Battle({ room }: BattleProps) {
           <CharacterDisplay
             key={enemy.id}
             character={enemy}
-            isPlayer={false}
             isSelected={selectedEnemy === enemy.id}
             onClick={() =>
               currentAction && selectedPlayer ? selectEnemy(enemy.id) : null
@@ -179,7 +175,6 @@ export default function Battle({ room }: BattleProps) {
           <CharacterDisplay
             key={player.id}
             character={player}
-            isPlayer={true}
             isSelected={selectedPlayer === player.id}
             onClick={() => {}}
           />

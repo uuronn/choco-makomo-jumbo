@@ -51,7 +51,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       }
       // 既存ユーザーか確認
       const checkUser = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}`,
       );
 
       if (checkUser.ok) {
@@ -90,7 +90,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       if (!user) return;
       // キャラクター一覧を取得
       const charRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
       );
       const charData = await charRes.json();
       setHavingCharacters(charData);
@@ -104,21 +104,22 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         (async () => {
           // キャラクター一覧を取得
           const charRes = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
           );
           const charData = await charRes.json();
           setHavingCharacters(charData ?? []);
         })();
         (async () => {
           const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
           );
           const data = (await res.json()) as SelectingRoom[];
 
           // ルームのホストユーザーIDと自分のUIDを比較
           const matchingRoom = data.find(
             (room) =>
-              room.host_user.id === user.uid || room.guest_user?.id === user.uid
+              room.host_user.id === user.uid ||
+              room.guest_user?.id === user.uid,
           );
           if (matchingRoom) {
             router.push(`/rooms/${matchingRoom.id}`);

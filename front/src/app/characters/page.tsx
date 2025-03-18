@@ -34,7 +34,7 @@ const typeColors: Record<CharacterType, string> = {
 
 export default function CharacterDevelopment() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
-    null
+    null,
   );
   const [availablePoints, setAvailablePoints] = useState(0);
   const [lifePoints, setLifePoints] = useState(0);
@@ -47,7 +47,7 @@ export default function CharacterDevelopment() {
     if (user) {
       (async () => {
         const pointRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`,
         );
         const pointData = await pointRes.json();
         setAvailablePoints(pointData);
@@ -81,7 +81,7 @@ export default function CharacterDevelopment() {
             power: powerPoints,
             speed: speedPoints,
           }),
-        }
+        },
       );
     })();
 
@@ -95,7 +95,7 @@ export default function CharacterDevelopment() {
     setSelectedCharacter(updatedCharacter);
 
     setAvailablePoints(
-      availablePoints - (lifePoints + powerPoints + speedPoints)
+      availablePoints - (lifePoints + powerPoints + speedPoints),
     );
 
     setLifePoints(0);
@@ -162,7 +162,7 @@ export default function CharacterDevelopment() {
                             <span key={i} className="text-emerald-400">
                               ★
                             </span>
-                          )
+                          ),
                         )}
                       </div>
                     </div>
