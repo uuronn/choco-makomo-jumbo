@@ -11,15 +11,16 @@ type BattleProps = {
   room: Room;
 };
 
-// CharacterDisplayをメモ化
 const CharacterDisplay = React.memo(
   ({
     character,
     isSelected,
+    isEnemy,
     onClick,
   }: {
     character: RoomCharacter;
     isSelected: boolean;
+    isEnemy: boolean;
     onClick: () => void;
   }) => {
     const hpPercentage = (character.life / character.maxLife) * 100;
@@ -30,26 +31,26 @@ const CharacterDisplay = React.memo(
       hpColor = "bg-yellow-500";
     }
 
+    const auraColor = isEnemy
+      ? "shadow-[0_0_15px_5px_rgba(239,68,68,0.5)]"
+      : "shadow-[0_0_15px_5px_rgba(59,130,246,0.5)]";
+
     return (
       <div
-        className={`flex flex-col items-center p-2 rounded-lg transition-all ${
-          isSelected ? "scale-105" : ""
-        }`}
+        className={`flex flex-col items-center p-2 rounded-lg transition-all ${isSelected ? "scale-105" : ""}`}
         onClick={onClick}
       >
         <div className="relative w-full h-32 mb-2 flex items-center justify-center">
           <div
-            className={`absolute inset-0 rounded-lg overflow-hidden flex justify-center items-center ${
-              isSelected ? "shadow-[0_0_15px_5px_rgba(74,222,128,0.5)]" : ""
-            }`}
+            className={`absolute inset-0 rounded-lg overflow-hidden flex justify-center items-center `}
             style={{ animation: `float 3s ease-in-out infinite` }}
           >
             <Image
-              src={character.character.image_url}
+              src={character.character.image_url || "/placeholder.svg"}
               alt=""
               width={120}
               height={120}
-              className="object-cover rounded-4xl"
+              className={`object-cover rounded-4xl ${auraColor}`}
             />
           </div>
           {isSelected && (
@@ -76,7 +77,8 @@ const CharacterDisplay = React.memo(
   (prevProps, nextProps) => {
     return (
       prevProps.character === nextProps.character &&
-      prevProps.isSelected === nextProps.isSelected
+      prevProps.isSelected === nextProps.isSelected &&
+      prevProps.isEnemy === nextProps.isEnemy
     );
   },
 );
@@ -86,6 +88,9 @@ CharacterDisplay.displayName = "CharacterDisplay";
 export default function Battle({ room }: BattleProps) {
   const [playerTeam, setPlayerTeam] = useState<RoomCharacter[]>([]);
   const [enemyTeam, setEnemyTeam] = useState<RoomCharacter[]>([]);
+  const [charactersBySpeed, setCharactersBySpeed] = useState<RoomCharacter[]>(
+    [],
+  );
 
   useEffect(() => {
     setPlayerTeam(
@@ -94,6 +99,7 @@ export default function Battle({ room }: BattleProps) {
     setEnemyTeam(
       room.room_character.filter((character) => character.userId !== user?.uid),
     );
+    setCharactersBySpeed(room.room_character.sort((a, b) => b.speed - a.speed));
   }, []);
 
   const { user } = useUserContext();
@@ -159,6 +165,7 @@ export default function Battle({ room }: BattleProps) {
       <div className="flex justify-center gap-4 mb-auto">
         {enemyTeam.map((enemy) => (
           <CharacterDisplay
+            isEnemy={true}
             key={enemy.id}
             character={enemy}
             isSelected={selectedEnemy === enemy.id}
@@ -173,6 +180,7 @@ export default function Battle({ room }: BattleProps) {
       <div className="flex justify-center gap-4 mb-4">
         {playerTeam.map((player) => (
           <CharacterDisplay
+            isEnemy={false}
             key={player.id}
             character={player}
             isSelected={selectedPlayer === player.id}
@@ -183,11 +191,11 @@ export default function Battle({ room }: BattleProps) {
 
       {/* Battle Log */}
       <div className="bg-gray-800 border border-green-500/50 rounded-lg p-2 h-32 overflow-y-auto mb-4">
-        <h3 className="text-green-400 font-bold mb-1 text-sm">バトルログ</h3>
+        {/* <h3 className="text-green-400 font-bold mb-1 text-sm">バトルログ</h3> */}
         <div className="space-y-1">
           {battleLog.map((log, index) => (
             <div key={index} className="text-sm font-mono text-green-300">
-              &gt; {log}
+              {log}
             </div>
           ))}
         </div>
