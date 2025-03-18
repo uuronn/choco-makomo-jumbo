@@ -20,7 +20,9 @@ export default function Battle({ room }: BattleProps) {
   const [activeCharacter, setActiveCharacter] = useState<RoomCharacter | null>(
     null,
   );
+  // ここを "preventRoom" と呼んでいるが、前回の room を保持するために使うステート
   const [preventRoom, setPreventRoom] = useState<Room | null>(null);
+
   const [loading, setLoading] = useState<boolean>(true);
   const [playerTeam, setPlayerTeam] = useState<RoomCharacter[]>([]);
   const [enemyTeam, setEnemyTeam] = useState<RoomCharacter[]>([]);
@@ -59,6 +61,7 @@ export default function Battle({ room }: BattleProps) {
     [],
   );
 
+  // characterEffects の終了チェック
   useEffect(() => {
     if (Object.keys(characterEffects).length === 0) return;
 
@@ -92,66 +95,7 @@ export default function Battle({ room }: BattleProps) {
     return () => clearInterval(checkEffectsInterval);
   }, [characterEffects]);
 
-  useEffect(() => {
-    setActiveCharacter(
-      room.room_character.find(
-        (character) =>
-          character.characterId === room.currentTurnCharacterId &&
-          character.userId === user?.uid &&
-          room.currentTurnUserId === user?.uid,
-      ) || null,
-    );
-    if (!preventRoom) {
-      setPreventRoom(room);
-    }
-    if (
-      !(
-        room.currentTurnCharacterId == preventRoom?.currentTurnCharacterId &&
-        room.currentTurnUserId == preventRoom?.currentTurnUserId
-      )
-    ) {
-      // ターンが変わった時
-      if (preventRoom) {
-        setPreventRoom(room);
-        const decreasedLifeCharacters = room.room_character.filter(
-          (character) => {
-            const prevCharacter = preventRoom.room_character.find(
-              (prevChar) => prevChar.characterId === character.characterId,
-            );
-            return prevCharacter && character.life < prevCharacter.life;
-          },
-        );
-        if (decreasedLifeCharacters.length > 0) {
-          (async () => {
-            await Promise.all(
-              decreasedLifeCharacters.map(async (character) => {
-                await showEffect(character.id, "explosion", 600);
-                await showEffect(character.id, "blink", 1000);
-              }),
-            );
-          })();
-        }
-      }
-      setLoading(false);
-      setIsSelectingAction(false);
-    }
-    setPlayerTeam(
-      room.room_character.filter((character) => character.userId === user?.uid),
-    );
-    setEnemyTeam(
-      room.room_character.filter((character) => character.userId !== user?.uid),
-    );
-    const isMyTurn = room.currentTurnUserId === user?.uid;
-
-    if (!isMyTurn) {
-      setIsSelectingAction(false);
-    } else {
-      if (selectedAction === null) setIsSelectingAction(true);
-    }
-    setIsMyTurn(isMyTurn);
-    setBattleLog(room.room_log.map((log) => log.description));
-  }, [room, showEffect, user?.uid]);
-
+  // battleLog が更新されたらスクロール
   useEffect(() => {
     const logContainer = document.getElementById("battle-log");
     if (logContainer) {
@@ -159,25 +103,129 @@ export default function Battle({ room }: BattleProps) {
     }
   }, [battleLog]);
 
+  // main effect: 部屋情報が変わるたびに実行
+  useEffect(() => {
+    // まず「前回の room」をローカル変数に保存してから、最新の room をステートに入れる
+    const oldRoom = preventRoom;
+    setPreventRoom(room);
+
+    // 「前回の room」が null なら初回なので差分チェックをスキップ
+    if (!oldRoom) {
+      setLoading(false);
+      // ただし初回でも、チーム分けなどはやっておく
+      setPlayerTeam(
+        room.room_character.filter((ch) => ch.userId === user?.uid),
+      );
+      setEnemyTeam(room.room_character.filter((ch) => ch.userId !== user?.uid));
+      setBattleLog(room.room_log.map((log) => log.description));
+
+      setActiveCharacter(
+        room.room_character.find(
+          (character) =>
+            character.characterId === room.currentTurnCharacterId &&
+            character.userId === user?.uid &&
+            room.currentTurnUserId === user?.uid,
+        ) || null,
+      );
+      setIsMyTurn(room.currentTurnUserId === user?.uid);
+      if (room.currentTurnUserId === user?.uid) {
+        setIsSelectingAction(true);
+      } else {
+        setIsSelectingAction(false);
+      }
+      return;
+    }
+
+    // oldRoom がある => 差分チェック（ターン変わったかなど）
+    const turnChanged =
+      room.currentTurnCharacterId !== oldRoom.currentTurnCharacterId ||
+      room.currentTurnUserId !== oldRoom.currentTurnUserId;
+
+    // アクティブキャラ設定
+    setActiveCharacter(
+      room.room_character.find(
+        (ch) =>
+          ch.characterId === room.currentTurnCharacterId &&
+          ch.userId === user?.uid &&
+          room.currentTurnUserId === user?.uid,
+      ) || null,
+    );
+
+    // 味方・敵リスト
+    setPlayerTeam(room.room_character.filter((ch) => ch.userId === user?.uid));
+    setEnemyTeam(room.room_character.filter((ch) => ch.userId !== user?.uid));
+
+    // ログ
+    setBattleLog(room.room_log.map((log) => log.description));
+
+    // ターンが変わった場合の処理
+    if (turnChanged) {
+      // ターンが変わった => ダメージ差分を調べる
+      const decreasedLifeCharacters = room.room_character.filter(
+        (character) => {
+          const prevCharacter = oldRoom.room_character.find(
+            (prevChar) => prevChar.characterId === character.characterId,
+          );
+          return prevCharacter && character.life < prevCharacter.life;
+        },
+      );
+
+      if (decreasedLifeCharacters.length > 0) {
+        (async () => {
+          await Promise.all(
+            decreasedLifeCharacters.map(async (character) => {
+              await showEffect(character.id, "explosion", 600);
+              await showEffect(character.id, "blink", 1000);
+            })
+          );
+        })();
+      }
+
+      // ターン変わり始めの演出などが終わったらロード解除するなど
+      setLoading(false);
+      // いったん行動選択をキャンセル
+      setIsSelectingAction(false);
+    }
+
+    // "今のターンは自分か？" フラグを更新
+    const nowMyTurn = room.currentTurnUserId === user?.uid;
+    setIsMyTurn(nowMyTurn);
+
+    // "まだ行動を選択中ではない" かつ "自分のターン" の場合は、行動選択可能にする
+    if (nowMyTurn) {
+      // まだ何も選んでないなら
+      if (selectedAction === null) {
+        setIsSelectingAction(true);
+      }
+    } else {
+      setIsSelectingAction(false);
+    }
+  }, [room, user?.uid, preventRoom, showEffect, selectedAction]);
+
+  // 敵を選択する関数
   const selectEnemy = async (characterId: string) => {
     if (!isSelectingEnemy) return;
     if (selectedAction === "attack") {
-      (async () => {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/attack`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              targetCharacterId: characterId,
-            }),
+      setLoading(true);
+      setSelectedAction(null);
+      setIsSelectingAction(false);
+      await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/attack`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
-      })();
+          body: JSON.stringify({
+            targetCharacterId: characterId,
+          }),
+        },
+      );
     }
     if (selectedAction === "skill") {
+      setLoading(true);
+      setSelectedAction(null);
+      setIsSelectingAction(false);
       fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/skill`,
         {
@@ -186,24 +234,23 @@ export default function Battle({ room }: BattleProps) {
         },
       );
     }
-    setLoading(true);
-    setSelectedAction(null);
-    setIsSelectingAction(false);
   };
 
+  // スキルボタンを押したとき
   const selectSkill = async () => {
     setSelectedAction("skill");
     setIsSelectingAction(false);
     const skillType = activeCharacter?.character.specialSkillType;
     const requireTarget = skillType?.includes("単体");
+
+    // 単体対象スキルでなければ即リクエスト送る
     if (!requireTarget) {
       setLoading(true);
-      fetch(
+      await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/skill`,
-        {
-          method: "POST",
-        },
+        { method: "POST" },
       );
+      setSelectedAction(null);
     }
   };
 
@@ -234,7 +281,7 @@ export default function Battle({ room }: BattleProps) {
           animation: blink 1s infinite;
         }
       `}</style>
-
+      {/* 敵キャラ表示 */}
       <div className="flex justify-center gap-4 mb-auto">
         {enemyTeam.map((character) => (
           <div
@@ -263,7 +310,7 @@ export default function Battle({ room }: BattleProps) {
           </div>
         ))}
       </div>
-
+      {/* 味方キャラ表示 */}
       <div className="flex justify-center gap-4 mb-4">
         {playerTeam.map((character) => (
           <CharacterDisplay
@@ -278,7 +325,7 @@ export default function Battle({ room }: BattleProps) {
           />
         ))}
       </div>
-
+      {/* ログ表示 */}
       <div className="relative">
         <div
           id="battle-log"
@@ -294,13 +341,14 @@ export default function Battle({ room }: BattleProps) {
           </div>
         </div>
 
+        {/* ローディング表示 */}
         {loading && (
           <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
             <Loader2 className="h-8 w-8 text-green-400 animate-spin" />
           </div>
         )}
       </div>
-
+      {/* コマンドボタン */}
       <div className="grid grid-cols-2 gap-4">
         <button
           onClick={() => {
@@ -317,6 +365,7 @@ export default function Battle({ room }: BattleProps) {
           <Sword size={20} />
           <span>攻撃</span>
         </button>
+
         <button
           onClick={selectSkill}
           className={`flex items-center justify-center gap-2 p-3 rounded-lg ${
@@ -345,12 +394,14 @@ export default function Battle({ room }: BattleProps) {
               : (activeCharacter?.character.specialTurnRequirement ?? 0) -
                     room.totalTurns >
                   0
-                ? `残り${(activeCharacter?.character.specialTurnRequirement ?? 0) - room.totalTurns}ターン`
+                ? `残り${
+                    (activeCharacter?.character.specialTurnRequirement ?? 0) -
+                    room.totalTurns
+                  }ターン`
                 : ""}
           </p>
         </button>
       </div>
-
       {/* <div className="fixed top-0 right-0 w-48 h-full m-8">
         <div className="border  bg-gray-900/60 rounded-sm p-3 border-emerald-500/70 transition-all duration-200">
           <div className="flex flex-col items-center gap-4">
