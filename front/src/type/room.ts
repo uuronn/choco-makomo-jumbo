@@ -10,6 +10,7 @@ export type Room = {
   room_character: RoomCharacter[];
   winUserId: string | null;
   room_log: { description: string }[];
+  totalTurns: number;
 };
 
 export type SelectingRoom = {

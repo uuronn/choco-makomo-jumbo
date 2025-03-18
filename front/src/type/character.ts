@@ -14,6 +14,7 @@ export type Character = {
   partySkillId: string | null;
   image_url: string;
   specialSkillType: string;
+  specialTurnRequirement : number
 };
 
 export type LevelUpResult = {

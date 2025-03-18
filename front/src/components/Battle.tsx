@@ -18,7 +18,7 @@ type EffectInfo = {
 
 export default function Battle({ room }: BattleProps) {
   const [activeCharacter, setActiveCharacter] = useState<RoomCharacter | null>(
-    null,
+    null
   );
   const [preventRoom, setPreventRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -42,7 +42,7 @@ export default function Battle({ room }: BattleProps) {
     (
       roomCharacterId: string,
       effectType: "blink" | string,
-      durationMs: number,
+      durationMs: number
     ): Promise<void> => {
       return new Promise<void>((resolve) => {
         const now = Date.now();
@@ -56,7 +56,7 @@ export default function Battle({ room }: BattleProps) {
         }));
       });
     },
-    [],
+    []
   );
 
   useEffect(() => {
@@ -98,8 +98,8 @@ export default function Battle({ room }: BattleProps) {
         (character) =>
           character.characterId === room.currentTurnCharacterId &&
           character.userId === user?.uid &&
-          room.currentTurnUserId === user?.uid,
-      ) || null,
+          room.currentTurnUserId === user?.uid
+      ) || null
     );
     if (!preventRoom) {
       setPreventRoom(room);
@@ -115,28 +115,31 @@ export default function Battle({ room }: BattleProps) {
         const decreasedLifeCharacters = room.room_character.filter(
           (character) => {
             const prevCharacter = preventRoom.room_character.find(
-              (prevChar) => prevChar.characterId === character.characterId,
+              (prevChar) => prevChar.characterId === character.characterId
             );
             return prevCharacter && character.life < prevCharacter.life;
-          },
+          }
         );
 
         if (decreasedLifeCharacters.length > 0) {
           (async () => {
-            await showEffect(decreasedLifeCharacters[0].id, "explosion", 600);
-            await showEffect(decreasedLifeCharacters[0].id, "blink", 1000);
+            for (const character of decreasedLifeCharacters) {
+              await showEffect(character.id, "explosion", 600);
+              await showEffect(character.id, "blink", 1000);
+            }
           })();
         }
       }
 
       setPreventRoom(room);
       setLoading(false);
+      setIsSelectingAction(false);
     }
     setPlayerTeam(
-      room.room_character.filter((character) => character.userId === user?.uid),
+      room.room_character.filter((character) => character.userId === user?.uid)
     );
     setEnemyTeam(
-      room.room_character.filter((character) => character.userId !== user?.uid),
+      room.room_character.filter((character) => character.userId !== user?.uid)
     );
     const isMyTurn = room.currentTurnUserId === user?.uid;
 
@@ -157,7 +160,6 @@ export default function Battle({ room }: BattleProps) {
   }, [battleLog]);
 
   const selectEnemy = async (characterId: string) => {
-    setLoading(true);
     if (!isSelectingEnemy) return;
     if (selectedAction === "attack") {
       (async () => {
@@ -171,7 +173,7 @@ export default function Battle({ room }: BattleProps) {
             body: JSON.stringify({
               targetCharacterId: characterId,
             }),
-          },
+          }
         );
       })();
     }
@@ -181,10 +183,10 @@ export default function Battle({ room }: BattleProps) {
         {
           method: "POST",
           body: JSON.stringify({ targetCharacterId: characterId }),
-        },
+        }
       );
     }
-
+    setLoading(true);
     setSelectedAction(null);
     setIsSelectingAction(false);
   };
@@ -200,7 +202,7 @@ export default function Battle({ room }: BattleProps) {
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/skill`,
         {
           method: "POST",
-        },
+        }
       );
     }
   };
@@ -318,16 +320,61 @@ export default function Battle({ room }: BattleProps) {
         <button
           onClick={selectSkill}
           className={`flex items-center justify-center gap-2 p-3 rounded-lg ${
-            isSelectingAction && !loading
+            isSelectingAction &&
+            !loading &&
+            activeCharacter?.character.specialSkillType !== null &&
+            (activeCharacter?.character.specialTurnRequirement ?? 0) -
+              room.totalTurns <=
+              0
               ? "bg-green-700 hover:bg-green-600 text-white"
               : "bg-gray-700 text-gray-400 cursor-not-allowed"
           } transition-colors`}
-          disabled={!isSelectingAction && !loading}
+          disabled={
+            (!isSelectingAction && !loading) ||
+            activeCharacter?.character.specialSkillType === null ||
+            (activeCharacter?.character.specialTurnRequirement ?? 0) -
+              room.totalTurns >
+              0
+          }
         >
           <Zap size={20} />
           <span>スキル</span>
+          <p>
+            {activeCharacter?.character.specialSkillType === null
+              ? "スキルなし"
+              : (activeCharacter?.character.specialTurnRequirement ?? 0) -
+                    room.totalTurns >
+                  0
+                ? `残り${(activeCharacter?.character.specialTurnRequirement ?? 0) - room.totalTurns}ターン`
+                : ""}
+          </p>
         </button>
       </div>
+
+      {/* <div className="fixed top-0 right-0 w-48 h-full m-8">
+        <div className="border  bg-gray-900/60 rounded-sm p-3 border-emerald-500/70 transition-all duration-200">
+          <div className="flex flex-col items-center gap-4">
+            <div className=" flex-shrink-0 bg-gray-800 rounded-sm overflow-hidden border border-emerald-800">
+              <img
+                src={activeCharacter?.character.image_url || "/placeholder.svg"}
+                alt={""}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex-1 text-center">
+              <h3 className="text-emerald-300 font-bold">
+                {activeCharacter?.character.name}
+              </h3>
+              <div className="px-1.5 my-2 py-0.5 bg-emerald-900/60 rounded text-xs text-emerald-400">
+                {"★".repeat(activeCharacter?.character.rarity || 0)}
+              </div>
+              <div className="px-1.5 py-0.5 bg-emerald-900/60 rounded text-xs text-emerald-400">
+                {activeCharacter?.character.type}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> */}
     </div>
   );
 }
