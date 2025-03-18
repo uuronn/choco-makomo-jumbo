@@ -454,16 +454,16 @@ class RoomController
                 $newLife = max(0, $target->life - $damage);
 
                 // ログを記録
-                RoomLog::create([
-                    'roomId' => $roomId,
-                    'actionType' => 'attack',
-                    'actorUserId' => $attacker->userId,
-                    'actorCharacterId' => $attacker->id,
-                    'targetUserId' => $target->userId,
-                    'targetCharacterId' => $target->id,
-                    'value' => $damage,
-                    'description' => "キャラクター {$attacker->id} が キャラクター {$target->id} に {$damage} ダメージを与えました",
-                ]);
+                // RoomLog::create([
+                //     'roomId' => $roomId,
+                //     'actionType' => 'attack',
+                //     'actorUserId' => $attacker->userId,
+                //     'actorCharacterId' => $attacker->id,
+                //     'targetUserId' => $target->userId,
+                //     'targetCharacterId' => $target->id,
+                //     'value' => $damage,
+                //     'description' => "キャラクター {$attacker->id} が キャラクター {$target->id} に {$damage} ダメージを与えました",
+                // ]);
 
                 // 対象のライフを更新
                 $target->update(['life' => $newLife]);
@@ -485,16 +485,16 @@ class RoomController
                         ->first();
 
                     // ターンリセットのログ
-                    RoomLog::create([
-                        'roomId' => $roomId,
-                        'actionType' => 'turnReset',
-                        'actorUserId' => null,
-                        'actorCharacterId' => null,
-                        'targetUserId' => null,
-                        'targetCharacterId' => null,
-                        'value' => null,
-                        'description' => 'ターンがリセットされました',
-                    ]);
+                    // RoomLog::create([
+                    //     'roomId' => $roomId,
+                    //     'actionType' => 'turnReset',
+                    //     'actorUserId' => null,
+                    //     'actorCharacterId' => null,
+                    //     'targetUserId' => null,
+                    //     'targetCharacterId' => null,
+                    //     'value' => null,
+                    //     'description' => 'ターンがリセットされました',
+                    // ]);
                 }
 
                 $room->update([
