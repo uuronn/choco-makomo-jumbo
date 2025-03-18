@@ -6,7 +6,7 @@ import { Plus, Users, ChevronRight } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
-import { useAuth } from "~/context/AuthProvider";
+import { useUserContext } from "~/context/UserProvider";
 import { Character } from "~/type/character";
 import { SelectingRoom } from "~/type/room";
 import { FaLaptopCode } from "react-icons/fa";
@@ -17,7 +17,7 @@ export default function GameInterface() {
   const [selectedRoom, setSelectedRoom] = useState<SelectingRoom | null>(null);
   const [rooms, setRooms] = useState<SelectingRoom[]>([]);
 
-  const { user, havingCharacters } = useAuth();
+  const { user, havingCharacters } = useUserContext();
 
   const router = useRouter();
 

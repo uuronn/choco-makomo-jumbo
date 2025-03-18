@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useAuth } from "../../../context/AuthProvider";
+import { useUserContext } from "../../../context/UserProvider";
 import Loading from "~/components/Loading";
 import Pending from "~/components/Pending";
 import { Room } from "~/type/room";
+import Battle from "~/components/Battle";
 
 export default function RoomDetailPage() {
-  const { user } = useAuth();
+  const { user } = useUserContext();
   const { roomId } = useParams();
 
   const [room, setRoom] = useState<Room | null>(null);
@@ -111,6 +112,6 @@ export default function RoomDetailPage() {
   ) : room.status === "pending" && room.hostUserId !== user.uid ? (
     <Loading message="参加中" />
   ) : (
-    <>戦闘中</>
+    <Battle room={room}/>
   );
 }

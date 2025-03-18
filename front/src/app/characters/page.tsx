@@ -6,22 +6,20 @@ import { Plus, Zap, Minus } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { useAuth } from "../../context/AuthProvider";
+import { useUserContext } from "../../context/UserProvider";
 import { Character } from "~/type/character";
 
-// Character type definition
 type CharacterType =
   | "バージョン管理"
-  | "データベース" // Database
-  | "フレームワーク" // Framework
-  | "言語" // Programming Language
-  | "クラウド" // Cloud
-  | "オペレーティングシステム" // Operating System
-  | "実行環境" // Runtime Environment
-  | "ゲームエンジン" // Game Engine
-  | "コンテナー"; // Container
+  | "データベース"
+  | "フレームワーク"
+  | "言語"
+  | "クラウド"
+  | "オペレーティングシステム"
+  | "実行環境"
+  | "ゲームエンジン"
+  | "コンテナー";
 
-// Type color mapping
 const typeColors: Record<CharacterType, string> = {
   バージョン管理: "bg-red-500",
   データベース: "bg-blue-500",
@@ -36,22 +34,20 @@ const typeColors: Record<CharacterType, string> = {
 
 export default function CharacterDevelopment() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
-    null,
+    null
   );
   const [availablePoints, setAvailablePoints] = useState(0);
   const [lifePoints, setLifePoints] = useState(0);
   const [powerPoints, setPowerPoints] = useState(0);
   const [speedPoints, setSpeedPoints] = useState(0);
 
-  const { user, havingCharacters } = useAuth();
+  const { user, havingCharacters } = useUserContext();
 
-  // キャラクター一覧取得
   useEffect(() => {
     if (user) {
       (async () => {
-        // キャラクター一覧を取得
         const pointRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`
         );
         const pointData = await pointRes.json();
         setAvailablePoints(pointData);
@@ -61,7 +57,7 @@ export default function CharacterDevelopment() {
 
   const handleCharacterSelect = (character: Character) => {
     setSelectedCharacter(character);
-    // Reset points when selecting a new character
+
     setLifePoints(0);
     setPowerPoints(0);
     setSpeedPoints(0);
@@ -72,7 +68,7 @@ export default function CharacterDevelopment() {
 
     (async () => {
       if (!user) return;
-      // キャラクター一覧を取得
+
       const charRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters/${selectedCharacter.characterId}`,
         {
@@ -85,11 +81,10 @@ export default function CharacterDevelopment() {
             power: powerPoints,
             speed: speedPoints,
           }),
-        },
+        }
       );
     })();
 
-    // Update character stats
     const updatedCharacter = {
       ...selectedCharacter,
       life: selectedCharacter.life + lifePoints,
@@ -99,12 +94,10 @@ export default function CharacterDevelopment() {
 
     setSelectedCharacter(updatedCharacter);
 
-    // Update available points
     setAvailablePoints(
-      availablePoints - (lifePoints + powerPoints + speedPoints),
+      availablePoints - (lifePoints + powerPoints + speedPoints)
     );
 
-    // Reset allocated points
     setLifePoints(0);
     setPowerPoints(0);
     setSpeedPoints(0);
@@ -169,7 +162,7 @@ export default function CharacterDevelopment() {
                             <span key={i} className="text-emerald-400">
                               ★
                             </span>
-                          ),
+                          )
                         )}
                       </div>
                     </div>

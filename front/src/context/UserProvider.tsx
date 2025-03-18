@@ -12,9 +12,9 @@ import {
 import Loading from "~/components/Loading";
 import { auth, googleProvider } from "~/lib/firebase";
 import { Character } from "~/type/character";
-import { Room, SelectingRoom } from "~/type/room";
+import { SelectingRoom } from "~/type/room";
 
-const AuthContext = createContext<{
+const UserContext = createContext<{
   handleSignIn: () => void;
   handleSignOut: () => void;
   user: User | null | undefined;
@@ -28,15 +28,15 @@ const AuthContext = createContext<{
   fetchCharacters: () => {},
 });
 
-export function useAuth() {
-  return useContext(AuthContext);
+export function useUserContext() {
+  return useContext(UserContext);
 }
 
-type AuthProviderProps = {
+type UserProviderProps = {
   children: ReactNode;
 };
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const UserProvider = ({ children }: UserProviderProps) => {
   const [user, setUser] = useState<User | null>();
   const [authenticating, setAuthenticating] = useState<boolean>(true);
   const [havingCharacters, setHavingCharacters] = useState<Character[]>([]);
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
       // 既存ユーザーか確認
       const checkUser = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}`
       );
 
       if (checkUser.ok) {
@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (!user) return;
       // キャラクター一覧を取得
       const charRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`
       );
       const charData = await charRes.json();
       setHavingCharacters(charData);
@@ -104,22 +104,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         (async () => {
           // キャラクター一覧を取得
           const charRes = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`
           );
           const charData = await charRes.json();
           setHavingCharacters(charData ?? []);
         })();
         (async () => {
           const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`
           );
           const data = (await res.json()) as SelectingRoom[];
 
           // ルームのホストユーザーIDと自分のUIDを比較
           const matchingRoom = data.find(
             (room) =>
-              room.host_user.id === user.uid ||
-              room.guest_user?.id === user.uid,
+              room.host_user.id === user.uid || room.guest_user?.id === user.uid
           );
           if (matchingRoom) {
             router.push(`/rooms/${matchingRoom.id}`);
@@ -143,7 +142,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   if (user === undefined) return <Loading message="認証中" />;
 
   return (
-    <AuthContext.Provider
+    <UserContext.Provider
       value={{
         handleSignIn,
         handleSignOut,
@@ -153,6 +152,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }}
     >
       {children}
-    </AuthContext.Provider>
+    </UserContext.Provider>
   );
 };

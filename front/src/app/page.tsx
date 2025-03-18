@@ -18,14 +18,14 @@ import {
   LogOut,
 } from "lucide-react";
 import Image from "next/image";
-import { useAuth } from "~/context/AuthProvider";
+import { useUserContext } from "~/context/UserProvider";
 import { SlEnergy } from "react-icons/sl";
 import { FaLaptopCode } from "react-icons/fa";
 
 export default function HomeScreen() {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
-  const { user, handleSignOut } = useAuth();
+  const { user, handleSignOut } = useUserContext();
 
   // ナビゲーションアイテム
   const navItems = [

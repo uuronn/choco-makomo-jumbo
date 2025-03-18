@@ -6,7 +6,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import Image from "next/image";
 import { Room } from "~/type/room";
-import { useAuth } from "~/context/AuthProvider";
+import { useUserContext } from "~/context/UserProvider";
 
 type Player = {
   id: string;
@@ -23,7 +23,7 @@ export default function Pending({ room, setRoom }: PendingProps) {
   const [name, setName] = useState<string>("Guest");
   const [img, setImg] = useState<string>("/placeholder.svg");
 
-  const { user } = useAuth();
+  const { user } = useUserContext();
 
   useEffect(() => {
     (async () => {

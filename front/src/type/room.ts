@@ -1,8 +1,11 @@
+import { Character } from "./character";
+
 export type Room = {
   id: string;
   hostUserId: string;
   guestUserId: string | null;
   status: string;
+  room_character: RoomCharacter[];
 };
 
 export type SelectingRoom = {
@@ -18,4 +21,18 @@ export type SelectingRoom = {
     photoUrl: string;
   };
   status: string;
+};
+
+export type RoomCharacter = {
+  characterId: string;
+  evasion: number;
+  id: string;
+  isActive: boolean;
+  level: number;
+  life: number;
+  power: number;
+  roomId: string;
+  speed: number;
+  userId: string;
+  character: Character;
 };
