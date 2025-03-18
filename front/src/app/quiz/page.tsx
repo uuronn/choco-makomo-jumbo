@@ -10,7 +10,6 @@ export default function CyberQuiz() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [binaryCode, setBinaryCode] = useState<string[]>([]);
   const [particles, setParticles] = useState<
     Array<{
       id: number;
@@ -46,17 +45,6 @@ export default function CyberQuiz() {
     },
   ];
 
-  useEffect(() => {
-    const generateBinaryCode = () => {
-      return Array.from({ length: 50 }).map(() =>
-        Array.from({ length: 120 })
-          .map(() => (Math.random() > 0.5 ? "1" : "0"))
-          .join(""),
-      );
-    };
-
-    setBinaryCode(generateBinaryCode());
-  }, []);
 
   useEffect(() => {
     if (isAnimating) {
@@ -109,16 +97,6 @@ export default function CyberQuiz() {
         <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse"></div>
       </div>
 
-      {/* Binary code background effect */}
-      <div className="absolute inset-0 overflow-hidden opacity-5">
-        <div className="font-mono text-xs text-green-500 whitespace-nowrap animate-scrollUp">
-          {binaryCode.map((line, i) => (
-            <div key={i} className="my-2">
-              {line}
-            </div>
-          ))}
-        </div>
-      </div>
 
       <div className="py-3 gap-0 w-full max-w-2xl bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden relative z-10">
         {/* Header */}

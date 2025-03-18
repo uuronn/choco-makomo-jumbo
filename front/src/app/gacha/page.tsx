@@ -23,7 +23,6 @@ export default function GachaScreen() {
       color: string;
     }>
   >([]);
-  const [binaryCode, setBinaryCode] = useState<string[]>([]);
 
   const { user, fetchCharacters } = useAuth();
 
@@ -47,17 +46,6 @@ export default function GachaScreen() {
     }
   }, [isAnimating]);
 
-  useEffect(() => {
-    const generateBinaryCode = () => {
-      return Array.from({ length: 50 }).map(() =>
-        Array.from({ length: 120 })
-          .map(() => (Math.random() > 0.5 ? "1" : "0"))
-          .join(""),
-      );
-    };
-
-    setBinaryCode(generateBinaryCode());
-  }, []);
 
   const pullGacha = async () => {
     try {
@@ -120,16 +108,6 @@ export default function GachaScreen() {
         <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse"></div>
       </div>
 
-      {/* Binary code background effect */}
-      <div className="absolute inset-0 overflow-hidden opacity-5">
-        <div className="font-mono text-xs text-green-500 whitespace-nowrap animate-scrollUp">
-          {binaryCode.map((line, i) => (
-            <div key={i} className="my-2">
-              {line}
-            </div>
-          ))}
-        </div>
-      </div>
 
       <div className="py-3 gap-0 w-full h-full max-w-md bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden relative z-10">
         {/* Header */}
@@ -414,19 +392,6 @@ export default function GachaScreen() {
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
           </div>
-        </div>
-      </div>
-
-      {/* Tech decorations around the card */}
-      <div className="absolute bottom-4 left-4 text-green-500/30 font-mono text-xs">
-        <div>SYS:ONLINE</div>
-        <div>VER:2.5.7</div>
-      </div>
-
-      <div className="absolute top-4 right-4 text-green-500/30 font-mono text-xs">
-        <div className="flex items-center gap-1">
-          <div className="w-1 h-1 bg-green-500 rounded-full"></div>
-          <span>NETWORK:ACTIVE</span>
         </div>
       </div>
 
