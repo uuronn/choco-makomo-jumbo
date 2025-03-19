@@ -56,6 +56,76 @@ class RoomController
         }
     }
 
+    private function applyPartyBonuses($characterNames, $hostUser, $room)
+    {
+        $powerMultiplier = 1.0;
+        $speedMultiplier = 1.0;
+        $lifeMultiplier = 1.0;
+        $evasionMultiplier = 1.0;
+        $logs = [];
+
+        // 1. 三大フレームワーク
+        if (!array_diff(['vue', 'react', 'angular'], $characterNames)) {
+            $powerMultiplier *= 1.10;
+            $speedMultiplier *= 1.10;
+            $lifeMultiplier *= 1.10;
+            $evasionMultiplier *= 1.10;
+            $logs[] = "{$hostUser->name} が「三大フレームワーク」を発動、全ステータスが10%アップ";
+        }
+
+        // 2. 三大クラウド
+        if (!array_diff(['AWS', 'GCP', 'Azure'], $characterNames)) {
+            $powerMultiplier *= 1.15;
+            $speedMultiplier *= 1.15;
+            $lifeMultiplier *= 1.15;
+            $logs[] = "{$hostUser->name} が「三大クラウド」を発動、最大HP、パワー、スピードが15%アップ";
+        }
+
+        // 3. 型安全
+        if (in_array('typescript', $characterNames) &&
+            (in_array('vue', $characterNames) || in_array('react', $characterNames) ||
+            in_array('angular', $characterNames) || in_array('javascript', $characterNames))) {
+            $powerMultiplier *= 1.05;
+            $speedMultiplier *= 1.05;
+            $evasionMultiplier *= 1.20;
+            $logs[] = "{$hostUser->name} が「型安全」を発動、攻撃力5%アップ、スピード5%アップ、回避率20%アップ";
+        }
+
+        // 4. ハイパーバイザー型
+        if (in_array('docker', $characterNames) && count($characterNames) >= 2) {
+            $powerMultiplier *= 1.07;
+            $speedMultiplier *= 1.07;
+            $evasionMultiplier *= 1.07;
+            $logs[] = "{$hostUser->name} が「ハイパーバイザー型」を発動、攻撃力7%アップ、スピード7%アップ、回避率7%アップ";
+        }
+
+        // 5. WSL2
+        $osCharacters = ['linux', 'macos', 'unix'];
+        if (in_array('windows', $characterNames) &&
+            count(array_intersect($characterNames, $osCharacters)) == 0 &&
+            count($characterNames) >= 2) {
+            $powerMultiplier *= 1.15;
+            $lifeMultiplier *= 1.15;
+            $speedMultiplier *= 0.80;
+            $logs[] = "{$hostUser->name} が「WSL2」を発動、最大HP15%アップ、パワー15%アップ、スピード20%ダウン";
+        }
+
+        // 6. DBマスター
+        $dbCharacters = ['mysql', 'postgres', 'sqlite', 'mongodb'];
+        if (count(array_intersect($characterNames, $dbCharacters)) > 0) {
+            $lifeMultiplier *= 1.30;
+            $logs[] = "{$hostUser->name} が「DBマスター」を発動、最大HPが30%アップ";
+        }
+
+        return [
+            'powerMultiplier' => $powerMultiplier,
+            'speedMultiplier' => $speedMultiplier,
+            'lifeMultiplier' => $lifeMultiplier,
+            'evasionMultiplier' => $evasionMultiplier,
+            'logs' => $logs,
+        ];
+    }
+
     /**
      * ルーム作成
      */
@@ -73,7 +143,7 @@ class RoomController
                 return response()->json(['message' => '既に作成されたルームが存在します'], 409);
             }
 
-            $hostUser = User::find($request->hostUserId); // ユーザー名取得用
+            $hostUser = User::find($request->hostUserId);
 
             $room = DB::transaction(function () use ($request, $characterIdList, $hostUser) {
                 $room = Room::create([
@@ -89,24 +159,24 @@ class RoomController
                     if (!$character) {
                         throw new Exception("キャラクター {$characterId} が見つかりません", 404);
                     }
-
                     $userCharacter = UserCharacter::where('userId', $request->hostUserId)
                         ->where('characterId', $characterId)
                         ->first();
                     if (!$userCharacter) {
                         throw new Exception("ユーザーのキャラクター {$characterId} が見つかりません", 404);
                     }
-
                     $characterNames[] = $character->name;
                 }
 
-                $powerMultiplier = 1.0;
-                $speedMultiplier = 1.0;
-                $lifeMultiplier = 1.0;
+                // スキル適用
+                $bonuses = $this->applyPartyBonuses($characterNames, $hostUser, $room);
+                $powerMultiplier = $bonuses['powerMultiplier'];
+                $speedMultiplier = $bonuses['speedMultiplier'];
+                $lifeMultiplier = $bonuses['lifeMultiplier'];
+                $evasionMultiplier = $bonuses['evasionMultiplier'];
 
-                if (!array_diff(['html', 'CSS', 'javascript'], $characterNames)) {
-                    $powerMultiplier = 3;
-                    $speedMultiplier = 3;
+                // ログ記録
+                if (!empty($bonuses['logs'])) {
                     RoomLog::create([
                         'roomId' => $room->id,
                         'actionType' => 'partyBonus',
@@ -115,62 +185,27 @@ class RoomController
                         'targetUserId' => null,
                         'targetCharacterId' => null,
                         'value' => null,
-                        'description' => "{$hostUser->name} のパーティ ['html', 'CSS', 'javascript'] で攻撃力とスピードが3倍に向上",
-                    ]);
-                } elseif (!array_diff(['react', 'vue', 'angular'], $characterNames)) {
-                    $powerMultiplier = 5;
-                    $lifeMultiplier = 5;
-                    RoomLog::create([
-                        'roomId' => $room->id,
-                        'actionType' => 'partyBonus',
-                        'actorUserId' => $request->hostUserId,
-                        'actorCharacterId' => null,
-                        'targetUserId' => null,
-                        'targetCharacterId' => null,
-                        'value' => null,
-                        'description' => "{$hostUser->name} のパーティ ['react', 'vue', 'angular'] で攻撃力と生命力が5倍に向上",
+                        'description' => implode(' / ', $bonuses['logs']),
                     ]);
                 }
 
-                $hasA = in_array('A', $characterNames);
-                $hasB = in_array('B', $characterNames);
-                $shouldBoostB = $hasA && $hasB;
-
+                // キャラクターに倍率を適用
                 foreach ($characterIdList as $characterId) {
                     $character = Character::find($characterId);
                     $userCharacter = UserCharacter::where('userId', $request->hostUserId)
                         ->where('characterId', $characterId)
                         ->first();
 
-                    $specificPowerMultiplier = $powerMultiplier;
-                    $specificSpeedMultiplier = $speedMultiplier;
-                    $specificLifeMultiplier = $lifeMultiplier;
-
-                    if ($shouldBoostB && $character->name === 'B') {
-                        $specificPowerMultiplier *= 1.2;
-                        $specificSpeedMultiplier *= 1.15;
-                        RoomLog::create([
-                            'roomId' => $room->id,
-                            'actionType' => 'characterBonus',
-                            'actorUserId' => $request->hostUserId,
-                            'actorCharacterId' => $characterId,
-                            'targetUserId' => null,
-                            'targetCharacterId' => null,
-                            'value' => null,
-                            'description' => "{$character->name} の攻撃力が20%増、スピードが15%増",
-                        ]);
-                    }
-
                     RoomCharacter::create([
                         'roomId' => $room->id,
                         'characterId' => $characterId,
                         'userId' => $room->hostUserId,
                         'level' => $userCharacter->level,
-                        'life' => $userCharacter->life * $specificLifeMultiplier,
-                        'maxLife' => $userCharacter->life * $specificLifeMultiplier,
-                        'power' => $userCharacter->power * $specificPowerMultiplier,
-                        'speed' => $userCharacter->speed * $specificSpeedMultiplier,
-                        'evasion' => $character->base_evasion,
+                        'life' => $userCharacter->life * $lifeMultiplier,
+                        'maxLife' => $userCharacter->life * $lifeMultiplier,
+                        'power' => $userCharacter->power * $powerMultiplier,
+                        'speed' => $userCharacter->speed * $speedMultiplier,
+                        'evasion' => $character->base_evasion * $evasionMultiplier,
                     ]);
                 }
 
@@ -211,7 +246,7 @@ class RoomController
                 return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
             }
 
-            $guestUser = User::find($request->guestUserId); // ユーザー名取得用
+            $guestUser = User::find($request->guestUserId);
 
             $room->update([
                 'guestUserId' => $request->guestUserId,
@@ -224,24 +259,24 @@ class RoomController
                 if (!$character) {
                     throw new Exception("キャラクター {$characterId} が見つかりません", 404);
                 }
-
                 $userCharacter = UserCharacter::where('userId', $request->guestUserId)
                     ->where('characterId', $characterId)
                     ->first();
                 if (!$userCharacter) {
                     throw new Exception("ユーザーのキャラクター {$characterId} が見つかりません", 404);
                 }
-
                 $characterNames[] = $character->name;
             }
 
-            $powerMultiplier = 1.0;
-            $speedMultiplier = 1.0;
-            $lifeMultiplier = 1.0;
+            // スキル適用
+            $bonuses = $this->applyPartyBonuses($characterNames, $guestUser, $room);
+            $powerMultiplier = $bonuses['powerMultiplier'];
+            $speedMultiplier = $bonuses['speedMultiplier'];
+            $lifeMultiplier = $bonuses['lifeMultiplier'];
+            $evasionMultiplier = $bonuses['evasionMultiplier'];
 
-            if (!array_diff(['html', 'CSS', 'javascript'], $characterNames)) {
-                $powerMultiplier = 3;
-                $speedMultiplier = 3;
+            // ログ記録
+            if (!empty($bonuses['logs'])) {
                 RoomLog::create([
                     'roomId' => $room->id,
                     'actionType' => 'partyBonus',
@@ -250,62 +285,27 @@ class RoomController
                     'targetUserId' => null,
                     'targetCharacterId' => null,
                     'value' => null,
-                    'description' => "{$guestUser->name} のパーティ ['html', 'CSS', 'javascript'] で攻撃力とスピードが3倍に向上",
-                ]);
-            } elseif (!array_diff(['react', 'vue', 'angular'], $characterNames)) {
-                $powerMultiplier = 5;
-                $lifeMultiplier = 5;
-                RoomLog::create([
-                    'roomId' => $room->id,
-                    'actionType' => 'partyBonus',
-                    'actorUserId' => $request->guestUserId,
-                    'actorCharacterId' => null,
-                    'targetUserId' => null,
-                    'targetCharacterId' => null,
-                    'value' => null,
-                    'description' => "{$guestUser->name} のパーティ ['react', 'vue', 'angular'] で攻撃力と生命力が5倍に向上",
+                    'description' => implode(' / ', $bonuses['logs']),
                 ]);
             }
 
-            $hasA = in_array('A', $characterNames);
-            $hasB = in_array('B', $characterNames);
-            $shouldBoostB = $hasA && $hasB;
-
+            // キャラクターに倍率を適用
             foreach ($characterIdList as $characterId) {
                 $character = Character::find($characterId);
                 $userCharacter = UserCharacter::where('userId', $request->guestUserId)
                     ->where('characterId', $characterId)
                     ->first();
 
-                $specificPowerMultiplier = $powerMultiplier;
-                $specificSpeedMultiplier = $speedMultiplier;
-                $specificLifeMultiplier = $lifeMultiplier;
-
-                if ($shouldBoostB && $character->name === 'B') {
-                    $specificPowerMultiplier *= 1.2;
-                    $specificSpeedMultiplier *= 1.15;
-                    RoomLog::create([
-                        'roomId' => $room->id,
-                        'actionType' => 'characterBonus',
-                        'actorUserId' => $request->guestUserId,
-                        'actorCharacterId' => $characterId,
-                        'targetUserId' => null,
-                        'targetCharacterId' => null,
-                        'value' => null,
-                        'description' => "{$character->name} の攻撃力が20%増、スピードが15%増",
-                    ]);
-                }
-
                 RoomCharacter::create([
                     'roomId' => $room->id,
                     'characterId' => $characterId,
                     'userId' => $request->guestUserId,
                     'level' => $userCharacter->level,
-                    'life' => $userCharacter->life * $specificLifeMultiplier,
-                    'maxLife' => $userCharacter->life * $specificLifeMultiplier,
-                    'power' => $userCharacter->power * $specificPowerMultiplier,
-                    'speed' => $userCharacter->speed * $specificSpeedMultiplier,
-                    'evasion' => $character->base_evasion,
+                    'life' => $userCharacter->life * $lifeMultiplier,
+                    'maxLife' => $userCharacter->life * $lifeMultiplier,
+                    'power' => $userCharacter->power * $powerMultiplier,
+                    'speed' => $userCharacter->speed * $speedMultiplier,
+                    'evasion' => $character->base_evasion * $evasionMultiplier,
                 ]);
             }
 
