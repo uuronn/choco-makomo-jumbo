@@ -42,4 +42,5 @@ export type RoomCharacter = {
   userId: string;
   character: Character;
   specialSkillType: string;
+  specialUsed: 0 | 1;
 };
