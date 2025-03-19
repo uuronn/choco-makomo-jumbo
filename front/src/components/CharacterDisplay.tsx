@@ -197,13 +197,14 @@ export const CharacterDisplay = React.memo(
               style={{ width: `${hpPercentage}%` }}
             ></div>
           </div>
-          <span className="text-xs mt-1">HP {character.life}</span>
-
-          <span className="text-xs">パワー {character.power}</span>
-
-          <span className="text-xs">スピード {character.speed}</span>
-
-          <span className="text-xs">回避率 {character.evasion}%</span>
+          <div className="flex justify-center items-end gap-3 w-full">
+            <span className="text-xs mt-1">HP {character.life}</span>
+            <span className="text-xs">パワー{character.power}</span>
+          </div>
+          <div className="flex justify-center gap-3 w-full">
+            <span className="text-xs">スピード {character.speed}</span>
+            <span className="text-xs">回避率 {character.evasion}%</span>
+          </div>
         </div>
       </div>
     );
