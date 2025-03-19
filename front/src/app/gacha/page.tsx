@@ -392,7 +392,7 @@ export default function GachaScreen() {
             </Button>
             <Button
               onClick={pullGacha}
-              disabled={isAnimating || availablePoints < 1}
+              disabled={isAnimating || availablePoints < 10}
               className="w-1/2 relative bg-black hover:bg-green-900 text-green-400 border border-green-500/50 px-8 py-6 text-xl rounded-md shadow-[0_0_10px_rgba(0,255,128,0.3)] transition-all hover:shadow-[0_0_15px_rgba(0,255,128,0.5)] disabled:opacity-70 disabled:hover:shadow-[0_0_10px_rgba(0,255,128,0.3)] overflow-hidden group"
             >
               {/* Button glow effect */}
