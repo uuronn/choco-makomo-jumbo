@@ -585,36 +585,63 @@ class RoomController
                     throw new Exception('攻撃対象のキャラクターが見つかりません');
                 }
 
-                $damage = max(0, $attacker->power);
-                $newLife = max(0, $target->life - $damage);
+                // 回避率の計算（0〜100の範囲でランダム値を生成し、evasion以下なら回避）
+                $evasionChance = $target->evasion; // 例: 7なら7%
+                $hitRoll = rand(0, 100); // 0〜100の乱数
+                $isHit = $hitRoll > $evasionChance; // 回避率より大きければ命中
 
-                RoomLog::create([
-                    'roomId' => $roomId,
-                    'actionType' => 'attack',
-                    'actorUserId' => $attacker->userId,
-                    'actorCharacterId' => $attacker->characterId,
-                    'targetUserId' => $target->userId,
-                    'targetCharacterId' => $target->characterId,
-                    'value' => $damage,
-                    'description' => "{$attacker->character->name} が {$target->character->name} に {$damage} ダメージを与えました",
-                ]);
+                if ($isHit) {
+                    // 命中した場合
+                    $damage = max(0, $attacker->power);
+                    $newLife = max(0, $target->life - $damage);
 
-                $target->update([
-                    'life' => $newLife,
-                    'isDead' => $newLife <= 0,
-                ]);
-
-                if ($newLife <= 0) {
                     RoomLog::create([
                         'roomId' => $roomId,
-                        'actionType' => 'death',
-                        'actorUserId' => null,
-                        'actorCharacterId' => null,
+                        'actionType' => 'attack',
+                        'actorUserId' => $attacker->userId,
+                        'actorCharacterId' => $attacker->characterId,
                         'targetUserId' => $target->userId,
                         'targetCharacterId' => $target->characterId,
-                        'value' => null,
-                        'description' => "{$target->character->name} がダウンしました",
+                        'value' => $damage,
+                        'description' => "{$attacker->character->name} が {$target->character->name} に {$damage} ダメージを与えました",
                     ]);
+
+                    $target->update([
+                        'life' => $newLife,
+                        'isDead' => $newLife <= 0,
+                    ]);
+
+                    if ($newLife <= 0) {
+                        RoomLog::create([
+                            'roomId' => $roomId,
+                            'actionType' => 'death',
+                            'actorUserId' => null,
+                            'actorCharacterId' => null,
+                            'targetUserId' => $target->userId,
+                            'targetCharacterId' => $target->characterId,
+                            'value' => null,
+                            'description' => "{$target->character->name} がダウンしました",
+                        ]);
+                    }
+
+                    $message = "{$attacker->character->name} が {$target->character->name} に {$damage} ダメージを与えました";
+                } else {
+                    // 回避した場合
+                    $damage = 0;
+                    $newLife = $target->life; // ライフは変わらない
+
+                    RoomLog::create([
+                        'roomId' => $roomId,
+                        'actionType' => 'attack',
+                        'actorUserId' => $attacker->userId,
+                        'actorCharacterId' => $attacker->characterId,
+                        'targetUserId' => $target->userId,
+                        'targetCharacterId' => $target->characterId,
+                        'value' => 0,
+                        'description' => "{$attacker->character->name} の攻撃が {$target->character->name} に回避されました",
+                    ]);
+
+                    $message = "{$attacker->character->name} の攻撃が {$target->character->name} に回避されました";
                 }
 
                 $attacker->update(['isActive' => false]);
@@ -627,7 +654,7 @@ class RoomController
                 $room->refresh();
 
                 return response()->json([
-                    'message' => "{$attacker->character->name} が {$target->character->name} に {$damage} ダメージを与えました",
+                    'message' => $message,
                     'room' => $room,
                     'attacker' => $attacker,
                     'targets' => [[
