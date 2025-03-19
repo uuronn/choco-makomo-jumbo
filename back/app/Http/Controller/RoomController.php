@@ -966,10 +966,10 @@ class RoomController
                         foreach ($targets as $target) {
                             $target->update(['isActive' => false]);
                         }
-                        $description = "{$attacker->character->name} が敵全員の次ターンを飛ばした";
+                        $description = "{$attacker->character->name}が「JavaJavaすんなよ」を発動、敵全員の次ターンを飛ばした";
                         break;
 
-                    case '攻撃力スピード入れ替え':
+                    case 'SQLインジェクション':
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', '!=', $userId)
@@ -987,7 +987,7 @@ class RoomController
                         break;
 
                     case 'rm -rf':
-                        $description = "{$attacker->character->name} が即時勝利を宣言し、バトルを終了させた";
+                        $description = "{$attacker->character->name} 「rm -rf」を発動、バトルを終了させた";
                         $room->update([
                             'status' => 'finished',
                             'winnerUserId' => $userId,
@@ -997,7 +997,7 @@ class RoomController
                             'actionType' => 'victory',
                             'actorUserId' => $userId,
                             'actorCharacterId' => $attacker->characterId,
-                            'description' => "{$attacker->character->name} の即時勝利により {$room->hostUser->name} の勝利",
+                            'description' => "{$attacker->character->name}が「rm -rf」を発動、{$room->hostUser->name} の勝利",
                         ]);
                         break;
 
@@ -1052,33 +1052,6 @@ class RoomController
                         }
                         $description = "{$attacker->character->name} が「依存性の注入」を発動、味方全員の体力を25%回復";
                         break;
-
-                    case 'SQLインジェクション': // Mysql, Postgres用（全体ダメージ）
-                        $targets = RoomCharacter::with('character')
-                            ->where('roomId', $roomId)
-                            ->where('userId', '!=', $userId)
-                            ->where('isDead', false)
-                            ->get();
-                        $damage = $attacker->power * 3; // 全体攻撃（2倍）より強め
-                        foreach ($targets as $target) {
-                            $newLife = max(0, $target->life - $damage);
-                            $target->update([
-                                'life' => $newLife,
-                                'isDead' => $newLife <= 0,
-                            ]);
-                            if ($newLife <= 0) {
-                                RoomLog::create([
-                                    'roomId' => $roomId,
-                                    'actionType' => 'death',
-                                    'targetUserId' => $target->userId,
-                                    'targetCharacterId' => $target->characterId,
-                                    'description' => "{$target->character->name} がダウンしました",
-                                ]);
-                            }
-                        }
-                        $description = "{$attacker->character->name} が「SQLインジェクション」を発動、敵全員に {$damage} ダメージ";
-                        break;
-
                     case 'IEを削除': // windows用（全体回復の変形）
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
@@ -1090,7 +1063,7 @@ class RoomController
                             $newLife = min($target->maxLife, $target->life + $healAmount);
                             $target->update(['life' => $newLife]);
                         }
-                        $description = "{$attacker->character->name} が「味方全体回復」を発動、味方全員の体力を50%回復";
+                        $description = "{$attacker->character->name} が「IEを削除」を発動、味方全員の体力を50%回復";
                         break;
 
                     case 'docker compose up': // windows用（全体回復の変形）
@@ -1104,7 +1077,7 @@ class RoomController
                             $newLife = min($target->maxLife, $target->life + $healAmount);
                             $target->update(['life' => $newLife]);
                         }
-                        $description = "{$attacker->character->name} が「味方全体回復」を発動、味方全員の体力を50%回復";
+                        $description = "{$attacker->character->name} が「docker compose up」を発動、味方全員の体力を50%回復";
                         break;
 
                     case '物理エンジン操作': // Unity用（スピードデバフ）
@@ -1114,9 +1087,9 @@ class RoomController
                             ->where('isDead', false)
                             ->get();
                         foreach ($targets as $target) {
-                            $target->update(['speed' => (int)($target->speed * 0.75)]); // 30%より少し弱め
+                            $target->update(['speed' => (int)($target->speed * 0.10)]); // 30%より少し弱め
                         }
-                        $description = "{$attacker->character->name} が「スピードデバフ」を発動、敵全員のスピードが25%ダウン";
+                        $description = "{$attacker->character->name} が「物理エンジン操作」を発動、敵全員のスピードが90%ダウン";
                         break;
 
                     default:

@@ -9,8 +9,6 @@ use App\Http\Controller\UserController;
 use Illuminate\Support\Facades\Route;
 
 
-
-
 // ユーザー関連のAPI--------------------------------
 
 // ユーザーを作成する
