@@ -120,7 +120,10 @@ export default function GachaScreen() {
     <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 overflow-hidden">
       {/* Background grid effect */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djJoLTJ2LTJoMnptMC00aDJ2MmgtMnYtMnptLTQgMHYyaC0ydi0yaDJ6bTIgMGgydjJoLTJ2LTJ6bS02IDBoMnYyaC0ydi0yem0yLTRoMnYyaC0ydi0yem0yIDBIMzZ2Mmgtc3YtMnptMCA0aDJ2MmgtMnYtMnoiLz48L2c+PC9nPjwvc3ZnPg==')]"></div>
-      <div className="text-md font-semibold mb-1 text-green-400">
+      <div
+        className="text-2xl font-semibold mb-1 text-green-400"
+        style={{ position: "absolute", top: "20px", right: "20px" }}
+      >
         所持ポイント:
         <span className="text-emerald-400">{availablePoints}</span>
       </div>

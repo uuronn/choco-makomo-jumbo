@@ -25,7 +25,7 @@ export default function Battle({ room }: BattleProps) {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [activeCharacter, setActiveCharacter] = useState<RoomCharacter | null>(
-    null,
+    null
   );
   const [playerTeam, setPlayerTeam] = useState<RoomCharacter[]>([]);
   const [enemyTeam, setEnemyTeam] = useState<RoomCharacter[]>([]);
@@ -46,7 +46,7 @@ export default function Battle({ room }: BattleProps) {
     (
       roomCharacterId: string,
       effectType: "blink" | string,
-      durationMs: number,
+      durationMs: number
     ): Promise<void> => {
       return new Promise<void>((resolve) => {
         const now = Date.now();
@@ -60,7 +60,7 @@ export default function Battle({ room }: BattleProps) {
         }));
       });
     },
-    [],
+    []
   );
 
   // characterEffects の終了チェック
@@ -116,7 +116,7 @@ export default function Battle({ room }: BattleProps) {
     if (!oldRoom) {
       setLoading(false);
       setPlayerTeam(
-        room.room_character.filter((ch) => ch.userId === user?.uid),
+        room.room_character.filter((ch) => ch.userId === user?.uid)
       );
       setEnemyTeam(room.room_character.filter((ch) => ch.userId !== user?.uid));
       setBattleLog(room.room_log.map((log) => log.description));
@@ -126,8 +126,8 @@ export default function Battle({ room }: BattleProps) {
           (ch) =>
             ch.characterId === room.currentTurnCharacterId &&
             ch.userId === user?.uid &&
-            room.currentTurnUserId === user?.uid,
-        ) || null,
+            room.currentTurnUserId === user?.uid
+        ) || null
       );
       setIsMyTurn(room.currentTurnUserId === user?.uid);
       if (room.currentTurnUserId === user?.uid) {
@@ -149,8 +149,8 @@ export default function Battle({ room }: BattleProps) {
         (ch) =>
           ch.characterId === room.currentTurnCharacterId &&
           ch.userId === user?.uid &&
-          room.currentTurnUserId === user?.uid,
-      ) || null,
+          room.currentTurnUserId === user?.uid
+      ) || null
     );
 
     // 味方・敵リスト
@@ -166,7 +166,7 @@ export default function Battle({ room }: BattleProps) {
       const decreasedLifeCharacters = room.room_character.filter((ch) => {
         const prevCharacter = oldRoom.room_character.find(
           (pCh) =>
-            pCh.characterId === ch.characterId && pCh.userId === ch.userId,
+            pCh.characterId === ch.characterId && pCh.userId === ch.userId
         );
         return prevCharacter && ch.life < prevCharacter.life;
       });
@@ -174,7 +174,7 @@ export default function Battle({ room }: BattleProps) {
       const increasedLifeCharacters = room.room_character.filter((ch) => {
         const prevCharacter = oldRoom.room_character.find(
           (pCh) =>
-            pCh.characterId === ch.characterId && pCh.userId === ch.userId,
+            pCh.characterId === ch.characterId && pCh.userId === ch.userId
         );
         return prevCharacter && ch.life > prevCharacter.life;
       });
@@ -183,9 +183,9 @@ export default function Battle({ room }: BattleProps) {
         (async () => {
           await Promise.all(
             decreasedLifeCharacters.map(async (ch) => {
-              await showEffect(ch.id, "explosion", 600);
+              await showEffect(ch.id, "explosion", 1200);
               await showEffect(ch.id, "blink", 1000);
-            }),
+            })
           );
         })();
       }
@@ -194,8 +194,8 @@ export default function Battle({ room }: BattleProps) {
         (async () => {
           await Promise.all(
             increasedLifeCharacters.map(async (ch) => {
-              await showEffect(ch.id, "heal", 600);
-            }),
+              await showEffect(ch.id, "heal", 2000);
+            })
           );
         })();
       }
@@ -238,7 +238,7 @@ export default function Battle({ room }: BattleProps) {
           body: JSON.stringify({
             targetCharacterId: characterId,
           }),
-        },
+        }
       );
     }
     if (selectedAction === "skill") {
@@ -250,7 +250,7 @@ export default function Battle({ room }: BattleProps) {
         {
           method: "POST",
           body: JSON.stringify({ targetCharacterId: characterId }),
-        },
+        }
       );
     }
   };
@@ -267,7 +267,7 @@ export default function Battle({ room }: BattleProps) {
       setLoading(true);
       await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/skill`,
-        { method: "POST" },
+        { method: "POST" }
       );
       setSelectedAction(null);
     }
@@ -351,12 +351,11 @@ export default function Battle({ room }: BattleProps) {
       <div className="relative">
         <div
           id="battle-log"
-          className="bg-gray-800 border border-green-500/50 rounded-lg p-2 h-44 overflow-y-hidden mb-4"
+          className="bg-gray-800 border border-green-500/50 rounded-lg py-2 px-4 h-32 overflow-y-hidden mb-4"
         >
           <div className="space-y-1">
             {battleLog.map((log, index) => (
               <div key={index} className="text-sm font-mono text-green-300">
-                <br />
                 {log}
               </div>
             ))}

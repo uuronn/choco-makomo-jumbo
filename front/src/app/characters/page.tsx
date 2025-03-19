@@ -8,6 +8,7 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { useUserContext } from "../../context/UserProvider";
 import { Character, LevelUpResult } from "~/type/character";
+import { enqueueSnackbar } from "notistack";
 
 type CharacterType =
   | "バージョン管理"
@@ -132,6 +133,10 @@ export default function CharacterDevelopment() {
     setSpeedPoints(0);
 
     fetchCharacters();
+
+    enqueueSnackbar("レベルアップ！", {
+      variant: "success",
+    });
 
     // const updatedCharacter = havingCharacters.find(
     //   (character) => character.characterId === selectedCharacter.characterId
