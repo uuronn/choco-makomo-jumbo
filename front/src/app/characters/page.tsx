@@ -36,7 +36,7 @@ const typeColors: Record<CharacterType, string> = {
 const handleMouseDown = (
   increment: boolean,
   setPoints: React.Dispatch<React.SetStateAction<number>>,
-  points: number
+  points: number,
 ) => {
   const interval = setInterval(() => {
     setPoints((prevPoints) => (increment ? prevPoints + 1 : prevPoints - 1));
@@ -52,7 +52,7 @@ const handleMouseDown = (
 
 export default function CharacterDevelopment() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
-    null
+    null,
   );
   const [availablePoints, setAvailablePoints] = useState(0);
   const [lifePoints, setLifePoints] = useState(0);
@@ -65,7 +65,7 @@ export default function CharacterDevelopment() {
     if (user) {
       (async () => {
         const pointRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`,
         );
         const pointData = await pointRes.json();
         setAvailablePoints(pointData);
@@ -108,7 +108,7 @@ export default function CharacterDevelopment() {
             power: powerPoints,
             speed: speedPoints,
           }),
-        }
+        },
       );
 
       const data = (await charRes.json()) as LevelUpResult;
@@ -125,7 +125,7 @@ export default function CharacterDevelopment() {
     })();
 
     setAvailablePoints(
-      availablePoints - (lifePoints + powerPoints + speedPoints)
+      availablePoints - (lifePoints + powerPoints + speedPoints),
     );
 
     setLifePoints(0);
@@ -206,7 +206,7 @@ export default function CharacterDevelopment() {
                             <span key={i} className="text-emerald-400">
                               ★
                             </span>
-                          )
+                          ),
                         )}
                       </div>
                     </div>

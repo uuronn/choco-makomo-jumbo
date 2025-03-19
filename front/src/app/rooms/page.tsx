@@ -29,8 +29,8 @@ export default function GameInterface() {
     ) {
       setSelectedCharacters(
         selectedCharacters.filter(
-          (c) => c.characterId !== character.characterId
-        )
+          (c) => c.characterId !== character.characterId,
+        ),
       );
     } else if (selectedCharacters.length < 3) {
       setSelectedCharacters([...selectedCharacters, character]);
@@ -53,10 +53,10 @@ export default function GameInterface() {
         body: JSON.stringify({
           hostUserId: user.uid,
           characterIdList: selectedCharacters.map(
-            (character) => character.characterId
+            (character) => character.characterId,
           ),
         }),
-      }
+      },
     );
     const data = await res.json();
     router.push(`/rooms/${data.id}`);
@@ -72,11 +72,11 @@ export default function GameInterface() {
         body: JSON.stringify({
           roomId: selectedRoom?.id,
           characterIdList: selectedCharacters.map(
-            (character) => character.characterId
+            (character) => character.characterId,
           ),
           guestUserId: user.uid,
         }),
-      }
+      },
     );
 
     const data = await res.json();
@@ -89,7 +89,7 @@ export default function GameInterface() {
   useEffect(() => {
     const fetchRooms = async () => {
       const roomsRas = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
       );
       const roomsData = await roomsRas.json();
       setRooms(roomsData);
@@ -99,11 +99,11 @@ export default function GameInterface() {
   }, []);
 
   const refreshRooms = async () => {
-    enqueueSnackbar('ルーム一覧を更新', {
-      variant: 'success',
-    })
+    enqueueSnackbar("ルーム一覧を更新", {
+      variant: "success",
+    });
     const roomsRas = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
     );
     const roomsData = await roomsRas.json();
     setRooms(roomsData);
@@ -195,10 +195,10 @@ export default function GameInterface() {
                       className={cn(
                         "flex flex-col justify-center items-center p-1.5 rounded-lg border transition-all cursor-pointer h-[150px] w-[150px]",
                         selectedCharacters.find(
-                          (c) => c.characterId === character.characterId
+                          (c) => c.characterId === character.characterId,
                         )
                           ? "bg-green-400/20 border-green-400"
-                          : "bg-black/30 border-green-400/20 hover:bg-green-400/10"
+                          : "bg-black/30 border-green-400/20 hover:bg-green-400/10",
                       )}
                       onClick={() => handleSelectCharacter(character)}
                     >
@@ -243,7 +243,7 @@ export default function GameInterface() {
               {rooms
                 .filter(
                   (room) =>
-                    room.guest_user === null && room.host_user.id !== user?.uid
+                    room.guest_user === null && room.host_user.id !== user?.uid,
                 )
                 .map((room) => (
                   <div
@@ -252,7 +252,7 @@ export default function GameInterface() {
                       "flex flex-col rounded-lg border transition-all justify-center items-center cursor-pointer min-w-[200px]  min-h-[160px] overflow-hidden",
                       selectedRoom?.id === room.id
                         ? "bg-green-400/20 border-green-400"
-                        : "bg-black/30 border-green-400/20 hover:bg-green-400/10"
+                        : "bg-black/30 border-green-400/20 hover:bg-green-400/10",
                     )}
                     onClick={() => handleSelectRoom(room)}
                   >

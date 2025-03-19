@@ -39,10 +39,16 @@ export default function RoomDetailPage() {
           return;
         }
         if (data.status === "finish") {
+          clearInterval(interval); // ポーリングを停止
+          setRoom((prevRoom) => ({
+            ...prevRoom,
+            ...data,
+            status: "battling",
+            currentTurnUserId: null,
+          })); // status以外を更新
           setTimeout(() => {
-            clearInterval(interval);
-            setRoom(data); // 5秒後に実行
-          }, 5000); // 5秒間一時停止
+            setRoom(data); // 5秒後にstatusをfinishに
+          }, 2000);
         } else {
           setRoom(data); // すぐに実行
         }
