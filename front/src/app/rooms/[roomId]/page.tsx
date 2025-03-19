@@ -41,9 +41,11 @@ export default function RoomDetailPage() {
         if (data.status === "finish") {
           setTimeout(() => {
             clearInterval(interval);
+            setRoom(data); // 5秒後に実行
           }, 5000); // 5秒間一時停止
+        } else {
+          setRoom(data); // すぐに実行
         }
-        setRoom(data);
       } catch (e) {
         console.log(e);
       }
