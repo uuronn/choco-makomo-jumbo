@@ -112,7 +112,7 @@ class CharacterSeeder extends Seeder
                 'name' => 'AWS',
                 'type' => 'クラウド',
                 'rarity' => 5,
-                'base_power' => 2000,
+                'base_power' => 400,
                 'base_life' => 3000,
                 'base_speed' => 90,
                 'base_evasion' => 6,
@@ -164,8 +164,8 @@ class CharacterSeeder extends Seeder
                 'base_life' => 4000,
                 'base_speed' => 70,
                 'base_evasion' => 1,
-                'specialSkillType' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillType' => 'docker compose up',
+                'specialTurnRequirement' => 20,
                 'image_url' => '/character/docker.webp',
             ],
             [
@@ -176,7 +176,7 @@ class CharacterSeeder extends Seeder
                 'base_life' => 1000,
                 'base_speed' => 60,
                 'base_evasion' => 4,
-                'specialSkillType' => '味方全体回復', // 味方全体回復
+                'specialSkillType' => 'IEを削除', // 味方全体回復
                 'specialTurnRequirement' => 5,
                 'image_url' => '/character/windows.webp',
             ],
@@ -200,8 +200,8 @@ class CharacterSeeder extends Seeder
                 'base_life' => 2600,
                 'base_speed' => 230,
                 'base_evasion' => 8,
-                'specialSkillType' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillType' => 'JavaJavaすんなよ',
+                'specialTurnRequirement' => 10,
                 'image_url' => '/character/javascript.webp',
             ],
             [
@@ -272,7 +272,7 @@ class CharacterSeeder extends Seeder
                 'base_life' => 2000,
                 'base_speed' => 250,
                 'base_evasion' => 20,
-                'specialSkillType' => 'area_debuff_speed',
+                'specialSkillType' => '物理エンジン操作',
                 'specialTurnRequirement' => 6,
                 'image_url' => '/character/unity.webp',
             ],

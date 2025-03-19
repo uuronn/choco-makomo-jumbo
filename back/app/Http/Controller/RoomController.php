@@ -787,7 +787,6 @@ class RoomController
         }
     }
 
-
     /**
      * キャラクターがスペシャルスキルを使用する
      */
@@ -842,7 +841,7 @@ class RoomController
                 }
 
                 switch ($skillType) {
-                    case '単体攻撃力強化': // 元: boost_attack
+                    case '単体攻撃力強化':
                         $target = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', $userId)
@@ -855,7 +854,7 @@ class RoomController
                         $targets = [$target];
                         break;
 
-                    case '単体犠牲攻撃': // 元: sacrifice
+                    case '単体犠牲攻撃':
                         $target = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('id', $targetCharacterId)
@@ -893,7 +892,7 @@ class RoomController
                         ]);
                         break;
 
-                    case '全体攻撃': // 元: area_attack
+                    case '全体攻撃':
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', '!=', $userId)
@@ -919,7 +918,7 @@ class RoomController
                         $description = "{$attacker->character->name} が全体攻撃で {$damage} ダメージ";
                         break;
 
-                    case '全体回復': // 元: heal_all
+                    case '全体回復':
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', $userId)
@@ -932,7 +931,7 @@ class RoomController
                         $description = "{$attacker->character->name} が味方全員を全回復";
                         break;
 
-                    case '全体スタン': // 元: stun_all
+                    case '全体スタン':
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', '!=', $userId)
@@ -944,7 +943,7 @@ class RoomController
                         $description = "{$attacker->character->name} が敵全員を次ターン行動不能に";
                         break;
 
-                    case 'kill': // 元: single_heal
+                    case '単体回復':
                         $target = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', $userId)
@@ -958,18 +957,7 @@ class RoomController
                         $targets = [$target];
                         break;
 
-                    case 'kill': // 元: skip_all_turns
-                        $targets = RoomCharacter::with('character')
-                            ->where('roomId', $roomId)
-                            ->where('userId', '!=', $userId)
-                            ->where('isDead', false)
-                            ->get();
-                        foreach ($targets as $target) {
-                            $target->update(['isActive' => false]);
-                        }
-                        $description = "{$attacker->character->name} が敵全員の次ターンを飛ばした";
-                        break;
-                    case 'rm -rf': // 元: skip_all_turns
+                    case 'JavaJavaすんなよ':
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', '!=', $userId)
@@ -981,7 +969,7 @@ class RoomController
                         $description = "{$attacker->character->name} が敵全員の次ターンを飛ばした";
                         break;
 
-                    case 'SQLインジェクション': // 元: swap_power_speed
+                    case '攻撃力スピード入れ替え':
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', '!=', $userId)
@@ -997,38 +985,161 @@ class RoomController
                         }
                         $description = "{$attacker->character->name} が敵全員の攻撃力とスピードを入れ替えた";
                         break;
+
                     case 'rm -rf':
-                        $description = "{$attacker->character->name} が「rm -rf」を発動し、バトルを終了させた";
+                        $description = "{$attacker->character->name} が即時勝利を宣言し、バトルを終了させた";
                         $room->update([
                             'status' => 'finished',
-                            'winnerUserId' => $userId, // スキル使用者が勝利
+                            'winnerUserId' => $userId,
                         ]);
                         RoomLog::create([
                             'roomId' => $roomId,
                             'actionType' => 'victory',
                             'actorUserId' => $userId,
                             'actorCharacterId' => $attacker->characterId,
-                            'description' => "{$attacker->character->name} の「rm -rf」により {$room->hostUser->name} の勝利",
+                            'description' => "{$attacker->character->name} の即時勝利により {$room->hostUser->name} の勝利",
                         ]);
+                        break;
+
+                    case 'Gopherくんはオコている': // Go用（全体攻撃の変形）
+                        $targets = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
+                            ->where('userId', '!=', $userId)
+                            ->where('isDead', false)
+                            ->get();
+                        $damage = $attacker->power * 2.5; // 全体攻撃（2倍）より少し強め
+                        foreach ($targets as $target) {
+                            $newLife = max(0, $target->life - $damage);
+                            $target->update([
+                                'life' => $newLife,
+                                'isDead' => $newLife <= 0,
+                            ]);
+                            if ($newLife <= 0) {
+                                RoomLog::create([
+                                    'roomId' => $roomId,
+                                    'actionType' => 'death',
+                                    'targetUserId' => $target->userId,
+                                    'targetCharacterId' => $target->characterId,
+                                    'description' => "{$target->character->name} がダウンしました",
+                                ]);
+                            }
+                        }
+                        $description = "{$attacker->character->name} が「Gopherくんはオコている」を発動、敵全員に {$damage} ダメージ";
+                        break;
+
+                    case 'セマンティックHTML': // html用（回避アップ）
+                        $targets = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
+                            ->where('userId', $userId)
+                            ->where('isDead', false)
+                            ->get();
+                        foreach ($targets as $target) {
+                            $target->update(['evasion' => $target->evasion + 30]); // 10より少し強め
+                        }
+                        $description = "{$attacker->character->name} が「セマンティックHTML」を発動、味方全員の回避率が30アップ";
+                        break;
+
+                    case '依存性の注入': // Angular用（全体回復の変形）
+                        $targets = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
+                            ->where('userId', $userId)
+                            ->where('isDead', false)
+                            ->get();
+                        foreach ($targets as $target) {
+                            $healAmount = (int)($target->maxLife * 0.25); // 30%より少し弱め
+                            $newLife = min($target->maxLife, $target->life + $healAmount);
+                            $target->update(['life' => $newLife]);
+                        }
+                        $description = "{$attacker->character->name} が「依存性の注入」を発動、味方全員の体力を25%回復";
+                        break;
+
+                    case 'SQLインジェクション': // Mysql, Postgres用（全体ダメージ）
+                        $targets = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
+                            ->where('userId', '!=', $userId)
+                            ->where('isDead', false)
+                            ->get();
+                        $damage = $attacker->power * 3; // 全体攻撃（2倍）より強め
+                        foreach ($targets as $target) {
+                            $newLife = max(0, $target->life - $damage);
+                            $target->update([
+                                'life' => $newLife,
+                                'isDead' => $newLife <= 0,
+                            ]);
+                            if ($newLife <= 0) {
+                                RoomLog::create([
+                                    'roomId' => $roomId,
+                                    'actionType' => 'death',
+                                    'targetUserId' => $target->userId,
+                                    'targetCharacterId' => $target->characterId,
+                                    'description' => "{$target->character->name} がダウンしました",
+                                ]);
+                            }
+                        }
+                        $description = "{$attacker->character->name} が「SQLインジェクション」を発動、敵全員に {$damage} ダメージ";
+                        break;
+
+                    case 'IEを削除': // windows用（全体回復の変形）
+                        $targets = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
+                            ->where('userId', $userId)
+                            ->where('isDead', false)
+                            ->get();
+                        foreach ($targets as $target) {
+                            $healAmount = (int)($target->maxLife * 0.4); // 全回復より弱め
+                            $newLife = min($target->maxLife, $target->life + $healAmount);
+                            $target->update(['life' => $newLife]);
+                        }
+                        $description = "{$attacker->character->name} が「味方全体回復」を発動、味方全員の体力を50%回復";
+                        break;
+
+                    case 'docker compose up': // windows用（全体回復の変形）
+                        $targets = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
+                            ->where('userId', $userId)
+                            ->where('isDead', false)
+                            ->get();
+                        foreach ($targets as $target) {
+                            $healAmount = (int)($target->maxLife * 0.3); // 全回復より弱め
+                            $newLife = min($target->maxLife, $target->life + $healAmount);
+                            $target->update(['life' => $newLife]);
+                        }
+                        $description = "{$attacker->character->name} が「味方全体回復」を発動、味方全員の体力を50%回復";
+                        break;
+
+                    case '物理エンジン操作': // Unity用（スピードデバフ）
+                        $targets = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
+                            ->where('userId', '!=', $userId)
+                            ->where('isDead', false)
+                            ->get();
+                        foreach ($targets as $target) {
+                            $target->update(['speed' => (int)($target->speed * 0.75)]); // 30%より少し弱め
+                        }
+                        $description = "{$attacker->character->name} が「スピードデバフ」を発動、敵全員のスピードが25%ダウン";
                         break;
 
                     default:
                         throw new Exception('未実装のスペシャルスキルです');
                 }
 
-                $attacker->update(['specialUsed' => true]);
-                RoomLog::create([
-                    'roomId' => $roomId,
-                    'actionType' => 'special',
-                    'actorUserId' => $attacker->userId,
-                    'actorCharacterId' => $attacker->characterId,
-                    'description' => $description,
-                ]);
+                if ($skillType !== '即時勝利') {
+                    $attacker->update(['specialUsed' => true]);
+                    RoomLog::create([
+                        'roomId' => $roomId,
+                        'actionType' => 'special',
+                        'actorUserId' => $attacker->userId,
+                        'actorCharacterId' => $attacker->characterId,
+                        'description' => $description,
+                    ]);
 
-                $attacker->update(['isActive' => false]);
-                $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
+                    $attacker->update(['isActive' => false]);
+                    $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
 
-                $nextTurn = $this->updateNextTurn($roomId);
+                    $nextTurn = $this->updateNextTurn($roomId);
+                } else {
+                    $nextTurn = null;
+                }
 
                 $this->checkBattleEnd($room);
 
@@ -1045,6 +1156,7 @@ class RoomController
                         'isDead' => $t->isDead,
                         'power' => $t->power,
                         'speed' => $t->speed,
+                        'evasion' => $t->evasion,
                     ]),
                     'next_turn_user_id' => $nextTurn ? $nextTurn->userId : null,
                     'next_turn_character_id' => $nextTurn ? $nextTurn->characterId : null,
