@@ -183,7 +183,7 @@ export default function Battle({ room }: BattleProps) {
         (async () => {
           await Promise.all(
             decreasedLifeCharacters.map(async (ch) => {
-              await showEffect(ch.id, "explosion", 1000);
+              await showEffect(ch.id, "explosion", 1200);
               await showEffect(ch.id, "blink", 1000);
             })
           );
@@ -194,7 +194,7 @@ export default function Battle({ room }: BattleProps) {
         (async () => {
           await Promise.all(
             increasedLifeCharacters.map(async (ch) => {
-              await showEffect(ch.id, "heal", 1500);
+              await showEffect(ch.id, "heal", 2000);
             })
           );
         })();
