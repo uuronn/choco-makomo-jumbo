@@ -389,7 +389,7 @@ export default function CharacterDevelopment() {
         {/* Character List Section */}
         <div className="h-1/2 overflow-auto border rounded-lg p-4 border-emerald-500/30 bg-gray-900/80">
           <h2 className="text-xl font-bold mb-4 text-green-400 flex items-center">
-            技術スタック
+            所持技術
             <div className="h-px flex-grow ml-4 bg-gradient-to-r from-emerald-400 to-transparent"></div>
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
