@@ -1096,7 +1096,7 @@ class RoomController
                         throw new Exception('未実装のスペシャルスキルです');
                 }
 
-                if ($skillType !== '即時勝利') {
+                if ($skillType !== 'rm -rf') {
                     $attacker->update(['specialUsed' => true]);
                     RoomLog::create([
                         'roomId' => $roomId,
