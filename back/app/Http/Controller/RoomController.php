@@ -987,18 +987,30 @@ class RoomController
                         break;
 
                     case 'rm -rf':
-                        $description = "{$attacker->character->name} 「rm -rf」を発動、バトルを終了させた";
-                        $room->update([
-                            'status' => 'finished',
-                            'winnerUserId' => $userId,
-                        ]);
-                        RoomLog::create([
-                            'roomId' => $roomId,
-                            'actionType' => 'victory',
-                            'actorUserId' => $userId,
-                            'actorCharacterId' => $attacker->characterId,
-                            'description' => "{$attacker->character->name}が「rm -rf」を発動、{$room->hostUser->name} の勝利",
-                        ]);
+                        $targets = RoomCharacter::with('character')
+                        ->where('roomId', $roomId)
+                        ->where('userId', '!=', $userId)
+                        ->where('isDead', false)
+                        ->get();
+                        $damage = $attacker->power * 2;
+                        foreach ($targets as $target) {
+                            // $newLife = max(0, $target->life - $damage);
+                            $newLife = 0;
+                            $target->update([
+                                'life' => $newLife,
+                                'isDead' => $newLife <= 0,
+                            ]);
+                            if ($newLife <= 0) {
+                                RoomLog::create([
+                                    'roomId' => $roomId,
+                                    'actionType' => 'death',
+                                    'targetUserId' => $target->userId,
+                                    'targetCharacterId' => $target->characterId,
+                                    'description' => "{$target->character->name} がダウンしました",
+                                ]);
+                            }
+                        }
+                        $description = "{$attacker->character->name} が「rm -rf」を発動、ゲームに勝利";
                         break;
 
                     case 'Gopherくんはオコている': // Go用（全体攻撃の変形）
@@ -1096,7 +1108,7 @@ class RoomController
                         throw new Exception('未実装のスペシャルスキルです');
                 }
 
-                if ($skillType !== 'rm -rf') {
+                if ($skillType !== 'rm -rfff') {
                     $attacker->update(['specialUsed' => true]);
                     RoomLog::create([
                         'roomId' => $roomId,
