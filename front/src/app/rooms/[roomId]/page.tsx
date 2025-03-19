@@ -75,7 +75,7 @@ export default function RoomDetailPage() {
   ) : room.status === "battling" ? (
     <Battle room={room} />
   ) : room.status === "finish" && room.winUserId == user.uid ? (
-    <Victory roomId={room.id} />
+    <Victory room={room} />
   ) : (
     <Defeat />
   );
