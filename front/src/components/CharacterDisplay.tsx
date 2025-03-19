@@ -63,7 +63,9 @@ export const CharacterDisplay = React.memo(
                   style={{
                     width: 130 + i * 5,
                     height: 130 + i * 5,
-                    border: "1px solid rgba(16, 185, 129, 0.7)",
+                    border: isEnemy
+                      ? "1px solid rgba(239, 68, 68, 0.7)"
+                      : "1px solid rgba(16, 185, 129, 0.7)",
                     borderRadius: "5%",
                     zIndex: -1,
                   }}
@@ -88,7 +90,9 @@ export const CharacterDisplay = React.memo(
                     width: 140 + i * 20,
                     height: 140 + i * 20,
                     borderRadius: "40% 60% 70% 30% / 40% 50% 60% 50%",
-                    background: `radial-gradient(circle, rgba(34, 197, 94, ${0.4 - i * 0.1}) 0%, rgba(21, 128, 61, ${0.4 - i * 0.05}) 70%, transparent 100%)`,
+                    background: isEnemy
+                      ? `radial-gradient(circle, rgba(239, 68, 68, ${0.3 - i * 0.1}) 0%, rgba(220, 38, 38, ${0.3 - i * 0.05}) 70%, transparent 100%)`
+                      : `radial-gradient(circle, rgba(34, 197, 94, ${0.3 - i * 0.1}) 0%, rgba(21, 128, 61, ${0.3 - i * 0.05}) 70%, transparent 100%)`,
                     filter: "blur(8px)",
                     zIndex: -1,
                   }}
@@ -118,10 +122,15 @@ export const CharacterDisplay = React.memo(
               <motion.div
                 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[160px] h-[160px]"
                 style={{
-                  background: `
-                    radial-gradient(circle at 50% 50%, transparent 50%, rgba(16, 185, 129, 0.5) 50.5%, transparent 51%),
-                    radial-gradient(circle at 50% 50%, transparent 50%, rgba(16, 185, 129, 0.5) 50.5%, transparent 51%)
-                  `,
+                  background: isEnemy
+                    ? `
+                      radial-gradient(circle at 50% 50%, transparent 50%, rgba(239, 68, 68, 0.5) 50.5%, transparent 51%),
+                      radial-gradient(circle at 50% 50%, transparent 50%, rgba(239, 68, 68, 0.5) 50.5%, transparent 51%)
+                    `
+                    : `
+                      radial-gradient(circle at 50% 50%, transparent 50%, rgba(16, 185, 129, 0.5) 50.5%, transparent 51%),
+                      radial-gradient(circle at 50% 50%, transparent 50%, rgba(16, 185, 129, 0.5) 50.5%, transparent 51%)
+                    `,
                   backgroundSize: "20px 20px",
                   backgroundPosition: "0 0, 10px 10px",
                   zIndex: -1,
