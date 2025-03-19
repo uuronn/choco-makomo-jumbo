@@ -45,6 +45,7 @@ class UserCharacterController
                 'activeSkillId' => $character->activeSkillId,
                 'passiveSkillId' => $character->passiveSkillId,
                 'partySkillId' => $character->partySkillId,
+                'specialSkillId' => $character->specialSkillId,
                 'image_url' => $character->image_url,
             ];
         });
@@ -81,7 +82,7 @@ class UserCharacterController
             $speed = $request->speed;
             $totalIncrease = $life + $power + $speed;
 
-            if ($userCharacter->level + $totalIncrease > 100) return response()->json(['message' => 'レベルが最大値（100）を超えます'], 400);
+            if ($userCharacter->level + $totalIncrease > 1000) return response()->json(['message' => 'レベルが最大値（1000）を超えます'], 400);
 
             // レベルアップ処理
             $updated = DB::transaction(function () use ($userCharacter, $life, $power, $speed, $totalIncrease) {

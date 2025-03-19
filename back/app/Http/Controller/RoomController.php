@@ -117,6 +117,118 @@ class RoomController
             $logs[] = "{$hostUser->name} が「DBマスター」を発動、最大HPが30%アップ";
         }
 
+        // 7. HTML5トリオ（html, CSS, Javascript）
+        if (!array_diff(['html', 'CSS', 'Javascript'], $characterNames)) {
+            $powerMultiplier *= 1.10;
+            $lifeMultiplier *= 1.15;
+            $evasionMultiplier *= 1.10;
+            $logs[] = "{$hostUser->name} が「HTML5トリオ」を発動、攻撃力10%アップ、最大HP15%アップ、回避率10%アップ";
+        }
+
+        // 8. OSトリオ（windows, Mac, Linux）
+        if (!array_diff(['windows', 'Mac', 'Linux'], $characterNames)) {
+            $powerMultiplier *= 1.15;
+            $speedMultiplier *= 1.10;
+            $lifeMultiplier *= 1.10;
+            $logs[] = "{$hostUser->name} が「OSトリオ」を発動、攻撃力15%アップ、スピード10%アップ、最大HP10%アップ";
+        }
+
+        // 9. サーバーサイド言語（PHP, Go, Ruby）
+        $serverSideLangs = ['PHP', 'Go', 'Ruby'];
+        if (count(array_intersect($characterNames, $serverSideLangs)) >= 2) {
+            $powerMultiplier *= 1.08;
+            $speedMultiplier *= 1.05;
+            $logs[] = "{$hostUser->name} が「サーバーサイド言語」を発動、攻撃力8%アップ、スピード5%アップ";
+        }
+
+        // 10. 高速開発（Swift, Javascript, Ruby）
+        $fastDevLangs = ['Swift', 'Javascript', 'Ruby'];
+        if (count(array_intersect($characterNames, $fastDevLangs)) >= 2) {
+            $speedMultiplier *= 1.15;
+            $evasionMultiplier *= 1.10;
+            $logs[] = "{$hostUser->name} が「高速開発」を発動、スピード15%アップ、回避率10%アップ";
+        }
+
+        // 11. ゲーム開発（Unity, Javascript）
+        if (in_array('Unity', $characterNames) && in_array('Javascript', $characterNames)) {
+            $powerMultiplier *= 1.12;
+            $speedMultiplier *= 1.08;
+            $logs[] = "{$hostUser->name} が「ゲーム開発」を発動、攻撃力12%アップ、スピード8%アップ";
+        }
+
+        // 12. フロントエンドマスター（html, CSS, Vue）
+        if (!array_diff(['html', 'CSS', 'Vue'], $characterNames)) {
+            $speedMultiplier *= 1.12;
+            $evasionMultiplier *= 1.15;
+            $logs[] = "{$hostUser->name} が「フロントエンドマスター」を発動、スピード12%アップ、回避率15%アップ";
+        }
+
+        // 13. データベース連携（Mysql, PHP）
+        if (in_array('Mysql', $characterNames) && in_array('PHP', $characterNames)) {
+            $powerMultiplier *= 1.10;
+            $lifeMultiplier *= 1.08;
+            $logs[] = "{$hostUser->name} が「データベース連携」を発動、攻撃力10%アップ、最大HP8%アップ";
+        }
+
+        // 14. コンテナ最適化（Docker, Go）
+        if (in_array('Docker', $characterNames) && in_array('Go', $characterNames)) {
+            $speedMultiplier *= 1.10;
+            $evasionMultiplier *= 1.08;
+            $logs[] = "{$hostUser->name} が「コンテナ最適化」を発動、スピード10%アップ、回避率8%アップ";
+        }
+
+        // 15. モダンスタック（React, Typescript）
+        if (in_array('React', $characterNames) && in_array('Typescript', $characterNames)) {
+            $powerMultiplier *= 1.08;
+            $speedMultiplier *= 1.10;
+            $logs[] = "{$hostUser->name} が「モダンスタック」を発動、攻撃力8%アップ、スピード10%アップ";
+        }
+
+        // 16. インフラマスター（AWS, Docker, Linux）
+        if (!array_diff(['AWS', 'Docker', 'Linux'], $characterNames)) {
+            $powerMultiplier *= 1.12;
+            $lifeMultiplier *= 1.10;
+            $speedMultiplier *= 1.08;
+            $logs[] = "{$hostUser->name} が「インフラマスター」を発動、攻撃力12%アップ、最大HP10%アップ、スピード8%アップ";
+        }
+
+        // 17. モバイル開発（Swift, React）
+        if (in_array('Swift', $characterNames) && in_array('React', $characterNames)) {
+            $speedMultiplier *= 1.12;
+            $evasionMultiplier *= 1.10;
+            $logs[] = "{$hostUser->name} が「モバイル開発」を発動、スピード12%アップ、回避率10%アップ";
+        }
+
+        // 18. データベーストリオ（Mysql, Postgres, Supabase）
+        if (!array_diff(['Mysql', 'Postgres', 'Supabase'], $characterNames)) {
+            $lifeMultiplier *= 1.15;
+            $powerMultiplier *= 1.10;
+            $logs[] = "{$hostUser->name} が「データベーストリオ」を発動、最大HP15%アップ、攻撃力10%アップ";
+        }
+
+        // 19. クラウドネイティブ（AWS, Docker, Supabase）
+        if (!array_diff(['AWS', 'Docker', 'Supabase'], $characterNames)) {
+            $speedMultiplier *= 1.10;
+            $lifeMultiplier *= 1.12;
+            $evasionMultiplier *= 1.08;
+            $logs[] = "{$hostUser->name} が「クラウドネイティブ」を発動、スピード10%アップ、最大HP12%アップ、回避率8%アップ";
+        }
+
+        // 20. レガシーアップデート（PHP, html, CSS）
+        if (!array_diff(['PHP', 'html', 'CSS'], $characterNames)) {
+            $powerMultiplier *= 1.08;
+            $lifeMultiplier *= 1.15;
+            $logs[] = "{$hostUser->name} が「レガシーアップデート」を発動、攻撃力8%アップ、最大HP15%アップ";
+        }
+
+        // 21. フルスタック（Javascript, Ruby, Docker）
+        if (!array_diff(['Javascript', 'Ruby', 'Docker'], $characterNames)) {
+            $powerMultiplier *= 1.10;
+            $speedMultiplier *= 1.08;
+            $lifeMultiplier *= 1.10;
+            $logs[] = "{$hostUser->name} が「フルスタック」を発動、攻撃力10%アップ、スピード8%アップ、最大HP10%アップ";
+        }
+
         return [
             'powerMultiplier' => $powerMultiplier,
             'speedMultiplier' => $speedMultiplier,
@@ -675,6 +787,7 @@ class RoomController
         }
     }
 
+
     /**
      * キャラクターがスペシャルスキルを使用する
      */
@@ -722,14 +835,14 @@ class RoomController
 
                 $description = '';
                 $targets = [];
-                $isSingleTarget = in_array($skillType, ['boost_attack', 'sacrifice', 'single_heal']);
+                $isSingleTarget = in_array($skillType, ['単体攻撃力強化', '単体犠牲攻撃', '単体回復']);
 
                 if ($isSingleTarget && !$targetCharacterId) {
                     throw new Exception('単体スキルの場合、ターゲットを指定してください');
                 }
 
                 switch ($skillType) {
-                    case 'boost_attack':
+                    case '単体攻撃力強化': // 元: boost_attack
                         $target = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', $userId)
@@ -742,7 +855,7 @@ class RoomController
                         $targets = [$target];
                         break;
 
-                    case 'sacrifice':
+                    case '単体犠牲攻撃': // 元: sacrifice
                         $target = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('id', $targetCharacterId)
@@ -780,7 +893,7 @@ class RoomController
                         ]);
                         break;
 
-                    case '全体攻撃':
+                    case '全体攻撃': // 元: area_attack
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', '!=', $userId)
@@ -806,7 +919,7 @@ class RoomController
                         $description = "{$attacker->character->name} が全体攻撃で {$damage} ダメージ";
                         break;
 
-                    case '味方全体回復':
+                    case '全体回復': // 元: heal_all
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', $userId)
@@ -819,7 +932,7 @@ class RoomController
                         $description = "{$attacker->character->name} が味方全員を全回復";
                         break;
 
-                    case 'stun_all':
+                    case '全体スタン': // 元: stun_all
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', '!=', $userId)
@@ -831,7 +944,7 @@ class RoomController
                         $description = "{$attacker->character->name} が敵全員を次ターン行動不能に";
                         break;
 
-                    case 'single_heal':
+                    case 'kill': // 元: single_heal
                         $target = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', $userId)
@@ -843,6 +956,60 @@ class RoomController
                         $target->update(['life' => $newLife]);
                         $description = "{$attacker->character->name} が {$target->character->name} を1000回復";
                         $targets = [$target];
+                        break;
+
+                    case 'kill': // 元: skip_all_turns
+                        $targets = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
+                            ->where('userId', '!=', $userId)
+                            ->where('isDead', false)
+                            ->get();
+                        foreach ($targets as $target) {
+                            $target->update(['isActive' => false]);
+                        }
+                        $description = "{$attacker->character->name} が敵全員の次ターンを飛ばした";
+                        break;
+                    case 'rm -rf': // 元: skip_all_turns
+                        $targets = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
+                            ->where('userId', '!=', $userId)
+                            ->where('isDead', false)
+                            ->get();
+                        foreach ($targets as $target) {
+                            $target->update(['isActive' => false]);
+                        }
+                        $description = "{$attacker->character->name} が敵全員の次ターンを飛ばした";
+                        break;
+
+                    case 'SQLインジェクション': // 元: swap_power_speed
+                        $targets = RoomCharacter::with('character')
+                            ->where('roomId', $roomId)
+                            ->where('userId', '!=', $userId)
+                            ->where('isDead', false)
+                            ->get();
+                        foreach ($targets as $target) {
+                            $oldPower = $target->power;
+                            $oldSpeed = $target->speed;
+                            $target->update([
+                                'power' => $oldSpeed,
+                                'speed' => $oldPower,
+                            ]);
+                        }
+                        $description = "{$attacker->character->name} が敵全員の攻撃力とスピードを入れ替えた";
+                        break;
+                    case 'rm -rf':
+                        $description = "{$attacker->character->name} が「rm -rf」を発動し、バトルを終了させた";
+                        $room->update([
+                            'status' => 'finished',
+                            'winnerUserId' => $userId, // スキル使用者が勝利
+                        ]);
+                        RoomLog::create([
+                            'roomId' => $roomId,
+                            'actionType' => 'victory',
+                            'actorUserId' => $userId,
+                            'actorCharacterId' => $attacker->characterId,
+                            'description' => "{$attacker->character->name} の「rm -rf」により {$room->hostUser->name} の勝利",
+                        ]);
                         break;
 
                     default:
@@ -876,6 +1043,8 @@ class RoomController
                         'userId' => $t->userId,
                         'life' => $t->life,
                         'isDead' => $t->isDead,
+                        'power' => $t->power,
+                        'speed' => $t->speed,
                     ]),
                     'next_turn_user_id' => $nextTurn ? $nextTurn->userId : null,
                     'next_turn_character_id' => $nextTurn ? $nextTurn->characterId : null,
