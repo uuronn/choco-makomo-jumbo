@@ -65,7 +65,7 @@ class RoomController
         $logs = [];
 
         // 1. 三大フレームワーク
-        if (!array_diff(['vue', 'react', 'angular'], $characterNames)) {
+        if (!array_diff(['Vue', 'React', 'Angular'], $characterNames)) {
             $powerMultiplier *= 1.10;
             $speedMultiplier *= 1.10;
             $lifeMultiplier *= 1.10;
@@ -82,9 +82,9 @@ class RoomController
         }
 
         // 3. 型安全
-        if (in_array('typescript', $characterNames) &&
-            (in_array('vue', $characterNames) || in_array('react', $characterNames) ||
-            in_array('angular', $characterNames) || in_array('javascript', $characterNames))) {
+        if (in_array('Typescript', $characterNames) &&
+            (in_array('Vue', $characterNames) || in_array('React', $characterNames) ||
+            in_array('Angular', $characterNames) || in_array('Javascript', $characterNames))) {
             $powerMultiplier *= 1.05;
             $speedMultiplier *= 1.05;
             $evasionMultiplier *= 1.20;
@@ -92,7 +92,7 @@ class RoomController
         }
 
         // 4. ハイパーバイザー型
-        if (in_array('docker', $characterNames) && count($characterNames) >= 2) {
+        if (in_array('Docker', $characterNames) && count($characterNames) >= 2) {
             $powerMultiplier *= 1.07;
             $speedMultiplier *= 1.07;
             $evasionMultiplier *= 1.07;
@@ -100,7 +100,7 @@ class RoomController
         }
 
         // 5. WSL2
-        $osCharacters = ['linux', 'macos', 'unix'];
+        $osCharacters = ['Linux', 'Mac'];
         if (in_array('windows', $characterNames) &&
             count(array_intersect($characterNames, $osCharacters)) == 0 &&
             count($characterNames) >= 2) {
@@ -111,7 +111,7 @@ class RoomController
         }
 
         // 6. DBマスター
-        $dbCharacters = ['mysql', 'postgres', 'sqlite', 'mongodb'];
+        $dbCharacters = ['Mysql', 'Postgres', 'Supabase'];
         if (count(array_intersect($characterNames, $dbCharacters)) > 0) {
             $lifeMultiplier *= 1.30;
             $logs[] = "{$hostUser->name} が「DBマスター」を発動、最大HPが30%アップ";

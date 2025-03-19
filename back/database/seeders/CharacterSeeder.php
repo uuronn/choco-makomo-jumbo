@@ -10,18 +10,7 @@ class CharacterSeeder extends Seeder
     public function run(): void
     {
         $characterList = [
-            // [
-            //     'name' => 'Ruby',
-            //     'type' => '言語',
-            //     'rarity' => 5,
-            //     'base_power' => 1000,
-            //     'base_life' => 2000,
-            //     'base_speed' => 80,
-            //     'base_evasion' => 7,
-            //     'specialSkillType' => 'boost_attack', // 味方単体の攻撃力アップ / 日本語: '単体攻撃力強化'
-            //     'specialTurnRequirement' => 5,
-            //     'image_url' => '/character/ruby.webp',
-            // ],
+            // 元々のキャラ（スペシャルスキルを調整）
             [
                 'name' => 'PHP',
                 'type' => '言語',
@@ -30,7 +19,7 @@ class CharacterSeeder extends Seeder
                 'base_life' => 1000,
                 'base_speed' => 60,
                 'base_evasion' => 4,
-                'specialSkillType' => '全体攻撃', // 敵全体にダメージ / 日本語: '全体攻撃'
+                'specialSkillType' => '全体攻撃', // 全体攻撃
                 'specialTurnRequirement' => 6,
                 'image_url' => '/character/php.webp',
             ],
@@ -42,7 +31,7 @@ class CharacterSeeder extends Seeder
                 'base_life' => 1000,
                 'base_speed' => 70,
                 'base_evasion' => 6,
-                'specialSkillType' => '味方全体回復', // 味方全体を回復 / 日本語: '全体回復'
+                'specialSkillType' => '味方全体回復', // 味方全体回復
                 'specialTurnRequirement' => 4,
                 'image_url' => '/character/swift.webp',
             ],
@@ -54,46 +43,191 @@ class CharacterSeeder extends Seeder
                 'base_life' => 1000,
                 'base_speed' => 10,
                 'base_evasion' => 2,
-                'specialSkillType' => null, // スキルなし / 日本語: null
+                'specialSkillType' => null, // スキルなし
                 'specialTurnRequirement' => 0,
                 'image_url' => '/character/css.webp',
             ],
-            // [
-            //     'name' => 'Go',
-            //     'type' => '言語',
-            //     'rarity' => 6,
-            //     'base_power' => 1800,
-            //     'base_life' => 2000,
-            //     'base_speed' => 100,
-            //     'base_evasion' => 9,
-            //     'specialSkillType' => 'sacrifice', // 単体大ダメージ + 自己犠牲 / 日本語: '単体犠牲攻撃'
-            //     'specialTurnRequirement' => 7,
-            //     'image_url' => '/character/go.webp',
-            // ],
-            // [
-            //     'name' => 'html',
-            //     'type' => '言語',
-            //     'rarity' => 5,
-            //     'base_power' => 300,
-            //     'base_life' => 1000,
-            //     'base_speed' => 100,
-            //     'base_evasion' => 8,
-            //     'specialSkillType' => 'single_heal', // 味方単体を回復 / 日本語: '単体回復'（新規追加）
-            //     'specialTurnRequirement' => 3,
-            //     'image_url' => '/character/html.webp',
-            // ],
-            // [
-            //     'name' => 'node.js',
-            //     'type' => '実行環境',
-            //     'rarity' => 6,
-            //     'base_power' => 3100,
-            //     'base_life' => 4000,
-            //     'base_speed' => 100,
-            //     'base_evasion' => 9,
-            //     'specialSkillType' => 'stun_all', // 敵全体をスタン / 日本語: '全体スタン'
-            //     'specialTurnRequirement' => 8,
-            //     'image_url' => '/character/nodejs.webp',
-            // ],
+            [
+                'name' => 'Go',
+                'type' => '言語',
+                'rarity' => 6,
+                'base_power' => 1800,
+                'base_life' => 2000,
+                'base_speed' => 100,
+                'base_evasion' => 9,
+                'specialSkillType' => '全体攻撃', // 全体攻撃（sacrificeから変更）
+                'specialTurnRequirement' => 7,
+                'image_url' => '/character/go.webp',
+            ],
+            [
+                'name' => 'html',
+                'type' => '言語',
+                'rarity' => 5,
+                'base_power' => 300,
+                'base_life' => 1000,
+                'base_speed' => 100,
+                'base_evasion' => 8,
+                'specialSkillType' => '味方全体回復', // 味方全体回復（single_healから変更）
+                'specialTurnRequirement' => 3,
+                'image_url' => '/character/html.webp',
+            ],
+            // スキル用テストデータ追加（小文字統一）
+            [
+                'name' => 'Vue',
+                'type' => 'フレームワーク',
+                'rarity' => 4,
+                'base_power' => 1100,
+                'base_life' => 2000,
+                'base_speed' => 140,
+                'base_evasion' => 8,
+                'specialSkillType' => null, // スキルなし
+                'specialTurnRequirement' => 0,
+                'image_url' => '/character/vue.webp',
+            ],
+            [
+                'name' => 'React',
+                'type' => 'フレームワーク',
+                'rarity' => 2,
+                'base_power' => 1100,
+                'base_life' => 2000,
+                'base_speed' => 200,
+                'base_evasion' => 10,
+                'specialSkillType' => '全体攻撃', // 全体攻撃
+                'specialTurnRequirement' => 4,
+                'image_url' => '/character/react.webp',
+            ],
+            [
+                'name' => 'Angular',
+                'type' => 'フレームワーク',
+                'rarity' => 4,
+                'base_power' => 1000,
+                'base_life' => 2000,
+                'base_speed' => 120,
+                'base_evasion' => 7,
+                'specialSkillType' => '味方全体回復', // 味方全体回復
+                'specialTurnRequirement' => 4,
+                'image_url' => '/character/angular.webp',
+            ],
+            [
+                'name' => 'aws',
+                'type' => 'クラウド',
+                'rarity' => 5,
+                'base_power' => 2000,
+                'base_life' => 3000,
+                'base_speed' => 90,
+                'base_evasion' => 6,
+                'specialSkillType' => null, // スキルなし
+                'specialTurnRequirement' => 0,
+                'image_url' => '/character/aws.webp',
+            ],
+            [
+                'name' => 'GCP',
+                'type' => 'クラウド',
+                'rarity' => 5,
+                'base_power' => 1000,
+                'base_life' => 2000,
+                'base_speed' => 130,
+                'base_evasion' => 8,
+                'specialSkillType' => null, // スキルなし
+                'specialTurnRequirement' => 0,
+                'image_url' => '/character/gcp.webp',
+            ],
+            [
+                'name' => 'azure',
+                'type' => 'クラウド',
+                'rarity' => 5,
+                'base_power' => 1500,
+                'base_life' => 2000,
+                'base_speed' => 90,
+                'base_evasion' => 6,
+                'specialSkillType' => null, // スキルなし
+                'specialTurnRequirement' => 0,
+                'image_url' => '/character/azure.webp',
+            ],
+            [
+                'name' => 'Typescript',
+                'type' => '言語',
+                'rarity' => 4,
+                'base_power' => 1200,
+                'base_life' => 2000,
+                'base_speed' => 130,
+                'base_evasion' => 8,
+                'specialSkillType' => '全体攻撃', // 全体攻撃
+                'specialTurnRequirement' => 7,
+                'image_url' => '/character/typescript.webp',
+            ],
+            [
+                'name' => 'Docker',
+                'type' => 'コンテナー',
+                'rarity' => 4,
+                'base_power' => 700,
+                'base_life' => 1000,
+                'base_speed' => 60,
+                'base_evasion' => 5,
+                'specialSkillType' => null, // スキルなし
+                'specialTurnRequirement' => 0,
+                'image_url' => '/character/docker.webp',
+            ],
+            [
+                'name' => 'windows',
+                'type' => 'オペレーティングシステム',
+                'rarity' => 3,
+                'base_power' => 700,
+                'base_life' => 1000,
+                'base_speed' => 60,
+                'base_evasion' => 4,
+                'specialSkillType' => '味方全体回復', // 味方全体回復
+                'specialTurnRequirement' => 5,
+                'image_url' => '/character/windows.webp',
+            ],
+            [
+                'name' => 'Mysql',
+                'type' => 'データベース',
+                'rarity' => 2,
+                'base_power' => 600,
+                'base_life' => 1000,
+                'base_speed' => 50,
+                'base_evasion' => 3,
+                'specialSkillType' => null, // スキルなし
+                'specialTurnRequirement' => 0,
+                'image_url' => '/character/mysql.webp',
+            ],
+            [
+                'name' => 'Javascript',
+                'type' => '言語',
+                'rarity' => 4,
+                'base_power' => 1200,
+                'base_life' => 2000,
+                'base_speed' => 130,
+                'base_evasion' => 8,
+                'specialSkillType' => null,
+                'specialTurnRequirement' => 0,
+                'image_url' => '/character/javascript.webp',
+            ],
+            [
+                'name' => 'Postgres',
+                'type' => 'データベース',
+                'rarity' => 3,
+                'base_power' => 700,
+                'base_life' => 1000,
+                'base_speed' => 65,
+                'base_evasion' => 4,
+                'specialSkillType' => null,
+                'specialTurnRequirement' => 0,
+                'image_url' => '/character/postgresql.webp',
+            ],
+            [
+                'name' => 'Supabase',
+                'type' => 'データベース',
+                'rarity' => 4,
+                'base_power' => 900,
+                'base_life' => 1000,
+                'base_speed' => 75,
+                'base_evasion' => 5,
+                'specialSkillType' => null,
+                'specialTurnRequirement' => 0,
+                'image_url' => '/character/supabase.webp',
+            ],
         ];
         // $characterList = [
         //     [
@@ -181,7 +315,7 @@ class CharacterSeeder extends Seeder
         //         'image_url' => '/character/nodejs.webp',
         //     ],
         //     [
-        //         'name' => 'react',
+        //         'name' => 'React',
         //         'type' => 'フレームワーク',
         //         'rarity' => 2,
         //         'base_power' => 1100,
@@ -229,7 +363,7 @@ class CharacterSeeder extends Seeder
         //         'image_url' => '/character/aws.webp',
         //     ],
         //     [
-        //         'name' => 'docker',
+        //         'name' => 'Docker',
         //         'type' => 'コンテナー',
         //         'rarity' => 4,
         //         'base_power' => 700,
@@ -241,7 +375,7 @@ class CharacterSeeder extends Seeder
         //         'image_url' => '/character/docker.webp',
         //     ],
         //     [
-        //         'name' => 'mysql',
+        //         'name' => 'Mysql',
         //         'type' => 'データベース',
         //         'rarity' => 2,
         //         'base_power' => 600,
@@ -324,20 +458,9 @@ class CharacterSeeder extends Seeder
         //         'specialTurnRequirement' => 7,
         //         'image_url' => '/character/javascript.webp',
         //     ],
+        //
         //     [
-        //         'name' => 'postgresql',
-        //         'type' => 'データベース',
-        //         'rarity' => 3,
-        //         'base_power' => 700,
-        //         'base_life' => 1000,
-        //         'base_speed' => 65,
-        //         'base_evasion' => 4,
-        //         'specialSkillType' => 'single_heal', // 味方単体を回復
-        //         'specialTurnRequirement' => 4,
-        //         'image_url' => '/character/postgresql.webp',
-        //     ],
-        //     [
-        //         'name' => 'supabase',
+        //         'name' => 'Supabase',
         //         'type' => 'データベース',
         //         'rarity' => 4,
         //         'base_power' => 900,
@@ -361,7 +484,7 @@ class CharacterSeeder extends Seeder
         //         'image_url' => '/character/unity.webp',
         //     ],
         //     [
-        //         'name' => 'vue',
+        //         'name' => 'Vue',
         //         'type' => 'フレームワーク',
         //         'rarity' => 4,
         //         'base_power' => 1100,
@@ -373,7 +496,7 @@ class CharacterSeeder extends Seeder
         //         'image_url' => '/character/vue.webp',
         //     ],
         //     [
-        //         'name' => 'linux',
+        //         'name' => 'Linux',
         //         'type' => 'オペレーティングシステム',
         //         'rarity' => 4,
         //         'base_power' => 900,
@@ -385,7 +508,7 @@ class CharacterSeeder extends Seeder
         //         'image_url' => '/character/linux.webp',
         //     ],
         //     [
-        //         'name' => 'mac',
+        //         'name' => 'Mac',
         //         'type' => 'オペレーティングシステム',
         //         'rarity' => 3,
         //         'base_power' => 700,

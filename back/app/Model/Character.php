@@ -2,8 +2,8 @@
 
 namespace App\Model;
 
-use App\Model\Skill;
-use App\Skill\PartyPowerChainSkill;
+// use App\Model\Skill;
+// use App\Skill\PartyPowerChainSkill;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
