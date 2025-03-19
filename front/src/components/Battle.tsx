@@ -396,7 +396,8 @@ export default function Battle({ room }: BattleProps) {
             activeCharacter?.character.specialSkillType !== null &&
             (activeCharacter?.character.specialTurnRequirement ?? 0) -
               room.totalTurns <=
-              0
+              0 &&
+            activeCharacter?.specialUsed !== 1
               ? "bg-green-700 hover:bg-green-600 text-white"
               : "bg-gray-700 text-gray-400 cursor-not-allowed"
           } transition-colors`}
@@ -405,7 +406,8 @@ export default function Battle({ room }: BattleProps) {
             activeCharacter?.character.specialSkillType === null ||
             (activeCharacter?.character.specialTurnRequirement ?? 0) -
               room.totalTurns >
-              0
+              0 ||
+            activeCharacter?.specialUsed === 1
           }
         >
           <Zap size={20} />
