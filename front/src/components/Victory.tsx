@@ -8,11 +8,10 @@ import confetti from "canvas-confetti";
 import { LuSwords } from "react-icons/lu";
 import { useRouter } from "next/navigation";
 import { useUserContext } from "~/context/UserProvider";
+import { Room } from "~/type/room";
 
-export default function Victory({ roomId }: { roomId: string }) {
+export default function Victory({ room }: { room: Room }) {
   const [showScreen, setShowScreen] = useState(false);
-
-  const { user } = useUserContext();
 
   const router = useRouter();
 
@@ -30,7 +29,7 @@ export default function Victory({ roomId }: { roomId: string }) {
     }, 600);
     (async () => {
       await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${roomId}/delete`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/${room.hostUserId}/${room.id}/delete`,
         {
           method: "DELETE",
         },
