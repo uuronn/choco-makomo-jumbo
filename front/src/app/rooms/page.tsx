@@ -11,6 +11,8 @@ import { Character } from "~/type/character";
 import { SelectingRoom } from "~/type/room";
 import { FaLaptopCode } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { set } from "lodash";
+import { enqueueSnackbar } from "notistack";
 
 export default function GameInterface() {
   const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);
@@ -27,8 +29,8 @@ export default function GameInterface() {
     ) {
       setSelectedCharacters(
         selectedCharacters.filter(
-          (c) => c.characterId !== character.characterId,
-        ),
+          (c) => c.characterId !== character.characterId
+        )
       );
     } else if (selectedCharacters.length < 3) {
       setSelectedCharacters([...selectedCharacters, character]);
@@ -51,10 +53,10 @@ export default function GameInterface() {
         body: JSON.stringify({
           hostUserId: user.uid,
           characterIdList: selectedCharacters.map(
-            (character) => character.characterId,
+            (character) => character.characterId
           ),
         }),
-      },
+      }
     );
     const data = await res.json();
     router.push(`/rooms/${data.id}`);
@@ -70,11 +72,11 @@ export default function GameInterface() {
         body: JSON.stringify({
           roomId: selectedRoom?.id,
           characterIdList: selectedCharacters.map(
-            (character) => character.characterId,
+            (character) => character.characterId
           ),
           guestUserId: user.uid,
         }),
-      },
+      }
     );
 
     const data = await res.json();
@@ -87,18 +89,25 @@ export default function GameInterface() {
   useEffect(() => {
     const fetchRooms = async () => {
       const roomsRas = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`
       );
       const roomsData = await roomsRas.json();
       setRooms(roomsData);
     };
 
     fetchRooms(); // 初回フェッチ
-
-    const intervalId = setInterval(fetchRooms, 1000); // 1秒ごとにフェッチ
-
-    return () => clearInterval(intervalId); // クリーンアップ
   }, []);
+
+  const refreshRooms = async () => {
+    enqueueSnackbar('ルーム一覧を更新', {
+      variant: 'success',
+    })
+    const roomsRas = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`
+    );
+    const roomsData = await roomsRas.json();
+    setRooms(roomsData);
+  };
 
   return (
     <div className="h-screen bg-gray-900 text-white p-3 flex flex-col overflow-hidden pl-20">
@@ -186,10 +195,10 @@ export default function GameInterface() {
                       className={cn(
                         "flex flex-col justify-center items-center p-1.5 rounded-lg border transition-all cursor-pointer h-[150px] w-[150px]",
                         selectedCharacters.find(
-                          (c) => c.characterId === character.characterId,
+                          (c) => c.characterId === character.characterId
                         )
                           ? "bg-green-400/20 border-green-400"
-                          : "bg-black/30 border-green-400/20 hover:bg-green-400/10",
+                          : "bg-black/30 border-green-400/20 hover:bg-green-400/10"
                       )}
                       onClick={() => handleSelectCharacter(character)}
                     >
@@ -218,7 +227,13 @@ export default function GameInterface() {
       {/* ルーム選択セクション */}
       <section className="border border-green-400/30 rounded-lg p-3 backdrop-blur-sm backdrop-filter bg-black/20 h-[42%] overflow-hidden">
         <h2 className="text-lg font-bold mb-2 text-green-400 flex items-center">
-          <Users className="mr-2 h-5 w-5" /> ルーム選択
+          <Users className="mr-2 h-5 w-5" /> ルーム選択{" "}
+          <Button
+            onClick={refreshRooms}
+            className="ml-2 bg-green-400 text-black hover:bg-green-500 text-sm h-9"
+          >
+            更新
+          </Button>
         </h2>
 
         <div className="space-y-3 h-[calc(100%-40px)]">
@@ -228,7 +243,7 @@ export default function GameInterface() {
               {rooms
                 .filter(
                   (room) =>
-                    room.guest_user === null && room.host_user.id !== user?.uid,
+                    room.guest_user === null && room.host_user.id !== user?.uid
                 )
                 .map((room) => (
                   <div
@@ -237,7 +252,7 @@ export default function GameInterface() {
                       "flex flex-col rounded-lg border transition-all justify-center items-center cursor-pointer min-w-[200px]  min-h-[160px] overflow-hidden",
                       selectedRoom?.id === room.id
                         ? "bg-green-400/20 border-green-400"
-                        : "bg-black/30 border-green-400/20 hover:bg-green-400/10",
+                        : "bg-black/30 border-green-400/20 hover:bg-green-400/10"
                     )}
                     onClick={() => handleSelectRoom(room)}
                   >
