@@ -943,20 +943,6 @@ class RoomController
                         $description = "{$attacker->character->name} が敵全員を次ターン行動不能に";
                         break;
 
-                    case '単体回復':
-                        $target = RoomCharacter::with('character')
-                            ->where('roomId', $roomId)
-                            ->where('userId', $userId)
-                            ->where('id', $targetCharacterId)
-                            ->where('isDead', false)
-                            ->first();
-                        if (!$target) throw new Exception('対象が見つかりません');
-                        $newLife = min($target->maxLife, $target->life + 1000);
-                        $target->update(['life' => $newLife]);
-                        $description = "{$attacker->character->name} が {$target->character->name} を1000回復";
-                        $targets = [$target];
-                        break;
-
                     case 'JavaJavaすんなよ':
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
