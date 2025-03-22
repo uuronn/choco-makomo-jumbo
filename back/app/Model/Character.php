@@ -2,8 +2,6 @@
 
 namespace App\Model;
 
-// use App\Model\Skill;
-// use App\Skill\PartyPowerChainSkill;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -31,37 +29,4 @@ class Character extends Model
             }
         });
     }
-
-    // public function activeSkill()
-    // {
-    //     return $this->belongsTo(Skill::class, 'activeSkillId');
-    // }
-
-    // public function passiveSkill()
-    // {
-    //     return $this->belongsTo(Skill::class, 'passiveSkillId');
-    // }
-
-    // public function partySkill()
-    // {
-    //     return $this->belongsTo(Skill::class, 'partySkillId');
-    // }
-
-    // public function getSkillInstance($type)
-    // {
-    //     $skill = match ($type) {
-    //         'active' => $this->activeSkill,
-    //         'passive' => $this->passiveSkill,
-    //         'party' => $this->partySkill,
-    //         default => null,
-    //     };
-
-    //     if (!$skill) return null;
-
-    //     $skillMap = [
-    //         'party_power_chain' => PartyPowerChainSkill::class,
-    //     ];
-    //     $skillClass = $skillMap[$skill->effect_type] ?? null;
-    //     return $skillClass ? new $skillClass($this, $skill->effect_amount) : null;
-    // }
 }
