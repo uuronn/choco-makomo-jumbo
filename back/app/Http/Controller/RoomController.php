@@ -66,30 +66,28 @@ class RoomController
 
         // 1. 三大フレームワーク
         if (!array_diff(['Vue', 'React', 'Angular'], $characterNames)) {
-            $powerMultiplier *= 1.10;
-            $speedMultiplier *= 1.10;
-            $lifeMultiplier *= 1.10;
-            $evasionMultiplier *= 1.10;
-            $logs[] = "{$hostUser->name} が「三大フレームワーク」を発動、全ステータスが10%アップ";
+            $powerMultiplier *= 1.25;
+            $speedMultiplier *= 1.25;
+            $lifeMultiplier *= 1.25;
+            $evasionMultiplier *= 1.25;
+            $logs[] = "{$hostUser->name} が「三大フレームワーク」を発動、全ステータスが25%アップ";
         }
 
         // 2. 三大クラウド
         if (!array_diff(['AWS', 'GCP', 'Azure'], $characterNames)) {
-            $powerMultiplier *= 1.15;
-            $speedMultiplier *= 1.15;
-            $lifeMultiplier *= 1.15;
-            $logs[] = "{$hostUser->name} が「三大クラウド」を発動、最大HP、パワー、スピードが15%アップ";
+            $lifeMultiplier *= 1.60;
+            $logs[] = "{$hostUser->name} が「三大クラウド」を発動、最大HPが60%アップ";
         }
 
         // 3. 型安全
-        if (in_array('Typescript', $characterNames) &&
-            (in_array('Vue', $characterNames) || in_array('React', $characterNames) ||
-            in_array('Angular', $characterNames) || in_array('Javascript', $characterNames))) {
-            $powerMultiplier *= 1.05;
-            $speedMultiplier *= 1.05;
-            $evasionMultiplier *= 1.20;
-            $logs[] = "{$hostUser->name} が「型安全」を発動、攻撃力5%アップ、スピード5%アップ、回避率20%アップ";
-        }
+        // if (in_array('Typescript', $characterNames) &&
+        //     (in_array('Vue', $characterNames) || in_array('React', $characterNames) ||
+        //     in_array('Angular', $characterNames) || in_array('Javascript', $characterNames))) {
+        //     $powerMultiplier *= 1.05;
+        //     $speedMultiplier *= 1.05;
+        //     $evasionMultiplier *= 1.20;
+        //     $logs[] = "{$hostUser->name} が「型安全」を発動、攻撃力5%アップ、スピード5%アップ、回避率20%アップ";
+        // }
 
         // 4. ハイパーバイザー型
         if (in_array('Docker', $characterNames) && count($characterNames) >= 2) {
@@ -104,57 +102,58 @@ class RoomController
         if (in_array('windows', $characterNames) &&
             count(array_intersect($characterNames, $osCharacters)) == 0 &&
             count($characterNames) >= 2) {
-            $powerMultiplier *= 1.15;
-            $lifeMultiplier *= 1.15;
+            $powerMultiplier *= 1.17;
+            $lifeMultiplier *= 1.30;
             $speedMultiplier *= 0.80;
-            $logs[] = "{$hostUser->name} が「WSL2」を発動、最大HP15%アップ、パワー15%アップ、スピード20%ダウン";
+            $logs[] = "{$hostUser->name} が「WSL2」を発動、最大HP30%アップ、パワー17%アップ、スピード20%ダウン";
         }
 
         // 6. DBマスター
-        $dbCharacters = ['Mysql', 'Postgres', 'Supabase'];
-        if (count(array_intersect($characterNames, $dbCharacters)) > 0) {
-            $lifeMultiplier *= 1.30;
-            $logs[] = "{$hostUser->name} が「DBマスター」を発動、最大HPが30%アップ";
-        }
+        // $dbCharacters = ['Mysql', 'Postgres', 'Supabase'];
+        // if (count(array_intersect($characterNames, $dbCharacters)) > 0) {
+        //     $lifeMultiplier *= 1.30;
+        //     $logs[] = "{$hostUser->name} が「DBマスター」を発動、最大HPが30%アップ";
+        // }
 
         // 7. HTML5トリオ（html, CSS, Javascript）
         if (!array_diff(['html', 'CSS', 'Javascript'], $characterNames)) {
             $powerMultiplier *= 1.10;
-            $lifeMultiplier *= 1.15;
+            $lifeMultiplier *= 1.25;
             $evasionMultiplier *= 1.10;
-            $logs[] = "{$hostUser->name} が「HTML5トリオ」を発動、攻撃力10%アップ、最大HP15%アップ、回避率10%アップ";
+            $logs[] = "{$hostUser->name} が「HTML5トリオ」を発動、攻撃力10%アップ、最大HP25%アップ、回避率10%アップ";
         }
 
         // 8. OSトリオ（windows, Mac, Linux）
         if (!array_diff(['windows', 'Mac', 'Linux'], $characterNames)) {
             $powerMultiplier *= 1.15;
-            $speedMultiplier *= 1.10;
-            $lifeMultiplier *= 1.10;
-            $logs[] = "{$hostUser->name} が「OSトリオ」を発動、攻撃力15%アップ、スピード10%アップ、最大HP10%アップ";
+            $speedMultiplier *= 1.15;
+            $lifeMultiplier *= 1.15;
+            $evasionMultiplier *= 1.15;
+            $logs[] = "{$hostUser->name} が「OSトリオ」を発動、攻撃力15%アップ、スピード15%アップ、最大HP15%アップ、回避率15%アップ";
         }
 
         // 9. サーバーサイド言語（PHP, Go, Ruby）
         $serverSideLangs = ['PHP', 'Go', 'Ruby'];
         if (count(array_intersect($characterNames, $serverSideLangs)) >= 2) {
-            $powerMultiplier *= 1.08;
-            $speedMultiplier *= 1.05;
-            $logs[] = "{$hostUser->name} が「サーバーサイド言語」を発動、攻撃力8%アップ、スピード5%アップ";
+            $powerMultiplier *= 1.40;
+            $speedMultiplier *= 1.40;
+            $logs[] = "{$hostUser->name} が「サーバーサイド言語」を発動、攻撃力40%アップ、スピード40%アップ";
         }
 
         // 10. 高速開発（Swift, Javascript, Ruby）
-        $fastDevLangs = ['Swift', 'Javascript', 'Ruby'];
-        if (count(array_intersect($characterNames, $fastDevLangs)) >= 2) {
-            $speedMultiplier *= 1.15;
-            $evasionMultiplier *= 1.10;
-            $logs[] = "{$hostUser->name} が「高速開発」を発動、スピード15%アップ、回避率10%アップ";
-        }
+        // $fastDevLangs = ['Swift', 'Javascript', 'Ruby'];
+        // if (count(array_intersect($characterNames, $fastDevLangs)) >= 2) {
+        //     $speedMultiplier *= 1.15;
+        //     $evasionMultiplier *= 1.10;
+        //     $logs[] = "{$hostUser->name} が「高速開発」を発動、スピード15%アップ、回避率10%アップ";
+        // }
 
         // 11. ゲーム開発（Unity, Javascript）
-        if (in_array('Unity', $characterNames) && in_array('Javascript', $characterNames)) {
-            $powerMultiplier *= 1.12;
-            $speedMultiplier *= 1.08;
-            $logs[] = "{$hostUser->name} が「ゲーム開発」を発動、攻撃力12%アップ、スピード8%アップ";
-        }
+        // if (in_array('Unity', $characterNames) && in_array('Javascript', $characterNames)) {
+        //     $powerMultiplier *= 1.12;
+        //     $speedMultiplier *= 1.08;
+        //     $logs[] = "{$hostUser->name} が「ゲーム開発」を発動、攻撃力12%アップ、スピード8%アップ";
+        // }
 
         // 12. フロントエンドマスター（html, CSS, Vue）
         if (!array_diff(['html', 'CSS', 'Vue'], $characterNames)) {
@@ -179,54 +178,67 @@ class RoomController
 
         // 15. モダンスタック（React, Typescript）
         if (in_array('React', $characterNames) && in_array('Typescript', $characterNames)) {
-            $powerMultiplier *= 1.08;
-            $speedMultiplier *= 1.10;
-            $logs[] = "{$hostUser->name} が「モダンスタック」を発動、攻撃力8%アップ、スピード10%アップ";
+            $lifeMultiplier *= 1.15;
+            $powerMultiplier *= 1.15;
+            $speedMultiplier *= 1.15;
+            $logs[] = "{$hostUser->name} が「モダンスタック」を発動、最大HP15%アップ、攻撃力15%アップ、スピード15%アップ";
         }
 
         // 16. インフラマスター（AWS, Docker, Linux）
-        if (!array_diff(['AWS', 'Docker', 'Linux'], $characterNames)) {
-            $powerMultiplier *= 1.12;
-            $lifeMultiplier *= 1.10;
-            $speedMultiplier *= 1.08;
-            $logs[] = "{$hostUser->name} が「インフラマスター」を発動、攻撃力12%アップ、最大HP10%アップ、スピード8%アップ";
-        }
+        // if (!array_diff(['AWS', 'Docker', 'Linux'], $characterNames)) {
+        //     $powerMultiplier *= 1.12;
+        //     $lifeMultiplier *= 1.10;
+        //     $speedMultiplier *= 1.08;
+        //     $logs[] = "{$hostUser->name} が「インフラマスター」を発動、攻撃力12%アップ、最大HP10%アップ、スピード8%アップ";
+        // }
 
         // 17. モバイル開発（Swift, React）
-        if (in_array('Swift', $characterNames) && in_array('React', $characterNames)) {
-            $speedMultiplier *= 1.12;
-            $evasionMultiplier *= 1.10;
-            $logs[] = "{$hostUser->name} が「モバイル開発」を発動、スピード12%アップ、回避率10%アップ";
-        }
+        // if (in_array('Swift', $characterNames) && in_array('React', $characterNames)) {
+        //     $speedMultiplier *= 1.12;
+        //     $evasionMultiplier *= 1.10;
+        //     $logs[] = "{$hostUser->name} が「モバイル開発」を発動、スピード12%アップ、回避率10%アップ";
+        // }
 
         // 18. データベーストリオ（Mysql, Postgres, Supabase）
         if (!array_diff(['Mysql', 'Postgres', 'Supabase'], $characterNames)) {
-            $lifeMultiplier *= 1.15;
-            $powerMultiplier *= 1.10;
-            $logs[] = "{$hostUser->name} が「データベーストリオ」を発動、最大HP15%アップ、攻撃力10%アップ";
+            $lifeMultiplier *= 1.20;
+            $powerMultiplier *= 1.20;
+            $speedMultiplier *= 1.20;
+            $evasionMultiplier *= 1.20;
+            $logs[] = "{$hostUser->name} が「DBマスター」を発動、最大HP20%アップ、攻撃力20%アップ、スピード20%アップ、回避率20%アップ";
         }
 
         // 19. クラウドネイティブ（AWS, Docker, Supabase）
-        if (!array_diff(['AWS', 'Docker', 'Supabase'], $characterNames)) {
-            $speedMultiplier *= 1.10;
-            $lifeMultiplier *= 1.12;
-            $evasionMultiplier *= 1.08;
-            $logs[] = "{$hostUser->name} が「クラウドネイティブ」を発動、スピード10%アップ、最大HP12%アップ、回避率8%アップ";
-        }
+        // if (!array_diff(['AWS', 'Docker', 'Supabase'], $characterNames)) {
+        //     $speedMultiplier *= 1.10;
+        //     $lifeMultiplier *= 1.12;
+        //     $evasionMultiplier *= 1.08;
+        //     $logs[] = "{$hostUser->name} が「クラウドネイティブ」を発動、スピード10%アップ、最大HP12%アップ、回避率8%アップ";
+        // }
 
         // 20. レガシーアップデート（PHP, html, CSS）
         if (!array_diff(['PHP', 'html', 'CSS'], $characterNames)) {
-            $powerMultiplier *= 1.08;
+            $powerMultiplier *= 1.15;
             $lifeMultiplier *= 1.15;
-            $logs[] = "{$hostUser->name} が「レガシーアップデート」を発動、攻撃力8%アップ、最大HP15%アップ";
+            $logs[] = "{$hostUser->name} が「レガシーアップデート」を発動、攻撃力15%アップ、最大HP15%アップ";
         }
 
         // 21. フルスタック（Javascript, Ruby, Docker）
-        if (!array_diff(['Javascript', 'Ruby', 'Docker'], $characterNames)) {
-            $powerMultiplier *= 1.10;
-            $speedMultiplier *= 1.08;
-            $lifeMultiplier *= 1.10;
-            $logs[] = "{$hostUser->name} が「フルスタック」を発動、攻撃力10%アップ、スピード8%アップ、最大HP10%アップ";
+        // if (!array_diff(['Javascript', 'Ruby', 'Docker'], $characterNames)) {
+        //     $powerMultiplier *= 1.10;
+        //     $speedMultiplier *= 1.08;
+        //     $lifeMultiplier *= 1.10;
+        //     $logs[] = "{$hostUser->name} が「フルスタック」を発動、攻撃力10%アップ、スピード8%アップ、最大HP10%アップ";
+        // }
+
+        // 22. Ruby & Rails パーティ
+        if (count($characterNames) === 2 &&
+        in_array('Ruby', $characterNames) &&
+        in_array('Ruby on Rails', $characterNames)) {
+            $powerMultiplier *= 1.35;
+            $speedMultiplier *= 1.35;
+            $lifeMultiplier *= 1.35;
+            $logs[] = "{$hostUser->name} が「Railsマジック」を発動、攻撃力35%アップ、スピード35%アップ、最大HP35%アップ";
         }
 
         return [
@@ -972,7 +984,7 @@ class RoomController
                         $description = "{$attacker->character->name} が敵全員の攻撃力とスピードを入れ替えた";
                         break;
 
-                    case 'rm -rf':
+                    case 'rm -rf /':
                         $targets = RoomCharacter::with('character')
                         ->where('roomId', $roomId)
                         ->where('userId', '!=', $userId)
@@ -999,7 +1011,7 @@ class RoomController
                         $description = "{$attacker->character->name} が「rm -rf」を発動、ゲームに勝利";
                         break;
 
-                    case 'Gopherくんはオコている': // Go用（全体攻撃の変形）
+                    case 'ゴルーチンラッシュ': // Go用（全体攻撃の変形）
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', '!=', $userId)
@@ -1094,23 +1106,23 @@ class RoomController
                         throw new Exception('未実装のスペシャルスキルです');
                 }
 
-                if ($skillType !== 'rm -rfff') {
-                    $attacker->update(['specialUsed' => true]);
-                    RoomLog::create([
-                        'roomId' => $roomId,
-                        'actionType' => 'special',
-                        'actorUserId' => $attacker->userId,
-                        'actorCharacterId' => $attacker->characterId,
-                        'description' => $description,
-                    ]);
+                // if ($skillType !== 'rm -rfff') {
+                //     $attacker->update(['specialUsed' => true]);
+                //     RoomLog::create([
+                //         'roomId' => $roomId,
+                //         'actionType' => 'special',
+                //         'actorUserId' => $attacker->userId,
+                //         'actorCharacterId' => $attacker->characterId,
+                //         'description' => $description,
+                //     ]);
 
-                    $attacker->update(['isActive' => false]);
-                    $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
+                //     $attacker->update(['isActive' => false]);
+                //     $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
 
-                    $nextTurn = $this->updateNextTurn($roomId);
-                } else {
+                //     $nextTurn = $this->updateNextTurn($roomId);
+                // } else {
                     $nextTurn = null;
-                }
+                // }
 
                 $this->checkBattleEnd($room);
 
