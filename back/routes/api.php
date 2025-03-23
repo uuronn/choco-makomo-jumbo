@@ -12,7 +12,12 @@ use Illuminate\Support\Facades\Route;
 // ユーザー関連のAPI--------------------------------
 
 // ユーザーを作成する
-Route::post('/users', [UserController::class, 'create']);
+// Route::post('/users', [UserController::class, 'create']);
+
+Route::middleware('firebase.auth')->group(function () {
+    // ユーザーを作成する
+    Route::post('/users', [UserController::class, 'create']);
+});
 
 // すべてのユーザーを取得する
 // Route::get('/users', [UserController::class, 'all']);

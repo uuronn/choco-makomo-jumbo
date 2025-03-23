@@ -3,11 +3,11 @@
 import { signInWithPopup, signOut, type User } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import {
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useState,
+	createContext,
+	type ReactNode,
+	useContext,
+	useEffect,
+	useState,
 } from "react";
 import Loading from "~/components/Loading";
 import { auth, googleProvider } from "~/lib/firebase";
@@ -15,166 +15,171 @@ import { Character } from "~/type/character";
 import { SelectingRoom } from "~/type/room";
 
 const UserContext = createContext<{
-  handleSignIn: () => void;
-  handleSignOut: () => void;
-  user: User | null | undefined;
-  havingCharacters: Character[];
-  fetchCharacters: () => void;
+	handleSignIn: () => void;
+	handleSignOut: () => void;
+	user: User | null | undefined;
+	havingCharacters: Character[];
+	fetchCharacters: () => void;
 }>({
-  handleSignIn: () => {},
-  handleSignOut: () => {},
-  user: null,
-  havingCharacters: [],
-  fetchCharacters: () => {},
+	handleSignIn: () => {},
+	handleSignOut: () => {},
+	user: null,
+	havingCharacters: [],
+	fetchCharacters: () => {},
 });
 
 export function useUserContext() {
-  return useContext(UserContext);
+	return useContext(UserContext);
 }
 
 type UserProviderProps = {
-  children: ReactNode;
+	children: ReactNode;
 };
 
 export const UserProvider = ({ children }: UserProviderProps) => {
-  const [user, setUser] = useState<User | null>();
-  const [authenticating, setAuthenticating] = useState<boolean>(true);
-  const [havingCharacters, setHavingCharacters] = useState<Character[]>([]);
+	const [user, setUser] = useState<User | null>();
+	const [authenticating, setAuthenticating] = useState<boolean>(true);
+	const [havingCharacters, setHavingCharacters] = useState<Character[]>([]);
 
-  const router = useRouter();
+	const router = useRouter();
 
-  const handleSignIn = async () => {
-    try {
-      const res = await signInWithPopup(auth, googleProvider);
-      if (!res.user) {
-        throw new Error("Google Sign-In Error");
-      }
-      // 既存ユーザーか確認
-      const checkUser = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}`,
-      );
+	const handleSignIn = async () => {
+		try {
+			const res = await signInWithPopup(auth, googleProvider);
+			if (!res.user) {
+				throw new Error("Google Sign-In Error");
+			}
 
-      if (checkUser.ok) {
-        setUser(res.user);
-        router.push("/");
-        return;
-      }
+			// トークンを取得
+			const token = await res.user.getIdToken();
 
-      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: res.user.uid,
-          name: res.user.displayName,
-          email: res.user.email,
-          photoUrl: res.user.photoURL,
-        }),
-      });
-      setUser(res.user);
-      router.push("/");
-    } catch (error) {
-      console.error("Google Sign-In Error", error);
-    }
-  };
+			// 既存ユーザーか確認
+			const checkUser = await fetch(
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}`,
+			);
 
-  const handleSignOut = async () => {
-    await signOut(auth);
-    setUser(null);
-    router.push("/auth/signIn");
-  };
+			if (checkUser.ok) {
+				setUser(res.user);
+				router.push("/");
+				return;
+			}
 
-  const fetchCharacters = async () => {
-    (async () => {
-      if (!user) return;
-      // キャラクター一覧を取得
-      const charRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
-      );
-      const charData = await charRes.json();
-      setHavingCharacters(charData);
-    })();
-  };
+			await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({
+					id: res.user.uid,
+					name: res.user.displayName,
+					email: res.user.email,
+					photoUrl: res.user.photoURL,
+				}),
+			});
+			setUser(res.user);
+			router.push("/");
+		} catch (error) {
+			console.error("Google Sign-In Error", error);
+		}
+	};
 
-  useEffect(() => {
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        setUser(user);
+	const handleSignOut = async () => {
+		await signOut(auth);
+		setUser(null);
+		router.push("/auth/signIn");
+	};
 
-        // ユーザーが存在するか確認
-        const checkUser = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}`,
-        );
+	const fetchCharacters = async () => {
+		(async () => {
+			if (!user) return;
+			// キャラクター一覧を取得
+			const charRes = await fetch(
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
+			);
+			const charData = await charRes.json();
+			setHavingCharacters(charData);
+		})();
+	};
 
-        if (!checkUser.ok) {
-          // ユーザーが存在しない場合、新しいユーザーを作成
-          await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              id: user.uid,
-              name: user.displayName,
-              email: user.email,
-              photoUrl: user.photoURL,
-            }),
-          });
-        }
+	useEffect(() => {
+		auth.onAuthStateChanged(async (user) => {
+			if (user) {
+				setUser(user);
 
-        (async () => {
-          // キャラクター一覧を取得
-          const charRes = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
-          );
-          const charData = await charRes.json();
-          setHavingCharacters(charData);
-        })();
-        (async () => {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
-          );
-          const data = (await res.json()) as SelectingRoom[];
+				// ユーザーが存在するか確認
+				const checkUser = await fetch(
+					`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}`,
+				);
 
-          // ルームのホストユーザーIDと自分のUIDを比較
-          const matchingRoom = data.find(
-            (room) =>
-              room.host_user.id === user.uid ||
-              room.guest_user?.id === user.uid,
-          );
-          if (matchingRoom) {
-            router.push(`/rooms/${matchingRoom.id}`);
-          }
-        })();
-      } else {
-        setUser(null);
-      }
-    });
-  }, []);
+				if (!checkUser.ok) {
+					// ユーザーが存在しない場合、新しいユーザーを作成
+					await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							id: user.uid,
+							name: user.displayName,
+							email: user.email,
+							photoUrl: user.photoURL,
+						}),
+					});
+				}
 
-  useEffect(() => {
-    if (user === null) {
-      setAuthenticating(false);
-      router.push("/auth/signIn");
-    } else {
-      setAuthenticating(false);
-    }
-  }, [user, router]);
+				(async () => {
+					// キャラクター一覧を取得
+					const charRes = await fetch(
+						`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
+					);
+					const charData = await charRes.json();
+					setHavingCharacters(charData);
+				})();
+				(async () => {
+					const res = await fetch(
+						`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
+					);
+					const data = (await res.json()) as SelectingRoom[];
 
-  if (user === undefined) return <Loading message="認証中" />;
+					// ルームのホストユーザーIDと自分のUIDを比較
+					const matchingRoom = data.find(
+						(room) =>
+							room.host_user.id === user.uid ||
+							room.guest_user?.id === user.uid,
+					);
+					if (matchingRoom) {
+						router.push(`/rooms/${matchingRoom.id}`);
+					}
+				})();
+			} else {
+				setUser(null);
+			}
+		});
+	}, []);
 
-  return (
-    <UserContext.Provider
-      value={{
-        handleSignIn,
-        handleSignOut,
-        user,
-        havingCharacters,
-        fetchCharacters,
-      }}
-    >
-      {children}
-    </UserContext.Provider>
-  );
+	useEffect(() => {
+		if (user === null) {
+			setAuthenticating(false);
+			router.push("/auth/signIn");
+		} else {
+			setAuthenticating(false);
+		}
+	}, [user, router]);
+
+	if (user === undefined) return <Loading message="認証中" />;
+
+	return (
+		<UserContext.Provider
+			value={{
+				handleSignIn,
+				handleSignOut,
+				user,
+				havingCharacters,
+				fetchCharacters,
+			}}
+		>
+			{children}
+		</UserContext.Provider>
+	);
 };
