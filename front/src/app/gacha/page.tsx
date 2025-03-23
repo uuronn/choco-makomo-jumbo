@@ -124,7 +124,7 @@ export default function GachaScreen() {
 				className="text-2xl font-semibold mb-1 text-green-400"
 				style={{ position: "absolute", top: "20px", right: "20px" }}
 			>
-				技術ポイント:
+				技術ポイント:{" "}
 				<span className="text-emerald-400">{availablePoints}</span>
 			</div>
 			{/* Animated circuit lines */}
