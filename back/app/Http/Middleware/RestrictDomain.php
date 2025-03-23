@@ -22,6 +22,11 @@ class RestrictDomain
             return response()->json(['message' => 'Unauthorized domain'], 403);
         }
 
+        // if (!$request->header('Origin') || !str_ends_with(parse_url($request->header('Origin'), PHP_URL_HOST), 'https://choco-makomo-jumbo.vercel.app')) {
+        //     return response()->json(['message' => 'Unauthorized domain'], 403);
+        // }
+        // return $next($request);
+
         return $next($request);
     }
 }
