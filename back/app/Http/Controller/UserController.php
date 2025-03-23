@@ -113,12 +113,12 @@ class UserController
     {
 
            // トークンから取得したfirebase_uid
-           $firebaseUid = $request->attributes->get('firebase_uid');
+        //    $firebaseUid = $request->attributes->get('firebase_uid');
 
-           // リクエストのidとfirebase_uidが一致するか検証
-           if ($firebaseUid !== $userId) {
-               return response()->json(['message' => 'Unauthorized'], 403);
-           }
+        //    // リクエストのidとfirebase_uidが一致するか検証
+        //    if ($firebaseUid !== $userId) {
+        //        return response()->json(['message' => 'Unauthorized'], 403);
+        //    }
 
 
         $user = User::find($userId);

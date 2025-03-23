@@ -19,7 +19,7 @@ Route::middleware('firebase.auth')->group(function () {
     Route::post('/users', [UserController::class, 'create']);
 
     // ユーザーのpointを更新する
-    Route::put('/users/{userId}/pointtest', [UserController::class, 'updatePointTest']);
+    // Route::put('/users/{userId}/pointtest', [UserController::class, 'updatePointTest']);
 });
 
 Route::middleware('web')->group(function () {
@@ -28,7 +28,7 @@ Route::middleware('web')->group(function () {
     // });
 
 });
-Route::middleware(['restrict.domain'])->post('/users/{userId}/pointTest', [UserController::class, 'updatePointTest']);
+Route::middleware(['restrict.domain'])->put('/users/{userId}/pointTest', [UserController::class, 'updatePointTest']);
 
 // すべてのユーザーを取得する
 // Route::get('/users', [UserController::class, 'all']);
