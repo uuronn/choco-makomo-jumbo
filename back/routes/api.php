@@ -22,6 +22,14 @@ Route::middleware('firebase.auth')->group(function () {
     Route::put('/users/{userId}/pointtest', [UserController::class, 'updatePointTest']);
 });
 
+Route::middleware('web')->group(function () {
+    // Route::get('/csrf-token', function () {
+    //     return response()->json(['message' => 'CSRF token set']);
+    // });
+
+});
+Route::middleware(['restrict.domain'])->post('/users/{userId}/pointTest', [UserController::class, 'updatePointTest']);
+
 // すべてのユーザーを取得する
 // Route::get('/users', [UserController::class, 'all']);
 
