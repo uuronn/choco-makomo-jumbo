@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('firebase.auth')->group(function () {
     // ユーザーを作成する
     Route::post('/users', [UserController::class, 'create']);
+
+    // ユーザーのpointを更新する
+    Route::put('/users/{userId}/pointtest', [UserController::class, 'updatePointTest']);
 });
 
 // すべてのユーザーを取得する

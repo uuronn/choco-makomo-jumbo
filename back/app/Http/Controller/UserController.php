@@ -105,4 +105,33 @@ class UserController
 
         return response()->json($user, 200);
     }
+
+    /**
+     * ユーザーのpointを更新
+     */
+    public function updatePointTest(Request $request, $userId)
+    {
+
+           // トークンから取得したfirebase_uid
+           $firebaseUid = $request->attributes->get('firebase_uid');
+
+           // リクエストのidとfirebase_uidが一致するか検証
+           if ($firebaseUid !== $userId) {
+               return response()->json(['message' => 'Unauthorized'], 403);
+           }
+
+
+        $user = User::find($userId);
+
+        if (!$user) return response()->json(['message' => 'User not found'], 404);
+
+        $additionalPoint = $request->point;
+
+        if (!is_numeric($additionalPoint)) return response()->json(['message' => 'Point must be a number'], 422);
+
+        $user->point = $user->point + (int)$additionalPoint;
+        $user->save();
+
+        return response()->json($user, 200);
+    }
 }
