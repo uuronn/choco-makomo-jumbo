@@ -14,10 +14,14 @@ class RestrictDomain
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next)
-{
-    if (!$request->header('Origin') || !str_ends_with(parse_url($request->header('Origin'), PHP_URL_HOST), 'https://choco-makomo-jumbo.vercel.app')) {
-        return response()->json(['message' => 'Unauthorized domain'], 403);
+    {
+        $allowedDomain = 'choco-makomo-jumbo.vercel.app'; // ホスト名のみ
+        $originHost = parse_url($request->header('Origin'), PHP_URL_HOST);
+
+        if (!$originHost || !str_ends_with($originHost, $allowedDomain)) {
+            return response()->json(['message' => 'Unauthorized domain'], 403);
+        }
+
+        return $next($request);
     }
-    return $next($request);
-}
 }
