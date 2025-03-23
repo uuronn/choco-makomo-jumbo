@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Plus, Zap, Minus } from "lucide-react";
@@ -7,7 +9,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { useUserContext } from "../../context/UserProvider";
-import { Character, LevelUpResult } from "~/type/character";
+import type { Character, LevelUpResult } from "~/type/character";
 import { enqueueSnackbar } from "notistack";
 
 type CharacterType =
@@ -33,23 +35,6 @@ const typeColors: Record<CharacterType, string> = {
 	コンテナー: "bg-teal-500",
 };
 
-const handleMouseDown = (
-	increment: boolean,
-	setPoints: React.Dispatch<React.SetStateAction<number>>,
-	points: number,
-) => {
-	const interval = setInterval(() => {
-		setPoints((prevPoints) => (increment ? prevPoints + 1 : prevPoints - 1));
-	}, 100);
-
-	const handleMouseUp = () => {
-		clearInterval(interval);
-		document.removeEventListener("mouseup", handleMouseUp);
-	};
-
-	document.addEventListener("mouseup", handleMouseUp);
-};
-
 export default function CharacterDevelopment() {
 	const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
 		null,
@@ -58,6 +43,7 @@ export default function CharacterDevelopment() {
 	const [lifePoints, setLifePoints] = useState(0);
 	const [powerPoints, setPowerPoints] = useState(0);
 	const [speedPoints, setSpeedPoints] = useState(0);
+	const [incrementAmount, setIncrementAmount] = useState<1 | 10 | 100>(1);
 
 	const { user, havingCharacters, fetchCharacters } = useUserContext();
 
@@ -83,7 +69,6 @@ export default function CharacterDevelopment() {
 
 	const handleDevelop = async () => {
 		if (!selectedCharacter) return;
-
 		(async () => {
 			if (!user) return;
 
@@ -137,14 +122,26 @@ export default function CharacterDevelopment() {
 		enqueueSnackbar("レベルアップ！", {
 			variant: "success",
 		});
+	};
 
-		// const updatedCharacter = havingCharacters.find(
-		//   (character) => character.characterId === selectedCharacter.characterId
-		// );
+	const handleIncrement = (
+		stateSetter: React.Dispatch<React.SetStateAction<number>>,
+		currentValue: number,
+	) => {
+		const newValue = currentValue + incrementAmount;
+		if (newValue <= remainingPoints + currentValue) {
+			stateSetter(newValue);
+		} else {
+			stateSetter(remainingPoints + currentValue);
+		}
+	};
 
-		// if (updatedCharacter) {
-		//   setSelectedCharacter(updatedCharacter);
-		// }
+	const handleDecrement = (
+		stateSetter: React.Dispatch<React.SetStateAction<number>>,
+		currentValue: number,
+	) => {
+		const newValue = currentValue - incrementAmount;
+		stateSetter(Math.max(0, newValue));
 	};
 
 	const usedPoints = lifePoints + powerPoints + speedPoints;
@@ -229,9 +226,31 @@ export default function CharacterDevelopment() {
 										<div className="mb-2">
 											<div className="text-lg font-semibold mb-1 text-green-400">
 												技術ポイント:{" "}
-												<span className="text-emerald-400">
+												<span className="text-emerald-400 text-xl">
 													{remainingPoints}
 												</span>
+											</div>
+											<div className="flex items-center gap-2 mb-3">
+												<span className="text-sm text-green-200">増減量:</span>
+												<div className="flex gap-1">
+													{[1, 10, 100].map((amount) => (
+														<Button
+															key={amount}
+															size="sm"
+															variant="outline"
+															className={`px-2 py-1 h-7 ${
+																incrementAmount === amount
+																	? "bg-emerald-500 text-gray-900 border-emerald-500"
+																	: "bg-gray-800 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20"
+															}`}
+															onClick={() =>
+																setIncrementAmount(amount as 1 | 10 | 100)
+															}
+														>
+															{amount}
+														</Button>
+													))}
+												</div>
 											</div>
 										</div>
 
@@ -250,11 +269,8 @@ export default function CharacterDevelopment() {
 													<Button
 														className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
 														size="icon"
-														onMouseDown={() =>
-															handleMouseDown(false, setLifePoints, lifePoints)
-														}
 														onClick={() =>
-															lifePoints > 0 && setLifePoints(lifePoints - 1)
+															handleDecrement(setLifePoints, lifePoints)
 														}
 														disabled={lifePoints <= 0}
 													>
@@ -263,18 +279,14 @@ export default function CharacterDevelopment() {
 													<Button
 														className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
 														size="icon"
-														onMouseDown={() =>
-															handleMouseDown(true, setLifePoints, lifePoints)
-														}
 														onClick={() =>
-															remainingPoints > 0 &&
-															setLifePoints(lifePoints + 1)
+															handleIncrement(setLifePoints, lifePoints)
 														}
 														disabled={remainingPoints <= 0}
 													>
 														<Plus />
 													</Button>
-													<div className="w-6 text-center text-emerald-400">
+													<div className="w-12 text-center text-emerald-400">
 														{lifePoints}
 													</div>
 												</div>
@@ -295,7 +307,7 @@ export default function CharacterDevelopment() {
 														className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
 														size="icon"
 														onClick={() =>
-															powerPoints > 0 && setPowerPoints(powerPoints - 1)
+															handleDecrement(setPowerPoints, powerPoints)
 														}
 														disabled={powerPoints <= 0}
 													>
@@ -305,14 +317,13 @@ export default function CharacterDevelopment() {
 														className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
 														size="icon"
 														onClick={() =>
-															remainingPoints > 0 &&
-															setPowerPoints(powerPoints + 1)
+															handleIncrement(setPowerPoints, powerPoints)
 														}
 														disabled={remainingPoints <= 0}
 													>
 														<Plus />
 													</Button>
-													<div className="w-6 text-center text-emerald-400">
+													<div className="w-12 text-center text-emerald-400">
 														{powerPoints}
 													</div>
 												</div>
@@ -333,7 +344,7 @@ export default function CharacterDevelopment() {
 														className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
 														size="icon"
 														onClick={() =>
-															speedPoints > 0 && setSpeedPoints(speedPoints - 1)
+															handleDecrement(setSpeedPoints, speedPoints)
 														}
 														disabled={speedPoints <= 0}
 													>
@@ -343,14 +354,13 @@ export default function CharacterDevelopment() {
 														className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
 														size="icon"
 														onClick={() =>
-															remainingPoints > 0 &&
-															setSpeedPoints(speedPoints + 1)
+															handleIncrement(setSpeedPoints, speedPoints)
 														}
 														disabled={remainingPoints <= 0}
 													>
 														<Plus />
 													</Button>
-													<div className="w-6 text-center text-emerald-400">
+													<div className="w-12 text-center text-emerald-400">
 														{speedPoints}
 													</div>
 												</div>
