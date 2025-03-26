@@ -36,7 +36,7 @@ class RoomCharacter extends Model
 
     protected $casts = [
         'isActive' => 'boolean',
-        'isDead' => 'boolean', // 追加
+        'isDead' => 'boolean',
     ];
 
     protected static function boot()
@@ -46,11 +46,13 @@ class RoomCharacter extends Model
             if (empty($model->id)) {
                 $model->id = (string) Str::uuid();
             }
+
             if (is_null($model->isActive)) {
                 $model->isActive = true;
             }
+
             if (is_null($model->isDead)) {
-                $model->isDead = false; // 初期値設定
+                $model->isDead = false;
             }
         });
     }
