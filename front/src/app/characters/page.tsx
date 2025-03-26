@@ -179,7 +179,7 @@ export default function CharacterDevelopment() {
 											style={{ boxShadow: "0 0 10px rgba(16, 185, 129, 0.5)" }}
 										>
 											<Image
-												src={selectedCharacter.image_url || "/placeholder.svg"}
+												src={selectedCharacter.imageUrl || "/placeholder.svg"}
 												alt={selectedCharacter.name}
 												fill
 												className="object-cover"
@@ -429,7 +429,7 @@ export default function CharacterDevelopment() {
 									<div className="flex flex-col items-center">
 										<div className="relative w-16 h-16 mb-2 overflow-hidden rounded-lg">
 											<Image
-												src={character.image_url || "/placeholder.svg"}
+												src={character.imageUrl || "/placeholder.svg"}
 												alt={character.name}
 												fill
 												className="object-cover"
