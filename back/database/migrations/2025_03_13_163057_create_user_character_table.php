@@ -11,15 +11,17 @@ return new class extends Migration
         Schema::create('userCharacter', function (Blueprint $table) {
             $table->uuid('userId');
             $table->uuid('characterId');
+            $table->primary(['userId', 'characterId']);
+            $table->smallInteger('level')->unsigned();
+            $table->smallInteger('life')->unsigned();
+            $table->smallInteger('power')->unsigned();
+            $table->smallInteger('speed')->unsigned();
+            $table->tinyInteger('evasion')->unsigned();
+            $table->timestamps();
+
+            // 外部キー制約
             $table->foreign('userId')->references('id')->on('user')->onDelete('cascade');
             $table->foreign('characterId')->references('id')->on('character')->onDelete('cascade');
-            $table->smallInteger('level');
-            $table->smallInteger('life');
-            $table->smallInteger('power');
-            $table->smallInteger('speed');
-            $table->smallInteger('evasion');
-            $table->primary(['userId', 'characterId']);
-            $table->timestamps();
         });
     }
 
