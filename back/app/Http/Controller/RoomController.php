@@ -74,7 +74,7 @@ class RoomController
         }
 
         // 2. 三大クラウド
-        if (!array_diff(['AWS', 'GCP', 'Azure'], $characterNames)) {
+        if (!array_diff(['AWS', 'Google Cloud', 'Azure'], $characterNames)) {
             $lifeMultiplier *= 1.60;
             $logs[] = "{$hostUser->name} が「三大クラウド」を発動、最大HPが60%アップ";
         }
