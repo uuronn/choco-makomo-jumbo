@@ -48,7 +48,7 @@ class UserCharacterController
                 'specialSkillType' => $character->specialSkillType,
                 'specialSkillDescription' => $character->specialSkillDescription,
                 'specialTurnRequirement' => $character->specialTurnRequirement,
-                'image_url' => $character->image_url,
+                'imageUrl' => $character->imageUrl,
             ];
         });
 
