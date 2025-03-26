@@ -8,9 +8,6 @@ export type Character = {
 	name: string;
 	type: string;
 	baseEvasion: number;
-	activeSkillId: string | null;
-	passiveSkillId: string | null;
-	partySkillId: string | null;
 	imageUrl: string;
 	specialSkillName: string;
 	specialSkillDescription: string;
