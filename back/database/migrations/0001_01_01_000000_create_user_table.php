@@ -12,7 +12,7 @@ return new class extends Migration
             $table->string('id', 255)->primary();
             $table->string('name');
             $table->string('email')->unique();
-            $table->integer('point')->default(50);
+            $table->mediumInteger('point')->unsigned();
             $table->string('photoUrl');
             $table->timestamps();
         });
