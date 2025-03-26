@@ -74,7 +74,7 @@ Route::get('/characters/{characterId}', [CharacterController::class, 'find']);
 Route::get('/rooms', [RoomController::class, 'list']);
 
 // ルームを全て削除する（テスト用）
-Route::delete('/rooms', [RoomController::class, 'allDelete']);
+// Route::delete('/rooms', [RoomController::class, 'allDelete']);
 
 // ルームを作成する
 Route::post('/rooms/create', [RoomController::class, 'create']);
