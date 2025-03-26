@@ -375,7 +375,7 @@ export default function CharacterDevelopment() {
 												<div className="w-20 text-green-200">回避率 :</div>
 												<div className="flex-1 mx-2">
 													<div className="text-md text-green-400">
-														{selectedCharacter.base_evasion}%
+														{selectedCharacter.baseEvasion}%
 													</div>
 												</div>
 												<div className="flex items-center gap-1"></div>

@@ -163,7 +163,7 @@ export default function GameInterface() {
 												スピード {character.speed}
 											</h5>
 											<h5 className="font-bold text-green-400 text-xs">
-												回避率 {character.base_evasion}%
+												回避率 {character.baseEvasion}%
 											</h5>
 										</div>
 										<div className="ml-auto">

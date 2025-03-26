@@ -8,7 +8,7 @@ export type Character = {
 	name: string;
 	type: string;
 	rarity: number;
-	base_evasion: number;
+	baseEvasion: number;
 	activeSkillId: string | null;
 	passiveSkillId: string | null;
 	partySkillId: string | null;

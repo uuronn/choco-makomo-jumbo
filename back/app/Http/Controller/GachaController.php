@@ -51,7 +51,7 @@ class GachaController
             'life' => $character->baseLife,
             'power' => $character->basePower,
             'speed' => $character->baseSpeed,
-            'evasion' => $character->base_evasion,
+            'evasion' => $character->baseEvasion,
             'level' => 1,
         ]);
 

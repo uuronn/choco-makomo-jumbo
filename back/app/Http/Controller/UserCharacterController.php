@@ -41,7 +41,7 @@ class UserCharacterController
                 'name' => $character->name,
                 'type' => $character->type,
                 'rarity' => $character->rarity,
-                'base_evasion' => $character->base_evasion,
+                'baseEvasion' => $character->baseEvasion,
                 'activeSkillId' => $character->activeSkillId,
                 'passiveSkillId' => $character->passiveSkillId,
                 'partySkillId' => $character->partySkillId,

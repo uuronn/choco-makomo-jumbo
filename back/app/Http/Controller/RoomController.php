@@ -329,7 +329,7 @@ class RoomController
                         'maxLife' => $userCharacter->life * $lifeMultiplier,
                         'power' => $userCharacter->power * $powerMultiplier,
                         'speed' => $userCharacter->speed * $speedMultiplier,
-                        'evasion' => $character->base_evasion * $evasionMultiplier,
+                        'evasion' => $character->baseEvasion * $evasionMultiplier,
                     ]);
                 }
 
@@ -429,7 +429,7 @@ class RoomController
                     'maxLife' => $userCharacter->life * $lifeMultiplier,
                     'power' => $userCharacter->power * $powerMultiplier,
                     'speed' => $userCharacter->speed * $speedMultiplier,
-                    'evasion' => $character->base_evasion * $evasionMultiplier,
+                    'evasion' => $character->baseEvasion * $evasionMultiplier,
                 ]);
             }
 

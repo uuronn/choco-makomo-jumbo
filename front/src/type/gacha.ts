@@ -15,7 +15,7 @@ export type gachaResult = {
 
 export type GachaCharacter = {
 	activeSkillId: string;
-	base_evasion: number;
+	baseEvasion: number;
 	baseLife: number;
 	basePower: number;
 	baseSpeed: number;

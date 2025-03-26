@@ -16,7 +16,7 @@ return new class extends Migration
             $table->smallInteger('basePower');
             $table->smallInteger('baseLife');
             $table->smallInteger('baseSpeed');
-            $table->smallInteger('base_evasion');
+            $table->smallInteger('baseEvasion');
             $table->uuid('activeSkillId')->nullable();
             $table->uuid('passiveSkillId')->nullable();
             $table->uuid('partySkillId')->nullable();

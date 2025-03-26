@@ -14,7 +14,7 @@ interface Character {
 	baseLife: number;
 	basePower: number;
 	baseSpeed: number;
-	base_evasion: number;
+	baseEvasion: number;
 }
 
 export default function GachaDialog() {
@@ -156,7 +156,7 @@ export default function GachaDialog() {
 																回避率:
 															</span>
 															<span className="text-emerald-200">
-																{character.base_evasion}%
+																{character.baseEvasion}%
 															</span>
 														</div>
 													</div>
