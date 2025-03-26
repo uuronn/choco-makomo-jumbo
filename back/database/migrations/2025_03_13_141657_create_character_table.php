@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('specialSkillName')->nullable();
             $table->string('specialSkillDescription')->nullable();
             $table->smallInteger('specialSkillTurn')->default(5);
+            $table->string('passiveSkillName')->nullable();
+            $table->string('passiveSkillDescription')->nullable();
             $table->string('imageUrl');
             $table->timestamps();
 
