@@ -839,7 +839,7 @@ class RoomController
                     throw new Exception("スペシャルスキルを発動するにはあと " . ($attacker->specialTurnRequirement - $room->totalTurns) . " ターン必要です");
                 }
 
-                $skillType = $attacker->character->specialSkillType;
+                $skillType = $attacker->character->specialSkillName;
                 if (!$skillType) {
                     throw new Exception('このキャラクターにスペシャルスキルが設定されていません');
                 }

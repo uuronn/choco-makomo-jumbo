@@ -20,7 +20,7 @@ return new class extends Migration
             $table->uuid('activeSkillId')->nullable();
             $table->uuid('passiveSkillId')->nullable();
             $table->uuid('partySkillId')->nullable();
-            $table->string('specialSkillType')->nullable();
+            $table->string('specialSkillName')->nullable();
             $table->string('specialSkillDescription')->nullable();
             $table->smallInteger('specialTurnRequirement')->default(5);
             $table->string('imageUrl');

@@ -210,17 +210,17 @@ export default function CharacterDevelopment() {
 											</div>
 										</div>
 										<h2 className="text-sm font-bold mt-2 text-green-400">
-											{selectedCharacter.specialSkillType
-												? `固有スキル: ${selectedCharacter.specialSkillType}`
+											{selectedCharacter.specialSkillName
+												? `固有スキル: ${selectedCharacter.specialSkillName}`
 												: "スキルなし"}
 										</h2>
 										<h2 className="text-sm font-bold mt-2 text-green-400">
-											{selectedCharacter.specialSkillType
+											{selectedCharacter.specialSkillName
 												? `内容: ${selectedCharacter.specialSkillDescription}`
 												: ""}
 										</h2>
 										<h4 className="text-sm font-bold text-green-400">
-											{selectedCharacter.specialSkillType
+											{selectedCharacter.specialSkillName
 												? `必要ターン数: ${selectedCharacter.specialTurnRequirement}`
 												: ""}
 										</h4>
