@@ -16,6 +16,8 @@ export type Character = {
 	specialSkillName: string;
 	specialSkillDescription: string;
 	specialSkillTurn: number;
+	passiveSkillName: string;
+	passiveSkillDescription: string;
 };
 
 export type LevelUpResult = {

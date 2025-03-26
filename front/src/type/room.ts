@@ -1,4 +1,4 @@
-import { Character } from "./character";
+import type { Character } from "./character";
 
 export type Room = {
 	id: string;
@@ -42,5 +42,7 @@ export type RoomCharacter = {
 	userId: string;
 	character: Character;
 	specialSkillName: string;
+	passiveSkillName: string;
+	passiveSkillDescription: string;
 	specialUsed: 0 | 1;
 };
