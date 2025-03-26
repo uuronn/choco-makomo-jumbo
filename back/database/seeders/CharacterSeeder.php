@@ -23,6 +23,8 @@ class CharacterSeeder extends Seeder
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
                 'specialSkillTurn' => 0,
+                'passiveSkillName' => null,
+                'passiveSkillDescription' => null,
                 'imageUrl' => '/character/css.webp',
             ],
             // Go
