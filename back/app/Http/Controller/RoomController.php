@@ -955,7 +955,7 @@ class RoomController
                         $description = "{$attacker->character->name} が敵全員を次ターン行動不能に";
                         break;
 
-                    case 'JavaJavaすんなよ':
+                    case 'LiveScript':
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
                             ->where('userId', '!=', $userId)
@@ -964,7 +964,7 @@ class RoomController
                         foreach ($targets as $target) {
                             $target->update(['isActive' => false]);
                         }
-                        $description = "{$attacker->character->name}が「JavaJavaすんなよ」を発動、敵全員の次ターンを飛ばした";
+                        $description = "{$attacker->character->name}が「LiveScript」を発動、敵全員の次ターンを飛ばした";
                         break;
 
                     case 'SQLインジェクション':
@@ -1017,7 +1017,7 @@ class RoomController
                             ->where('userId', '!=', $userId)
                             ->where('isDead', false)
                             ->get();
-                        $damage = $attacker->power * 2.5; // 全体攻撃（2倍）より少し強め
+                        $damage = $attacker->power * 2.0; // 全体攻撃（2倍）より少し強め
                         foreach ($targets as $target) {
                             $newLife = max(0, $target->life - $damage);
                             $target->update([
@@ -1034,8 +1034,35 @@ class RoomController
                                 ]);
                             }
                         }
-                        $description = "{$attacker->character->name} が「Gopherくんはオコている」を発動、敵全員に {$damage} ダメージ";
+                        $description = "{$attacker->character->name} が「ゴルーチンラッシュ」を発動、敵全員に {$damage} ダメージ";
                         break;
+
+                    // case 'Eloquentストライク': // ruby on rails用（全体攻撃の変形）
+                    //     $targets = RoomCharacter::with('character')
+                    //         ->where('roomId', $roomId)
+                    //         ->where('userId', '!=', $userId)
+                    //         ->where('isDead', false)
+                    //         ->get();
+                    //     $damage = $attacker->power * 2.0; // 全体攻撃（2倍）より少し強め
+                    //     foreach ($targets as $target) {
+                    //         $newLife = max(0, $target->life - $damage);
+                    //         $target->update([
+                    //             'life' => $newLife,
+                    //             'isDead' => $newLife <= 0,
+                    //         ]);
+                    //         if ($newLife <= 0) {
+                    //             RoomLog::create([
+                    //                 'roomId' => $roomId,
+                    //                 'actionType' => 'death',
+                    //                 'targetUserId' => $target->userId,
+                    //                 'targetCharacterId' => $target->characterId,
+                    //                 'description' => "{$target->character->name} がダウンしました",
+                    //             ]);
+                    //         }
+                    //     }
+                    //     $description = "{$attacker->character->name} が「Eloquentストライク」を発動、敵全員に {$damage} ダメージ";
+                    //     break;
+
 
                     case 'セマンティックHTML': // html用（回避アップ）
                         $targets = RoomCharacter::with('character')
@@ -1073,7 +1100,7 @@ class RoomController
                             $newLife = min($target->maxLife, $target->life + $healAmount);
                             $target->update(['life' => $newLife]);
                         }
-                        $description = "{$attacker->character->name} が「IEを削除」を発動、味方全員の体力を50%回復";
+                        $description = "{$attacker->character->name} が「IEを削除」を発動、味方全員の体力を40%回復";
                         break;
 
                     case 'docker compose up': // windows用（全体回復の変形）
@@ -1083,7 +1110,7 @@ class RoomController
                             ->where('isDead', false)
                             ->get();
                         foreach ($targets as $target) {
-                            $healAmount = (int)($target->maxLife * 0.3); // 全回復より弱め
+                            $healAmount = (int)($target->maxLife * 0.5); // 全回復より弱め
                             $newLife = min($target->maxLife, $target->life + $healAmount);
                             $target->update(['life' => $newLife]);
                         }
