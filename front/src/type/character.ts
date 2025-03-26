@@ -12,7 +12,7 @@ export type Character = {
 	activeSkillId: string | null;
 	passiveSkillId: string | null;
 	partySkillId: string | null;
-	image_url: string;
+	imageUrl: string;
 	specialSkillType: string;
 	specialSkillDescription: string;
 	specialTurnRequirement: number;
