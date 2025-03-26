@@ -40,7 +40,7 @@ class UserCharacterController
                 // Character（固定値）
                 'name' => $character->name,
                 'type' => $character->type,
-                'baseEvasion' => $character->baseEvasion,
+                'baseEvasion' => $character->baseEvasion, // TODO: 多分変動になる（装備機能も後に実装するから）
                 'specialSkillName' => $character->specialSkillName,
                 'specialSkillDescription' => $character->specialSkillDescription,
                 'specialSkillTurn' => $character->specialSkillTurn,
