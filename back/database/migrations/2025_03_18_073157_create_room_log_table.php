@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('description');
             $table->timestamps();
 
+            // 外部キー制約
             $table->foreign('roomId')->references('id')->on('room')->onDelete('cascade');
         });
     }
