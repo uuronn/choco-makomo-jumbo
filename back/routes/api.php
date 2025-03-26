@@ -110,14 +110,6 @@ Route::get('/rooms/{roomId}/log', [roomLogController::class, 'logs']);
 
 
 
-// Route::put('/rooms/start-battle', [RoomController::class, 'startBattle']);
-
-// Route::post('/rooms/action', [RoomController::class, 'processAction']);
-
-// Route::post('/rooms/end-battle', [RoomController::class, 'endBattle']);
-
-
-
 
 // ガチャ関連のAPI--------------------------------
 
