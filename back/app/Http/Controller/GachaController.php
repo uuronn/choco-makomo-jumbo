@@ -48,9 +48,9 @@ class GachaController
         $userCharacter = new UserCharacter([
             'userId' => $user->id,
             'characterId' => $character->id,
-            'life' => $character->base_life,
-            'power' => $character->base_power,
-            'speed' => $character->base_speed,
+            'life' => $character->baseLife,
+            'power' => $character->basePower,
+            'speed' => $character->baseSpeed,
             'evasion' => $character->base_evasion,
             'level' => 1,
         ]);
