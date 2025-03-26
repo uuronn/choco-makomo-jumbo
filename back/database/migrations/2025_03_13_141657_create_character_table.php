@@ -12,25 +12,17 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('type');
-            $table->smallInteger('basePower');
-            $table->smallInteger('baseLife');
-            $table->smallInteger('baseSpeed');
-            $table->smallInteger('baseEvasion');
-            $table->uuid('activeSkillId')->nullable();
-            $table->uuid('passiveSkillId')->nullable();
-            $table->uuid('partySkillId')->nullable();
+            $table->smallInteger('basePower')->unsigned();
+            $table->smallInteger('baseLife')->unsigned();
+            $table->smallInteger('baseSpeed')->unsigned();
+            $table->tinyInteger('baseEvasion')->unsigned();
             $table->string('specialSkillName')->nullable();
             $table->string('specialSkillDescription')->nullable();
-            $table->smallInteger('specialSkillTurn')->default(5);
+            $table->tinyInteger('specialSkillTurn')->unsigned();
             $table->string('passiveSkillName')->nullable();
             $table->string('passiveSkillDescription')->nullable();
             $table->string('imageUrl');
             $table->timestamps();
-
-            // 外部キー制約
-            // $table->foreign('activeSkillId')->references('id')->on('skill')->onDelete('set null');
-            // $table->foreign('passiveSkillId')->references('id')->on('skill')->onDelete('set null');
-            // $table->foreign('partySkillId')->references('id')->on('skill')->onDelete('set null');
         });
     }
 
