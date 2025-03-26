@@ -163,7 +163,7 @@ export default function CharacterDevelopment() {
 				<h1 className="text-2xl font-bold mb-4 text-green-400 flex items-center">
 					<Zap className="mr-2 h-6 w-6 text-emerald-400" />
 					技術育成
-					<div className="h-px flex-grow ml-4 bg-gradient-to-r from-emerald-400 to-transparent"></div>
+					<div className="h-px flex-grow ml-4 bg-gradient-to-r from-emerald-400 to-transparent" />
 				</h1>
 
 				{/* Character Status Section */}
@@ -202,7 +202,7 @@ export default function CharacterDevelopment() {
 											<div className="flex">
 												{Array.from({ length: selectedCharacter.rarity }).map(
 													(_, i) => (
-														<span key={i} className="text-emerald-400">
+														<span key={`${i + 1}`} className="text-emerald-400">
 															★
 														</span>
 													),
@@ -378,7 +378,7 @@ export default function CharacterDevelopment() {
 														{selectedCharacter.baseEvasion}%
 													</div>
 												</div>
-												<div className="flex items-center gap-1"></div>
+												<div className="flex items-center gap-1" />
 											</div>
 										</div>
 
@@ -407,10 +407,10 @@ export default function CharacterDevelopment() {
 				<div className="h-1/2 overflow-auto border rounded-lg p-4 border-emerald-500/30 bg-gray-900/80">
 					<h2 className="text-xl font-bold mb-4 text-green-400 flex items-center">
 						所持技術
-						<div className="h-px flex-grow ml-4 bg-gradient-to-r from-emerald-400 to-transparent"></div>
+						<div className="h-px flex-grow ml-4 bg-gradient-to-r from-emerald-400 to-transparent" />
 					</h2>
 					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-						{havingCharacters &&
+						{havingCharacters.length > 0 &&
 							havingCharacters.map((character) => (
 								<div
 									key={character.characterId}
@@ -425,6 +425,12 @@ export default function CharacterDevelopment() {
 											: {}
 									}
 									onClick={() => handleCharacterSelect(character)}
+									onKeyDown={(e) => {
+										if (e.key === "Enter" || e.key === " ") {
+											handleCharacterSelect(character);
+										}
+									}}
+									tabIndex={-1}
 								>
 									<div className="flex flex-col items-center">
 										<div className="relative w-16 h-16 mb-2 overflow-hidden rounded-lg">
