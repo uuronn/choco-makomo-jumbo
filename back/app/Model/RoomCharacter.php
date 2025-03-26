@@ -27,6 +27,9 @@ class RoomCharacter extends Model
         'evasion',
         'isActive',
         'isDead',
+        'blockCount',
+        'confusionCount',
+        'poisonCount',
         'specialSkillTurn',
         'specialUsed'
     ];

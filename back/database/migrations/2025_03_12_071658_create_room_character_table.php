@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up()
     {
         Schema::create('roomCharacter', function (Blueprint $table) {
@@ -22,6 +21,9 @@ return new class extends Migration
             $table->tinyInteger('evasion')->unsigned();
             $table->boolean('isActive')->default(true);
             $table->boolean('isDead')->default(false);
+            $table->tinyInteger('blockCount')->unsigned();
+            $table->tinyInteger('confusionCount')->unsigned();
+            $table->tinyInteger('poisonCount')->unsigned();
             $table->tinyInteger('specialSkillTurn')->unsigned();
             $table->boolean('specialUsed')->default(false);
             $table->timestamps();
