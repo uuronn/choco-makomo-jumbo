@@ -13,9 +13,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('type');
             $table->smallInteger('rarity');
-            $table->smallInteger('base_power');
-            $table->smallInteger('base_life');
-            $table->smallInteger('base_speed');
+            $table->smallInteger('basePower');
+            $table->smallInteger('baseLife');
+            $table->smallInteger('baseSpeed');
             $table->smallInteger('base_evasion');
             $table->uuid('activeSkillId')->nullable();
             $table->uuid('passiveSkillId')->nullable();
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('specialSkillType')->nullable();
             $table->string('specialSkillDescription')->nullable();
             $table->smallInteger('specialTurnRequirement')->default(5);
-            $table->string('image_url');
+            $table->string('imageUrl');
             $table->timestamps();
 
             // 外部キー制約
