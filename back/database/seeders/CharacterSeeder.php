@@ -212,9 +212,9 @@ class CharacterSeeder extends Seeder
                 'specialTurnRequirement' => 0,
                 'imageUrl' => '/character/azure.webp',
             ],
-            // GCP
+            // Google Cloud
             [
-                'name' => 'GCP',
+                'name' => 'Google Cloud',
                 'type' => 'クラウド',
                 'rarity' => 5,
                 'basePower' => 620,
@@ -224,7 +224,7 @@ class CharacterSeeder extends Seeder
                 'specialSkillType' => null,
                 'specialSkillDescription' => null,
                 'specialTurnRequirement' => 0,
-                'imageUrl' => '/character/gcp.webp',
+                'imageUrl' => '/character/googlecloud.webp',
             ],
 
             // コンテナー (Container)
