@@ -221,7 +221,7 @@ export default function CharacterDevelopment() {
 										</h2>
 										<h4 className="text-sm font-bold text-green-400">
 											{selectedCharacter.specialSkillName
-												? `必要ターン数: ${selectedCharacter.specialTurnRequirement}`
+												? `必要ターン数: ${selectedCharacter.specialSkillTurn}`
 												: ""}
 										</h4>
 									</div>

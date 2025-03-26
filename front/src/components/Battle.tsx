@@ -394,7 +394,7 @@ export default function Battle({ room }: BattleProps) {
 						isSelectingAction &&
 						!loading &&
 						activeCharacter?.character.specialSkillName !== null &&
-						(activeCharacter?.character.specialTurnRequirement ?? 0) -
+						(activeCharacter?.character.specialSkillTurn ?? 0) -
 							room.totalTurns <=
 							0 &&
 						activeCharacter?.specialUsed !== 1
@@ -404,7 +404,7 @@ export default function Battle({ room }: BattleProps) {
 					disabled={
 						(!isSelectingAction && !loading) ||
 						activeCharacter?.character.specialSkillName === null ||
-						(activeCharacter?.character.specialTurnRequirement ?? 0) -
+						(activeCharacter?.character.specialSkillTurn ?? 0) -
 							room.totalTurns >
 							0 ||
 						activeCharacter?.specialUsed === 1
@@ -415,11 +415,11 @@ export default function Battle({ room }: BattleProps) {
 					<p>
 						{activeCharacter?.character.specialSkillName === null
 							? "スキルなし"
-							: (activeCharacter?.character.specialTurnRequirement ?? 0) -
+							: (activeCharacter?.character.specialSkillTurn ?? 0) -
 										room.totalTurns >
 									0
 								? `残り${
-										(activeCharacter?.character.specialTurnRequirement ?? 0) -
+										(activeCharacter?.character.specialSkillTurn ?? 0) -
 										room.totalTurns
 									}ターン`
 								: ""}

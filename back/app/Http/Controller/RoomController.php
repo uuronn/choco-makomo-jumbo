@@ -835,8 +835,8 @@ class RoomController
                 if ($attacker->specialUsed) {
                     throw new Exception('このキャラクターのスペシャルスキルは既に使用済みです');
                 }
-                if ($room->totalTurns < $attacker->specialTurnRequirement) {
-                    throw new Exception("スペシャルスキルを発動するにはあと " . ($attacker->specialTurnRequirement - $room->totalTurns) . " ターン必要です");
+                if ($room->totalTurns < $attacker->specialSkillTurn) {
+                    throw new Exception("スペシャルスキルを発動するにはあと " . ($attacker->specialSkillTurn - $room->totalTurns) . " ターン必要です");
                 }
 
                 $skillType = $attacker->character->specialSkillName;

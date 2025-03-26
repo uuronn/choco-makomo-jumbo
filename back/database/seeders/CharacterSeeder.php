@@ -22,7 +22,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 40,
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillTurn' => 0,
                 'imageUrl' => '/character/css.webp',
             ],
             // Go
@@ -36,7 +36,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 9,
                 'specialSkillName' => 'ゴルーチンラッシュ',
                 'specialSkillDescription' => '自身の攻撃力の2倍分のダメージ相手キャラ全員に与える',
-                'specialTurnRequirement' => 14,
+                'specialSkillTurn' => 14,
                 'imageUrl' => '/character/go.webp',
             ],
             // html
@@ -50,7 +50,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 2,
                 'specialSkillName' => 'セマンティックHTML',
                 'specialSkillDescription' => '味方全員の回避率に30%をプラスする',
-                'specialTurnRequirement' => 10,
+                'specialSkillTurn' => 10,
                 'imageUrl' => '/character/html.webp',
             ],
             // Javascript
@@ -64,7 +64,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 8,
                 'specialSkillName' => 'LiveScript',
                 'specialSkillDescription' => '敵全員の次ターンをスキップする',
-                'specialTurnRequirement' => 10,
+                'specialSkillTurn' => 10,
                 'imageUrl' => '/character/javascript.webp',
             ],
             // PHP
@@ -78,7 +78,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 10,
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillTurn' => 0,
                 'imageUrl' => '/character/php.webp',
             ],
             // Ruby
@@ -92,7 +92,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 2,
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillTurn' => 0,
                 'imageUrl' => '/character/ruby.webp',
             ],
             // Swift
@@ -106,7 +106,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 20,
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillTurn' => 0,
                 'imageUrl' => '/character/swift.webp',
             ],
             // Typescript
@@ -120,7 +120,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 10,
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillTurn' => 0,
                 'imageUrl' => '/character/typescript.webp',
             ],
 
@@ -136,7 +136,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 0,
                 'specialSkillName' => '依存性の注入',
                 'specialSkillDescription' => '味方全員の最大体力25%分を回復する',
-                'specialTurnRequirement' => 14,
+                'specialSkillTurn' => 14,
                 'imageUrl' => '/character/angular.webp',
             ],
             // React
@@ -150,7 +150,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 10,
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillTurn' => 0,
                 'imageUrl' => '/character/react.webp',
             ],
             // Vue
@@ -164,7 +164,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 5,
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillTurn' => 0,
                 'imageUrl' => '/character/vue.webp',
             ],
             // Ruby on Rails
@@ -179,7 +179,7 @@ class CharacterSeeder extends Seeder
                 // 'specialSkillName' => 'Eloquentストライク',
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 10,
+                'specialSkillTurn' => 10,
                 'imageUrl' => '/character/rubyonrails.webp',
             ],
 
@@ -195,7 +195,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 6,
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillTurn' => 0,
                 'imageUrl' => '/character/aws.webp',
             ],
             // Azure
@@ -209,7 +209,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 6,
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillTurn' => 0,
                 'imageUrl' => '/character/azure.webp',
             ],
             // Google Cloud
@@ -223,7 +223,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 8,
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillTurn' => 0,
                 'imageUrl' => '/character/googlecloud.webp',
             ],
 
@@ -239,7 +239,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 1,
                 'specialSkillName' => 'docker compose up',
                 'specialSkillDescription' => '味方全員の体力を50%回復',
-                'specialTurnRequirement' => 20,
+                'specialSkillTurn' => 20,
                 'imageUrl' => '/character/docker.webp',
             ],
 
@@ -255,7 +255,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 1,
                 'specialSkillName' => 'rm -rf /',
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 40,
+                'specialSkillTurn' => 40,
                 'imageUrl' => '/character/linux.webp',
             ],
             // Mac
@@ -269,7 +269,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 1,
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillTurn' => 0,
                 'imageUrl' => '/character/mac.webp',
             ],
             // windows
@@ -283,7 +283,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 4,
                 'specialSkillName' => 'IEを削除',
                 'specialSkillDescription' => '味方全員の体力を40%回復',
-                'specialTurnRequirement' => 5,
+                'specialSkillTurn' => 5,
                 'imageUrl' => '/character/windows.webp',
             ],
 
@@ -299,7 +299,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 15,
                 'specialSkillName' => 'SQLインジェクション',
                 'specialSkillDescription' => '敵全員の攻撃力とスピードを入れ替える',
-                'specialTurnRequirement' => 20,
+                'specialSkillTurn' => 20,
                 'imageUrl' => '/character/mysql.webp',
             ],
             // Postgres
@@ -313,7 +313,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 1,
                 'specialSkillName' => 'SQLインジェクション',
                 'specialSkillDescription' => '敵全員の攻撃力とスピードを入れ替える',
-                'specialTurnRequirement' => 20,
+                'specialSkillTurn' => 20,
                 'imageUrl' => '/character/postgresql.webp',
             ],
             // Supabase
@@ -327,7 +327,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 20,
                 'specialSkillName' => null,
                 'specialSkillDescription' => null,
-                'specialTurnRequirement' => 0,
+                'specialSkillTurn' => 0,
                 'imageUrl' => '/character/supabase.webp',
             ],
 
@@ -343,7 +343,7 @@ class CharacterSeeder extends Seeder
                 'baseEvasion' => 20,
                 'specialSkillName' => '物理エンジン操作',
                 'specialSkillDescription' => '敵全員のスピードが90%ダウン',
-                'specialTurnRequirement' => 12,
+                'specialSkillTurn' => 12,
                 'imageUrl' => '/character/unity.webp',
             ],
         ];
@@ -357,7 +357,7 @@ class CharacterSeeder extends Seeder
         //         'baseSpeed' => 80,
         //         'baseEvasion' => 5,
         //         'specialSkillName' => 'single_boost_life', // 味方単体の最大HPアップ
-        //         'specialTurnRequirement' => 3,
+        //         'specialSkillTurn' => 3,
         //         'imageUrl' => '/character/git.webp',
         //     ],
         //     [
@@ -369,7 +369,7 @@ class CharacterSeeder extends Seeder
         //         'baseSpeed' => 110,
         //         'baseEvasion' => 7,
         //         'specialSkillName' => 'area_boost_evasion', // 味方全体の回避率アップ
-        //         'specialTurnRequirement' => 5,
+        //         'specialSkillTurn' => 5,
         //         'imageUrl' => '/character/github.webp',
         //     ],
         //     [
@@ -381,7 +381,7 @@ class CharacterSeeder extends Seeder
         //         'baseSpeed' => 75,
         //         'baseEvasion' => 5,
         //         'specialSkillName' => 'single_stun', // 敵単体をスタン
-        //         'specialTurnRequirement' => 4,
+        //         'specialSkillTurn' => 4,
         //         'imageUrl' => '/character/gitlab.webp',
         //     ],
 

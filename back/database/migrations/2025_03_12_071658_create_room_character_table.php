@@ -22,7 +22,7 @@ return new class extends Migration
             $table->smallInteger('evasion');
             $table->boolean('isActive')->default(true);
             $table->boolean('isDead')->default(false);
-            $table->smallInteger('specialTurnRequirement')->default(5);
+            $table->smallInteger('specialSkillTurn')->default(5);
             $table->boolean('specialUsed')->default(false);
             $table->timestamps();
 

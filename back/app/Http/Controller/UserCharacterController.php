@@ -47,7 +47,7 @@ class UserCharacterController
                 'partySkillId' => $character->partySkillId,
                 'specialSkillName' => $character->specialSkillName,
                 'specialSkillDescription' => $character->specialSkillDescription,
-                'specialTurnRequirement' => $character->specialTurnRequirement,
+                'specialSkillTurn' => $character->specialSkillTurn,
                 'imageUrl' => $character->imageUrl,
             ];
         });

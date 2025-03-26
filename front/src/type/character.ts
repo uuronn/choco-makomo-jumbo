@@ -15,7 +15,7 @@ export type Character = {
 	imageUrl: string;
 	specialSkillName: string;
 	specialSkillDescription: string;
-	specialTurnRequirement: number;
+	specialSkillTurn: number;
 };
 
 export type LevelUpResult = {
