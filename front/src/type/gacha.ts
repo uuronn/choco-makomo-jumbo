@@ -2,7 +2,6 @@ export type gachaResult = {
 	message?: string;
 	id: string;
 	name: string;
-	rarity: number;
 	basePower: number;
 	imageUrl: string;
 	baseLife: number;
@@ -24,6 +23,5 @@ export type GachaCharacter = {
 	name: string;
 	partySkillId: string | null;
 	passiveSkillId: string | null;
-	rarity: number;
 	type: string;
 };

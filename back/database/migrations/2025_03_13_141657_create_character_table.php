@@ -12,7 +12,6 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('type');
-            $table->smallInteger('rarity');
             $table->smallInteger('basePower');
             $table->smallInteger('baseLife');
             $table->smallInteger('baseSpeed');

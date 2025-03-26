@@ -199,15 +199,6 @@ export default function CharacterDevelopment() {
 											>
 												{selectedCharacter.type}
 											</Badge>
-											<div className="flex">
-												{Array.from({ length: selectedCharacter.rarity }).map(
-													(_, i) => (
-														<span key={`${i + 1}`} className="text-emerald-400">
-															★
-														</span>
-													),
-												)}
-											</div>
 										</div>
 										<h2 className="text-sm font-bold mt-2 text-green-400">
 											{selectedCharacter.specialSkillName

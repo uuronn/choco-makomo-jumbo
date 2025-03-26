@@ -7,7 +7,6 @@ export type Character = {
 	speed: number;
 	name: string;
 	type: string;
-	rarity: number;
 	baseEvasion: number;
 	activeSkillId: string | null;
 	passiveSkillId: string | null;

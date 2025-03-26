@@ -6,7 +6,6 @@ return [
     [
         'name' => 'CSS',
         'type' => '言語',
-        'rarity' => 1,
         'basePower' => 340,
         'baseLife' => 3000,
         'baseSpeed' => 10,
@@ -22,7 +21,6 @@ return [
     [
         'name' => 'Go',
         'type' => '言語',
-        'rarity' => 5,
         'basePower' => 560,
         'baseLife' => 3000,
         'baseSpeed' => 100,
@@ -38,7 +36,6 @@ return [
     [
         'name' => 'html',
         'type' => '言語',
-        'rarity' => 5,
         'basePower' => 300,
         'baseLife' => 5000,
         'baseSpeed' => 100,
@@ -54,7 +51,6 @@ return [
     [
         'name' => 'Javascript',
         'type' => '言語',
-        'rarity' => 4,
         'basePower' => 600,
         'baseLife' => 2600,
         'baseSpeed' => 230,
@@ -70,7 +66,6 @@ return [
     [
         'name' => 'PHP',
         'type' => '言語',
-        'rarity' => 3,
         'basePower' => 200,
         'baseLife' => 4000,
         'baseSpeed' => 60,
@@ -86,7 +81,6 @@ return [
     [
         'name' => 'Ruby',
         'type' => '言語',
-        'rarity' => 5,
         'basePower' => 230,
         'baseLife' => 3000,
         'baseSpeed' => 100,
@@ -102,7 +96,6 @@ return [
     [
         'name' => 'Swift',
         'type' => '言語',
-        'rarity' => 4,
         'basePower' => 800,
         'baseLife' => 3000,
         'baseSpeed' => 100,
@@ -118,7 +111,6 @@ return [
     [
         'name' => 'Typescript',
         'type' => '言語',
-        'rarity' => 4,
         'basePower' => 1000,
         'baseLife' => 2300,
         'baseSpeed' => 30,
@@ -136,7 +128,6 @@ return [
     [
         'name' => 'Angular',
         'type' => 'フレームワーク',
-        'rarity' => 4,
         'basePower' => 200,
         'baseLife' => 2200,
         'baseSpeed' => 20,
@@ -152,7 +143,6 @@ return [
     [
         'name' => 'React',
         'type' => 'フレームワーク',
-        'rarity' => 6,
         'basePower' => 630,
         'baseLife' => 2800,
         'baseSpeed' => 100,
@@ -168,7 +158,6 @@ return [
     [
         'name' => 'Vue',
         'type' => 'フレームワーク',
-        'rarity' => 4,
         'basePower' => 1000,
         'baseLife' => 2000,
         'baseSpeed' => 140,
@@ -184,7 +173,6 @@ return [
     [
         'name' => 'Ruby on Rails',
         'type' => 'フレームワーク',
-        'rarity' => 5,
         'basePower' => 400,
         'baseLife' => 2000,
         'baseSpeed' => 90,
@@ -202,7 +190,6 @@ return [
     [
         'name' => 'AWS',
         'type' => 'クラウド',
-        'rarity' => 5,
         'basePower' => 400,
         'baseLife' => 3000,
         'baseSpeed' => 90,
@@ -218,7 +205,6 @@ return [
     [
         'name' => 'Azure',
         'type' => 'クラウド',
-        'rarity' => 5,
         'basePower' => 780,
         'baseLife' => 2100,
         'baseSpeed' => 90,
@@ -234,7 +220,6 @@ return [
     [
         'name' => 'Google Cloud',
         'type' => 'クラウド',
-        'rarity' => 5,
         'basePower' => 620,
         'baseLife' => 2200,
         'baseSpeed' => 130,
@@ -252,7 +237,6 @@ return [
     [
         'name' => 'Docker',
         'type' => 'コンテナー',
-        'rarity' => 5,
         'basePower' => 300,
         'baseLife' => 4000,
         'baseSpeed' => 70,
@@ -270,7 +254,6 @@ return [
     [
         'name' => 'Linux',
         'type' => 'オペレーティングシステム',
-        'rarity' => 4,
         'basePower' => 100,
         'baseLife' => 5000,
         'baseSpeed' => 10,
@@ -286,7 +269,6 @@ return [
     [
         'name' => 'Mac',
         'type' => 'オペレーティングシステム',
-        'rarity' => 3,
         'basePower' => 600,
         'baseLife' => 1600,
         'baseSpeed' => 700,
@@ -302,7 +284,6 @@ return [
     [
         'name' => 'windows',
         'type' => 'オペレーティングシステム',
-        'rarity' => 3,
         'basePower' => 700,
         'baseLife' => 2600,
         'baseSpeed' => 60,
@@ -320,7 +301,6 @@ return [
     [
         'name' => 'Mysql',
         'type' => 'データベース',
-        'rarity' => 2,
         'basePower' => 100,
         'baseLife' => 3000,
         'baseSpeed' => 100,
@@ -336,7 +316,6 @@ return [
     [
         'name' => 'Postgres',
         'type' => 'データベース',
-        'rarity' => 3,
         'basePower' => 320,
         'baseLife' => 3400,
         'baseSpeed' => 10,
@@ -352,7 +331,6 @@ return [
     [
         'name' => 'Supabase',
         'type' => 'データベース',
-        'rarity' => 4,
         'basePower' => 900,
         'baseLife' => 1900,
         'baseSpeed' => 600,
@@ -370,7 +348,6 @@ return [
     [
         'name' => 'Unity',
         'type' => 'ゲームエンジン',
-        'rarity' => 5,
         'basePower' => 620,
         'baseLife' => 2000,
         'baseSpeed' => 250,
@@ -387,7 +364,6 @@ return [
     [
         'name' => 'Scratch',
         'type' => '言語',
-        'rarity' => 1,
         'basePower' => 150,
         'baseLife' => 2500,
         'baseSpeed' => 50,
@@ -403,7 +379,6 @@ return [
     [
         'name' => 'Viscuit',
         'type' => '言語',
-        'rarity' => 1,
         'basePower' => 100,
         'baseLife' => 2000,
         'baseSpeed' => 40,
@@ -419,7 +394,6 @@ return [
     [
         'name' => 'Apache',
         'type' => 'ウェブサーバー',
-        'rarity' => 3,
         'basePower' => 300,
         'baseLife' => 3500,
         'baseSpeed' => 80,
@@ -435,7 +409,6 @@ return [
     [
         'name' => 'Nginx',
         'type' => 'ウェブサーバー',
-        'rarity' => 4,
         'basePower' => 450,
         'baseLife' => 3000,
         'baseSpeed' => 120,
@@ -451,7 +424,6 @@ return [
     [
         'name' => 'LiteSpeed',
         'type' => 'ウェブサーバー',
-        'rarity' => 4,
         'basePower' => 500,
         'baseLife' => 2800,
         'baseSpeed' => 150,
@@ -467,7 +439,6 @@ return [
     [
         'name' => 'Caddy',
         'type' => 'ウェブサーバー',
-        'rarity' => 3,
         'basePower' => 350,
         'baseLife' => 2600,
         'baseSpeed' => 100,
@@ -483,7 +454,6 @@ return [
     [
         'name' => 'Kotlin',
         'type' => '言語',
-        'rarity' => 4,
         'basePower' => 700,
         'baseLife' => 2700,
         'baseSpeed' => 90,
@@ -499,7 +469,6 @@ return [
     [
         'name' => 'VBA',
         'type' => '言語',
-        'rarity' => 2,
         'basePower' => 200,
         'baseLife' => 3000,
         'baseSpeed' => 50,
@@ -515,7 +484,6 @@ return [
     [
         'name' => 'Google Apps Script',
         'type' => '言語',
-        'rarity' => 3,
         'basePower' => 250,
         'baseLife' => 2800,
         'baseSpeed' => 70,
@@ -531,7 +499,6 @@ return [
     [
         'name' => 'Firebase',
         'type' => 'クラウド',
-        'rarity' => 4,
         'basePower' => 600,
         'baseLife' => 2500,
         'baseSpeed' => 110,
@@ -547,7 +514,6 @@ return [
     [
         'name' => 'SQLite',
         'type' => 'データベース',
-        'rarity' => 2,
         'basePower' => 150,
         'baseLife' => 3200,
         'baseSpeed' => 80,
@@ -563,7 +529,6 @@ return [
     [
         'name' => 'jQuery',
         'type' => 'フレームワーク',
-        'rarity' => 3,
         'basePower' => 400,
         'baseLife' => 2400,
         'baseSpeed' => 90,
@@ -579,7 +544,6 @@ return [
     [
         'name' => 'Unreal Engine',
         'type' => 'ゲームエンジン',
-        'rarity' => 5,
         'basePower' => 800,
         'baseLife' => 2300,
         'baseSpeed' => 200,
@@ -595,7 +559,6 @@ return [
     [
         'name' => 'Java',
         'type' => '言語',
-        'rarity' => 4,
         'basePower' => 650,
         'baseLife' => 3000,
         'baseSpeed' => 80,
@@ -611,7 +574,6 @@ return [
     [
         'name' => 'Perl',
         'type' => '言語',
-        'rarity' => 3,
         'basePower' => 300,
         'baseLife' => 2800,
         'baseSpeed' => 70,
@@ -627,7 +589,6 @@ return [
     [
         'name' => 'C',
         'type' => '言語',
-        'rarity' => 3,
         'basePower' => 500,
         'baseLife' => 2600,
         'baseSpeed' => 100,
@@ -643,7 +604,6 @@ return [
     [
         'name' => 'C++',
         'type' => '言語',
-        'rarity' => 4,
         'basePower' => 700,
         'baseLife' => 2800,
         'baseSpeed' => 110,
@@ -659,7 +619,6 @@ return [
     [
         'name' => 'C#',
         'type' => '言語',
-        'rarity' => 4,
         'basePower' => 680,
         'baseLife' => 2900,
         'baseSpeed' => 90,
@@ -675,7 +634,6 @@ return [
     [
         'name' => 'git',
         'type' => 'バージョン管理',
-        'rarity' => 4,
         'basePower' => 200,
         'baseLife' => 2540,
         'baseSpeed' => 30,

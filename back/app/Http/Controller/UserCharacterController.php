@@ -40,7 +40,6 @@ class UserCharacterController
                 // Character（固定値）
                 'name' => $character->name,
                 'type' => $character->type,
-                'rarity' => $character->rarity,
                 'baseEvasion' => $character->baseEvasion,
                 'activeSkillId' => $character->activeSkillId,
                 'passiveSkillId' => $character->passiveSkillId,

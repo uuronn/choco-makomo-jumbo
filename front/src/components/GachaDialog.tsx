@@ -9,7 +9,6 @@ interface Character {
 	id: number;
 	name: string;
 	imageUrl: string;
-	rarity: number;
 	type: string;
 	baseLife: number;
 	basePower: number;
@@ -119,9 +118,6 @@ export default function GachaDialog() {
 														<h3 className="text-emerald-300 font-bold">
 															{character.name}
 														</h3>
-														<div className="px-1.5 py-0.5 bg-emerald-900/60 rounded text-xs text-emerald-400">
-															{"★".repeat(character.rarity)}
-														</div>
 														<div className="px-1.5 py-0.5 bg-emerald-900/60 rounded text-xs text-emerald-400">
 															{character.type}
 														</div>
