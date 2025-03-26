@@ -16,7 +16,7 @@ class Character extends Model
 
     protected $fillable = [
         'id', 'name', 'type', 'rarity', 'basePower', 'imageUrl', 'baseLife', 'baseSpeed', 'baseEvasion',
-        'specialSkillName', 'specialSkillDescription', 'specialSkillTurn'
+        'specialSkillName', 'specialSkillDescription', 'specialSkillTurn', 'passiveSkillName', 'passiveSkillDescription'
     ];
 
     protected static function boot()

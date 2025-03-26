@@ -48,6 +48,8 @@ class UserCharacterController
                 'specialSkillName' => $character->specialSkillName,
                 'specialSkillDescription' => $character->specialSkillDescription,
                 'specialSkillTurn' => $character->specialSkillTurn,
+                'passiveSkillName' => $character->passiveSkillName,
+                'passiveSkillDescription' => $character->passiveSkillDescription,
                 'imageUrl' => $character->imageUrl,
             ];
         });
