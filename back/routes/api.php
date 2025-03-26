@@ -3,7 +3,7 @@
 use App\Http\Controller\CharacterController;
 use App\Http\Controller\GachaController;
 use App\Http\Controller\RoomController;
-use App\Http\Controller\roomLogController;
+use App\Http\Controller\RoomLogController;
 use App\Http\Controller\UserCharacterController;
 use App\Http\Controller\UserController;
 use Illuminate\Support\Facades\Route;
@@ -106,7 +106,7 @@ Route::post('/{userId}/{roomId}/nextTurn', [RoomController::class, 'nextTurn']);
 
 
 // ルームログ取得
-Route::get('/rooms/{roomId}/log', [roomLogController::class, 'logs']);
+Route::get('/rooms/{roomId}/log', [RoomLogController::class, 'logs']);
 
 
 

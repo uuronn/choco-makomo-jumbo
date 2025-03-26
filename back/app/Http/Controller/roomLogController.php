@@ -5,7 +5,7 @@ namespace App\Http\Controller;
 use App\Model\RoomLog;
 use Illuminate\Http\Request;
 
-class roomLogController
+class RoomLogController
 {
     public function logs(Request $request)
     {
