@@ -14,18 +14,19 @@ return new class extends Migration
             $table->uuid('roomId')->index();
             $table->uuid('characterId');
             $table->uuid('userId');
-            $table->smallInteger('level');
-            $table->smallInteger('life');
-            $table->smallInteger('maxLife');
-            $table->smallInteger('power');
-            $table->smallInteger('speed');
-            $table->smallInteger('evasion');
+            $table->smallInteger('level')->unsigned();
+            $table->smallInteger('life')->unsigned();
+            $table->smallInteger('maxLife')->unsigned();
+            $table->smallInteger('power')->unsigned();
+            $table->smallInteger('speed')->unsigned();
+            $table->tinyInteger('evasion')->unsigned();
             $table->boolean('isActive')->default(true);
             $table->boolean('isDead')->default(false);
-            $table->smallInteger('specialSkillTurn')->default(5);
+            $table->tinyInteger('specialSkillTurn')->unsigned();
             $table->boolean('specialUsed')->default(false);
             $table->timestamps();
 
+            // 外部キー制約
             $table->foreign('roomId')->references('id')->on('room')->onDelete('cascade');
         });
     }
