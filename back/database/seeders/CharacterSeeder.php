@@ -10,6 +10,7 @@ class CharacterSeeder extends Seeder
     public function run(): void
     {
         $characters = require_once __DIR__ . '/data/characters.php';
+
         Character::insert($characters);
     }
 }
