@@ -11,6 +11,8 @@ class CharacterSeeder extends Seeder
     {
         $characters = require_once __DIR__ . '/data/characters.php';
 
-        Character::insert($characters);
+        foreach ($characters as $character) {
+            Character::create($character);
+        }
     }
 }
