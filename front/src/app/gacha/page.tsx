@@ -12,25 +12,46 @@ import {
 	Server,
 	Star,
 	Trophy,
+	Sparkles,
+	Shield,
+	Lightbulb,
 } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "~/components/ui/button";
+import confetti from "canvas-confetti";
+import { useUserContext } from "~/context/UserProvider";
+
+// Define the character type
+type Character = {
+	id: string;
+	name: string;
+	type: string;
+	basePower: number;
+	baseLife: number;
+	baseSpeed: number;
+	baseEvasion: number;
+	imageUrl?: string;
+	specialSkillName?: string;
+	specialSkillDescription?: string;
+	specialSkillTurn?: number;
+	passiveSkillName?: string;
+	passiveSkillDescription?: string;
+	isNew?: boolean; // 初獲得かどうかのフラグ
+};
 
 // Define the gacha result type
 type GachaResult = {
 	id: string;
 	name: string;
-	rarity: 1 | 2 | 3 | 4 | 5 | 6;
 	imageUrl?: string;
 	message?: string;
-	character?: {
-		name: string;
-	};
-	specialEffect?: string; // Add this for special rarity effects
+	character?: Character;
+	isNew?: boolean; // 初獲得かどうかのフラグ
 };
 
 export default function TechGacha() {
+	const { user, havingCharacters } = useUserContext();
 	const [availablePoints, setAvailablePoints] = useState(100);
 	const [isAnimating, setIsAnimating] = useState(false);
 	const [showResult, setShowResult] = useState(false);
@@ -58,7 +79,7 @@ export default function TechGacha() {
 	const [showPulse, setShowPulse] = useState(false);
 	const [showShockwave, setShowShockwave] = useState(false);
 	const [lightRays, setLightRays] = useState<boolean>(false);
-	const [confetti, setConfetti] = useState<boolean>(false);
+	const [confettiEffect, setConfettiEffect] = useState<boolean>(false);
 	const [glowIntensity, setGlowIntensity] = useState<number>(0);
 	const [revealStage, setRevealStage] = useState<number>(0);
 	const [specialEffects, setSpecialEffects] = useState<string[]>([]);
@@ -76,14 +97,14 @@ export default function TechGacha() {
 	const [loadingProgress, setLoadingProgress] = useState<number>(0);
 	const [loadingBarColor, setLoadingBarColor] =
 		useState<string>("bg-green-500");
+	const [showNewBadge, setShowNewBadge] = useState<boolean>(false);
 
 	// Refs for audio elements
 	const pullSoundRef = useRef<HTMLAudioElement | null>(null);
 	const rareSoundRef = useRef<HTMLAudioElement | null>(null);
 	const epicSoundRef = useRef<HTMLAudioElement | null>(null);
 	const legendarySoundRef = useRef<HTMLAudioElement | null>(null);
-
-	const router = useRouter();
+	const confettiCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
 	// Initialize audio elements
 	useEffect(() => {
@@ -124,15 +145,12 @@ export default function TechGacha() {
 			"  });",
 			"  return result.json();",
 			"}",
-			"// Calculate rarity based on seed",
-			"function calculateRarity(seed) {",
+			"// Calculate tech power based on seed",
+			"function calculatePower(seed) {",
 			"  const value = hashCode(seed) % 100;",
-			"  if (value < 1) return 6;  // 1%",
-			"  if (value < 5) return 5;  // 4%",
-			"  if (value < 15) return 4; // 10%",
-			"  if (value < 35) return 3; // 20%",
-			"  if (value < 65) return 2; // 30%",
-			"  return 1; // 35%",
+			"  if (value < 20) return 90 + value;",
+			"  if (value < 50) return 70 + value / 2;",
+			"  return 50 + value / 3;",
 			"}",
 		];
 
@@ -177,7 +195,7 @@ export default function TechGacha() {
 		setShowPulse(false);
 		setShowShockwave(false);
 		setLightRays(false);
-		setConfetti(false);
+		setConfettiEffect(false);
 		setGlowIntensity(0);
 		setRevealStage(0);
 		setSpecialEffects([]);
@@ -192,6 +210,41 @@ export default function TechGacha() {
 		setShowTrophy(false);
 		setShowCelebration(false);
 		setAnimationPhase(0);
+		setShowNewBadge(false);
+	};
+
+	// 紙吹雪エフェクトを実行する関数
+	const triggerConfetti = () => {
+		try {
+			if (confettiCanvasRef.current && typeof confetti !== "undefined") {
+				const myConfetti = confetti.create(confettiCanvasRef.current, {
+					resize: true,
+					useWorker: true,
+				});
+
+				myConfetti({
+					particleCount: 150,
+					spread: 100,
+					origin: { y: 0.5, x: 0.5 },
+					colors: [
+						"#00ff9d",
+						"#00f0ff",
+						"#00c3ff",
+						"#00ff66",
+						"#7bff00",
+						"#ffcc00",
+					],
+					shapes: ["circle", "square"],
+					ticks: 200,
+					gravity: 0.8,
+					scalar: 1.2,
+					disableForReducedMotion: true,
+				});
+			}
+		} catch (error) {
+			console.error("Confetti error:", error);
+			// エラーが発生しても処理を続行
+		}
 	};
 
 	// Mock gacha pull function with enhanced animations
@@ -243,7 +296,7 @@ export default function TechGacha() {
 		}, 50);
 
 		// Mock API call with timeout to simulate server request
-		setTimeout(() => {
+		setTimeout(async () => {
 			// Clear interval if it's still running
 			clearInterval(loadingInterval);
 			setLoadingProgress(100);
@@ -264,57 +317,98 @@ export default function TechGacha() {
 				}, 100);
 			}, 100);
 
-			// テスト用に必ずレアリティ5か6が出るようにする
-			// 50%の確率でレアリティ5か6が出る
-			const rand = Math.random();
-			let rarity: 1 | 2 | 3 | 4 | 5 | 6;
+			// 初獲得かどうかのフラグを宣言
+			let isNewCharacter = false;
 
-			if (rand < 0.5)
-				rarity = 6; // 50% chance for legendary
-			else rarity = 5; // 50% chance for mythical
+			// 実際のAPIを呼び出す
+			try {
+				const response = await fetch(
+					`${process.env.NEXT_PUBLIC_BASE_URL}/api/gacha`,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							userId: user?.uid, // 実際の実装ではユーザーIDを使用
+						}),
+					},
+				);
 
-			// Tech names based on rarity
-			const techNames = {
-				1: ["HTML", "CSS", "Basic JavaScript", "jQuery"],
-				2: ["React", "Vue.js", "Node.js", "Express"],
-				3: ["TypeScript", "Next.js", "GraphQL", "Docker"],
-				4: ["Rust", "WebAssembly", "Kubernetes", "TensorFlow.js"],
-				5: [
-					"Quantum Computing",
-					"Blockchain",
-					"Neural Networks",
-					"Advanced AI",
-				],
-				6: [
-					"Legendary Full Stack",
-					"10x Developer",
-					"System Architect",
-					"Tech Lead",
-				],
-			};
+				if (!response.ok) {
+					throw new Error("API request failed");
+				}
 
-			// Select random tech from the rarity tier
-			const techList = techNames[rarity];
-			const techName = techList[Math.floor(Math.random() * techList.length)];
+				const data = await response.json();
+				setResult(data);
 
-			// Add special effects based on rarity
-			const effects = [];
-			if (rarity >= 3) effects.push("rays");
-			if (rarity >= 4) effects.push("confetti");
-			if (rarity >= 5) effects.push("shake");
-			if (rarity === 6) effects.push("ultimate");
+				// 初獲得かどうかのフラグを設定
+				isNewCharacter = data.isNew || false;
+			} catch (error) {
+				console.error("Gacha API error:", error);
 
-			const mockResult: GachaResult = {
-				id: Math.random().toString(36).substring(2, 9),
-				name: techName,
-				rarity: rarity,
-				imageUrl: `/placeholder.svg?height=140&width=140&text=${encodeURIComponent(
-					techName,
-				)}`,
-				specialEffect: rarity >= 5 ? "legendary" : rarity >= 3 ? "rare" : "",
-			};
+				// APIエラー時はフォールバックとしてモックデータを使用
+				const techTypes = [
+					"バージョン管理",
+					"データベース",
+					"フレームワーク",
+					"言語",
+					"クラウド",
+					"オペレーティングシステム",
+					"実行環境",
+					"ゲームエンジン",
+					"コンテナー",
+				];
 
-			setResult(mockResult);
+				const techNames = [
+					"React",
+					"Vue.js",
+					"Angular",
+					"Next.js",
+					"Node.js",
+					"TypeScript",
+					"Python",
+					"Rust",
+					"Go",
+					"Docker",
+				];
+
+				// ランダムに技術を選択
+				const randomType =
+					techTypes[Math.floor(Math.random() * techTypes.length)];
+				const randomName =
+					techNames[Math.floor(Math.random() * techNames.length)];
+
+				// フォールバック用のモックデータ
+				const mockCharacter: Character = {
+					id: Math.random().toString(36).substring(2, 9),
+					name: randomName,
+					type: randomType,
+					basePower: Math.floor(Math.random() * 50) + 50,
+					baseLife: Math.floor(Math.random() * 100) + 100,
+					baseSpeed: Math.floor(Math.random() * 40) + 40,
+					baseEvasion: Math.floor(Math.random() * 20) + 5,
+					imageUrl: `/placeholder.svg?height=140&width=140&text=${encodeURIComponent(
+						randomName,
+					)}`,
+					specialSkillName: `${randomName}の特殊技`,
+					specialSkillDescription: "攻撃力が1.5倍になる",
+					specialSkillTurn: Math.floor(Math.random() * 3) + 1,
+					passiveSkillName: `${randomName}の受動スキル`,
+					passiveSkillDescription: "バトル開始時、HPが10%回復する",
+					isNew: false,
+				};
+
+				const mockResult: GachaResult = {
+					id: mockCharacter.id,
+					name: mockCharacter.name,
+					imageUrl: mockCharacter.imageUrl,
+					character: mockCharacter,
+					isNew: false,
+				};
+
+				setResult(mockResult);
+			}
 
 			// Phase 3: Climax animation
 			setAnimationPhase(3);
@@ -325,13 +419,14 @@ export default function TechGacha() {
 				setShowFlash(false);
 				setExplosionParticles(true);
 
-				// Play appropriate sound based on rarity
-				if (rarity >= 6) {
-					// legendarySoundRef.current?.play();
-				} else if (rarity >= 5) {
-					// epicSoundRef.current?.play();
-				} else if (rarity >= 3) {
-					// rareSoundRef.current?.play();
+				// 初獲得の場合は特別な演出を追加
+				// isNewCharacter 変数は既に定義されているので、この部分は削除
+
+				if (isNewCharacter) {
+					setShowNewBadge(true);
+					setSpecialEffects(["rays", "confetti", "shake", "ultimate"]);
+				} else {
+					setSpecialEffects(["rays"]);
 				}
 
 				// Phase 4: Result reveal with special effects
@@ -341,21 +436,19 @@ export default function TechGacha() {
 					setShowCrack(false);
 					setScreenShake(false);
 
-					if (effects.includes("rays")) setLightRays(true);
-					setGlowIntensity(rarity * 3); // Increased glow intensity
+					if (specialEffects.includes("rays")) setLightRays(true);
+					setGlowIntensity(isNewCharacter ? 15 : 5);
 
 					setTimeout(() => {
-						if (effects.includes("confetti")) {
-							setConfetti(true);
+						if (specialEffects.includes("confetti")) {
+							setConfettiEffect(true);
 							setShowStars(true);
+							triggerConfetti();
 						}
 
-						if (rarity >= 5) {
+						if (isNewCharacter) {
 							setShowRainbow(true);
 							setShowFireworks(true);
-						}
-
-						if (rarity === 6) {
 							setShowTrophy(true);
 							setTimeout(() => setShowCelebration(true), 500);
 						}
@@ -369,8 +462,8 @@ export default function TechGacha() {
 								setExplosionParticles(false);
 							}, 3000);
 
-							// Keep the celebration effects longer for high rarity items
-							if (rarity < 5) {
+							// Keep the celebration effects longer for new characters
+							if (!isNewCharacter) {
 								setTimeout(() => {
 									resetAnimations();
 								}, 5000);
@@ -382,30 +475,21 @@ export default function TechGacha() {
 		}, 2500);
 	};
 
-	const rarityColors = {
-		1: "from-green-400 to-green-600",
-		2: "from-blue-400 to-blue-600",
-		3: "from-purple-400 to-purple-600",
-		4: "from-yellow-400 to-yellow-600",
-		5: "from-red-400 to-red-600",
-		6: "from-pink-400 via-purple-500 to-blue-600",
-	};
+	// 技術タイプに基づく色を取得
+	const getTypeColor = (type: string) => {
+		const typeColors: Record<string, string> = {
+			バージョン管理: "bg-red-500",
+			データベース: "bg-blue-500",
+			フレームワーク: "bg-amber-700",
+			言語: "bg-green-500",
+			クラウド: "bg-yellow-400",
+			オペレーティングシステム: "bg-purple-800",
+			実行環境: "bg-pink-500",
+			ゲームエンジン: "bg-indigo-500",
+			コンテナー: "bg-teal-500",
+		};
 
-	const rarityText = {
-		1: "⭐️",
-		2: "⭐️⭐️",
-		3: "⭐️⭐️⭐️",
-		4: "⭐️⭐️⭐️⭐️",
-		5: "⭐️⭐️⭐️⭐️⭐️",
-		6: "⭐️⭐️⭐️⭐️⭐️⭐️",
-	};
-
-	const getRarityAnimation = (rarity: number) => {
-		if (rarity >= 6) return "animate-ultra-pulse";
-		if (rarity >= 5) return "animate-epic-pulse";
-		if (rarity >= 4) return "animate-rare-pulse";
-		if (rarity >= 3) return "animate-uncommon-pulse";
-		return "animate-common-pulse";
+		return typeColors[type] || "bg-gray-500";
 	};
 
 	return (
@@ -414,6 +498,13 @@ export default function TechGacha() {
 				screenShake ? "animate-screen-shake" : ""
 			}`}
 		>
+			{/* 紙吹雪用のキャンバス */}
+			<canvas
+				ref={confettiCanvasRef}
+				className="fixed inset-0 pointer-events-none z-50"
+				style={{ width: "100%", height: "100%" }}
+			/>
+
 			{/* Background code effect */}
 			<div className="absolute inset-0 overflow-hidden opacity-10 pointer-events-none">
 				<div className="h-full w-full flex flex-col text-xs text-green-500 font-mono">
@@ -949,15 +1040,14 @@ export default function TechGacha() {
 										damping: 20,
 										x: { repeat: 5, duration: 0.1 },
 									}}
-									className={`w-full h-full bg-gradient-to-br ${
-										rarityColors[result?.rarity as keyof typeof rarityColors]
-									} p-6 rounded-xl border-2 border-white/50 shadow-[0_0_${
-										glowIntensity * 5
-									}px_rgba(255,255,255,0.7)] relative overflow-hidden ${getRarityAnimation(
-										result?.rarity || 1,
-									)}`}
+									className="w-full h-full bg-gradient-to-br from-green-400 to-green-600 p-6 rounded-xl border-2 border-white/50 shadow-lg relative overflow-hidden"
+									style={{
+										boxShadow: `0 0 ${
+											glowIntensity * 5
+										}px rgba(255,255,255,0.7)`,
+									}}
 								>
-									{/* Light rays effect for high rarity */}
+									{/* Light rays effect */}
 									{lightRays && (
 										<div className="absolute inset-0 overflow-hidden">
 											{Array.from({ length: 12 }).map((_, i) => (
@@ -965,11 +1055,8 @@ export default function TechGacha() {
 													key={`ray-${i}`}
 													className="absolute top-1/2 left-1/2 h-[300%] w-[20px] origin-bottom"
 													style={{
-														background: `linear-gradient(to top, transparent, ${
-															result?.rarity && result.rarity >= 5
-																? "white"
-																: "rgba(255,255,255,0.7)"
-														})`,
+														background:
+															"linear-gradient(to top, transparent, rgba(255,255,255,0.7))",
 														rotate: `${i * 30}deg`,
 														opacity: 0,
 													}}
@@ -984,8 +1071,8 @@ export default function TechGacha() {
 										</div>
 									)}
 
-									{/* Confetti effect for high rarity */}
-									{confetti && (
+									{/* Confetti effect */}
+									{confettiEffect && (
 										<div className="absolute inset-0 overflow-hidden">
 											{Array.from({ length: 50 }).map((_, i) => (
 												<motion.div
@@ -1019,7 +1106,7 @@ export default function TechGacha() {
 										</div>
 									)}
 
-									{/* Ultimate effect for legendary items */}
+									{/* Ultimate effect for new items */}
 									{specialEffects.includes("ultimate") && (
 										<>
 											<motion.div
@@ -1044,7 +1131,7 @@ export default function TechGacha() {
 										</>
 									)}
 
-									{/* Celebration effect for legendary items */}
+									{/* Celebration effect for new items */}
 									{showCelebration && (
 										<div className="absolute inset-0 z-30 overflow-hidden">
 											<motion.div
@@ -1065,32 +1152,27 @@ export default function TechGacha() {
 												animate={{ y: 0, opacity: 1 }}
 												transition={{ delay: 0.5, duration: 0.5 }}
 											>
-												伝説級獲得！
+												新技術獲得！
 											</motion.div>
 										</div>
 									)}
 
 									<div className="text-center relative z-10">
-										<motion.div
-											className="mb-1 px-3 py-1 bg-black/30 rounded-full inline-block"
-											animate={{
-												y: [0, -5, 0],
-												scale: specialEffects.includes("ultimate")
-													? [1, 1.2, 1]
-													: 1,
-											}}
-											transition={{
-												y: { duration: 2, repeat: Number.POSITIVE_INFINITY },
-												scale: {
+										{/* New badge */}
+										{showNewBadge && (
+											<motion.div
+												className="absolute -top-4 -right-4 bg-yellow-500 text-black px-3 py-1 rounded-full font-bold text-sm transform rotate-12 z-20"
+												initial={{ scale: 0 }}
+												animate={{ scale: [0, 1.2, 1] }}
+												transition={{
 													duration: 0.5,
-													repeat: Number.POSITIVE_INFINITY,
-												},
-											}}
-										>
-											<p className="text-xs font-mono text-white tracking-widest">
-												{rarityText[result?.rarity as keyof typeof rarityText]}
-											</p>
-										</motion.div>
+													type: "spring",
+													stiffness: 300,
+												}}
+											>
+												NEW!
+											</motion.div>
+										)}
 
 										<motion.h3
 											className="text-2xl font-bold text-white mb-1 drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]"
@@ -1110,10 +1192,23 @@ export default function TechGacha() {
 											{result?.name}
 										</motion.h3>
 
-										<div className="flex justify-center items-center mt-2">
+										{/* Type badge */}
+										{result?.character?.type && (
+											<div className="mb-2">
+												<span
+													className={`inline-block px-2 py-0.5 rounded-full text-xs text-white ${getTypeColor(
+														result.character.type,
+													)}`}
+												>
+													{result.character.type}
+												</span>
+											</div>
+										)}
+
+										<div className="flex flex-col items-center mt-2">
 											{result?.imageUrl && (
 												<motion.div
-													className="relative"
+													className="relative mb-3"
 													animate={{
 														rotate: specialEffects.includes("ultimate")
 															? [0, 5, 0, -5, 0]
@@ -1139,15 +1234,6 @@ export default function TechGacha() {
 														}`}
 													></div>
 
-													{/* Glowing border based on rarity */}
-													<div
-														className={`absolute inset-0 rounded-lg ${
-															result?.rarity && result.rarity >= 5
-																? "animate-border-glow"
-																: ""
-														}`}
-													></div>
-
 													<Image
 														alt={result?.name || ""}
 														height={140}
@@ -1155,29 +1241,87 @@ export default function TechGacha() {
 														src={result?.imageUrl || "/placeholder.svg"}
 														className="rounded-lg border border-white/30 relative z-10"
 													/>
-
-													{/* Special effect overlay for legendary items */}
-													{result?.rarity && result.rarity >= 5 && (
-														<motion.div
-															className="absolute inset-0 rounded-lg bg-gradient-to-t from-transparent to-white/80 z-20"
-															animate={{ opacity: [0, 0.7, 0] }}
-															transition={{
-																duration: 2,
-																repeat: Number.POSITIVE_INFINITY,
-															}}
-														/>
-													)}
 												</motion.div>
 											)}
-											{result?.message ===
-												"Character already owned! You received 5 points!" && (
-												<h2 className="text-xl font-bold text-green-400">
-													{result.character?.name}
-													<br /> <br />
-													(取得済み技術)
-													<br /> <br />
-													+5ポイント
-												</h2>
+
+											{/* Character stats */}
+											{result?.character && (
+												<div className="bg-black/40 rounded-lg p-3 w-full mt-2 border border-white/20">
+													<div className="grid grid-cols-2 gap-2 text-sm">
+														<div className="flex items-center gap-1">
+															<Shield className="h-3 w-3 text-blue-300" />
+															<span className="text-blue-300">HP:</span>
+															<span className="text-white font-bold">
+																{result.character.baseLife}
+															</span>
+														</div>
+														<div className="flex items-center gap-1">
+															<Zap className="h-3 w-3 text-red-300" />
+															<span className="text-red-300">パワー:</span>
+															<span className="text-white font-bold">
+																{result.character.basePower}
+															</span>
+														</div>
+														<div className="flex items-center gap-1">
+															<Cpu className="h-3 w-3 text-green-300" />
+															<span className="text-green-300">スピード:</span>
+															<span className="text-white font-bold">
+																{result.character.baseSpeed}
+															</span>
+														</div>
+														<div className="flex items-center gap-1">
+															<Sparkles className="h-3 w-3 text-yellow-300" />
+															<span className="text-yellow-300">回避率:</span>
+															<span className="text-white font-bold">
+																{result.character.baseEvasion}%
+															</span>
+														</div>
+													</div>
+
+													{/* Skills section */}
+													<div className="mt-3 border-t border-white/20 pt-2">
+														{result.character.specialSkillName && (
+															<div className="mb-2">
+																<div className="flex items-center gap-1 text-sm">
+																	<Sparkles className="h-3 w-3 text-yellow-300" />
+																	<span className="text-yellow-300 font-bold">
+																		固有スキル:
+																	</span>
+																	<span className="text-white">
+																		{result.character.specialSkillName}
+																	</span>
+																</div>
+																<div className="text-xs text-gray-300 ml-4 mt-0.5">
+																	{result.character.specialSkillDescription}
+																	{result.character.specialSkillTurn && (
+																		<span className="text-yellow-200">
+																			{" "}
+																			(ターン:{" "}
+																			{result.character.specialSkillTurn})
+																		</span>
+																	)}
+																</div>
+															</div>
+														)}
+
+														{result.character.passiveSkillName && (
+															<div>
+																<div className="flex items-center gap-1 text-sm">
+																	<Lightbulb className="h-3 w-3 text-blue-300" />
+																	<span className="text-blue-300 font-bold">
+																		パッシブスキル:
+																	</span>
+																	<span className="text-white">
+																		{result.character.passiveSkillName}
+																	</span>
+																</div>
+																<div className="text-xs text-gray-300 ml-4 mt-0.5">
+																	{result.character.passiveSkillDescription}
+																</div>
+															</div>
+														)}
+													</div>
+												</div>
 											)}
 										</div>
 									</div>
@@ -1187,31 +1331,30 @@ export default function TechGacha() {
 					</div>
 
 					<div className="w-full flex items-center gap-3 justify-center">
-						<Button
-							onClick={() => {
-								router.push("/");
-							}}
-							disabled={isAnimating}
-							className="w-1/2 relative bg-black hover:bg-green-900 text-green-400 border border-green-500/50 px-8 py-6 text-xl rounded-md shadow-[0_0_10px_rgba(0,255,128,0.3)] transition-all hover:shadow-[0_0_15px_rgba(0,255,128,0.5)] disabled:opacity-70 disabled:hover:shadow-[0_0_10px_rgba(0,255,128,0.3)] overflow-hidden group"
-						>
-							{/* Button glow effect */}
-							<div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+						<Link href="/" className="w-1/2">
+							<Button
+								disabled={isAnimating}
+								className="w-full relative bg-black hover:bg-green-900 text-green-400 border border-green-500/50 px-8 py-6 text-xl rounded-md shadow-[0_0_10px_rgba(0,255,128,0.3)] transition-all hover:shadow-[0_0_15px_rgba(0,255,128,0.5)] disabled:opacity-70 disabled:hover:shadow-[0_0_10px_rgba(0,255,128,0.3)] overflow-hidden group"
+							>
+								{/* Button glow effect */}
+								<div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
-							{/* Button text with scan line */}
-							<div className="relative flex items-center justify-center gap-2">
-								<ArrowLeft className="h-5 w-5" />
-								<span className="tracking-wider font-mono">戻る</span>
-								<motion.div
-									className="absolute inset-0 bg-green-400/20 mix-blend-overlay"
-									animate={{ top: ["100%", "-100%"] }}
-									transition={{
-										duration: 2,
-										repeat: Number.POSITIVE_INFINITY,
-										ease: "linear",
-									}}
-								></motion.div>
-							</div>
-						</Button>
+								{/* Button text with scan line */}
+								<div className="relative flex items-center justify-center gap-2">
+									<ArrowLeft className="h-5 w-5" />
+									<span className="tracking-wider font-mono">戻る</span>
+									<motion.div
+										className="absolute inset-0 bg-green-400/20 mix-blend-overlay"
+										animate={{ top: ["100%", "-100%"] }}
+										transition={{
+											duration: 2,
+											repeat: Number.POSITIVE_INFINITY,
+											ease: "linear",
+										}}
+									></motion.div>
+								</div>
+							</Button>
+						</Link>
 						<Button
 							onClick={pullGacha}
 							disabled={isAnimating || availablePoints < 10}
@@ -1272,78 +1415,6 @@ export default function TechGacha() {
         }
         .animate-scrollUp {
           animation: scrollUp 60s linear infinite;
-        }
-        
-        @keyframes common-pulse {
-          0%, 100% {
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-          }
-          50% {
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-          }
-        }
-        .animate-common-pulse {
-          animation: common-pulse 2s infinite;
-        }
-        
-        @keyframes uncommon-pulse {
-          0%, 100% {
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-          }
-          50% {
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
-          }
-        }
-        .animate-uncommon-pulse {
-          animation: uncommon-pulse 1.8s infinite;
-        }
-        
-        @keyframes rare-pulse {
-          0%, 100% {
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-          }
-          50% {
-            box-shadow: 0 0 35px rgba(255, 255, 255, 0.7);
-          }
-        }
-        .animate-rare-pulse {
-          animation: rare-pulse 1.5s infinite;
-        }
-        
-        @keyframes epic-pulse {
-          0%, 100% {
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
-          }
-          50% {
-            box-shadow: 0 0 45px rgba(255, 255, 255, 0.8);
-          }
-        }
-        .animate-epic-pulse {
-          animation: epic-pulse 1.2s infinite;
-        }
-        
-        @keyframes ultra-pulse {
-          0%, 100% {
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.7);
-          }
-          50% {
-            box-shadow: 0 0 60px rgba(255, 255, 255, 0.9);
-          }
-        }
-        .animate-ultra-pulse {
-          animation: ultra-pulse 1s infinite;
-        }
-        
-        @keyframes border-glow {
-          0%, 100% {
-            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
-          }
-          50% {
-            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.8);
-          }
-        }
-        .animate-border-glow {
-          animation: border-glow 1s infinite;
         }
         
         @keyframes pulse-fast {
