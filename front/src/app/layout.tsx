@@ -7,6 +7,7 @@ import { UserProvider } from "../context/UserProvider";
 // import { Sidebar } from "~/components/SideBar";
 import { SnackbarProvider } from "notistack";
 import { MaintenanceModal } from "~/components/MaintenanceModal";
+import { Sidebar } from "~/components/SideBar";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -32,7 +33,7 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				<MaintenanceModal />
+				{/* <MaintenanceModal /> */}
 				<SnackbarProvider
 					anchorOrigin={{
 						vertical: "top",
@@ -43,7 +44,7 @@ export default function RootLayout({
 				/>
 				<UserProvider>
 					{/* TODO: メンテナンス終わったら解除する */}
-					{/* <Sidebar /> */}
+					<Sidebar />
 					{children}
 				</UserProvider>
 			</body>
