@@ -8,7 +8,6 @@ export type Character = {
 	name: string;
 	type: string;
 	baseEvasion: number;
-	imageUrl: string;
 	specialSkillName: string;
 	specialSkillDescription: string;
 	specialSkillTurn: number;
