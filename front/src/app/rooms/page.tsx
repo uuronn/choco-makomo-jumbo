@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Plus, Users, ChevronRight } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
-import { cn } from "~/lib/utils";
+import { characterToImagePath, cn } from "~/lib/utils";
 import { useUserContext } from "~/context/UserProvider";
 import { Character } from "~/type/character";
 import { SelectingRoom } from "~/type/room";
@@ -138,7 +138,10 @@ export default function GameInterface() {
 									>
 										<div className="relative h-16 w-16 mx-3 rounded-md overflow-hidden border border-green-400/50">
 											<Image
-												src={character.imageUrl || "/placeholder.svg"}
+												src={
+													characterToImagePath(character.characterId) ||
+													"/placeholder.svg"
+												}
 												alt={character.name}
 												fill
 												className="object-cover"
@@ -204,7 +207,10 @@ export default function GameInterface() {
 										>
 											<div className="relative h-12 w-12 mb-1 rounded-full overflow-hidden border-2 border-green-400/50">
 												<Image
-													src={character.imageUrl || "/placeholder.svg"}
+													src={
+														characterToImagePath(character.characterId) ||
+														"/placeholder.svg"
+													}
 													alt={character.name}
 													fill
 													className="object-cover"

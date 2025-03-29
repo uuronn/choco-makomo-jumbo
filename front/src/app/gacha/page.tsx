@@ -21,6 +21,7 @@ import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import confetti from "canvas-confetti";
 import { useUserContext } from "~/context/UserProvider";
+import { characterToImagePath } from "~/lib/utils";
 
 // Define the character type
 type Character = {
@@ -31,7 +32,6 @@ type Character = {
 	baseLife: number;
 	baseSpeed: number;
 	baseEvasion: number;
-	imageUrl?: string;
 	specialSkillName?: string;
 	specialSkillDescription?: string;
 	specialSkillTurn?: number;
@@ -44,7 +44,6 @@ type Character = {
 type GachaResult = {
 	id: string;
 	name: string;
-	imageUrl?: string;
 	message?: string;
 	character?: Character;
 	isNew?: boolean; // 初獲得かどうかのフラグ
@@ -388,9 +387,6 @@ export default function TechGacha() {
 					baseLife: Math.floor(Math.random() * 100) + 100,
 					baseSpeed: Math.floor(Math.random() * 40) + 40,
 					baseEvasion: Math.floor(Math.random() * 20) + 5,
-					imageUrl: `/placeholder.svg?height=140&width=140&text=${encodeURIComponent(
-						randomName,
-					)}`,
 					specialSkillName: `${randomName}の特殊技`,
 					specialSkillDescription: "攻撃力が1.5倍になる",
 					specialSkillTurn: Math.floor(Math.random() * 3) + 1,
@@ -402,7 +398,6 @@ export default function TechGacha() {
 				const mockResult: GachaResult = {
 					id: mockCharacter.id,
 					name: mockCharacter.name,
-					imageUrl: mockCharacter.imageUrl,
 					character: mockCharacter,
 					isNew: false,
 				};
@@ -1206,7 +1201,7 @@ export default function TechGacha() {
 										)}
 
 										<div className="flex flex-col items-center mt-2">
-											{result?.imageUrl && (
+											{result?.id && (
 												<motion.div
 													className="relative mb-3"
 													animate={{
@@ -1238,7 +1233,10 @@ export default function TechGacha() {
 														alt={result?.name || ""}
 														height={140}
 														width={140}
-														src={result?.imageUrl || "/placeholder.svg"}
+														src={
+															characterToImagePath(result?.id) ||
+															"/placeholder.svg"
+														}
 														className="rounded-lg border border-white/30 relative z-10"
 													/>
 												</motion.div>

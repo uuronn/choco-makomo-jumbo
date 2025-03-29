@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { cn } from "~/lib/utils";
+import { characterToImagePath, cn } from "~/lib/utils";
 
 interface Character {
-	id: number;
+	id: string;
 	name: string;
-	imageUrl: string;
 	type: string;
 	baseLife: number;
 	basePower: number;
@@ -99,9 +98,12 @@ export default function GachaDialog() {
 											<div className="flex gap-4">
 												{/* Character Image */}
 												<div className="w-20 h-20 flex-shrink-0 bg-gray-800 rounded-sm overflow-hidden border border-emerald-800">
-													{character.imageUrl ? (
+													{character.id ? (
 														<img
-															src={character.imageUrl || "/placeholder.svg"}
+															src={
+																characterToImagePath(character.id) ||
+																"/placeholder.svg"
+															}
 															alt={character.name}
 															className="w-full h-full object-cover"
 														/>

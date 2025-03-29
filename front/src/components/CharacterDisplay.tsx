@@ -4,6 +4,7 @@ import type { RoomCharacter } from "~/type/room";
 import Image from "next/image";
 import React from "react";
 import { motion } from "framer-motion";
+import { characterToImagePath } from "~/lib/utils";
 
 export const CharacterDisplay = React.memo(
 	({
@@ -170,7 +171,10 @@ export const CharacterDisplay = React.memo(
 						variants={blinkVariants}
 					>
 						<Image
-							src={character.character.imageUrl || "/placeholder.svg"}
+							src={
+								characterToImagePath(character.character.characterId) ||
+								"/placeholder.svg"
+							}
 							alt=""
 							width={100}
 							height={100}

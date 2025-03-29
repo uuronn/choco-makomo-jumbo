@@ -11,6 +11,7 @@ import { Button } from "~/components/ui/button";
 import { useUserContext } from "../../context/UserProvider";
 import type { Character, LevelUpResult } from "~/type/character";
 import { enqueueSnackbar } from "notistack";
+import { characterToImagePath } from "~/lib/utils";
 
 type CharacterType =
 	| "バージョン管理"
@@ -179,7 +180,10 @@ export default function CharacterDevelopment() {
 											style={{ boxShadow: "0 0 10px rgba(16, 185, 129, 0.5)" }}
 										>
 											<Image
-												src={selectedCharacter.imageUrl || "/placeholder.svg"}
+												src={
+													characterToImagePath(selectedCharacter.characterId) ||
+													"/placeholder.svg"
+												}
 												alt={selectedCharacter.name}
 												fill
 												className="object-cover"
@@ -426,7 +430,10 @@ export default function CharacterDevelopment() {
 									<div className="flex flex-col items-center">
 										<div className="relative w-16 h-16 mb-2 overflow-hidden rounded-lg">
 											<Image
-												src={character.imageUrl || "/placeholder.svg"}
+												src={
+													characterToImagePath(character.characterId) ||
+													"/placeholder.svg"
+												}
 												alt={character.name}
 												fill
 												className="object-cover"
