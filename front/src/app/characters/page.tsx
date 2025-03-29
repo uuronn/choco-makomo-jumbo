@@ -13,6 +13,7 @@ import {
 	Sparkles,
 	Lightbulb,
 	Info,
+	Layers,
 } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
@@ -210,7 +211,7 @@ export default function CharacterDevelopment() {
 					<Card className="w-full border border-emerald-500/50 bg-gray-900/90">
 						<CardContent className="p-4 h-full flex flex-col">
 							{selectedCharacter ? (
-								<div className="flex flex-col">
+								<div className="flex flex-col max-h-[340px]">
 									{/* Character Info and Skills - Horizontal Layout */}
 									<div className="flex flex-col md:flex-row gap-4 mb-4">
 										{/* Character Image and Basic Info */}
@@ -239,25 +240,30 @@ export default function CharacterDevelopment() {
 													【Lv.{selectedCharacter.level}】
 												</span>
 											</h2>
-											<div className="flex items-center gap-1 mt-1">
-												<Badge
-													className={`${
-														typeColors[
-															selectedCharacter.type as CharacterType
-														] || "bg-gray-500"
-													} text-white`}
-												>
-													{selectedCharacter.type}
-												</Badge>
-											</div>
 										</div>
 
 										{/* Skills Section */}
 										<div className="flex-1 bg-gray-800/80 p-3 rounded-md border border-emerald-500/30 h-full overflow-y-auto">
-											{/* <h3 className="text-sm font-semibold text-emerald-400 mb-2 flex items-center">
-												<Sparkles className="h-4 w-4 mr-1" />
-												スキル
-											</h3> */}
+											{/* タイプをスキルの上に移動 */}
+											<div className="mb-3 min-h-16">
+												<div className="flex items-center gap-1 text-sm">
+													<Layers className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+													<span className="text-emerald-400 font-bold">
+														タイプ:
+													</span>
+													<span className="text-white">
+														<Badge
+															className={`${
+																typeColors[
+																	selectedCharacter.type as CharacterType
+																] || "bg-gray-500"
+															} text-white ml-1`}
+														>
+															{selectedCharacter.type}
+														</Badge>
+													</span>
+												</div>
+											</div>
 
 											{/* Passive Skill */}
 											<div className="mb-3 min-h-16">
@@ -306,15 +312,17 @@ export default function CharacterDevelopment() {
 										</div>
 
 										<div className="flex-1 max-h-[346px] bg-gray-800/50 rounded-md border border-emerald-500/30 p-3">
-											<div className="flex flex-col md:flex-row md:items-center justify-between mb-3">
-												<div className="text-lg font-semibold text-green-400 flex items-center">
+											<div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+												<div className="flex items-center">
 													<Info className="h-4 w-4 mr-1 text-emerald-400" />
-													技術ポイント:{" "}
+													<span className="text-green-400 font-semibold">
+														技術ポイント:
+													</span>
 													<span className="text-emerald-400 text-xl ml-1">
 														{remainingPoints}
 													</span>
 												</div>
-												<div className="flex items-center gap-2 mt-2 md:mt-0">
+												<div className="flex items-center gap-2">
 													<span className="text-sm text-green-200">
 														増減量:
 													</span>
@@ -379,7 +387,7 @@ export default function CharacterDevelopment() {
 
 												{/* Evasion Stat (non-modifiable) */}
 												<div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
-													<div className="w-20 text-green-200 flex items-center">
+													<div className="w-24 text-green-200 flex items-center whitespace-nowrap">
 														<Sparkles className="h-4 w-4 text-yellow-300 mr-1" />
 														回避率:
 													</div>
@@ -402,12 +410,10 @@ export default function CharacterDevelopment() {
 											</Button>
 										</div>
 									</div>
-
-									{/* Stats Section - Original Design */}
 								</div>
 							) : (
 								/* Placeholder content */
-								<div className="flex items-center justify-center h-full min-h-[398px]">
+								<div className="flex items-center justify-center h-full min-h-[340px]">
 									<div className="text-center w-full max-w-md">
 										<div className="mb-4 text-emerald-400 opacity-50">
 											<Zap className="h-16 w-16 mx-auto" />
@@ -426,7 +432,7 @@ export default function CharacterDevelopment() {
 				</div>
 
 				{/* Character List Section */}
-				<div className="h-1/3 overflow-auto border rounded-lg p-4 border-emerald-500/30 bg-gray-900/80">
+				<div className="overflow-auto border h-full rounded-lg p-4 border-emerald-500/30 bg-gray-900/80">
 					<h2 className="text-xl font-bold mb-4 text-green-400 flex items-center">
 						所持技術
 						<div className="h-px flex-grow ml-4 bg-gradient-to-r from-emerald-400 to-transparent" />
@@ -484,7 +490,7 @@ function StatRow({
 }: StatRowProps) {
 	return (
 		<div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
-			<div className="w-20 text-green-200 flex items-center whitespace-nowrap">
+			<div className="w-24 text-green-200 flex items-center whitespace-nowrap">
 				{icon}
 				{label}:
 			</div>
