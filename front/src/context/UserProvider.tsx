@@ -55,7 +55,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
 			// 既存ユーザーか確認
 			const checkUser = await fetch(
-				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}`,
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}/checkUser`,
 			);
 
 			if (checkUser.ok) {
@@ -109,7 +109,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
 				// ユーザーが存在するか確認
 				const checkUser = await fetch(
-					`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}`,
+					`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/checkUser`,
 				);
 
 				if (!checkUser.ok) {
