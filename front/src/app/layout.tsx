@@ -28,7 +28,6 @@ export default function RootLayout({
 		<html lang="en">
 			<head>
 				<title>技術大戦争</title>
-				<link rel="icon" href="/character/vue.webp" />
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
