@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('character', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
+            $table->string('officialName')->nullable();
             $table->string('type');
             $table->smallInteger('basePower')->unsigned();
             $table->smallInteger('baseLife')->unsigned();
@@ -21,7 +22,6 @@ return new class extends Migration
             $table->tinyInteger('specialSkillTurn')->unsigned();
             $table->string('passiveSkillName')->nullable();
             $table->string('passiveSkillDescription')->nullable();
-            $table->string('imageUrl');
             $table->timestamps();
         });
     }
