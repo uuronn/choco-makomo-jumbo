@@ -9,16 +9,16 @@ use Illuminate\Http\Request;
 
 class GachaController
 {
+    private const GACHA_COST = 10;
+    private const DUPLICATE_POINT_REWARD = 5;
+
     public function gacha(Request $request)
     {
         $user = User::find($request->userId);
 
         if (!$user) return response()->json(['message' => 'User not found'], 404);
 
-        // ガチャコスト
-        $gachaCost = 10;
-
-        if ($user->point < $gachaCost) return response()->json(['message' => 'ポイントが不足しています'], 400);
+        if ($user->point < self::GACHA_COST) return response()->json(['message' => 'ポイントが不足しています'], 400);
 
         $character = Character::inRandomOrder()->first();
 
@@ -28,21 +28,19 @@ class GachaController
                                     ->first();
 
         if ($userCharacter) {
-            // すでに持っている場合、ポイントを加算
-            $additionalPoint = 5;
 
-            $user->point += $additionalPoint;
-            $user->point -= $gachaCost;
+            $user->point += self::DUPLICATE_POINT_REWARD;
+            $user->point -= self::GACHA_COST;
             $user->save();
 
             return response()->json([
-                'message' => 'Character already owned! You received ' . $additionalPoint . ' points!',
+                'message' => 'Character already owned! You received ' . self::DUPLICATE_POINT_REWARD . ' points!',
                 'character' => $character,
                 'new_point' => $user->point
             ]);
         }
 
-        $user->point -= $gachaCost;
+        $user->point -= self::GACHA_COST;
         $user->save();
 
         $userCharacter = new UserCharacter([
