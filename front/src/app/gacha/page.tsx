@@ -22,6 +22,7 @@ import { Button } from "~/components/ui/button";
 import confetti from "canvas-confetti";
 import { useUserContext } from "~/context/UserProvider";
 import { characterToImagePath } from "~/lib/utils";
+// import { mutate } from "swr";
 
 // Define the character type
 type Character = {
@@ -339,10 +340,13 @@ export default function TechGacha() {
 				}
 
 				const data = await response.json();
+
 				setResult(data);
 
 				// 初獲得かどうかのフラグを設定
 				isNewCharacter = data.isNew || false;
+
+				// mutate(user?.uid);
 			} catch (error) {
 				console.error("Gacha API error:", error);
 
