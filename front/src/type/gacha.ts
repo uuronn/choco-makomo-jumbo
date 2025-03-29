@@ -3,7 +3,6 @@ export type gachaResult = {
 	id: string;
 	name: string;
 	basePower: number;
-	imageUrl: string;
 	baseLife: number;
 	baseSpeed: number;
 	skill: string;
@@ -18,7 +17,6 @@ export type GachaCharacter = {
 	basePower: number;
 	baseSpeed: number;
 	id: string;
-	imageUrl: string;
 	name: string;
 	type: string;
 };
