@@ -4,7 +4,9 @@ return [
     // 言語
     // CSS
     [
+        'id' => 'css',
         'name' => 'CSS',
+        'officialName' => 'Cascading Style Sheet',
         'type' => '言語',
         'basePower' => 340,
         'baseLife' => 3000,
@@ -15,11 +17,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "フレックスボックス",
         'passiveSkillDescription' => "自身が受ける通常攻撃のダメージを10%軽減する",
-        'imageUrl' => '/character/css.webp',
     ],
     // Go
     [
+        'id' => 'go',
         'name' => 'Go',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 560,
         'baseLife' => 3000,
@@ -30,11 +33,12 @@ return [
         'specialSkillTurn' => 14,
         'passiveSkillName' => "並行処理",
         'passiveSkillDescription' => "自身のスピードが毎ターン5%増加する",
-        'imageUrl' => '/character/go.webp',
     ],
-    // html
+    // HTML
     [
-        'name' => 'html',
+        'id' => 'html',
+        'name' => 'HTML',
+        'officialName' => 'HyperText Markup Language',
         'type' => '言語',
         'basePower' => 300,
         'baseLife' => 5000,
@@ -45,11 +49,12 @@ return [
         'specialSkillTurn' => 10,
         'passiveSkillName' => "構造化",
         'passiveSkillDescription' => "味方全員の最大体力が5%増加する",
-        'imageUrl' => '/character/html.webp',
     ],
-    // Javascript
+    // JavaScript
     [
-        'name' => 'Javascript',
+        'id' => 'javascript',
+        'name' => 'JavaScript',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 600,
         'baseLife' => 2600,
@@ -60,11 +65,12 @@ return [
         'specialSkillTurn' => 10,
         'passiveSkillName' => "動的実行",
         'passiveSkillDescription' => "自身の攻撃力が毎ターン10%増加する",
-        'imageUrl' => '/character/javascript.webp',
     ],
     // PHP
     [
+        'id' => 'php',
         'name' => 'PHP',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 200,
         'baseLife' => 4000,
@@ -75,41 +81,44 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "サーバーサイド",
         'passiveSkillDescription' => "自身の体力が20%未満の時、回避率が15%増加する",
-        'imageUrl' => '/character/php.webp',
     ],
     // Ruby
     [
+        'id' => 'ruby',
         'name' => 'Ruby',
+        'officialName' => null,
         'type' => '言語',
-        'basePower' => 230,
+        'basePower' => 200,
         'baseLife' => 3000,
-        'baseSpeed' => 100,
+        'baseSpeed' => 200,
         'baseEvasion' => 2,
         'specialSkillName' => null,
         'specialSkillDescription' => null,
         'specialSkillTurn' => 0,
-        'passiveSkillName' => "優雅な構文",
-        'passiveSkillDescription' => "味方全員のスピードが毎ターン3%増加する",
-        'imageUrl' => '/character/ruby.webp',
+        'passiveSkillName' => "ActiveRecord",
+        'passiveSkillDescription' => "自身が通常攻撃を行うたびに、攻撃力とスピードが20%増加する",
     ],
     // Swift
     [
+        'id' => 'swift',
         'name' => 'Swift',
+        'officialName' => null,
         'type' => '言語',
-        'basePower' => 800,
-        'baseLife' => 3000,
+        'basePower' => 360,
+        'baseLife' => 4300,
         'baseSpeed' => 100,
-        'baseEvasion' => 20,
+        'baseEvasion' => 15,
         'specialSkillName' => null,
         'specialSkillDescription' => null,
         'specialSkillTurn' => 0,
-        'passiveSkillName' => "型安全",
-        'passiveSkillDescription' => "自身が受けるダメージを5%軽減する",
-        'imageUrl' => '/character/swift.webp',
+        'passiveSkillName' => null,
+        'passiveSkillDescription' => null,
     ],
     // Typescript
     [
+        'id' => 'typescript',
         'name' => 'Typescript',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 1000,
         'baseLife' => 2300,
@@ -120,61 +129,65 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "静的型付け",
         'passiveSkillDescription' => "自身の攻撃力が10%増加する",
-        'imageUrl' => '/character/typescript.webp',
     ],
 
     // フレームワーク (Framework)
     // Angular
     [
+        'id' => 'angular',
         'name' => 'Angular',
+        'officialName' => null,
         'type' => 'フレームワーク',
         'basePower' => 200,
-        'baseLife' => 2200,
+        'baseLife' => 2460,
         'baseSpeed' => 20,
-        'baseEvasion' => 0,
+        'baseEvasion' => 1,
         'specialSkillName' => '依存性の注入',
-        'specialSkillDescription' => '味方全員の最大体力25%分を回復する',
+        'specialSkillDescription' => '味方全員の最大HPの25%分を回復する',
         'specialSkillTurn' => 14,
-        'passiveSkillName' => "コンポーネントベース",
-        'passiveSkillDescription' => "味方全員の体力が毎ターン2%回復する",
-        'imageUrl' => '/character/angular.webp',
+        'passiveSkillName' => "双方向バインディング",
+        'passiveSkillDescription' => "自身が通常攻撃を受けた時、その攻撃を行った相手に、受けたダメージの50%を与える。",
     ],
     // React
     [
+        'id' => 'react',
         'name' => 'React',
+        'officialName' => null,
         'type' => 'フレームワーク',
         'basePower' => 630,
-        'baseLife' => 2800,
+        'baseLife' => 2400,
         'baseSpeed' => 100,
         'baseEvasion' => 10,
         'specialSkillName' => null,
         'specialSkillDescription' => null,
         'specialSkillTurn' => 0,
-        'passiveSkillName' => "仮想DOM",
-        'passiveSkillDescription' => "自身のスピードが10%増加する",
-        'imageUrl' => '/character/react.webp',
+        'passiveSkillName' => "StrictMode",
+        'passiveSkillDescription' => "通常攻撃が命中した時、相手のキャラ1体（ランダム）に、自身の攻撃力の50%の追加ダメージを与える。",
     ],
     // Vue
     [
+        'id' => 'vue',
         'name' => 'Vue',
-        'type' => 'フレームワーク',
-        'basePower' => 1000,
-        'baseLife' => 2000,
-        'baseSpeed' => 140,
-        'baseEvasion' => 5,
-        'specialSkillName' => null,
-        'specialSkillDescription' => null,
-        'specialSkillTurn' => 0,
-        'passiveSkillName' => "反応性",
-        'passiveSkillDescription' => "自身の攻撃力が毎ターン5%増加する",
-        'imageUrl' => '/character/vue.webp',
-    ],
-    // Ruby on Rails
-    [
-        'name' => 'Ruby on Rails',
+        'officialName' => null,
         'type' => 'フレームワーク',
         'basePower' => 400,
         'baseLife' => 2000,
+        'baseSpeed' => 140,
+        'baseEvasion' => 5,
+        'specialSkillName' => 'Vue3',
+        'specialSkillDescription' => '自身の攻撃力とスピードを20%アップし、最大HPの30%を回復する。',
+        'specialSkillTurn' => 14,
+        'passiveSkillName' => null,
+        'passiveSkillDescription' => null,
+    ],
+    // Ruby on Rails
+    [
+        'id' => 'rubyonrails',
+        'name' => 'Ruby on Rails',
+        'officialName' => null,
+        'type' => 'フレームワーク',
+        'basePower' => 410,
+        'baseLife' => 2120,
         'baseSpeed' => 90,
         'baseEvasion' => 6,
         'specialSkillName' => null,
@@ -182,13 +195,14 @@ return [
         'specialSkillTurn' => 10,
         'passiveSkillName' => "規約優先",
         'passiveSkillDescription' => "味方全員の回避率が5%増加する",
-        'imageUrl' => '/character/rubyonrails.webp',
     ],
 
     // クラウド (Cloud)
     // AWS
     [
+        'id' => 'aws',
         'name' => 'AWS',
+        'officialName' => 'Amazon Web Services',
         'type' => 'クラウド',
         'basePower' => 400,
         'baseLife' => 3000,
@@ -199,11 +213,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "スケーラビリティ",
         'passiveSkillDescription' => "自身の体力が毎ターン5%回復する",
-        'imageUrl' => '/character/aws.webp',
     ],
     // Azure
     [
+        'id' => 'azure',
         'name' => 'Azure',
+        'officialName' => null,
         'type' => 'クラウド',
         'basePower' => 780,
         'baseLife' => 2100,
@@ -214,11 +229,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "クラウド連携",
         'passiveSkillDescription' => "味方全員のスピードが5%増加する",
-        'imageUrl' => '/character/azure.webp',
     ],
     // Google Cloud
     [
+        'id' => 'googlecloud',
         'name' => 'Google Cloud',
+        'officialName' => null,
         'type' => 'クラウド',
         'basePower' => 620,
         'baseLife' => 2200,
@@ -229,13 +245,14 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "データ解析",
         'passiveSkillDescription' => "自身の攻撃力が10%増加する",
-        'imageUrl' => '/character/googlecloud.webp',
     ],
 
     // コンテナー (Container)
     // Docker
     [
+        'id' => 'docker',
         'name' => 'Docker',
+        'officialName' => null,
         'type' => 'コンテナー',
         'basePower' => 300,
         'baseLife' => 4000,
@@ -246,13 +263,14 @@ return [
         'specialSkillTurn' => 20,
         'passiveSkillName' => "コンテナ化",
         'passiveSkillDescription' => "自身が受けるダメージを5%軽減する",
-        'imageUrl' => '/character/docker.webp',
     ],
 
     // オペレーティングシステム (Operating System)
     // Linux
     [
+        'id' => 'linux',
         'name' => 'Linux',
+        'officialName' => null,
         'type' => 'オペレーティングシステム',
         'basePower' => 100,
         'baseLife' => 5000,
@@ -263,11 +281,12 @@ return [
         'specialSkillTurn' => 40,
         'passiveSkillName' => "オープンソース",
         'passiveSkillDescription' => "味方全員の最大体力が5%増加する",
-        'imageUrl' => '/character/linux.webp',
     ],
     // Mac
     [
+        'id' => 'mac',
         'name' => 'Mac',
+        'officialName' => null,
         'type' => 'オペレーティングシステム',
         'basePower' => 600,
         'baseLife' => 1600,
@@ -278,11 +297,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "ユニックスベース",
         'passiveSkillDescription' => "自身のスピードが10%増加する",
-        'imageUrl' => '/character/mac.webp',
     ],
     // windows
     [
+        'id' => 'windows',
         'name' => 'windows',
+        'officialName' => null,
         'type' => 'オペレーティングシステム',
         'basePower' => 700,
         'baseLife' => 2600,
@@ -293,13 +313,14 @@ return [
         'specialSkillTurn' => 5,
         'passiveSkillName' => "互換性",
         'passiveSkillDescription' => "自身の体力が20%未満の時、攻撃力が15%増加する",
-        'imageUrl' => '/character/windows.webp',
     ],
 
     // データベース (Database)
     // Mysql
     [
-        'name' => 'Mysql',
+        'id' => 'mysql',
+        'name' => 'MySQL',
+        'officialName' => null,
         'type' => 'データベース',
         'basePower' => 100,
         'baseLife' => 3000,
@@ -310,11 +331,12 @@ return [
         'specialSkillTurn' => 20,
         'passiveSkillName' => "リレーショナル",
         'passiveSkillDescription' => "味方全員の回避率が5%増加する",
-        'imageUrl' => '/character/mysql.webp',
     ],
     // Postgres
     [
-        'name' => 'Postgres',
+        'id' => 'postgresql',
+        'name' => 'PostgreSQL',
+        'officialName' => null,
         'type' => 'データベース',
         'basePower' => 320,
         'baseLife' => 3400,
@@ -325,11 +347,12 @@ return [
         'specialSkillTurn' => 20,
         'passiveSkillName' => "堅牢性",
         'passiveSkillDescription' => "自身の体力が毎ターン3%回復する",
-        'imageUrl' => '/character/postgresql.webp',
     ],
     // Supabase
     [
+        'id' => 'supabase',
         'name' => 'Supabase',
+        'officialName' => null,
         'type' => 'データベース',
         'basePower' => 900,
         'baseLife' => 1900,
@@ -340,13 +363,14 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "リアルタイム",
         'passiveSkillDescription' => "自身のスピードが10%増加する",
-        'imageUrl' => '/character/supabase.webp',
     ],
 
     // ゲームエンジン (Game Engine)
     // Unity
     [
+        'id' => 'unity',
         'name' => 'Unity',
+        'officialName' => null,
         'type' => 'ゲームエンジン',
         'basePower' => 620,
         'baseLife' => 2000,
@@ -357,12 +381,13 @@ return [
         'specialSkillTurn' => 12,
         'passiveSkillName' => "クロスプラットフォーム",
         'passiveSkillDescription' => "味方全員の攻撃力が5%増加する",
-        'imageUrl' => '/character/unity.webp',
     ],
 
     // Scratch (言語)
     [
+        'id' => 'scratch',
         'name' => 'Scratch',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 150,
         'baseLife' => 2500,
@@ -373,11 +398,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "ブロックプログラミング",
         'passiveSkillDescription' => "自身の回避率が10%増加する",
-        'imageUrl' => '/character/scratch.webp',
     ],
     // Viscuit (言語)
     [
+        'id' => 'viscuit',
         'name' => 'Viscuit',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 100,
         'baseLife' => 2000,
@@ -388,11 +414,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "ビジュアルコーディング",
         'passiveSkillDescription' => "自身の体力が毎ターン2%回復する",
-        'imageUrl' => '/character/viscuit.webp',
     ],
     // Apache (ウェブサーバー)
     [
+        'id' => 'apache',
         'name' => 'Apache',
+        'officialName' => null,
         'type' => 'ウェブサーバー',
         'basePower' => 300,
         'baseLife' => 3500,
@@ -403,11 +430,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "モジュール拡張",
         'passiveSkillDescription' => "自身の攻撃力が10%増加する",
-        'imageUrl' => '/character/apache.webp',
     ],
     // Nginx (ウェブサーバー)
     [
+        'id' => 'nginx',
         'name' => 'Nginx',
+        'officialName' => null,
         'type' => 'ウェブサーバー',
         'basePower' => 450,
         'baseLife' => 3000,
@@ -418,11 +446,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "リバースプロキシ",
         'passiveSkillDescription' => "自身が受けるダメージを5%軽減する",
-        'imageUrl' => '/character/nginx.webp',
     ],
     // LiteSpeed (ウェブサーバー)
     [
+        'id' => 'litespeed',
         'name' => 'LiteSpeed',
+        'officialName' => null,
         'type' => 'ウェブサーバー',
         'basePower' => 500,
         'baseLife' => 2800,
@@ -433,11 +462,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "高速キャッシュ",
         'passiveSkillDescription' => "自身のスピードが10%増加する",
-        'imageUrl' => '/character/litespeed.webp',
     ],
     // Caddy (ウェブサーバー)
     [
+        'id' => 'caddy',
         'name' => 'Caddy',
+        'officialName' => null,
         'type' => 'ウェブサーバー',
         'basePower' => 350,
         'baseLife' => 2600,
@@ -448,11 +478,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "自動HTTPS",
         'passiveSkillDescription' => "自身の回避率が10%増加する",
-        'imageUrl' => '/character/caddy.webp',
     ],
     // Kotlin (言語)
     [
+        'id' => 'kotlin',
         'name' => 'Kotlin',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 700,
         'baseLife' => 2700,
@@ -463,11 +494,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "ヌル安全",
         'passiveSkillDescription' => "自身が受けるダメージを5%軽減する",
-        'imageUrl' => '/character/kotlin.webp',
     ],
     // VBA (言語)
     [
+        'id' => 'vba',
         'name' => 'VBA',
+        'officialName' => 'Visual Basic for Applications',
         'type' => '言語',
         'basePower' => 200,
         'baseLife' => 3000,
@@ -478,11 +510,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "マクロ自動化",
         'passiveSkillDescription' => "自身の攻撃力が毎ターン5%増加する",
-        'imageUrl' => '/character/vba.webp',
     ],
     // Google Apps Script (言語)
     [
-        'name' => 'Google Apps Script',
+        'id' => 'gas',
+        'name' => 'GAS',
+        'officialName' => 'Google Apps Script',
         'type' => '言語',
         'basePower' => 250,
         'baseLife' => 2800,
@@ -493,11 +526,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "クラウド連携",
         'passiveSkillDescription' => "味方全員のスピードが3%増加する",
-        'imageUrl' => '/character/googleappsscript.webp',
     ],
     // Firebase (クラウド)
     [
+        'id' => 'firebase',
         'name' => 'Firebase',
+        'officialName' => null,
         'type' => 'クラウド',
         'basePower' => 600,
         'baseLife' => 2500,
@@ -508,11 +542,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "リアルタイム同期",
         'passiveSkillDescription' => "自身のスピードが10%増加する",
-        'imageUrl' => '/character/firebase.webp',
     ],
     // SQLite (データベース)
     [
+        'id' => 'sqlite',
         'name' => 'SQLite',
+        'officialName' => null,
         'type' => 'データベース',
         'basePower' => 150,
         'baseLife' => 3200,
@@ -523,11 +558,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "軽量設計",
         'passiveSkillDescription' => "自身の回避率が10%増加する",
-        'imageUrl' => '/character/sqlite.webp',
     ],
     // jQuery (フレームワーク)
     [
+        'id' => 'jquery',
         'name' => 'jQuery',
+        'officialName' => null,
         'type' => 'フレームワーク',
         'basePower' => 400,
         'baseLife' => 2400,
@@ -538,11 +574,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "DOM操作",
         'passiveSkillDescription' => "自身の攻撃力が10%増加する",
-        'imageUrl' => '/character/jquery.webp',
     ],
     // Unreal Engine (ゲームエンジン)
     [
+        'id' => 'unrealengine',
         'name' => 'Unreal Engine',
+        'officialName' => null,
         'type' => 'ゲームエンジン',
         'basePower' => 800,
         'baseLife' => 2300,
@@ -553,26 +590,28 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "ブループリント",
         'passiveSkillDescription' => "自身の攻撃力が毎ターン5%増加する",
-        'imageUrl' => '/character/unrealengine.webp',
     ],
     // Java (言語)
     [
+        'id' => 'java',
         'name' => 'Java',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 650,
-        'baseLife' => 3000,
-        'baseSpeed' => 80,
-        'baseEvasion' => 10,
-        'specialSkillName' => null,
+        'baseLife' => 2200,
+        'baseSpeed' => 50,
+        'baseEvasion' => 14,
+        'specialSkillName' => 'ぬるぽ → ｶﾞｯ',
         'specialSkillDescription' => null,
         'specialSkillTurn' => 0,
-        'passiveSkillName' => "プラットフォーム独立",
+        'passiveSkillName' => "",
         'passiveSkillDescription' => "自身が受けるダメージを5%軽減する",
-        'imageUrl' => '/character/java.webp',
     ],
     // Perl (言語)
     [
+        'id' => 'perl',
         'name' => 'Perl',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 300,
         'baseLife' => 2800,
@@ -583,11 +622,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "正規表現",
         'passiveSkillDescription' => "自身の攻撃力が10%増加する",
-        'imageUrl' => '/character/perl.webp',
     ],
     // C (言語)
     [
+        'id' => 'c',
         'name' => 'C',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 500,
         'baseLife' => 2600,
@@ -598,11 +638,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "低レベル制御",
         'passiveSkillDescription' => "自身のスピードが10%増加する",
-        'imageUrl' => '/character/c.webp',
     ],
     // C++ (言語)
     [
+        'id' => 'c++',
         'name' => 'C++',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 700,
         'baseLife' => 2800,
@@ -613,11 +654,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "オブジェクト指向",
         'passiveSkillDescription' => "自身の攻撃力が10%増加する",
-        'imageUrl' => '/character/cpp.webp',
     ],
     // C# (言語)
     [
+        'id' => 'c#',
         'name' => 'C#',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 680,
         'baseLife' => 2900,
@@ -628,11 +670,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => ".NET連携",
         'passiveSkillDescription' => "味方全員の体力が毎ターン2%回復する",
-        'imageUrl' => '/character/csharp.webp',
     ],
     // git
     [
-        'name' => 'git',
+        'id' => 'git',
+        'name' => 'Git',
+        'officialName' => null,
         'type' => 'バージョン管理',
         'basePower' => 200,
         'baseLife' => 2540,
@@ -643,11 +686,12 @@ return [
         'specialSkillTurn' => 20,
         'passiveSkillName' => null,
         'passiveSkillDescription' => null,
-        'imageUrl' => '/character/git.webp',
     ],
     // Fortran (言語)
     [
+        'id' => 'fortran',
         'name' => 'Fortran',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 400,
         'baseLife' => 2800,
@@ -658,11 +702,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "科学計算",
         'passiveSkillDescription' => "自身の攻撃力が10%増加する",
-        'imageUrl' => '/character/fortran.webp',
     ],
     // Laravel (フレームワーク)
     [
+        'id' => 'laravel',
         'name' => 'Laravel',
+        'officialName' => null,
         'type' => 'フレームワーク',
         'basePower' => 500,
         'baseLife' => 2600,
@@ -673,11 +718,12 @@ return [
         'specialSkillTurn' => 12,
         'passiveSkillName' => "エレガントな構文",
         'passiveSkillDescription' => "味方全員のスピードが3%増加する",
-        'imageUrl' => '/character/laravel.webp',
     ],
     // Python (言語)
     [
+        'id' => 'python',
         'name' => 'Python',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 550,
         'baseLife' => 3000,
@@ -688,11 +734,12 @@ return [
         'specialSkillTurn' => 15,
         'passiveSkillName' => "可読性",
         'passiveSkillDescription' => "味方全員の回避率が5%増加する",
-        'imageUrl' => '/character/python.webp',
     ],
     // Rust (言語)
     [
+        'id' => 'rust',
         'name' => 'Rust',
+        'officialName' => null,
         'type' => '言語',
         'basePower' => 750,
         'baseLife' => 2700,
@@ -703,11 +750,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "メモリ安全",
         'passiveSkillDescription' => "自身が受けるダメージを5%軽減する",
-        'imageUrl' => '/character/rust.webp',
     ],
     // SQL (データベース)
     [
+        'id' => 'sql',
         'name' => 'SQL',
+        'officialName' => null,
         'type' => 'データベース',
         'basePower' => 200,
         'baseLife' => 3100,
@@ -718,11 +766,12 @@ return [
         'specialSkillTurn' => 18,
         'passiveSkillName' => "クエリ最適化",
         'passiveSkillDescription' => "自身のスピードが10%増加する",
-        'imageUrl' => '/character/sql.webp',
     ],
     // Vite (フレームワーク)
     [
+        'id' => 'vite',
         'name' => 'Vite',
+        'officialName' => null,
         'type' => 'フレームワーク',
         'basePower' => 450,
         'baseLife' => 2400,
@@ -733,11 +782,12 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "高速ビルド",
         'passiveSkillDescription' => "自身のスピードが10%増加する",
-        'imageUrl' => '/character/vite.webp',
     ],
     // Webpack (フレームワーク)
     [
+        'id' => 'webpack',
         'name' => 'Webpack',
+        'officialName' => null,
         'type' => 'フレームワーク',
         'basePower' => 400,
         'baseLife' => 2500,
@@ -748,6 +798,5 @@ return [
         'specialSkillTurn' => 0,
         'passiveSkillName' => "モジュールバンドル",
         'passiveSkillDescription' => "自身の攻撃力が10%増加する",
-        'imageUrl' => '/character/webpack.webp',
     ],
 ];
