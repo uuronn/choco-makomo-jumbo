@@ -641,7 +641,7 @@ return [
     ],
     // C++ (言語)
     [
-        'id' => 'c++',
+        'id' => 'cpp',
         'name' => 'C++',
         'officialName' => null,
         'type' => '言語',
@@ -657,7 +657,7 @@ return [
     ],
     // C# (言語)
     [
-        'id' => 'c#',
+        'id' => 'csharp',
         'name' => 'C#',
         'officialName' => null,
         'type' => '言語',
