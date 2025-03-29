@@ -15,7 +15,7 @@ class Character extends Model
     protected $hidden = ['created_at', 'updated_at'];
 
     protected $fillable = [
-        'id', 'name', 'type', 'basePower', 'imageUrl', 'baseLife', 'baseSpeed', 'baseEvasion',
+        'id', 'name', 'officialName', 'type', 'basePower', 'baseLife', 'baseSpeed', 'baseEvasion',
         'specialSkillName', 'specialSkillDescription', 'specialSkillTurn', 'passiveSkillName', 'passiveSkillDescription'
     ];
 
@@ -23,10 +23,10 @@ class Character extends Model
     {
         parent::boot();
 
-        static::creating(function ($model) {
-            if (empty($model->id)) {
-                $model->id = (string) Str::uuid();
-            }
-        });
+        // static::creating(function ($model) {
+        //     if (empty($model->id)) {
+        //         $model->id = (string) Str::uuid();
+        //     }
+        // });
     }
 }
