@@ -14,6 +14,7 @@ import {
 	Lightbulb,
 	Info,
 	Layers,
+	Database,
 } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
@@ -314,7 +315,7 @@ export default function CharacterDevelopment() {
 										<div className="flex-1 max-h-[346px] bg-gray-800/50 rounded-md border border-emerald-500/30 p-3">
 											<div className="flex items-center justify-between mb-3 flex-wrap gap-2">
 												<div className="flex items-center">
-													<Info className="h-4 w-4 mr-1 text-emerald-400" />
+													<Database className="h-4 w-4 mr-1 text-emerald-400" />
 													<span className="text-green-400 font-semibold">
 														技術ポイント:
 													</span>

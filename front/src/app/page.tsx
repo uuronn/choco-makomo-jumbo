@@ -132,7 +132,7 @@ export default function HomeScreen() {
 									{user.name}
 								</div>
 								<div className="flex items-center gap-2 mt-1">
-									<Cpu className="h-4 w-4 text-green-400" />
+									<Database className="h-4 w-4 text-green-400" />
 									<span className="text-sm text-green-400 font-mono">
 										技術ポイント:{" "}
 										<span className="font-bold">{user.point}</span>
