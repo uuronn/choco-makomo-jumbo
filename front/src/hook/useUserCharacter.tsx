@@ -1,6 +1,7 @@
 import useSwr from "swr";
 
 export type Character = {
+	id: string;
 	userId: string;
 	characterId: string;
 	level: number;

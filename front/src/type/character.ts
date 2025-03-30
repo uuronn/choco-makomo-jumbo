@@ -1,4 +1,5 @@
 export type Character = {
+	characterId: string;
 	userId: string;
 	id: string;
 	level: number;
