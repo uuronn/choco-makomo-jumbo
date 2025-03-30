@@ -401,6 +401,67 @@ class RoomController
             return response()->json(['message' => $e->getMessage()], $e->getCode() ?: 500);
         }
     }
+
+    /**
+     * ルームへの参加をキャンセル
+     */
+    public function cancelJoin(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $room = Room::where('id', $request->roomId)->first();
+
+            if (!$room) {
+                return response()->json(['message' => '指定されたルームが見つかりません'], 404);
+            }
+
+            // ゲストユーザーしかキャンセルできない
+            if ($room->guestUserId !== $request->guestUserId) {
+                return response()->json(['message' => 'キャンセルする権限がありません'], 403);
+            }
+
+            // pending 状態でなければキャンセル不可
+            if ($room->status !== 'pending') {
+                return response()->json(['message' => '現在キャンセルできません'], 400);
+            }
+
+            // ゲストの参加を解除
+            $room->update([
+                'guestUserId' => null,
+                'status' => 'waiting',
+            ]);
+
+            // ゲストのキャラクターを削除
+            RoomCharacter::where('roomId', $room->id)
+                ->where('userId', $request->guestUserId)
+                ->delete();
+
+            DB::commit();
+
+            $room->load(['hostUser', 'guestUser']);
+            $response = [
+                'id' => $room->id,
+                'host_user' => $room->hostUser ? [
+                    'id' => $room->hostUser->id,
+                    'name' => $room->hostUser->name,
+                    'photoUrl' => $room->hostUser->photoUrl,
+                ] : null,
+                'guest_user' => $room->guestUser ? [
+                    'id' => $room->guestUser->id,
+                    'name' => $room->guestUser->name,
+                    'photoUrl' => $room->guestUser->photoUrl,
+                ] : null,
+                'status' => $room->status,
+            ];
+
+            return response()->json($response, 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], $e->getCode() ?: 500);
+        }
+    }
+
     public function approve(Request $request)
     {
         try {

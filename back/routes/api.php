@@ -82,11 +82,14 @@ Route::post('/rooms/create', [RoomController::class, 'create']);
 // ルームに参加する
 Route::post('/rooms/join', [RoomController::class, 'join']);
 
+Route::post('/rooms/{roomId}/cancel', [RoomController::class, 'cancelJoin']);
+
 // ルームのステータスを取得する
 Route::get('/{userId}/{roomId}/status', [RoomController::class, 'status']);
 
 // 参加申請を承認
 Route::post('/{userId}/{roomId}/approve', [RoomController::class, 'approve']);
+
 
 // 参加申請を拒否
 Route::post('/{userId}/{roomId}/reject', [RoomController::class, 'reject']);
