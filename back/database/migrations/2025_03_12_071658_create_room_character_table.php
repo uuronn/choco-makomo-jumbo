@@ -21,9 +21,9 @@ return new class extends Migration
             $table->tinyInteger('evasion')->unsigned();
             $table->boolean('isActive')->default(true);
             $table->boolean('isDead')->default(false);
-            $table->tinyInteger('blockCount')->unsigned();
-            $table->tinyInteger('confusionCount')->unsigned();
-            $table->tinyInteger('poisonCount')->unsigned();
+            $table->tinyInteger('blockCount')->unsigned()->default(0);
+            $table->tinyInteger('confusionCount')->unsigned()->default(0);
+            $table->tinyInteger('poisonCount')->unsigned()->default(0);
             $table->tinyInteger('specialSkillTurn')->unsigned();
             $table->boolean('specialUsed')->default(false);
             $table->timestamps();
