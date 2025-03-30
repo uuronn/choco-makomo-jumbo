@@ -84,6 +84,8 @@ Route::post('/rooms/join', [RoomController::class, 'join']);
 
 Route::post('/rooms/{roomId}/cancel', [RoomController::class, 'cancelJoin']);
 
+Route::post('/rooms/{roomId}/cancelCreate', [RoomController::class, 'cancelCreate']);
+
 // ルームのステータスを取得する
 Route::get('/{userId}/{roomId}/status', [RoomController::class, 'status']);
 

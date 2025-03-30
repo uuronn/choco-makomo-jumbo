@@ -403,6 +403,43 @@ class RoomController
     }
 
     /**
+     * ルーム作成をキャンセル
+     */
+    public function cancelCreate(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $room = Room::where('id', $request->roomId)->first();
+
+            if (!$room) {
+                return response()->json(['message' => '指定されたルームが見つかりません'], 404);
+            }
+
+            // ホストユーザーしかキャンセルできない
+            if ($room->hostUserId !== $request->hostUserId) {
+                return response()->json(['message' => 'キャンセルする権限がありません'], 403);
+            }
+
+            // waiting 状態でなければキャンセル不可
+            if ($room->status !== 'waiting') {
+                return response()->json(['message' => '現在キャンセルできません'], 400);
+            }
+
+            // ルームと関連するキャラクターを削除
+            RoomCharacter::where('roomId', $room->id)->delete();
+            $room->delete();
+
+            DB::commit();
+
+            return response()->json(['message' => 'ルーム作成がキャンセルされました'], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], $e->getCode() ?: 500);
+        }
+    }
+
+    /**
      * ルームへの参加をキャンセル
      */
     public function cancelJoin(Request $request)
