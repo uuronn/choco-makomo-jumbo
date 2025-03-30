@@ -7,8 +7,7 @@ import { FcGoogle } from "react-icons/fc";
 import { useUserContext } from "~/context/UserProvider";
 
 export default function Home() {
-	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const [error, _] = useState<string | null>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
 	const { handleSignIn } = useUserContext();
@@ -86,35 +85,19 @@ export default function Home() {
 		};
 	}, []);
 
-	// Google Authentication
-	useEffect(() => {
-		// Load Google Identity Services script
-		const script = document.createElement("script");
-		script.src = "https://accounts.google.com/gsi/client";
-		script.async = true;
-		script.defer = true;
-		document.body.appendChild(script);
-
-		return () => {
-			if (document.body.contains(script)) {
-				document.body.removeChild(script);
-			}
-		};
-	}, []);
-
 	return (
 		<div className="min-h-screen bg-black flex items-center justify-center p-4 overflow-hidden">
 			<canvas ref={canvasRef} className="absolute inset-0 z-0" />
 
-			<div className="absolute inset-0 bg-gradient-radial from-transparent to-black opacity-70"></div>
+			<div className="absolute inset-0 bg-gradient-radial from-transparent to-black opacity-70" />
 
 			<div className="relative z-10 w-full max-w-md">
 				<div className="p-8 rounded-lg border border-emerald-500/50 bg-black/60 backdrop-blur-md shadow-[0_0_25px_rgba(16,185,129,0.3)] animate-pulse-slow">
 					<div className="mb-8 text-center relative">
-						<div className="absolute -top-20 left-1/2 transform -translate-x-1/2 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl"></div>
+						<div className="absolute -top-20 left-1/2 transform -translate-x-1/2 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl" />
 						<h1 className="text-5xl font-bold tracking-wider text-emerald-500 mb-2 font-mono relative">
 							技術大戦争
-							<span className="absolute -inset-1 bg-emerald-500/20 blur-sm rounded-lg -z-10"></span>
+							<span className="absolute -inset-1 bg-emerald-500/20 blur-sm rounded-lg -z-10" />
 						</h1>
 						<p className="text-emerald-300/80 text-sm tracking-[0.5em] mt-2">
 							TECHNOLOGY WAR
@@ -132,7 +115,7 @@ export default function Home() {
 
 						<div className="relative">
 							<div className="absolute inset-0 flex items-center">
-								<span className="w-full border-t border-emerald-500/30"></span>
+								<span className="w-full border-t border-emerald-500/30" />
 							</div>
 							<div className="relative flex justify-center text-xs uppercase">
 								<span className="bg-black px-2 text-emerald-400">
@@ -152,7 +135,7 @@ export default function Home() {
 
 						<div className="text-center text-xs text-emerald-400/60 mt-6">
 							<p className="relative inline-block">
-								<span className="absolute -inset-1 bg-emerald-500/10 blur-sm rounded-lg -z-10"></span>
+								<span className="absolute -inset-1 bg-emerald-500/10 blur-sm rounded-lg -z-10" />
 								login with google
 							</p>
 						</div>
