@@ -24,7 +24,7 @@ return new class extends Migration
             $table->tinyInteger('blockCount')->unsigned()->default(0);
             $table->tinyInteger('confusionCount')->unsigned()->default(0);
             $table->tinyInteger('poisonCount')->unsigned()->default(0);
-            $table->tinyInteger('specialSkillTurn')->unsigned();
+            $table->tinyInteger('specialSkillTurn')->unsigned()->default(0);
             $table->boolean('specialUsed')->default(false);
             $table->timestamps();
 
