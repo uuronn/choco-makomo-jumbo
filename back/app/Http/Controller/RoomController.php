@@ -290,46 +290,18 @@ class RoomController
                         throw new Exception("ユーザーのキャラクター {$characterId} が見つかりません", 404);
                     }
                     $characterNames[] = $character->name;
-                }
 
-                // スキル適用
-                $bonuses = $this->applyPartyBonuses($characterNames, $hostUser, $room);
-                $powerMultiplier = $bonuses['powerMultiplier'];
-                $speedMultiplier = $bonuses['speedMultiplier'];
-                $lifeMultiplier = $bonuses['lifeMultiplier'];
-                $evasionMultiplier = $bonuses['evasionMultiplier'];
-
-                // ログ記録
-                if (!empty($bonuses['logs'])) {
-                    RoomLog::create([
-                        'roomId' => $room->id,
-                        'actionType' => 'partyBonus',
-                        'actorUserId' => $request->hostUserId,
-                        'actorCharacterId' => null,
-                        'targetUserId' => null,
-                        'targetCharacterId' => null,
-                        'value' => null,
-                        'description' => implode(' / ', $bonuses['logs']),
-                    ]);
-                }
-
-                // キャラクターに倍率を適用
-                foreach ($characterIdList as $characterId) {
-                    $character = Character::find($characterId);
-                    $userCharacter = UserCharacter::where('userId', $request->hostUserId)
-                        ->where('characterId', $characterId)
-                        ->first();
-
+                    // ここではボーナスを適用せず、基本ステータスのみを保存
                     RoomCharacter::create([
                         'roomId' => $room->id,
                         'characterId' => $characterId,
                         'userId' => $room->hostUserId,
                         'level' => $userCharacter->level,
-                        'life' => $userCharacter->life * $lifeMultiplier,
-                        'maxLife' => $userCharacter->life * $lifeMultiplier,
-                        'power' => $userCharacter->power * $powerMultiplier,
-                        'speed' => $userCharacter->speed * $speedMultiplier,
-                        'evasion' => $character->baseEvasion * $evasionMultiplier,
+                        'life' => $userCharacter->life,
+                        'maxLife' => $userCharacter->life,
+                        'power' => $userCharacter->power,
+                        'speed' => $userCharacter->speed,
+                        'evasion' => $character->baseEvasion,
                     ]);
                 }
 
@@ -390,46 +362,18 @@ class RoomController
                     throw new Exception("ユーザーのキャラクター {$characterId} が見つかりません", 404);
                 }
                 $characterNames[] = $character->name;
-            }
 
-            // スキル適用
-            $bonuses = $this->applyPartyBonuses($characterNames, $guestUser, $room);
-            $powerMultiplier = $bonuses['powerMultiplier'];
-            $speedMultiplier = $bonuses['speedMultiplier'];
-            $lifeMultiplier = $bonuses['lifeMultiplier'];
-            $evasionMultiplier = $bonuses['evasionMultiplier'];
-
-            // ログ記録
-            if (!empty($bonuses['logs'])) {
-                RoomLog::create([
-                    'roomId' => $room->id,
-                    'actionType' => 'partyBonus',
-                    'actorUserId' => $request->guestUserId,
-                    'actorCharacterId' => null,
-                    'targetUserId' => null,
-                    'targetCharacterId' => null,
-                    'value' => null,
-                    'description' => implode(' / ', $bonuses['logs']),
-                ]);
-            }
-
-            // キャラクターに倍率を適用
-            foreach ($characterIdList as $characterId) {
-                $character = Character::find($characterId);
-                $userCharacter = UserCharacter::where('userId', $request->guestUserId)
-                    ->where('characterId', $characterId)
-                    ->first();
-
+                // 基本ステータスのみを保存
                 RoomCharacter::create([
                     'roomId' => $room->id,
                     'characterId' => $characterId,
                     'userId' => $request->guestUserId,
                     'level' => $userCharacter->level,
-                    'life' => $userCharacter->life * $lifeMultiplier,
-                    'maxLife' => $userCharacter->life * $lifeMultiplier,
-                    'power' => $userCharacter->power * $powerMultiplier,
-                    'speed' => $userCharacter->speed * $speedMultiplier,
-                    'evasion' => $character->baseEvasion * $evasionMultiplier,
+                    'life' => $userCharacter->life,
+                    'maxLife' => $userCharacter->life,
+                    'power' => $userCharacter->power,
+                    'speed' => $userCharacter->speed,
+                    'evasion' => $character->baseEvasion,
                 ]);
             }
 
@@ -457,10 +401,6 @@ class RoomController
             return response()->json(['message' => $e->getMessage()], $e->getCode() ?: 500);
         }
     }
-
-    /**
-     * ルームへの参加申請を承認
-     */
     public function approve(Request $request)
     {
         try {
@@ -489,85 +429,60 @@ class RoomController
                     ->where('userId', $room->hostUserId)
                     ->with('character')
                     ->get();
+                $guestCharacters = RoomCharacter::where('roomId', $roomId)
+                    ->where('userId', $room->guestUserId)
+                    ->with('character')
+                    ->get();
 
-                $guestCharacters = $room->guestUserId
-                    ? RoomCharacter::where('roomId', $roomId)
-                        ->where('userId', $room->guestUserId)
-                        ->with('character')
-                        ->get()
-                    : [];
-
+                // ホストのパーティボーナス適用
                 $hostCharacterNames = $hostCharacters->pluck('character.name')->toArray();
+                $hostBonuses = $this->applyPartyBonuses($hostCharacterNames, $room->hostUser, $room);
                 if (!array_diff(['Warrior', 'Mage', 'Healer'], $hostCharacterNames)) {
-                    RoomCharacter::where('roomId', $roomId)
-                        ->where('userId', $room->hostUserId)
-                        ->update([
-                            'power' => DB::raw('power * 1.2'),
-                            'speed' => DB::raw('speed * 1.1')
-                        ]);
-                    RoomLog::create([
-                        'roomId' => $roomId,
-                        'actionType' => 'partyBonus',
-                        'actorUserId' => $room->hostUserId,
-                        'actorCharacterId' => null,
-                        'targetUserId' => null,
-                        'targetCharacterId' => null,
-                        'value' => null,
-                        'description' => "{$room->hostUser->name} のパーティ ['Warrior', 'Mage', 'Healer'] で攻撃力が20%増、スピードが10%増",
+                    $hostBonuses['powerMultiplier'] *= 1.2;
+                    $hostBonuses['speedMultiplier'] *= 1.1;
+                    $hostBonuses['logs'][] = "{$room->hostUser->name} のパーティ ['Warrior', 'Mage', 'Healer'] で攻撃力が20%増、スピードが10%増";
+                }
+                foreach ($hostCharacters as $character) {
+                    RoomCharacter::where('id', $character->id)->update([
+                        'life' => $character->life * $hostBonuses['lifeMultiplier'],
+                        'maxLife' => $character->maxLife * $hostBonuses['lifeMultiplier'],
+                        'power' => $character->power * $hostBonuses['powerMultiplier'],
+                        'speed' => $character->speed * $hostBonuses['speedMultiplier'],
+                        'evasion' => $character->evasion * $hostBonuses['evasionMultiplier'],
                     ]);
-                } elseif (!array_diff(['Knight', 'Wizard', 'Priest'], $hostCharacterNames)) {
-                    RoomCharacter::where('roomId', $roomId)
-                        ->where('userId', $room->hostUserId)
-                        ->update([
-                            'power' => DB::raw('power * 1.1'),
-                            'evasion' => DB::raw('evasion * 1.3')
-                        ]);
+                }
+                if (!empty($hostBonuses['logs'])) {
                     RoomLog::create([
                         'roomId' => $roomId,
                         'actionType' => 'partyBonus',
                         'actorUserId' => $room->hostUserId,
-                        'actorCharacterId' => null,
-                        'targetUserId' => null,
-                        'targetCharacterId' => null,
-                        'value' => null,
-                        'description' => "{$room->hostUser->name} のパーティ ['Knight', 'Wizard', 'Priest'] で攻撃力が10%増、回避率が30%増",
+                        'description' => implode(' / ', $hostBonuses['logs']),
                     ]);
                 }
 
+                // ゲストのパーティボーナス適用
                 $guestCharacterNames = $guestCharacters->pluck('character.name')->toArray();
+                $guestBonuses = $this->applyPartyBonuses($guestCharacterNames, $room->guestUser, $room);
                 if (!array_diff(['Archer', 'Tank', 'Support'], $guestCharacterNames)) {
-                    RoomCharacter::where('roomId', $roomId)
-                        ->where('userId', $room->guestUserId)
-                        ->update([
-                            'speed' => DB::raw('speed * 1.25'),
-                            'power' => DB::raw('power * 1.15')
-                        ]);
-                    RoomLog::create([
-                        'roomId' => $roomId,
-                        'actionType' => 'partyBonus',
-                        'actorUserId' => $room->guestUserId,
-                        'actorCharacterId' => null,
-                        'targetUserId' => null,
-                        'targetCharacterId' => null,
-                        'value' => null,
-                        'description' => "{$room->guestUser->name} のパーティ ['Archer', 'Tank', 'Support'] でスピードが25%増、攻撃力が15%増",
+                    $guestBonuses['speedMultiplier'] *= 1.25;
+                    $guestBonuses['powerMultiplier'] *= 1.15;
+                    $guestBonuses['logs'][] = "{$room->guestUser->name} のパーティ ['Archer', 'Tank', 'Support'] でスピードが25%増、攻撃力が15%増";
+                }
+                foreach ($guestCharacters as $character) {
+                    RoomCharacter::where('id', $character->id)->update([
+                        'life' => $character->life * $guestBonuses['lifeMultiplier'],
+                        'maxLife' => $character->maxLife * $guestBonuses['lifeMultiplier'],
+                        'power' => $character->power * $guestBonuses['powerMultiplier'],
+                        'speed' => $character->speed * $guestBonuses['speedMultiplier'],
+                        'evasion' => $character->evasion * $guestBonuses['evasionMultiplier'],
                     ]);
-                } elseif (!array_diff(['Rogue', 'Berserker', 'Cleric'], $guestCharacterNames)) {
-                    RoomCharacter::where('roomId', $roomId)
-                        ->where('userId', $room->guestUserId)
-                        ->update([
-                            'evasion' => DB::raw('evasion * 1.2'),
-                            'maxLife' => DB::raw('maxLife * 1.2')
-                        ]);
+                }
+                if (!empty($guestBonuses['logs'])) {
                     RoomLog::create([
                         'roomId' => $roomId,
                         'actionType' => 'partyBonus',
                         'actorUserId' => $room->guestUserId,
-                        'actorCharacterId' => null,
-                        'targetUserId' => null,
-                        'targetCharacterId' => null,
-                        'value' => null,
-                        'description' => "{$room->guestUser->name} のパーティ ['Rogue', 'Berserker', 'Cleric'] で回避率が20%増、最大HPが20%増",
+                        'description' => implode(' / ', $guestBonuses['logs']),
                     ]);
                 }
 
@@ -589,31 +504,20 @@ class RoomController
                 $room->update([
                     'status' => 'battling',
                     'currentTurnUserId' => $firstTurn->userId,
-                    'currentTurnCharacterId' => $firstTurn->characterId
+                    'currentTurnCharacterId' => $firstTurn->characterId,
                 ]);
-
-                // RoomLog::create([
-                //     'roomId' => $roomId,
-                //     'actionType' => 'approve',
-                //     'actorUserId' => $room->hostUserId,
-                //     'actorCharacterId' => null,
-                //     'targetUserId' => $room->guestUserId,
-                //     'targetCharacterId' => null,
-                //     'value' => null,
-                //     'description' => "{$room->hostUser->name} が {$room->guestUser->name} の参加申請を承認しました",
-                // ]);
             });
 
             $room->refresh();
 
             return response()->json([
                 'message' => '参加申請が承認されました',
-                'room' => $room
+                'room' => $room,
             ], 200);
         } catch (Exception $e) {
             return response()->json([
                 'message' => '承認処理に失敗しました',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
