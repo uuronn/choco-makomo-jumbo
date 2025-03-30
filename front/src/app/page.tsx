@@ -137,13 +137,13 @@ export default function HomeScreen() {
 										技術ポイント:{" "}
 										<span className="font-bold">{user.point}</span>
 									</span>
-									<button
+									{/* <button
 										type="button"
 										onClick={() => setShowTechPoints(!showTechPoints)}
 										className="ml-1 text-xs text-green-500 hover:text-green-300 transition-colors"
 									>
 										{showTechPoints ? "閉じる" : "詳細"}
-									</button>
+									</button> */}
 								</div>
 								<div className="mt-1 w-full bg-black/50 h-1.5 rounded-full overflow-hidden border border-green-500/30">
 									<div
@@ -160,58 +160,9 @@ export default function HomeScreen() {
 							<div className="flex h-8 w-8 items-center justify-center rounded-md bg-black/50 text-green-400 group-hover:text-green-300">
 								<Cpu className="size-5" />
 							</div>
-							<span className="text-green-400">テスト中</span>
+							<span className="text-green-400">ベータ版</span>
 						</Button>
 					</div>
-
-					{/* 技術ポイント詳細 - アコーディオン式 */}
-					{showTechPoints && (
-						<motion.div
-							initial={{ height: 0, opacity: 0 }}
-							animate={{ height: "auto", opacity: 1 }}
-							exit={{ height: 0, opacity: 0 }}
-							transition={{ duration: 0.3 }}
-							className="mt-4 p-3 rounded-lg border border-green-500/30 bg-black/70"
-						>
-							<div className="flex items-center gap-2 mb-2">
-								<Terminal className="h-4 w-4 text-green-400" />
-								<h3 className="text-sm font-bold text-green-300 font-mono">
-									技術スキルステータス
-								</h3>
-							</div>
-							{/* <div className="grid grid-cols-2 gap-3">
-								{testTechPoints.categories.map((category, index) => (
-									<div key={index} className="flex flex-col">
-										<div className="flex items-center gap-1.5">
-											{category.icon}
-											<span className="text-xs text-green-400/70">
-												{category.name}
-											</span>
-										</div>
-										<div className="flex items-center gap-2">
-											<span className="text-sm font-mono font-bold text-green-300">
-												{category.points}
-											</span>
-											<div className="flex-1 h-1.5 bg-black/50 rounded-full overflow-hidden border border-green-500/20">
-												<div
-													className={`bg-gradient-to-r ${category.color} h-full rounded-full`}
-													style={{
-														width: `${(category.points / category.max) * 100}%`,
-													}}
-												/>
-											</div>
-											<span className="text-xs font-mono text-green-400/50">
-												{category.max}
-											</span>
-										</div>
-									</div>
-								))}
-							</div> */}
-							<div className="mt-2 text-xs text-green-500/50 font-mono text-right">
-								LEVEL UP AVAILABLE
-							</div>
-						</motion.div>
-					)}
 				</div>
 
 				<div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -274,9 +225,9 @@ export default function HomeScreen() {
 							<div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
 							<span>ONLINE</span>
 						</div>
-						<div className="text-xs text-green-500/70 font-mono">
+						{/* <div className="text-xs text-green-500/70 font-mono">
 							TECH POINTS: {user.point}
-						</div>
+						</div> */}
 					</div>
 
 					{/* フッターナビゲーション */}
