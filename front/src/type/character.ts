@@ -1,6 +1,6 @@
 export type Character = {
 	userId: string;
-	characterId: string;
+	id: string;
 	level: number;
 	life: number;
 	power: number;

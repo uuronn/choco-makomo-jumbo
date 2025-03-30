@@ -172,7 +172,7 @@ export const CharacterDisplay = React.memo(
 					>
 						<Image
 							src={
-								characterToImagePath(character.character.characterId) ||
+								characterToImagePath(character.character.id) ||
 								"/placeholder.svg"
 							}
 							alt=""
