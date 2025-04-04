@@ -711,16 +711,39 @@ class RoomController
                     throw new Exception('攻撃対象のキャラクターが見つかりません');
                 }
 
-                // 回避率の計算（0〜100の範囲でランダム値を生成し、evasion以下なら回避）
-                $evasionChance = $target->evasion; // 例: 7なら7%
-                $hitRoll = rand(0, 100); // 0〜100の乱数
-                $isHit = $hitRoll > $evasionChance; // 回避率より大きければ命中
+                // 回避判定
+                $evasionChance = $target->evasion;
+                $hitRoll = rand(0, 100);
+                $isHit = $hitRoll > $evasionChance;
 
                 if ($isHit) {
-                    // 命中した場合
                     $damage = max(0, $attacker->power);
-                    $newLife = max(0, $target->life - $damage);
 
+                    // パッシブスキル: ダメージを受ける前
+                    $context = ['attacker' => $attacker, 'target' => $target, 'damage' => &$damage];
+                    $passiveLogs = PassiveSkillManager::applyPassives($room, 'before_damage_taken', $context);
+
+                    // ダメージ適用
+                    $newLife = max(0, $target->life - $damage);
+                    $target->update(['life' => $newLife, 'isDead' => $newLife <= 0]);
+
+                    // パッシブスキル: ダメージを受けた後
+                    $context['damage'] = $damage; // 軽減後のダメージを渡す
+                    $passiveLogs = array_merge($passiveLogs, PassiveSkillManager::applyPassives($room, 'on_damage_taken', $context));
+                    $passiveLogs = array_merge($passiveLogs, PassiveSkillManager::applyPassives($room, 'on_attack_hit', $context));
+
+                    // ログ記録
+                    foreach ($passiveLogs as $log) {
+                        RoomLog::create([
+                            'roomId' => $roomId,
+                            'actionType' => 'passive',
+                            'actorUserId' => $log['userId'],
+                            'actorCharacterId' => $log['characterId'],
+                            'description' => $log['description'],
+                        ]);
+                    }
+
+                    // 攻撃ログ
                     RoomLog::create([
                         'roomId' => $roomId,
                         'actionType' => 'attack',
@@ -732,30 +755,20 @@ class RoomController
                         'description' => "{$attacker->character->name} が {$target->character->name} に {$damage} ダメージを与えました",
                     ]);
 
-                    $target->update([
-                        'life' => $newLife,
-                        'isDead' => $newLife <= 0,
-                    ]);
-
                     if ($newLife <= 0) {
                         RoomLog::create([
                             'roomId' => $roomId,
                             'actionType' => 'death',
-                            'actorUserId' => null,
-                            'actorCharacterId' => null,
                             'targetUserId' => $target->userId,
                             'targetCharacterId' => $target->characterId,
-                            'value' => null,
                             'description' => "{$target->character->name} がダウンしました",
                         ]);
                     }
 
                     $message = "{$attacker->character->name} が {$target->character->name} に {$damage} ダメージを与えました";
                 } else {
-                    // 回避した場合
                     $damage = 0;
-                    $newLife = $target->life; // ライフは変わらない
-
+                    $newLife = $target->life;
                     RoomLog::create([
                         'roomId' => $roomId,
                         'actionType' => 'attack',
@@ -766,7 +779,6 @@ class RoomController
                         'value' => 0,
                         'description' => "{$attacker->character->name} の攻撃が {$target->character->name} に回避されました",
                     ]);
-
                     $message = "{$attacker->character->name} の攻撃が {$target->character->name} に回避されました";
                 }
 
@@ -774,9 +786,7 @@ class RoomController
                 $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
 
                 $nextTurn = $this->updateNextTurn($roomId);
-
                 $this->checkBattleEnd($room);
-
                 $room->refresh();
 
                 return response()->json([
