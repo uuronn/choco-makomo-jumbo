@@ -5,6 +5,8 @@ import { Loader2, Sword, Zap } from "lucide-react";
 import type { Room, RoomCharacter } from "~/type/room";
 import { useUserContext } from "~/context/UserProvider";
 import { CharacterDisplay } from "./CharacterDisplay";
+import Image from "next/image";
+import { characterToImagePath } from "~/lib/utils";
 
 type BattleProps = {
 	room: Room;
@@ -224,6 +226,13 @@ export default function Battle({ room }: BattleProps) {
 	// 敵を選択する関数
 	const selectEnemy = async (characterId: string) => {
 		if (!isSelectingEnemy) return;
+
+		// 対象のキャラクターが生きているか確認
+		const targetCharacter = enemyTeam.find((char) => char.id === characterId);
+
+		// 対象キャラクターが存在し、かつライフが0より大きい場合のみ処理を続行
+		if (!targetCharacter || targetCharacter.life <= 0) return;
+
 		if (selectedAction === "attack") {
 			setLoading(true);
 			setSelectedAction(null);
@@ -274,7 +283,7 @@ export default function Battle({ room }: BattleProps) {
 	};
 
 	return (
-		<div className="min-h-screen bg-gray-900 text-green-300 p-4 flex flex-col">
+		<div className="min-h-screen bg-gray-900 text-green-300 p-4 flex flex-col justify-between">
 			<style jsx global>{`
         @keyframes float {
           0% {
@@ -296,135 +305,279 @@ export default function Battle({ room }: BattleProps) {
             opacity: 0;
           }
         }
+        /* @keyframes float {
+            0% { transform: translateY(0px) scale(1.1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+            100% { transform: translateY(0px) scale(1.1); }
+          } */
         .blink {
           animation: blink 1s infinite;
         }
       `}</style>
-
 			{/* 敵キャラ表示 */}
-			<div className="flex justify-center gap-4 mb-auto">
-				{enemyTeam.map((character) => (
-					<div
-						onClick={() => selectEnemy(character.id)}
-						key={character.id}
-						className={`${
-							isSelectingEnemy && character.life > 0
-								? "hover:border-green-500 cursor-pointer"
-								: ""
-						} border-2 border-transparent rounded-md`}
-					>
+			<div className="flex flex-col justify-between md:min-h-[700px] md:mt-14">
+				<div className="flex justify-center gap-4">
+					{enemyTeam.map((character) => (
+						<div
+							onClick={() => selectEnemy(character.id)}
+							key={character.id}
+							className={`${
+								isSelectingEnemy && character.life > 0
+									? "hover:border-green-500 cursor-pointer"
+									: ""
+							} border-2 border-transparent rounded-md`}
+						>
+							<CharacterDisplay
+								effect={characterEffects[character.id]?.type}
+								isEnemy={true}
+								key={character.id}
+								character={character}
+								onClick={() => {}}
+								isActive={
+									room.currentTurnCharacterId === character.characterId &&
+									!isMyTurn
+								}
+							/>
+							<div className="block h-1 relative">
+								{isSelectingEnemy && character.life > 0 && (
+									<p className="w-full blink text-center absolute top-[4px]">
+										▲
+									</p>
+								)}
+							</div>
+						</div>
+					))}
+				</div>
+				{/* 行動できる順のUI */}
+				<div className="relative min-w-[30%] mx-auto py-6 my-4">
+					{/* Glowing timeline bar */}
+					<div className="absolute h-2 w-full bg-gray-800 rounded-full overflow-hidden">
+						<div className="h-full w-full bg-gradient-to-r from-green-500/30 via-green-400/50 to-green-500/30 animate-pulse"></div>
+					</div>
+
+					{/* Character turn indicators */}
+					<div className="flex justify-between items-center relative mt-4">
+						{/* Sort characters by speed (highest first) for turn order */}
+						{[...room.room_character]
+							.sort((a, b) => b.speed - a.speed)
+							.map((character, index) => {
+								const isCurrentTurn =
+									room.currentTurnCharacterId === character.characterId;
+								const isPlayer = character.userId === user?.uid;
+
+								return (
+									<div
+										key={character.id}
+										className={`flex flex-col items-center transition-all duration-300 ${
+											isCurrentTurn ? "scale-110 -translate-y-2" : ""
+										}`}
+										style={{
+											animation: isCurrentTurn
+												? "float 2s ease-in-out infinite"
+												: "none",
+										}}
+									>
+										{/* Turn number */}
+										{/* <div
+											className={`text-xs font-bold mb-1 ${
+												isCurrentTurn ? "text-green-400" : "text-gray-500"
+											}`}
+										>
+											{index + 1}
+										</div> */}
+
+										{/* Character portrait with frame */}
+										<div className={`relative ${isCurrentTurn ? "z-10" : ""}`}>
+											{/* Glowing effect for current turn */}
+											{isCurrentTurn && (
+												<div className="absolute inset-0 bg-green-500/30 rounded-full blur-md -z-10 scale-110"></div>
+											)}
+
+											{/* Character frame */}
+											<div
+												className={`relative rounded-full p-0.5 ${
+													isCurrentTurn
+														? isPlayer
+															? "bg-gradient-to-br from-green-400 to-emerald-600 shadow-lg shadow-green-500/30"
+															: "bg-gradient-to-br from-red-400 to-red-600 shadow-lg shadow-red-500/30" // Enemy's turn
+														: isPlayer
+															? "bg-gradient-to-br from-green-400 to-green-600"
+															: "bg-gradient-to-br from-red-400 to-red-600"
+												}`}
+											>
+												<div className="relative rounded-full overflow-hidden bg-gray-900 p-0.5">
+													<Image
+														src={
+															characterToImagePath(character.character.id) ||
+															"/placeholder.svg"
+														}
+														alt={character.character.name}
+														width={60}
+														height={60}
+														className={`rounded-full ${
+															isCurrentTurn
+																? isPlayer
+																	? "border-2 border-green-400"
+																	: "border-2 border-red-400"
+																: ""
+														}`}
+													/>
+
+													{/* Speed indicator */}
+													{/* <div className="absolute bottom-0 right-0 bg-gray-800 rounded-full px-1.5 text-xs font-bold border border-gray-700">
+														<span
+															className={
+																isPlayer ? "text-green-400" : "text-red-400"
+															}
+														>
+															{character.speed}
+														</span>
+													</div> */}
+												</div>
+											</div>
+
+											{/* Arrow indicator for current turn */}
+											{isCurrentTurn && (
+												<div
+													className={`absolute -top-5 left-1/2 transform -translate-x-1/2 animate-bounce ${
+														isPlayer ? "text-green-400" : "text-red-400"
+													}`}
+												>
+													▼
+												</div>
+											)}
+										</div>
+
+										{/* Character name */}
+										<div
+											className={`mt-1 text-xs font-semibold truncate max-w-[70px] text-cente`}
+										>
+											{character.speed}
+											{/* {character.character.name.length > 8
+												? character.character.name.substring(0, 8) + "..."
+												: character.character.name} */}
+										</div>
+
+										{/* Connection line to timeline */}
+										{/* <div
+											className={`h-3 w-0.5 -mt-1 ${
+												isCurrentTurn
+													? "bg-green-400"
+													: isPlayer
+														? "bg-green-500/50"
+														: "bg-red-500/50"
+											}`}
+										></div> */}
+									</div>
+								);
+							})}
+					</div>
+
+					{/* Add some extra styles for animations */}
+					{/* <style jsx global>{`
+          @keyframes float {
+            0% { transform: translateY(0px) scale(1.1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+            100% { transform: translateY(0px) scale(1.1); }
+          }
+        `}</style> */}
+				</div>
+				{/* 味方キャラ表示 */}
+				<div className="flex justify-center gap-4 mb-4">
+					{playerTeam.map((character) => (
 						<CharacterDisplay
 							effect={characterEffects[character.id]?.type}
-							isEnemy={true}
+							isEnemy={false}
 							key={character.id}
 							character={character}
 							onClick={() => {}}
 							isActive={
 								room.currentTurnCharacterId === character.characterId &&
-								!isMyTurn
+								isMyTurn
 							}
 						/>
-						{isSelectingEnemy && character.life > 0 && (
-							<p className="w-full blink text-center">▲</p>
-						)}
-					</div>
-				))}
-			</div>
-
-			{/* 味方キャラ表示 */}
-			<div className="flex justify-center gap-4 mb-4">
-				{playerTeam.map((character) => (
-					<CharacterDisplay
-						effect={characterEffects[character.id]?.type}
-						isEnemy={false}
-						key={character.id}
-						character={character}
-						onClick={() => {}}
-						isActive={
-							room.currentTurnCharacterId === character.characterId && isMyTurn
-						}
-					/>
-				))}
-			</div>
-
-			{/* ログ表示 */}
-			<div className="relative">
-				<div
-					id="battle-log"
-					className="bg-gray-800 border border-green-500/50 rounded-lg py-2 px-4 h-32 overflow-y-hidden mb-4"
-				>
-					<div className="space-y-1">
-						{battleLog.map((log, index) => (
-							<div key={index} className="text-sm font-mono text-green-300">
-								{log}
-							</div>
-						))}
-					</div>
+					))}
 				</div>
-
-				{/* ローディング表示 */}
-				{loading && (
-					<div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
-						<Loader2 className="h-8 w-8 text-green-400 animate-spin" />
-					</div>
-				)}
 			</div>
+			<div>
+				{/* ログ表示 */}
+				<div className="relative">
+					<div
+						id="battle-log"
+						className="bg-gray-800 border border-green-500/50 rounded-lg py-2 px-4 h-32 overflow-y-hidden mb-4"
+					>
+						<div className="space-y-1">
+							{battleLog.map((log, index) => (
+								<div key={index} className="text-sm font-mono text-green-300">
+									{log}
+								</div>
+							))}
+						</div>
+					</div>
 
-			{/* コマンドボタン */}
-			<div className="grid grid-cols-2 gap-4">
-				<button
-					onClick={() => {
-						setSelectedAction("attack");
-						setIsSelectingAction(false);
-					}}
-					className={`flex items-center justify-center gap-2 p-3 rounded-lg ${
-						isSelectingAction && !loading
-							? "bg-green-700 hover:bg-green-600 text-white"
-							: "bg-gray-700 text-gray-400 cursor-not-allowed"
-					} transition-colors`}
-					disabled={!isSelectingAction && !loading}
-				>
-					<Sword size={20} />
-					<span>攻撃</span>
-				</button>
+					{/* ローディング表示 */}
+					{loading && (
+						<div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+							<Loader2 className="h-8 w-8 text-green-400 animate-spin" />
+						</div>
+					)}
+				</div>
+				{/* コマンドボタン */}
+				<div className="grid grid-cols-2 gap-4">
+					<button
+						onClick={() => {
+							setSelectedAction("attack");
+							setIsSelectingAction(false);
+						}}
+						className={`flex items-center justify-center gap-2 p-3 rounded-lg ${
+							isSelectingAction && !loading
+								? "bg-green-700 hover:bg-green-600 text-white"
+								: "bg-gray-700 text-gray-400 cursor-not-allowed"
+						} transition-colors`}
+						disabled={!isSelectingAction && !loading}
+					>
+						<Sword size={20} />
+						<span>攻撃</span>
+					</button>
 
-				<button
-					onClick={selectSkill}
-					className={`flex items-center justify-center gap-2 p-3 rounded-lg ${
-						isSelectingAction &&
-						!loading &&
-						activeCharacter?.character.specialSkillName !== null &&
-						(activeCharacter?.character.specialSkillTurn ?? 0) -
-							room.totalTurns <=
-							0 &&
-						activeCharacter?.specialUsed !== 1
-							? "bg-green-700 hover:bg-green-600 text-white"
-							: "bg-gray-700 text-gray-400 cursor-not-allowed"
-					} transition-colors`}
-					disabled={
-						(!isSelectingAction && !loading) ||
-						activeCharacter?.character.specialSkillName === null ||
-						(activeCharacter?.character.specialSkillTurn ?? 0) -
-							room.totalTurns >
-							0 ||
-						activeCharacter?.specialUsed === 1
-					}
-				>
-					<Zap size={20} />
-					<span>スキル</span>
-					<p>
-						{activeCharacter?.character.specialSkillName === null
-							? "スキルなし"
-							: (activeCharacter?.character.specialSkillTurn ?? 0) -
-										room.totalTurns >
-									0
-								? `残り${
-										(activeCharacter?.character.specialSkillTurn ?? 0) -
-										room.totalTurns
-									}ターン`
-								: ""}
-					</p>
-				</button>
+					<button
+						onClick={selectSkill}
+						className={`flex items-center justify-center gap-2 p-3 rounded-lg ${
+							isSelectingAction &&
+							!loading &&
+							activeCharacter?.character.specialSkillName !== null &&
+							(activeCharacter?.character.specialSkillTurn ?? 0) -
+								room.totalTurns <=
+								0 &&
+							activeCharacter?.specialUsed !== 1
+								? "bg-green-700 hover:bg-green-600 text-white"
+								: "bg-gray-700 text-gray-400 cursor-not-allowed"
+						} transition-colors`}
+						disabled={
+							(!isSelectingAction && !loading) ||
+							activeCharacter?.character.specialSkillName === null ||
+							(activeCharacter?.character.specialSkillTurn ?? 0) -
+								room.totalTurns >
+								0 ||
+							activeCharacter?.specialUsed === 1
+						}
+					>
+						<Zap size={20} />
+						<span>スキル</span>
+						<p>
+							{activeCharacter?.character.specialSkillName === null
+								? "スキルなし"
+								: (activeCharacter?.character.specialSkillTurn ?? 0) -
+											room.totalTurns >
+										0
+									? `残り${
+											(activeCharacter?.character.specialSkillTurn ?? 0) -
+											room.totalTurns
+										}ターン`
+									: ""}
+						</p>
+					</button>
+				</div>
 			</div>
 		</div>
 	);
