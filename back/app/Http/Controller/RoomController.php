@@ -2,6 +2,7 @@
 
 namespace App\Http\Controller;
 
+use App\Service\PassiveSkillManager;
 use App\Model\Character;
 use App\Model\Room;
 use App\Model\RoomCharacter;

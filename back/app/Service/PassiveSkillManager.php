@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controller;
+namespace App\Service;
 
 use App\Model\Room;
 use App\Model\RoomCharacter;
