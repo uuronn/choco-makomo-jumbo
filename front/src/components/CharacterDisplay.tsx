@@ -30,8 +30,8 @@ export const CharacterDisplay = React.memo(
 		}
 
 		const auraColor = isEnemy
-			? "shadow-[0_0_15px_5px_rgba(239,68,68,0.5)]"
-			: "shadow-[0_0_15px_5px_rgba(59,130,246,0.5)]";
+			? "shadow-[0_0_15px_5px_rgba(239,68,68,0.5)]" // 赤系 (enemy)
+			: "shadow-[0_0_15px_5px_rgba(34,197,94,0.5)]"; // 緑系 (味方とか)
 
 		// Define the blink animation variants
 		const blinkVariants = {
