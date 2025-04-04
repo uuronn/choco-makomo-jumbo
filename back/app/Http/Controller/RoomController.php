@@ -1021,7 +1021,7 @@ class RoomController
                                 ]);
                             }
                         }
-                        $description = "{$attacker->character->name} が「rm -rf」を発動、ゲームに勝利";
+                        $description = "{$attacker->character->name} が「rm -rf」を発動、敵全員の体力を0にした。";
                         break;
 
                     case 'ゴルーチンラッシュ': // Go用（全体攻撃の変形）
