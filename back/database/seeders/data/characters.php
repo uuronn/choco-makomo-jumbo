@@ -445,7 +445,7 @@ return [
         'specialSkillDescription' => null,
         'specialSkillTurn' => 0,
         'passiveSkillName' => "リバースプロキシ",
-        'passiveSkillDescription' => "自身が受けるダメージを5%軽減する",
+        'passiveSkillDescription' => "自身が受けるダメージを30%に軽減し、受けたダメージ分を他の味方に与える",
     ],
     // LiteSpeed (ウェブサーバー)
     [
