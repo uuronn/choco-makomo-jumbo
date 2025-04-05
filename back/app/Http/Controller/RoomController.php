@@ -1217,23 +1217,23 @@ class RoomController
                         throw new Exception('未実装のスペシャルスキルです');
                 }
 
-                // if ($skillType !== 'rm -rfff') {
-                //     $attacker->update(['specialUsed' => true]);
-                //     RoomLog::create([
-                //         'roomId' => $roomId,
-                //         'actionType' => 'special',
-                //         'actorUserId' => $attacker->userId,
-                //         'actorCharacterId' => $attacker->characterId,
-                //         'description' => $description,
-                //     ]);
+                if ($skillType !== 'rm -rfff') {
+                    $attacker->update(['specialUsed' => true]);
+                    RoomLog::create([
+                        'roomId' => $roomId,
+                        'actionType' => 'special',
+                        'actorUserId' => $attacker->userId,
+                        'actorCharacterId' => $attacker->characterId,
+                        'description' => $description,
+                    ]);
 
-                //     $attacker->update(['isActive' => false]);
-                //     $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
+                    $attacker->update(['isActive' => false]);
+                    $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
 
-                //     $nextTurn = $this->updateNextTurn($roomId);
-                // } else {
+                    $nextTurn = $this->updateNextTurn($roomId);
+                } else {
                     $nextTurn = null;
-                // }
+                }
 
                 $this->checkBattleEnd($room);
 
