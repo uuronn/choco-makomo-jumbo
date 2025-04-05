@@ -29,6 +29,8 @@ Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () 
     // ユーザーのキャラクターをレベルアップ
     Route::put('/users/{userId}/characters/{characterId}', [UserCharacterController::class, 'levelUp']);
 
+    Route::get('/onlineUsers', [UserController::class, 'getOnlineUsers']);
+
     // 他のルートもここに追加できる
     // Route::put('/users/{userId}/pointtest', [UserController::class, 'updatePointTest']);
 });
