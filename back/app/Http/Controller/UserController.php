@@ -39,6 +39,7 @@ class UserController
                 'email' => $request->email,
                 'point' => 3000,
                 'photoUrl' => $request->photoUrl,
+                'last_activity_at' => now(),
             ]);
 
             return response()->json($user, 201);
