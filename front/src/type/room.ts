@@ -11,6 +11,7 @@ export type Room = {
 	winUserId: string | null;
 	room_log: { description: string }[];
 	totalTurns: number;
+	isCpuMode: boolean;
 };
 
 export type SelectingRoom = {
