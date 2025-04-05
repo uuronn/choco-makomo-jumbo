@@ -684,7 +684,7 @@ export default function TechGacha() {
 						)}
 
 						{/* Crack effect */}
-						{showCrack && (
+						{/* {showCrack && (
 							<div className="absolute inset-0 z-10 overflow-hidden">
 								{Array.from({ length: 8 }).map((_, i) => (
 									<motion.div
@@ -697,7 +697,7 @@ export default function TechGacha() {
 									/>
 								))}
 							</div>
-						)}
+						)} */}
 
 						{/* Particle effects */}
 						{isAnimating &&
