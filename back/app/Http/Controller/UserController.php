@@ -6,6 +6,7 @@ use App\Model\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class UserController
 {
@@ -86,6 +87,13 @@ class UserController
         if (!$user) return response()->json(['message' => 'User not found'], 404);
 
         return response()->json($user->point, 200);
+    }
+
+    public function getOnlineUsers()
+    {
+        $onlineUsers = User::where('last_activity_at', '>=', Carbon::now()->subMinutes(10))->get();
+
+        return response()->json($onlineUsers);
     }
 
     /**
