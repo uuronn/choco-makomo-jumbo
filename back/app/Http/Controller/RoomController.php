@@ -665,6 +665,77 @@ class RoomController
     }
 
     /**
+     * ルーム内で降参する
+     */
+    public function surrender(Request $request)
+    {
+        try {
+            $roomId = $request->route('roomId');
+            $userId = $request->route('userId');
+
+            $room = Room::with(['hostUser', 'guestUser'])->where('id', $roomId)->first();
+
+            if (!$room) {
+                return response()->json(['message' => 'ルームが見つかりません'], 404);
+            }
+
+            if ($room->status !== 'battling') {
+                return response()->json(['message' => 'バトルが進行中ではありません'], 400);
+            }
+
+            if ($room->hostUserId !== $userId && $room->guestUserId !== $userId) {
+                return response()->json(['message' => 'このルームにアクセスする権限がありません'], 403);
+            }
+
+            return DB::transaction(function () use ($roomId, $userId, $room) {
+                // 降参した側の全キャラを死にさせる
+                RoomCharacter::where('roomId', $roomId)
+                    ->where('userId', $userId)
+                    ->where('isDead', false)
+                    ->update([
+                        'life' => 0,
+                        'isDead' => true,
+                        'isActive' => false,
+                    ]);
+
+                // 勝者を決定（降参した側と反対）
+                $winnerUserId = ($userId === $room->hostUserId) ? $room->guestUserId : $room->hostUserId;
+                $loserName = ($userId === $room->hostUserId) ? $room->hostUser->name : $room->guestUser->name;
+                $winnerName = ($userId === $room->hostUserId) ? $room->guestUser->name : $room->hostUser->name;
+
+                // ルームのステータスを終了に更新
+                $room->update([
+                    'status' => 'finish',
+                    'winUserId' => $winnerUserId,
+                    'currentTurnUserId' => null,
+                    'currentTurnCharacterId' => null,
+                ]);
+
+                // 降参ログを記録
+                RoomLog::create([
+                    'roomId' => $roomId,
+                    'actionType' => 'surrender',
+                    'actorUserId' => $userId,
+                    'description' => "{$loserName} が降参しました。{$winnerName} の勝利です。",
+                ]);
+
+                $room->refresh();
+
+                return response()->json([
+                    'message' => "{$loserName} が降参しました。{$winnerName} の勝利です。",
+                    'room' => $room,
+                    'winner_user_id' => $winnerUserId,
+                ], 200);
+            });
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => '降参処理に失敗しました',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * キャラクターが別のキャラクターに通常攻撃する
      */
     public function attack(Request $request)
