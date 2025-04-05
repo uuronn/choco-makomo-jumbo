@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'firebase.auth' => \App\Http\Middleware\FirebaseAuth::class,
+            'update.last.activity' => \App\Http\Middleware\UpdateLastActivity::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
