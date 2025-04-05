@@ -1,12 +1,20 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Loader2, Sword, Zap } from "lucide-react";
+import { Loader2, Sword, Zap, Flag } from "lucide-react";
 import type { Room, RoomCharacter } from "~/type/room";
 import { useUserContext } from "~/context/UserProvider";
 import { CharacterDisplay } from "./CharacterDisplay";
 import Image from "next/image";
 import { characterToImagePath } from "~/lib/utils";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "~/components/ui/dialog";
 
 type BattleProps = {
 	room: Room;
@@ -38,6 +46,7 @@ export default function Battle({ room }: BattleProps) {
 	const [characterEffects, setCharacterEffects] = useState<
 		Record<string, EffectInfo>
 	>({});
+	const [showSurrenderModal, setShowSurrenderModal] = useState<boolean>(false);
 
 	const isSelectingEnemy =
 		(isMyTurn && selectedAction === "attack") ||
@@ -585,6 +594,48 @@ export default function Battle({ room }: BattleProps) {
 					</button>
 				</div>
 			</div>
+			<button
+				type="button"
+				onClick={() => setShowSurrenderModal(true)}
+				className="flex items-center justify-center top-[16px] right-[16px] absolute opacity-80 gap-2 p-3 rounded-lg bg-red-700 hover:bg-red-600 text-white transition-colors"
+			>
+				<Flag size={20} />
+				{/* <span>降参</span> */}
+			</button>
+			{/* Surrender Modal */}
+			<Dialog open={showSurrenderModal} onOpenChange={setShowSurrenderModal}>
+				<DialogContent className="bg-gray-800 border border-green-500/50 text-green-300">
+					<DialogHeader>
+						<DialogTitle className="text-center text-xl">降参確認</DialogTitle>
+						<DialogDescription className="text-center text-green-200">
+							本当に降参しますか？この操作は取り消せません。
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter className="flex justify-center gap-4 mt-4">
+						<button
+							onClick={() => setShowSurrenderModal(false)}
+							className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white transition-colors"
+						>
+							キャンセル
+						</button>
+						<button
+							onClick={() => {
+								// Add your surrender logic here
+								fetch(
+									`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/surrender`,
+									{
+										method: "POST",
+									},
+								);
+								setShowSurrenderModal(false);
+							}}
+							className="px-4 py-2 rounded-lg bg-red-700 hover:bg-red-600 text-white transition-colors"
+						>
+							降参する
+						</button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }
