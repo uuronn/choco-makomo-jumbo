@@ -2,17 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Button } from "~/components/ui/button";
 import Link from "next/link";
 import {
 	Cpu,
 	Terminal,
 	Swords,
 	ChevronRight,
-	Code,
-	Server,
 	Database,
-	Layers,
 	BookOpen,
 	Trophy,
 } from "lucide-react";
@@ -86,9 +82,38 @@ export default function HomeScreen() {
 	const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 	const [showTechPoints, setShowTechPoints] = useState(false);
 	const { user: authUser, handleSignOut } = useUserContext();
+	const [onlineUsers, setOnlineUsers] = useState<number>(0);
 
 	// 👇 常に useUser を呼ぶ（userId が null のときは SWR が fetch しない）
 	const { data: user, error, isLoading } = useUser(authUser?.uid ?? null);
+
+	useEffect(() => {
+		const fetchOnlineUsers = async () => {
+			try {
+				const token = await authUser?.getIdToken();
+				const res = await fetch(
+					`${process.env.NEXT_PUBLIC_BASE_URL}/api/onlineUsers`,
+					{
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${token}`,
+						},
+					},
+				);
+
+				const data = await res.json();
+
+				setOnlineUsers(data.length); // もしくは data.count に応じて
+			} catch (err) {
+				console.error("Failed to fetch online users:", err);
+			}
+		};
+
+		fetchOnlineUsers();
+		// const response = await fetch(
+		// 	`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}/point`,
+		// );
+	}, []);
 
 	// 👇 データの状態を見てレンダリングを制御
 	if (!authUser) return <Loading message="認証中" />;
@@ -223,7 +248,7 @@ export default function HomeScreen() {
 					<div className="flex justify-between items-center">
 						<div className="text-xs text-green-500/70 font-mono flex items-center gap-2">
 							<div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-							<span>ONLINE</span>
+							<span>ONLINE: {onlineUsers}</span>
 						</div>
 						<div className="text-xs text-green-500/70 font-mono">
 							v1.0.0-beta
