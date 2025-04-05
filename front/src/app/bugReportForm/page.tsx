@@ -15,19 +15,11 @@ import {
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
-import {
-	AlertCircle,
-	CheckCircle2,
-	ArrowLeft,
-	Trophy,
-	Info,
-	AlertTriangle,
-} from "lucide-react";
+import { AlertCircle, ArrowLeft, Info, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import Link from "next/link";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Progress } from "~/components/ui/progress";
-import { Badge } from "~/components/ui/badge";
 import DOMPurify from "dompurify";
 
 // 文字数制限の定数
@@ -94,6 +86,13 @@ export default function BugReportForm() {
 		return suspiciousPatterns.some((pattern) => pattern.test(value));
 	};
 
+	// 同じ文字が連続して繰り返されているかチェック
+	const checkForRepeatedCharacters = (value: string): boolean => {
+		// 3文字以上の同じ文字の繰り返しを検出する正規表現
+		const repeatedCharPattern = /(.)\1{2,}/;
+		return repeatedCharPattern.test(value);
+	};
+
 	const handleChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
 	) => {
@@ -107,6 +106,10 @@ export default function BugReportForm() {
 		if (checkForMaliciousContent(value)) {
 			setSecurityWarning(
 				"セキュリティ上の問題があるコンテンツが検出されました。HTMLやJavaScriptコードは入力しないでください。",
+			);
+		} else if (checkForRepeatedCharacters(value)) {
+			setSecurityWarning(
+				"同じ文字が連続して使われています。より詳細な説明を入力してください。",
 			);
 		} else {
 			setSecurityWarning(null);
@@ -126,11 +129,98 @@ export default function BugReportForm() {
 		if (!formData.title.trim()) return "タイトルを入力してください";
 		if (formData.title.length > TITLE_MAX_LENGTH)
 			return `タイトルは${TITLE_MAX_LENGTH}文字以内で入力してください`;
+		if (checkForRepeatedCharacters(formData.title))
+			return "タイトルに同じ文字が連続して使われています";
 		if (!formData.description.trim()) return "詳細を入力してください";
 		if (formData.description.length > DESCRIPTION_MAX_LENGTH)
 			return `詳細は${DESCRIPTION_MAX_LENGTH}文字以内で入力してください`;
+		if (checkForRepeatedCharacters(formData.description))
+			return "詳細に同じ文字が連続して使われています";
 		if (securityWarning) return securityWarning;
 		return null;
+	};
+
+	// レポートタイプに基づいたラベルとプレースホルダーを取得
+	const getTitleLabel = () => {
+		switch (formData.reportType) {
+			case "bug":
+				return "バグのタイトル";
+			case "feature":
+				return "機能のタイトル";
+			case "other":
+				return "報告のタイトル";
+			default:
+				return "タイトル";
+		}
+	};
+
+	const getTitlePlaceholder = () => {
+		switch (formData.reportType) {
+			case "bug":
+				return "バグを簡潔に説明してください";
+			case "feature":
+				return "欲しい機能を簡潔に説明してください";
+			case "other":
+				return "報告内容を簡潔に説明してください";
+			default:
+				return "タイトルを入力してください";
+		}
+	};
+
+	const getDescriptionLabel = () => {
+		switch (formData.reportType) {
+			case "bug":
+				return "バグの詳細説明";
+			case "feature":
+				return "機能の詳細説明";
+			case "other":
+				return "報告の詳細説明";
+			default:
+				return "詳細説明";
+		}
+	};
+
+	const getDescriptionPlaceholder = () => {
+		switch (formData.reportType) {
+			case "bug":
+				return "バグの詳細を説明してください";
+			case "feature":
+				return "欲しい機能の詳細や使用シーンを説明してください";
+			case "other":
+				return "報告内容の詳細を説明してください";
+			default:
+				return "詳細を入力してください";
+		}
+	};
+
+	const getSuccessMessage = () => {
+		switch (formData.reportType) {
+			case "bug":
+				return "バグ報告を受け付けました。調査結果はメールでお知らせします。";
+			case "feature":
+				return "機能リクエストを受け付けました。検討結果はメールでお知らせします。";
+			case "other":
+				return "ご報告ありがとうございます。内容を確認させていただきます。";
+			default:
+				return "送信が完了しました。";
+		}
+	};
+
+	const getSubmitButtonText = () => {
+		if (isSubmitting) return "送信中...";
+		if (submissionsLeft <= 0) return "送信上限に達しました";
+		if (securityWarning) return "セキュリティ警告があります";
+
+		switch (formData.reportType) {
+			case "bug":
+				return "バグを報告する";
+			case "feature":
+				return "機能をリクエストする";
+			case "other":
+				return "報告を送信する";
+			default:
+				return "送信する";
+		}
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -229,7 +319,7 @@ export default function BugReportForm() {
 			{showPointsAnimation && (
 				<div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
 					<div className="bg-black/70 text-green-400 font-mono text-4xl px-8 py-4 rounded-lg border border-green-500 shadow-[0_0_30px_rgba(0,255,128,0.5)] animate-bounce flex items-center">
-						<Trophy className="mr-3 h-8 w-8" />
+						{/* <Trophy className="mr-3 h-8 w-8" /> */}
 						+300 技術ポイント!
 					</div>
 				</div>
@@ -245,22 +335,22 @@ export default function BugReportForm() {
 							>
 								<ArrowLeft className="h-5 w-5 text-green-400" />
 							</Link>
-							<div>
-								<CardTitle className="text-xl font-bold text-green-300 font-mono">
-									バグ報告・機能リクエスト
+							<div className="mb-4">
+								<CardTitle className="text-xl font-bold text-green-300 font-mono mb-1">
+									報告フォーム
 								</CardTitle>
 								<CardDescription className="text-green-300/70">
-									バグの報告や欲しい機能のリクエストを送信できます。
+									バグ報告、機能リクエスト、その他の報告を送信できます。
 								</CardDescription>
 							</div>
 						</div>
-						<Badge
+						{/* <Badge
 							variant="outline"
 							className="bg-black/50 border-green-500/50 text-green-300 px-3 py-1 flex items-center gap-1"
 						>
 							<Trophy className="h-4 w-4" />
 							{totalPoints} ポイント
-						</Badge>
+						</Badge> */}
 					</div>
 				</CardHeader>
 
@@ -285,21 +375,19 @@ export default function BugReportForm() {
 							</Progress>
 						</div>
 
-						{submitStatus === "success" && (
+						{/* {submitStatus === "success" && (
 							<Alert className="bg-green-500/20 border-green-500 text-green-300">
 								<CheckCircle2 className="h-4 w-4" />
 								<AlertTitle>送信完了</AlertTitle>
 								<AlertDescription>
-									{formData.reportType === "bug"
-										? "バグ報告を受け付けました。調査結果はメールでお知らせします。"
-										: "機能リクエストを受け付けました。検討結果はメールでお知らせします。"}
+									{getSuccessMessage()}
 									<div className="mt-1 font-semibold flex items-center">
 										<Trophy className="h-4 w-4 mr-1" />
 										300技術ポイントを獲得しました！
 									</div>
 								</AlertDescription>
 							</Alert>
-						)}
+						)} */}
 
 						{submitStatus === "error" && (
 							<Alert className="bg-red-500/20 border-red-500 text-red-300">
@@ -322,26 +410,45 @@ export default function BugReportForm() {
 							<RadioGroup
 								value={formData.reportType}
 								onValueChange={handleReportTypeChange}
-								className="flex space-x-4"
+								className="flex flex-wrap gap-4"
 							>
 								<div className="flex items-center space-x-2">
-									<RadioGroupItem
-										value="bug"
-										id="bug"
-										className="border-green-500/50 text-green-500"
-									/>
-									<Label htmlFor="bug" className="text-green-300">
+									<Label
+										htmlFor="bug"
+										className="text-green-300 cursor-pointer"
+									>
+										<RadioGroupItem
+											value="bug"
+											id="bug"
+											className="border-green-500/50 text-green-500 cursor-pointer"
+										/>
 										バグ報告
 									</Label>
 								</div>
 								<div className="flex items-center space-x-2">
-									<RadioGroupItem
-										value="feature"
-										id="feature"
-										className="border-green-500/50 text-green-500"
-									/>
-									<Label htmlFor="feature" className="text-green-300">
+									<Label
+										htmlFor="feature"
+										className="text-green-300 cursor-pointer"
+									>
+										<RadioGroupItem
+											value="feature"
+											id="feature"
+											className="border-green-500/50 text-green-500 cursor-pointer"
+										/>
 										機能リクエスト
+									</Label>
+								</div>
+								<div className="flex items-center space-x-2">
+									<Label
+										htmlFor="other"
+										className="text-green-300 cursor-pointer"
+									>
+										<RadioGroupItem
+											value="other"
+											id="other"
+											className="border-green-500/50 text-green-500 cursor-pointer"
+										/>
+										その他の報告
 									</Label>
 								</div>
 							</RadioGroup>
@@ -350,9 +457,7 @@ export default function BugReportForm() {
 						<div className="space-y-2">
 							<div className="flex justify-between">
 								<Label htmlFor="title" className="text-green-300">
-									{formData.reportType === "bug"
-										? "バグのタイトル"
-										: "機能のタイトル"}
+									{getTitleLabel()}
 								</Label>
 								<span
 									className={`text-xs ${getCounterColor(
@@ -368,11 +473,7 @@ export default function BugReportForm() {
 								name="title"
 								value={formData.title}
 								onChange={handleChange}
-								placeholder={
-									formData.reportType === "bug"
-										? "バグを簡潔に説明してください"
-										: "欲しい機能を簡潔に説明してください"
-								}
+								placeholder={getTitlePlaceholder()}
 								className={`bg-black/50 border-green-500/30 text-green-300 placeholder:text-green-300/50 ${
 									formData.title.length >= TITLE_MAX_LENGTH * 0.95
 										? "border-red-400"
@@ -385,9 +486,7 @@ export default function BugReportForm() {
 						<div className="space-y-2">
 							<div className="flex justify-between">
 								<Label htmlFor="description" className="text-green-300">
-									{formData.reportType === "bug"
-										? "バグの詳細説明"
-										: "機能の詳細説明"}
+									{getDescriptionLabel()}
 								</Label>
 								<span
 									className={`text-xs ${getCounterColor(
@@ -403,11 +502,7 @@ export default function BugReportForm() {
 								name="description"
 								value={formData.description}
 								onChange={handleChange}
-								placeholder={
-									formData.reportType === "bug"
-										? "バグの詳細を説明してください"
-										: "欲しい機能の詳細や使用シーンを説明してください"
-								}
+								placeholder={getDescriptionPlaceholder()}
 								className={`bg-black/50 border-green-500/30 text-green-300 placeholder:text-green-300/50 min-h-[150px] ${
 									formData.description.length >= DESCRIPTION_MAX_LENGTH * 0.95
 										? "border-red-400"
@@ -424,21 +519,14 @@ export default function BugReportForm() {
 							disabled={
 								isSubmitting || submissionsLeft <= 0 || !!securityWarning
 							}
-							className={`ml-auto font-mono ${
+							className={`ml-auto cursor-pointer font-mono ${
 								submissionsLeft <= 0 || !!securityWarning
 									? "bg-gray-600 cursor-not-allowed"
 									: "bg-green-600 hover:bg-green-500"
 							} text-white`}
 						>
-							{isSubmitting
-								? "送信中..."
-								: submissionsLeft <= 0
-									? "送信上限に達しました"
-									: securityWarning
-										? "セキュリティ警告があります"
-										: formData.reportType === "bug"
-											? "バグを報告する"
-											: "機能をリクエストする"}
+							{/* {getSubmitButtonText()} */}
+							送信する
 						</Button>
 					</CardFooter>
 				</form>
@@ -451,7 +539,7 @@ export default function BugReportForm() {
 
 			<div className="absolute top-4 right-4 text-green-500/30 font-mono text-xs">
 				<div className="flex items-center gap-1">
-					<div className="w-1 h-1 bg-green-500 rounded-full"></div>
+					<div className="w-1 h-1 bg-green-500 rounded-full" />
 				</div>
 			</div>
 		</div>
