@@ -28,6 +28,16 @@ Route::middleware('web')->group(function () {
     // });
 
 });
+
+Route::middleware(['update.last.activity'])->group(function () {
+    // ...
+    // ユーザーのキャラクターをレベルアップする
+Route::put('/users/{userId}/characters/{characterId}', [UserCharacterController::class, 'levelUp']);
+
+
+});
+
+
 Route::middleware(['restrict.domain'])->put('/users/{userId}/pointTest', [UserController::class, 'updatePointTest']);
 
 // すべてのユーザーを取得する
@@ -50,9 +60,6 @@ Route::get('/users/{userId}/characters', [UserCharacterController::class, 'list'
 
 // ユーザーのキャラクターを全て削除する
 Route::delete('/users/{userId}/characters', [UserCharacterController::class, 'delete']);
-
-// ユーザーのキャラクターをレベルアップする
-Route::put('/users/{userId}/characters/{characterId}', [UserCharacterController::class, 'levelUp']);
 
 
 
