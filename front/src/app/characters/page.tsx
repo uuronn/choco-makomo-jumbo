@@ -118,6 +118,9 @@ export default function CharacterDevelopment() {
 			return;
 		}
 
+		const token = await authUser.getIdToken();
+		// console.info("token", token);
+
 		try {
 			const response = await fetch(
 				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.id}/characters/${selectedCharacter.characterId}`,
@@ -125,6 +128,7 @@ export default function CharacterDevelopment() {
 					method: "PUT",
 					headers: {
 						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
 					},
 					body: JSON.stringify({
 						life: statPoints.life,
