@@ -139,8 +139,9 @@ Route::post('/{userId}/{roomId}/nextTurn', [RoomController::class, 'nextTurn']);
 Route::get('/rooms/{roomId}/log', [RoomLogController::class, 'logs']);
 
 
+// Route::post('/rooms/{roomId}/cpu-turn', [RoomController::class, 'handleCpuTurn']);
 
-
+Route::post('/cpu-battle/create', [RoomController::class, 'createCpuBattle']);
 
 
 

@@ -2,22 +2,22 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Plus, Users, ChevronRight } from "lucide-react";
+import { Plus, Users, ChevronRight, Cpu } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import { characterToImagePath, cn } from "~/lib/utils";
 import { useUserContext } from "~/context/UserProvider";
-import { Character } from "~/type/character";
-import { SelectingRoom } from "~/type/room";
+import type { Character } from "~/type/character";
+import type { SelectingRoom } from "~/type/room";
 import { FaLaptopCode } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { set } from "lodash";
 import { enqueueSnackbar } from "notistack";
 
 export default function GameInterface() {
 	const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);
 	const [selectedRoom, setSelectedRoom] = useState<SelectingRoom | null>(null);
 	const [rooms, setRooms] = useState<SelectingRoom[]>([]);
+	const [showCpuOptions, setShowCpuOptions] = useState(false);
 
 	const { user, havingCharacters } = useUserContext();
 
@@ -39,11 +39,17 @@ export default function GameInterface() {
 
 	const handleSelectRoom = (room: SelectingRoom) => {
 		setSelectedRoom(room);
+		setShowCpuOptions(false);
+	};
+
+	const toggleCpuOptions = () => {
+		setShowCpuOptions(!showCpuOptions);
+		setSelectedRoom(null);
 	};
 
 	const isButtonDisabled = selectedCharacters.length === 0;
 
-	const craeteRoom = async () => {
+	const createRoom = async () => {
 		if (!user) return;
 		const res = await fetch(
 			`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/create`,
@@ -80,10 +86,29 @@ export default function GameInterface() {
 		);
 
 		const data = await res.json();
-
-		console.log(data);
-
 		router.push(`/rooms/${selectedRoom?.id}`);
+	};
+
+	const startCpuBattle = async () => {
+		if (!user) return;
+		const res = await fetch(
+			`${process.env.NEXT_PUBLIC_BASE_URL}/api/cpu-battle/create`,
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					userId: user.uid, // userId に変更
+					characterIdList: selectedCharacters.map((c) => c.characterId),
+				}),
+			},
+		);
+		const data = await res.json();
+		if (res.ok) {
+			enqueueSnackbar("CPU対戦を開始します", { variant: "success" });
+			router.push(`/rooms/${data.id}`); // cpu-battle ではなく rooms に統一
+		} else {
+			enqueueSnackbar(data.message, { variant: "error" });
+		}
 	};
 
 	useEffect(() => {
@@ -209,6 +234,7 @@ export default function GameInterface() {
 												<Image
 													src={
 														characterToImagePath(character.characterId) ||
+														"/placeholder.svg" ||
 														"/placeholder.svg"
 													}
 													alt={character.name}
@@ -230,76 +256,131 @@ export default function GameInterface() {
 				</div>
 			</section>
 
-			{/* ルーム選択セクション */}
-			<section className="border border-green-400/30 rounded-lg p-3 backdrop-blur-sm backdrop-filter bg-black/20 h-[42%] overflow-hidden">
-				<h2 className="text-lg font-bold mb-2 text-green-400 flex items-center">
-					<Users className="mr-2 h-5 w-5" /> ルーム選択{" "}
-					<Button
-						onClick={refreshRooms}
-						className="ml-2 bg-green-400 text-black hover:bg-green-500 text-sm h-9"
-					>
-						更新
-					</Button>
-				</h2>
+			{/* 対戦モード選択タブ */}
+			<div className="flex mb-2">
+				<Button
+					onClick={() => setShowCpuOptions(false)}
+					className={cn(
+						"mr-2 text-sm",
+						!showCpuOptions
+							? "bg-green-400 text-black hover:bg-green-500"
+							: "bg-black/30 border-green-400/30 text-green-400 hover:bg-green-400/20",
+					)}
+				>
+					<Users className="mr-2 h-4 w-4" /> 対人戦
+				</Button>
+				<Button
+					onClick={toggleCpuOptions}
+					className={cn(
+						"text-sm",
+						showCpuOptions
+							? "bg-green-400 text-black hover:bg-green-500"
+							: "bg-black/30 border-green-400/30 text-green-400 hover:bg-green-400/20",
+					)}
+				>
+					<Cpu className="mr-2 h-4 w-4" /> CPU対戦
+				</Button>
+			</div>
 
-				<div className="space-y-3 h-[calc(100%-40px)]">
-					{/* ルーム一覧 */}
-					<div className="overflow-x-auto h-[calc(100%-40px)]">
-						<div className="flex h-full gap-4 items-center">
-							{rooms
-								.filter(
-									(room) =>
-										room.guest_user === null && room.host_user.id !== user?.uid,
-								)
-								.map((room) => (
-									<div
-										key={room.id}
-										className={cn(
-											"flex flex-col rounded-lg border transition-all justify-center items-center cursor-pointer min-w-[200px]  min-h-[160px] overflow-hidden",
-											selectedRoom?.id === room.id
-												? "bg-green-400/20 border-green-400"
-												: "bg-black/30 border-green-400/20 hover:bg-green-400/10",
-										)}
-										onClick={() => handleSelectRoom(room)}
-									>
-										<div className="relative h-[90px] w-full flex items-center justify-center">
-											<Image
-												src={room.host_user.photoUrl || "/placeholder.svg"}
-												alt={room.id}
-												width={80}
-												height={80}
-												className="object-cover rounded-full"
-											/>
-										</div>
-										<div className="p-2 text-center">
-											<h4 className="font-bold text-green-400 text-sm">
-												{room.host_user.name}
-											</h4>
-										</div>
-									</div>
-								))}
+			{/* ルーム選択またはCPU対戦セクション */}
+			<section className="border border-green-400/30 rounded-lg p-3 backdrop-blur-sm backdrop-filter bg-black/20 h-[38%] overflow-hidden">
+				{showCpuOptions ? (
+					<div className="space-y-4 h-[calc(100%-40px)] flex flex-col justify-center">
+						<div className="bg-black/30 border border-green-400/20 rounded-lg p-4">
+							<h3 className="text-sm font-semibold text-green-400/80 mb-2">
+								CPU対戦情報
+							</h3>
+							<p className="text-xs text-green-400/70 mb-1">
+								CPUと対戦して技術力を試そう！
+							</p>
+							<p className="text-xs text-green-400/70">
+								※ CPU対戦ではレベル経験値が通常の80%になります
+							</p>
+						</div>
+
+						<div className="flex justify-center mt-4">
+							<Button
+								onClick={startCpuBattle}
+								className="w-2/3 bg-green-400 text-black hover:bg-green-500 text-sm h-10"
+								disabled={isButtonDisabled}
+							>
+								CPU対戦を開始 <ChevronRight className="ml-1 h-4 w-4" />
+							</Button>
 						</div>
 					</div>
+				) : (
+					<>
+						<h2 className="text-lg font-bold mb-2 text-green-400 flex items-center">
+							<Users className="mr-2 h-5 w-5" /> ルーム選択{" "}
+							<Button
+								onClick={refreshRooms}
+								className="ml-2 bg-green-400 text-black hover:bg-green-500 text-sm h-9"
+							>
+								更新
+							</Button>
+						</h2>
 
-					{/* アクションボタン */}
-					<div className="flex gap-4 justify-around">
-						<Button
-							onClick={joinRoom}
-							className="w-[calc(50%-10px)] bg-green-400 text-black hover:bg-green-500 text-sm h-9"
-							disabled={isButtonDisabled || !selectedRoom}
-						>
-							入室 <ChevronRight className="ml-1 h-4 w-4" />
-						</Button>
-						<Button
-							onClick={craeteRoom}
-							variant="outline"
-							className="w-[calc(50%-10px)] bg-green-400 text-black hover:bg-green-500 text-sm h-9"
-							disabled={isButtonDisabled}
-						>
-							<Plus className="mr-1 h-4 w-4" /> ルーム作成
-						</Button>
-					</div>
-				</div>
+						<div className="space-y-3 h-[calc(100%-40px)]">
+							{/* ルーム一覧 */}
+							<div className="overflow-x-auto h-[calc(100%-40px)]">
+								<div className="flex h-full gap-4 items-center">
+									{rooms
+										.filter(
+											(room) =>
+												room.guest_user === null &&
+												room.host_user.id !== user?.uid,
+										)
+										.map((room) => (
+											<div
+												key={room.id}
+												className={cn(
+													"flex flex-col rounded-lg border transition-all justify-center items-center cursor-pointer min-w-[200px] min-h-[160px] overflow-hidden",
+													selectedRoom?.id === room.id
+														? "bg-green-400/20 border-green-400"
+														: "bg-black/30 border-green-400/20 hover:bg-green-400/10",
+												)}
+												onClick={() => handleSelectRoom(room)}
+											>
+												<div className="relative h-[90px] w-full flex items-center justify-center">
+													<Image
+														src={room.host_user.photoUrl || "/placeholder.svg"}
+														alt={room.id}
+														width={80}
+														height={80}
+														className="object-cover rounded-full"
+													/>
+												</div>
+												<div className="p-2 text-center">
+													<h4 className="font-bold text-green-400 text-sm">
+														{room.host_user.name}
+													</h4>
+												</div>
+											</div>
+										))}
+								</div>
+							</div>
+
+							{/* アクションボタン */}
+							<div className="flex gap-4 justify-around">
+								<Button
+									onClick={joinRoom}
+									className="w-[calc(50%-10px)] bg-green-400 text-black hover:bg-green-500 text-sm h-9"
+									disabled={isButtonDisabled || !selectedRoom}
+								>
+									入室 <ChevronRight className="ml-1 h-4 w-4" />
+								</Button>
+								<Button
+									onClick={createRoom}
+									variant="outline"
+									className="w-[calc(50%-10px)] bg-green-400 text-black hover:bg-green-500 text-sm h-9"
+									disabled={isButtonDisabled}
+								>
+									<Plus className="mr-1 h-4 w-4" /> ルーム作成
+								</Button>
+							</div>
+						</div>
+					</>
+				)}
 			</section>
 		</div>
 	);

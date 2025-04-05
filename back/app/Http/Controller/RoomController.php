@@ -16,6 +16,79 @@ use Illuminate\Support\Facades\DB;
 
 class RoomController
 {
+    public function createCpuBattle(Request $request)
+    {
+        try {
+            $hostUserId = $request->userId;
+            $characterIdList = $request->characterIdList;
+
+            if (empty($characterIdList)) {
+                return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
+            }
+
+            $cpuUserId = config('game.cpu_user_id', 9999); // 環境変数 or 定数管理もおすすめ
+
+            // ルーム作成とキャラ登録
+            $room = DB::transaction(function () use ($hostUserId, $cpuUserId, $characterIdList) {
+                $room = Room::create([
+                    'id' => Str::uuid(),
+                    'hostUserId' => $hostUserId,
+                    'guestUserId' => $cpuUserId,
+                    'status' => 'pending',
+                    'isCpuBattle' => true,
+                ]);
+
+                // ホストのキャラ登録（既存と同様）
+                foreach ($characterIdList as $characterId) {
+                    // validation略
+                    $userCharacter = UserCharacter::where('userId', $hostUserId)
+                        ->where('characterId', $characterId)
+                        ->first();
+
+                    $character = Character::find($characterId);
+
+                    RoomCharacter::create([
+                        'roomId' => $room->id,
+                        'characterId' => $characterId,
+                        'userId' => $hostUserId,
+                        'level' => $userCharacter->level,
+                        'life' => $userCharacter->life,
+                        'maxLife' => $userCharacter->life,
+                        'power' => $userCharacter->power,
+                        'speed' => $userCharacter->speed,
+                        'evasion' => $character->baseEvasion,
+                    ]);
+                }
+
+                // CPUキャラ選出
+                $cpuCharacterIds = Character::inRandomOrder()->limit(3)->pluck('id');
+                foreach ($cpuCharacterIds as $characterId) {
+                    $character = Character::find($characterId);
+                    RoomCharacter::create([
+                        'roomId' => $room->id,
+                        'characterId' => $character->id,
+                        'userId' => $cpuUserId,
+                        'level' => 1,
+                        'life' => $character->baseLife,
+                        'maxLife' => $character->baseLife,
+                        'power' => $character->basePower,
+                        'speed' => $character->baseSpeed,
+                        'evasion' => $character->baseEvasion,
+                    ]);
+                }
+
+                return $room;
+            });
+
+            // 承認処理を手動で呼ぶ
+            // $this->approveManually($room);
+
+            return response()->json($room, 201);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'CPUバトル作成に失敗しました', 'error' => $e->getMessage()], 500);
+        }
+    }
+
     /**
      * ルーム一覧を取得
      */
