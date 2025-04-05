@@ -52,7 +52,7 @@ type GachaResult = {
 
 export default function TechGacha() {
 	const { user, havingCharacters } = useUserContext();
-	const [availablePoints, setAvailablePoints] = useState(100);
+	const [availablePoints, setAvailablePoints] = useState(0);
 	const [isAnimating, setIsAnimating] = useState(false);
 	const [showResult, setShowResult] = useState(false);
 	const [result, setResult] = useState<GachaResult | null>(null);
