@@ -68,7 +68,7 @@ const footerItems = [
 		id: "bug-report",
 		title: "バグ報告",
 		icon: <Terminal className="h-5 w-5" />,
-		path: "/bug-report",
+		path: "/bugReportForm",
 	},
 	{
 		id: "ranking",
@@ -178,7 +178,7 @@ export default function HomeScreen() {
 								</div>
 							</div>
 						</div>
-						<div
+						{/* <div
 							// variant="ghost"
 							className="group pointer-events-none flex h-12 items-center justify-center rounded-lg border border-transparent px-3 py-2"
 						>
@@ -186,7 +186,7 @@ export default function HomeScreen() {
 								<Cpu className="size-5" />
 							</div>
 							<span className="text-green-400">ベータ版</span>
-						</div>
+						</div> */}
 					</div>
 				</div>
 
