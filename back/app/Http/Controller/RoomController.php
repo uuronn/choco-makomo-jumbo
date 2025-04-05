@@ -193,7 +193,7 @@ class RoomController
                 return response()->json(['message' => 'キャラクターIDリストが必要です'], 400);
             }
 
-            $cpuUserId = config('game.cpu_user_id', 9999); // 環境変数 or 定数管理もおすすめ
+            $cpuUserId = '00000000-0000-0000-0000-000000000cpu';
 
             // ルーム作成とキャラ登録
             $room = DB::transaction(function () use ($hostUserId, $cpuUserId, $characterIdList) {
