@@ -26,11 +26,20 @@ class FirebaseAuth
 
             Log::info('[FirebaseAuth] UID from token: ' . $uid);
 
-            $user = User::where('id', $uid)->first();
 
-            if (!$user) {
-                return response()->json(['message' => 'ユーザーが見つかりません'], 404);
-            }
+            // UIDでユーザーを探して、なければ作成
+            $user = User::firstOrCreate(
+                ['id' => $uid], // FirebaseのUIDをそのまま主キーに使う場合
+                [
+                    'name' => $verifiedIdToken->claims()->get('name') ?? 'No Name',
+                    'email' => $verifiedIdToken->claims()->get('email') ?? null,
+                    'photoUrl' => $verifiedIdToken->claims()->get('picture') ?? null,
+                    'point' => 3000,
+                    'last_activity_at' => now(),
+                ]
+            );
+
+            Log::info('user ' . $user);
 
             LaravelAuth::login($user);
 
