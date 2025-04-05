@@ -99,6 +99,9 @@ Route::post('/{userId}/{roomId}/reject', [RoomController::class, 'reject']);
 // 通常攻撃を行う
 Route::post('{userId}/{roomId}/attack', [RoomController::class, 'attack']);
 
+
+Route::post('{userId}/{roomId}/surrender', [RoomController::class, 'surrender']);
+
 // スペシャルスキル発動
 Route::post('{userId}/{roomId}/skill', [RoomController::class, 'skill']);
 
@@ -112,6 +115,9 @@ Route::post('/{userId}/{roomId}/nextTurn', [RoomController::class, 'nextTurn']);
 
 // ルームログ取得
 Route::get('/rooms/{roomId}/log', [RoomLogController::class, 'logs']);
+
+
+
 
 
 
