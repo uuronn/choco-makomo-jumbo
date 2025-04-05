@@ -132,7 +132,7 @@ export default function TechGacha() {
 			try {
 				const token = await user.getIdToken();
 				const res = await fetch(
-					`${process.env.NEXT_PUBLIC_BASE_URL}/api/onlineUsers`,
+					`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`,
 					{
 						headers: {
 							"Content-Type": "application/json",
