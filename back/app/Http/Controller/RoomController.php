@@ -164,9 +164,9 @@ class RoomController
             $room->refresh();
 
             // 👇 これを追記するだけ！
-            if ($room->currentTurnUserId === '00000000-0000-0000-0000-000000000cpu') {
-                return $this->cpuAct($request, $roomId);
-            }
+            // if ($room->currentTurnUserId === '00000000-0000-0000-0000-000000000cpu') {
+            //     return $this->cpuAct($request, $roomId);
+            // }
 
             return response()->json([
                 'message' => 'CPUが攻撃しました',

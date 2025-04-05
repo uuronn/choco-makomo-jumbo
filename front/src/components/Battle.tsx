@@ -232,18 +232,36 @@ export default function Battle({ room }: BattleProps) {
 		}
 	}, [room, user?.uid, showEffect, selectedAction]);
 
+	// useEffect(() => {
+	// 	if (room?.currentTurnUserId === "00000000-0000-0000-0000-000000000cpu") {
+	// 		setTimeout(() => {
+	// 			fetch(
+	// 				`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/${room.id}/cpu-act`,
+	// 				{
+	// 					method: "POST",
+	// 				},
+	// 			);
+	// 		}, 1000); // 1秒ディレイして自然な動きに
+	// 	}
+	// }, [room?.currentTurnUserId]);
+
 	useEffect(() => {
-		if (room?.currentTurnUserId === "00000000-0000-0000-0000-000000000cpu") {
-			setTimeout(() => {
+		if (
+			room?.currentTurnUserId === "00000000-0000-0000-0000-000000000cpu" &&
+			room.status === "battling"
+		) {
+			const timer = setTimeout(() => {
 				fetch(
 					`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/${room.id}/cpu-act`,
 					{
 						method: "POST",
 					},
 				);
-			}, 1000); // 1秒ディレイして自然な動きに
+			}, 1000); // 1秒待ってから次のCPUを行動させる
+
+			return () => clearTimeout(timer);
 		}
-	}, [room?.currentTurnUserId]);
+	}, [room?.currentTurnUserId, room?.status]);
 
 	// 敵を選択する関数
 	const selectEnemy = async (characterId: string) => {
