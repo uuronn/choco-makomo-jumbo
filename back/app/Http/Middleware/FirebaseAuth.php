@@ -6,6 +6,8 @@ use Kreait\Firebase\Contract\Auth;
 use App\Model\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth as LaravelAuth;
+use Illuminate\Support\Facades\Log;
+
 class FirebaseAuth
 {
     public function __construct(protected Auth $auth) {}
@@ -21,6 +23,8 @@ class FirebaseAuth
         try {
             $verifiedIdToken = $this->auth->verifyIdToken($token);
             $uid = $verifiedIdToken->claims()->get('sub');
+
+            Log::info('[FirebaseAuth] UID from token: ' . $uid);
 
             $user = User::where('id', $uid)->first();
 
