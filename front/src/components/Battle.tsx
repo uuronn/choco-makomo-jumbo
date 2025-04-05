@@ -352,7 +352,13 @@ export default function Battle({ room }: BattleProps) {
 				<div className="relative min-w-[30%] mx-auto py-6 my-4">
 					{/* Glowing timeline bar */}
 					<div className="absolute h-2 w-full bg-gray-800 rounded-full overflow-hidden">
-						<div className="h-full w-full bg-gradient-to-r from-green-500/30 via-green-400/50 to-green-500/30 animate-pulse"></div>
+						<div
+							className={`h-full w-full animate-pulse ${
+								room.currentTurnUserId === user?.uid
+									? "bg-gradient-to-r from-green-500/30 via-green-400/50 to-green-500/30"
+									: "bg-gradient-to-r from-red-500/30 via-red-400/50 to-red-500/30"
+							}`}
+						/>
 					</div>
 
 					{/* Character turn indicators */}
@@ -389,9 +395,9 @@ export default function Battle({ room }: BattleProps) {
 										{/* Character portrait with frame */}
 										<div className={`relative ${isCurrentTurn ? "z-10" : ""}`}>
 											{/* Glowing effect for current turn */}
-											{isCurrentTurn && (
+											{/* {isCurrentTurn && (
 												<div className="absolute inset-0 bg-green-500/30 rounded-full blur-md -z-10 scale-110"></div>
-											)}
+											)} */}
 
 											{/* Character frame */}
 											<div
