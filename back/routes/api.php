@@ -14,28 +14,39 @@ use Illuminate\Support\Facades\Route;
 // ユーザーを作成する
 // Route::post('/users', [UserController::class, 'create']);
 
-Route::middleware('firebase.auth')->group(function () {
-    // ユーザーを作成する
+// Route::middleware('firebase.auth')->group(function () {
+//     // ユーザーを作成する
+//     Route::post('/users', [UserController::class, 'create']);
+
+//     // ユーザーのpointを更新する
+//     // Route::put('/users/{userId}/pointtest', [UserController::class, 'updatePointTest']);
+// });
+
+Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () {
+    // ユーザー作成（初回のみ）
     Route::post('/users', [UserController::class, 'create']);
 
-    // ユーザーのpointを更新する
+    // ユーザーのキャラクターをレベルアップ
+    Route::put('/users/{userId}/characters/{characterId}', [UserCharacterController::class, 'levelUp']);
+
+    // 他のルートもここに追加できる
     // Route::put('/users/{userId}/pointtest', [UserController::class, 'updatePointTest']);
 });
 
-Route::middleware('web')->group(function () {
-    // Route::get('/csrf-token', function () {
-    //     return response()->json(['message' => 'CSRF token set']);
-    // });
+// Route::middleware('web')->group(function () {
+//     // Route::get('/csrf-token', function () {
+//     //     return response()->json(['message' => 'CSRF token set']);
+//     // });
 
-});
+// });
 
-Route::middleware(['update.last.activity'])->group(function () {
-    // ...
-    // ユーザーのキャラクターをレベルアップする
-Route::put('/users/{userId}/characters/{characterId}', [UserCharacterController::class, 'levelUp']);
+// Route::middleware(['update.last.activity'])->group(function () {
+//     // ...
+//     // ユーザーのキャラクターをレベルアップする
+// Route::put('/users/{userId}/characters/{characterId}', [UserCharacterController::class, 'levelUp']);
 
 
-});
+// });
 
 
 Route::middleware(['restrict.domain'])->put('/users/{userId}/pointTest', [UserController::class, 'updatePointTest']);
