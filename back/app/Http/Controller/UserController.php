@@ -91,7 +91,7 @@ class UserController
 
     public function getOnlineUsers()
     {
-        $onlineUsers = User::where('last_activity_at', '>=', Carbon::now()->subMinutes(10))->get();
+        $onlineUsers = User::where('last_activity_at', '>=', Carbon::now()->subMinutes(5))->get();
 
         return response()->json($onlineUsers);
     }
