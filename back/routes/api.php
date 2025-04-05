@@ -143,6 +143,8 @@ Route::get('/rooms/{roomId}/log', [RoomLogController::class, 'logs']);
 
 Route::post('/cpu-battle/create', [RoomController::class, 'createCpuBattle']);
 
+Route::post('/rooms/{roomId}/cpu-act', [RoomController::class, 'cpuAct']);
+
 
 
 // ガチャ関連のAPI--------------------------------

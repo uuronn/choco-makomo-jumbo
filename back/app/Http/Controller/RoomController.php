@@ -16,6 +16,173 @@ use Illuminate\Support\Facades\DB;
 
 class RoomController
 {
+
+    private function approveManually(Room $room)
+    {
+        DB::transaction(function () use ($room) {
+            $roomId = $room->id;
+
+            $hostCharacters = RoomCharacter::where('roomId', $roomId)
+                ->where('userId', $room->hostUserId)
+                ->with('character')
+                ->get();
+
+            $guestCharacters = RoomCharacter::where('roomId', $roomId)
+                ->where('userId', $room->guestUserId)
+                ->with('character')
+                ->get();
+
+            // ホストのボーナス適用
+            $hostCharacterNames = $hostCharacters->pluck('character.name')->toArray();
+            $hostBonuses = $this->applyPartyBonuses($hostCharacterNames, $room->hostUser, $room);
+
+            foreach ($hostCharacters as $character) {
+                RoomCharacter::where('id', $character->id)->update([
+                    'life' => $character->life * $hostBonuses['lifeMultiplier'],
+                    'maxLife' => $character->maxLife * $hostBonuses['lifeMultiplier'],
+                    'power' => $character->power * $hostBonuses['powerMultiplier'],
+                    'speed' => $character->speed * $hostBonuses['speedMultiplier'],
+                    'evasion' => $character->evasion * $hostBonuses['evasionMultiplier'],
+                ]);
+            }
+
+            if (!empty($hostBonuses['logs'])) {
+                RoomLog::create([
+                    'roomId' => $roomId,
+                    'actionType' => 'partyBonus',
+                    'actorUserId' => $room->hostUserId,
+                    'description' => implode(' / ', $hostBonuses['logs']),
+                ]);
+            }
+
+            // ゲストのボーナス適用
+            $guestCharacterNames = $guestCharacters->pluck('character.name')->toArray();
+            $guestBonuses = $this->applyPartyBonuses($guestCharacterNames, $room->guestUser, $room);
+
+            foreach ($guestCharacters as $character) {
+                RoomCharacter::where('id', $character->id)->update([
+                    'life' => $character->life * $guestBonuses['lifeMultiplier'],
+                    'maxLife' => $character->maxLife * $guestBonuses['lifeMultiplier'],
+                    'power' => $character->power * $guestBonuses['powerMultiplier'],
+                    'speed' => $character->speed * $guestBonuses['speedMultiplier'],
+                    'evasion' => $character->evasion * $guestBonuses['evasionMultiplier'],
+                ]);
+            }
+
+            if (!empty($guestBonuses['logs'])) {
+                RoomLog::create([
+                    'roomId' => $roomId,
+                    'actionType' => 'partyBonus',
+                    'actorUserId' => $room->guestUserId,
+                    'description' => implode(' / ', $guestBonuses['logs']),
+                ]);
+            }
+
+            RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
+
+            $characters = RoomCharacter::where('roomId', $roomId)
+                ->orderBy('speed', 'desc')
+                ->get();
+
+            $firstTurn = $characters->first();
+            $room->update([
+                'status' => 'battling',
+                'currentTurnUserId' => $firstTurn->userId,
+                'currentTurnCharacterId' => $firstTurn->characterId,
+            ]);
+        });
+    }
+
+
+
+    public function cpuAct(Request $request, $roomId)
+    {
+        try {
+            $room = Room::with(['hostUser', 'guestUser'])->where('id', $roomId)->first();
+
+            if (!$room) {
+                return response()->json(['message' => 'ルームが見つかりません'], 404);
+            }
+
+            if ($room->currentTurnUserId !== '00000000-0000-0000-0000-000000000cpu') {
+                return response()->json(['message' => '現在はCPUのターンではありません'], 403);
+            }
+
+            $attacker = RoomCharacter::with('character')
+                ->where('roomId', $roomId)
+                ->where('userId', $room->currentTurnUserId)
+                ->where('characterId', $room->currentTurnCharacterId)
+                ->where('isActive', true)
+                ->where('isDead', false)
+                ->first();
+
+            $target = RoomCharacter::with('character')
+                ->where('roomId', $roomId)
+                ->where('userId', '!=', $room->currentTurnUserId)
+                ->where('isDead', false)
+                ->inRandomOrder()
+                ->first();
+
+            if (!$attacker || !$target) {
+                return response()->json(['message' => '攻撃者または対象が見つかりません'], 404);
+            }
+
+            $damage = $attacker->power;
+            $newLife = max(0, $target->life - $damage);
+            $target->update([
+                'life' => $newLife,
+                'isDead' => $newLife <= 0
+            ]);
+
+            // ログ記録
+            RoomLog::create([
+                'roomId' => $roomId,
+                'actionType' => 'attack',
+                'actorUserId' => $attacker->userId,
+                'actorCharacterId' => $attacker->characterId,
+                'targetUserId' => $target->userId,
+                'targetCharacterId' => $target->characterId,
+                'value' => $damage,
+                'description' => "{$attacker->character->name}（CPU）が {$target->character->name} に {$damage} ダメージ",
+            ]);
+
+            if ($newLife <= 0) {
+                RoomLog::create([
+                    'roomId' => $roomId,
+                    'actionType' => 'death',
+                    'targetUserId' => $target->userId,
+                    'targetCharacterId' => $target->characterId,
+                    'description' => "{$target->character->name} がダウンしました",
+                ]);
+            }
+
+            $attacker->update(['isActive' => false]);
+            $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
+
+            $nextTurn = $this->updateNextTurn($roomId);
+            $this->checkBattleEnd($room);
+            $room->refresh();
+
+            return response()->json([
+                'message' => 'CPUが攻撃しました',
+                'room' => $room,
+                'attacker' => $attacker,
+                'target' => [
+                    'id' => $target->id,
+                    'userId' => $target->userId,
+                    'life' => $newLife,
+                    'isDead' => $newLife <= 0
+                ],
+                'next_turn_user_id' => $nextTurn?->userId,
+                'next_turn_character_id' => $nextTurn?->characterId,
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'CPUの攻撃処理に失敗しました',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
     public function createCpuBattle(Request $request)
     {
         try {
@@ -81,7 +248,7 @@ class RoomController
             });
 
             // 承認処理を手動で呼ぶ
-            // $this->approveManually($room);
+            $this->approveManually($room);
 
             return response()->json($room, 201);
         } catch (Exception $e) {

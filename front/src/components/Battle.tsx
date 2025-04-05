@@ -232,6 +232,19 @@ export default function Battle({ room }: BattleProps) {
 		}
 	}, [room, user?.uid, showEffect, selectedAction]);
 
+	useEffect(() => {
+		if (room?.currentTurnUserId === "00000000-0000-0000-0000-000000000cpu") {
+			setTimeout(() => {
+				fetch(
+					`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/${room.id}/cpu-act`,
+					{
+						method: "POST",
+					},
+				);
+			}, 1000); // 1秒ディレイして自然な動きに
+		}
+	}, [room?.currentTurnUserId]);
+
 	// 敵を選択する関数
 	const selectEnemy = async (characterId: string) => {
 		if (!isSelectingEnemy) return;
