@@ -31,6 +31,9 @@ Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () 
 
     Route::get('/onlineUsers', [UserController::class, 'getOnlineUsers']);
 
+// ユーザーのpointを取得する
+Route::get('/users/{userId}/point', [UserController::class, 'getPoint']);
+
     // 他のルートもここに追加できる
     // Route::put('/users/{userId}/pointtest', [UserController::class, 'updatePointTest']);
 });
@@ -62,8 +65,7 @@ Route::get('/users/{userId}', [UserController::class, 'getUser']);
 // ユーザーが存在するか確認する
 Route::get('/users/{userId}/checkUser', [UserController::class, 'checkUser']);
 
-// ユーザーのpointを取得する
-Route::get('/users/{userId}/point', [UserController::class, 'getPoint']);
+
 
 // ユーザーのpointを更新する
 Route::put('/users/{userId}/point', [UserController::class, 'updatePoint']);

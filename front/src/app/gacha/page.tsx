@@ -124,6 +124,38 @@ export default function TechGacha() {
 		};
 	}, []);
 
+	// Initialize audio elements
+	useEffect(() => {
+		if (!user) return;
+
+		const fetchOnlineUsers = async () => {
+			try {
+				const token = await user.getIdToken();
+				const res = await fetch(
+					`${process.env.NEXT_PUBLIC_BASE_URL}/api/onlineUsers`,
+					{
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${token}`,
+						},
+					},
+				);
+
+				if (!res.ok) {
+					console.error("Failed to fetch online users:", res.statusText);
+					return;
+				}
+
+				const data = await res.json();
+				setAvailablePoints(data);
+			} catch (error) {
+				console.error("Error fetching online users:", error);
+			}
+		};
+
+		fetchOnlineUsers();
+	}, [user]);
+
 	// Generate code lines for background effect
 	useEffect(() => {
 		const lines = [
