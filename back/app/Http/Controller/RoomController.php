@@ -1002,7 +1002,11 @@ class RoomController
                 return response()->json(['message' => '攻撃対象を指定してください'], 400);
             }
 
-            $room = Room::with(['hostUser', 'guestUser', 'roomCharacter.character'])->where('id', $roomId)->first();
+            $room = Room::with(['hostUser', 'guestUser', 'roomCharacter' => function ($query) {
+                $query->with('character');
+            }])->where('id', $roomId)->first();
+
+            // $room = Room::with(['hostUser', 'guestUser', 'roomCharacter.character'])->where('id', $roomId)->first();
 
             Log::info('attack: ' . $room);
 
