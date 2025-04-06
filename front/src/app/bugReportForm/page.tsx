@@ -123,7 +123,7 @@ export default function BugReportForm() {
 	};
 
 	const handleReportTypeChange = (value: string) => {
-		setFormData((prev) => ({ ...prev, reportType: value }));
+		setFormData((prev) => ({ ...prev, type: value }));
 	};
 
 	const validateForm = () => {
