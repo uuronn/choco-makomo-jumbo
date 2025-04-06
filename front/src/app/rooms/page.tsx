@@ -286,17 +286,17 @@ export default function GameInterface() {
 			<section className="border border-green-400/30 rounded-lg p-3 backdrop-blur-sm backdrop-filter bg-black/20 h-[38%] overflow-hidden">
 				{showCpuOptions ? (
 					<div className="space-y-4 h-[calc(100%-40px)] flex flex-col justify-center">
-						<div className="bg-black/30 border border-green-400/20 rounded-lg p-4">
+						{/* <div className="bg-black/30 border border-green-400/20 rounded-lg p-4">
 							<h3 className="text-sm font-semibold text-green-400/80 mb-2">
 								CPU対戦情報
 							</h3>
 							<p className="text-xs text-green-400/70 mb-1">
-								CPUと対戦して技術力を試そう！
+								CPUと思う存分対戦しよう！
 							</p>
 							<p className="text-xs text-green-400/70">
 								※ CPU対戦ではレベル経験値が通常の80%になります
 							</p>
-						</div>
+						</div> */}
 
 						<div className="flex justify-center mt-4">
 							<Button
