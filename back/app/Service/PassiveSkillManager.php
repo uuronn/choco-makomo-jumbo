@@ -96,7 +96,7 @@ class PassiveSkillManager
 
 
                     // 味方を取得（自分以外の同じユーザー）
-                    $allies = $room->characters->filter(function ($ally) use ($character) {
+                    $allies = $room->room_character->filter(function ($ally) use ($character) {
                         return $ally->userId === $character->userId &&
                             $ally->id !== $character->id &&
                             !$ally->isDead;
