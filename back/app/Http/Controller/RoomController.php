@@ -879,10 +879,14 @@ class RoomController
             if (!$roomId) return response()->json(['message' => 'ルームIDが必要です'], 401);
 
             $room = Room::with([
-                'roomCharacter.character',
+                // 'roomCharacter.character',
             //     'roomCharacter.character' => function ($query) {
             //     $query->orderBy('speed', 'desc'); // speed順に並び替え（降順）
             // },
+            'roomCharacter' => function ($query) {
+        $query->orderBy('speed', 'desc'); // roomCharacterのspeedで降順に並び替え
+        $query->with('character'); // characterリレーションをさらに読み込む
+    },
                 'roomLog' => function ($query) {
                     $query->with([
                         'actorCharacter' => function ($query) {
