@@ -21,12 +21,14 @@ import Link from "next/link";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Progress } from "~/components/ui/progress";
 import DOMPurify from "dompurify";
+import { useUserContext } from "~/context/UserProvider";
 
 // 文字数制限の定数
 const TITLE_MAX_LENGTH = 100;
 const DESCRIPTION_MAX_LENGTH = 2000;
 
 export default function BugReportForm() {
+	const { user } = useUserContext();
 	const [formData, setFormData] = useState({
 		reportType: "bug", // デフォルトはバグ報告
 		title: "",
@@ -266,32 +268,35 @@ export default function BugReportForm() {
 			});
 
 			// 実際のAPIが用意されたら以下のようなコードに置き換える
-			/*
-      const response = await fetch('/api/bug-report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // CSRFトークンをヘッダーに含める（実際の実装では必要）
-          // 'X-CSRF-Token': csrfToken
-        },
-        body: JSON.stringify(sanitizedData),
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setSubmissionsLeft(prev => prev - 1);
-        setTotalPoints(prev => prev + 300);
-        setSubmitStatus("success");
-        setFormData({
-          reportType: "bug",
-          title: "",
-          description: "",
-        });
-      } else {
-        throw new Error(data.message || "送信中にエラーが発生しました");
-      }
-      */
+
+			const token = await user?.getIdToken();
+
+			const response = await fetch(
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/report`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify(sanitizedData),
+				},
+			);
+
+			const data = await response.json();
+
+			if (data.success) {
+				setSubmissionsLeft((prev) => prev - 1);
+				setTotalPoints((prev) => prev + 300);
+				setSubmitStatus("success");
+				setFormData({
+					reportType: "bug",
+					title: "",
+					description: "",
+				});
+			} else {
+				throw new Error(data.message || "送信中にエラーが発生しました");
+			}
 		} catch (error) {
 			setSubmitStatus("error");
 			setErrorMessage(

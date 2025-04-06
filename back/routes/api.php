@@ -2,6 +2,7 @@
 
 use App\Http\Controller\CharacterController;
 use App\Http\Controller\GachaController;
+use App\Http\Controller\ReportLogController;
 use App\Http\Controller\RoomController;
 use App\Http\Controller\RoomLogController;
 use App\Http\Controller\UserCharacterController;
@@ -151,3 +152,6 @@ Route::post('/rooms/{roomId}/cpu-act', [RoomController::class, 'cpuAct']);
 
 // ガチャを引く
 Route::post('/gacha', [GachaController::class, 'gacha']);
+
+
+Route::post('/{userId}/report', [ReportLogController::class, 'store']);
