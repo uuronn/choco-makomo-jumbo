@@ -401,21 +401,18 @@ export default function Battle({ room }: BattleProps) {
 						/>
 					</div>
 
-					{console.info("room.room_cneharacter", room.room_character)}
-
 					{/* Character turn indicators */}
 					<div className="flex justify-between items-center relative mt-4">
 						{/* Sort characters by speed (highest first) for turn order */}
 						{[...room.room_character]
-							// .sort((a, b) => b.speed - a.speed)
-							.filter((character) => character.isDead === false)
-							// .filter((character) => character.isDead === false)
+							.sort((a, b) => b.speed - a.speed) // speedの降順でソート
+							.filter((character) => character.isDead === false) // 死んでいないキャラのみ
 							.map((character, index) => {
-								const isCurrentTurn =
-									room.currentTurnCharacterId === character.characterId;
 								const isPlayer = character.userId === user?.uid;
+								const isCurrentTurn =
+									room.currentTurnCharacterId === character.characterId &&
+									room.currentTurnUserId === character.userId; // ユーザーIDも一致するか確認
 
-								// console.info("character", character);
 								return (
 									<div
 										key={character.id}
@@ -428,29 +425,15 @@ export default function Battle({ room }: BattleProps) {
 												: "none",
 										}}
 									>
-										{/* Turn number */}
-										{/* <div
-											className={`text-xs font-bold mb-1 ${
-												isCurrentTurn ? "text-green-400" : "text-gray-500"
-											}`}
-										>
-											{index + 1}
-										</div> */}
-
 										{/* Character portrait with frame */}
 										<div className={`relative ${isCurrentTurn ? "z-10" : ""}`}>
-											{/* Glowing effect for current turn */}
-											{/* {isCurrentTurn && (
-												<div className="absolute inset-0 bg-green-500/30 rounded-full blur-md -z-10 scale-110"></div>
-											)} */}
-
 											{/* Character frame */}
 											<div
 												className={`relative rounded-full p-0.5 ${
 													isCurrentTurn
 														? isPlayer
 															? "bg-gradient-to-br from-green-400 to-emerald-600 shadow-lg shadow-green-500/30"
-															: "bg-gradient-to-br from-red-400 to-red-600 shadow-lg shadow-red-500/30" // Enemy's turn
+															: "bg-gradient-to-br from-red-400 to-red-600 shadow-lg shadow-red-500/30"
 														: isPlayer
 															? "bg-gradient-to-br from-green-400 to-green-600"
 															: "bg-gradient-to-br from-red-400 to-red-600"
@@ -473,17 +456,6 @@ export default function Battle({ room }: BattleProps) {
 																: ""
 														}`}
 													/>
-
-													{/* Speed indicator */}
-													{/* <div className="absolute bottom-0 right-0 bg-gray-800 rounded-full px-1.5 text-xs font-bold border border-gray-700">
-														<span
-															className={
-																isPlayer ? "text-green-400" : "text-red-400"
-															}
-														>
-															{character.speed}
-														</span>
-													</div> */}
 												</div>
 											</div>
 
@@ -501,37 +473,14 @@ export default function Battle({ room }: BattleProps) {
 
 										{/* Character name */}
 										<div
-											className={`mt-1 text-xs font-semibold truncate max-w-[70px] text-cente`}
+											className={`mt-1 text-xs font-semibold truncate max-w-[70px] text-center`}
 										>
 											{character.speed}
-											{/* {character.character.name.length > 8
-												? character.character.name.substring(0, 8) + "..."
-												: character.character.name} */}
 										</div>
-
-										{/* Connection line to timeline */}
-										{/* <div
-											className={`h-3 w-0.5 -mt-1 ${
-												isCurrentTurn
-													? "bg-green-400"
-													: isPlayer
-														? "bg-green-500/50"
-														: "bg-red-500/50"
-											}`}
-										></div> */}
 									</div>
 								);
 							})}
 					</div>
-
-					{/* Add some extra styles for animations */}
-					{/* <style jsx global>{`
-          @keyframes float {
-            0% { transform: translateY(0px) scale(1.1); }
-            50% { transform: translateY(-10px) scale(1.1); }
-            100% { transform: translateY(0px) scale(1.1); }
-          }
-        `}</style> */}
 				</div>
 				{/* 味方キャラ表示 */}
 				<div className="flex justify-center gap-4 mb-4">
