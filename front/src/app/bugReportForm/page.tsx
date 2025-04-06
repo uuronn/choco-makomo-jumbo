@@ -364,10 +364,10 @@ export default function BugReportForm() {
 						{/* 残り送信回数表示 */}
 						<div className="space-y-2">
 							<div className="flex justify-between items-center">
-								<div className="flex items-center text-green-300 text-sm">
+								{/* <div className="flex items-center text-green-300 text-sm">
 									<Info className="h-4 w-4 mr-1" />
 									残り送信回数: {submissionsLeft}/30
-								</div>
+								</div> */}
 								<span className="text-xs text-green-300/70">
 									送信成功で300ポイント獲得!
 								</span>
