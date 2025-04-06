@@ -355,7 +355,7 @@ export default function Battle({ room }: BattleProps) {
         }
       `}</style>
 			{/* 敵キャラ表示 */}
-			<div className="flex flex-col justify-between md:min-h-[700px] md:mt-14">
+			<div className="flex flex-col justify-between md:min-h-[580px] md:mt-4">
 				<div className="flex justify-center gap-4">
 					{enemyTeam.map((character) => (
 						<div
