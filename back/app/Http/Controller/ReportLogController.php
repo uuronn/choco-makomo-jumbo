@@ -4,6 +4,7 @@ namespace App\Http\Controller;
 
 use App\Model\ReportLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ReportLogController
@@ -13,6 +14,11 @@ class ReportLogController
      */
     public function store(Request $request, string $userId)
     {
+
+        Log::info('ReportLogController@store', [
+            'userId' => $userId,
+            'request' => $request->all(),
+        ]);
         // 既に30件ある場合はエラーを返す
         $reportCount = ReportLog::where('userId', $userId)->count();
 
