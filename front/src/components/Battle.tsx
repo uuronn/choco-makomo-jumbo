@@ -251,9 +251,12 @@ export default function Battle({ room }: BattleProps) {
 			room?.status === "battling"
 		) {
 			const timer = setTimeout(() => {
-				fetch(`/api/rooms/${room.id}/cpu-act`, {
-					method: "POST",
-				});
+				fetch(
+					`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/${room.id}/cpu-act`,
+					{
+						method: "POST",
+					},
+				);
 			}, 1000);
 
 			return () => clearTimeout(timer);
