@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Model\Room;
 use App\Model\RoomCharacter;
+use Illuminate\Support\Facades\Log;
 
 class PassiveSkillManager
 {
@@ -87,20 +88,33 @@ class PassiveSkillManager
 
                     // ダメージを軽減
                     $context['damage'] = $reducedDamage;
-// $ally->userId === $character->userId &&
-                    // 味方を取得（自分以外の同じチーム）
+
+                    // コンソールログ: ダメージ軽減
+                    Log::info("ロードバランシング発動: {$character->character->name} が受けるダメージ {$originalDamage} を {$reducedDamage} に軽減");
+
+                    // 味方を取得（自分以外の同じユーザー）
                     $allies = $room->characters->filter(function ($ally) use ($character) {
-                        return $ally->userId === $character->userId && $ally->id !== $character->id && !$ally->isDead;
+                        return $ally->userId === $character->userId &&
+                            $ally->id !== $character->id &&
+                            !$ally->isDead;
                     });
 
                     // 味方に元のダメージをそのまま与える
                     $allyCount = $allies->count();
                     if ($allyCount > 0) {
                         foreach ($allies as $ally) {
+                            $newLife = max(0, $ally->life - $originalDamage);
                             $ally->update([
-                                'life' => max(0, $ally->life - $originalDamage)
+                                'life' => $newLife,
+                                'isDead' => $newLife <= 0 // 死んだかどうかも更新
                             ]);
+
+                            // コンソールログ: 味方へのダメージ分配
+                            Log::info("ロードバランシング: {$character->character->name} が {$ally->character->name} に {$originalDamage} ダメージを与えました (残りライフ: {$newLife})");
                         }
+                    } else {
+                        // コンソールログ: 味方がいない場合
+                        Log::info("ロードバランシング: {$character->character->name} に味方がいないためダメージ分配なし");
                     }
 
                     return "{$character->character->name} の「ロードバランシング」発動、自身が受ける通常攻撃のダメージを20%に軽減し、受けたダメージ分を他の味方全員に与える";
