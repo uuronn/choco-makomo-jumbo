@@ -92,6 +92,9 @@ class PassiveSkillManager
                     // コンソールログ: ダメージ軽減
                     Log::info("ロードバランシング発動: {$character->character->name} が受けるダメージ {$originalDamage} を {$reducedDamage} に軽減");
 
+                    Log::info("room: {$room}");
+
+
                     // 味方を取得（自分以外の同じユーザー）
                     $allies = $room->characters->filter(function ($ally) use ($character) {
                         return $ally->userId === $character->userId &&
