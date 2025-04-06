@@ -32,6 +32,9 @@ Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () 
 
     Route::get('/onlineUsers', [UserController::class, 'getOnlineUsers']);
 
+    Route::post('/{userId}/report', [ReportLogController::class, 'store']);
+
+
 // ユーザーのpointを取得する
 Route::get('/users/{userId}/point', [UserController::class, 'getPoint']);
 
@@ -154,4 +157,3 @@ Route::post('/rooms/{roomId}/cpu-act', [RoomController::class, 'cpuAct']);
 Route::post('/gacha', [GachaController::class, 'gacha']);
 
 
-Route::post('/{userId}/report', [ReportLogController::class, 'store']);
