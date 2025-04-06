@@ -123,6 +123,6 @@ export default function RoomDetailPage() {
 	) : room.status === "finish" && room.winUserId === user.uid ? (
 		<Victory room={room} />
 	) : (
-		<Defeat />
+		<Defeat room={room} />
 	);
 }
