@@ -248,20 +248,17 @@ export default function Battle({ room }: BattleProps) {
 	useEffect(() => {
 		if (
 			room?.currentTurnUserId === "00000000-0000-0000-0000-000000000cpu" &&
-			room.status === "battling"
+			room?.status === "battling"
 		) {
 			const timer = setTimeout(() => {
-				fetch(
-					`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/${room.id}/cpu-act`,
-					{
-						method: "POST",
-					},
-				);
-			}, 1000); // 1秒待ってから次のCPUを行動させる
+				fetch(`/api/rooms/${room.id}/cpu-act`, {
+					method: "POST",
+				});
+			}, 1000);
 
 			return () => clearTimeout(timer);
 		}
-	}, [room?.currentTurnUserId, room?.status]);
+	}, [room?.currentTurnUserId, room?.currentTurnCharacterId]);
 
 	// 敵を選択する関数
 	const selectEnemy = async (characterId: string) => {
