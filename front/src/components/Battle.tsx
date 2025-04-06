@@ -446,8 +446,8 @@ export default function Battle({ room }: BattleProps) {
 															"/placeholder.svg"
 														}
 														alt={character.character.name}
-														width={60}
-														height={60}
+														width={46}
+														height={46}
 														className={`rounded-full ${
 															isCurrentTurn
 																? isPlayer
@@ -473,7 +473,7 @@ export default function Battle({ room }: BattleProps) {
 
 										{/* Character name */}
 										<div
-											className={`mt-1 text-xs font-semibold truncate max-w-[70px] text-center`}
+											className={`mt-1 text-sm font-semibold truncate max-w-[70px] text-center`}
 										>
 											{character.speed}
 										</div>
