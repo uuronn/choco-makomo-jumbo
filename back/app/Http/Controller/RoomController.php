@@ -13,6 +13,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RoomController
 {
@@ -1002,6 +1003,8 @@ class RoomController
             }
 
             $room = Room::with(['hostUser', 'guestUser', 'roomCharacter.character'])->where('id', $roomId)->first();
+
+            Log::info('attack', "{$room}");
 
             if (!$room || $room->status !== 'battling') {
                 return response()->json(['message' => 'バトルが進行中ではありません'], 400);
