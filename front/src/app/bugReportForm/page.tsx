@@ -283,9 +283,7 @@ export default function BugReportForm() {
 		} catch (error: unknown) {
 			console.error("送信エラー:", error);
 			setSubmitStatus("error");
-			setErrorMessage(
-				error?.message || "送信中に予期せぬエラーが発生しました。",
-			);
+			setErrorMessage("送信中に予期せぬエラーが発生しました。");
 		} finally {
 			setIsSubmitting(false);
 		}
