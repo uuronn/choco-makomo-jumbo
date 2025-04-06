@@ -87,10 +87,10 @@ class PassiveSkillManager
 
                     // ダメージを軽減
                     $context['damage'] = $reducedDamage;
-
+// $ally->userId === $character->userId &&
                     // 味方を取得（自分以外の同じチーム）
                     $allies = $room->characters->filter(function ($ally) use ($character) {
-                        return $ally->team_id === $character->team_id && $ally->id !== $character->id && !$ally->isDead;
+                        return $ally->userId === $character->userId && $ally->id !== $character->id && !$ally->isDead;
                     });
 
                     // 味方に元のダメージをそのまま与える
