@@ -401,16 +401,21 @@ export default function Battle({ room }: BattleProps) {
 						/>
 					</div>
 
+					{console.info("room.room_cneharacter", room.room_character)}
+
 					{/* Character turn indicators */}
 					<div className="flex justify-between items-center relative mt-4">
 						{/* Sort characters by speed (highest first) for turn order */}
 						{[...room.room_character]
-							.sort((a, b) => b.speed - a.speed)
+							// .sort((a, b) => b.speed - a.speed)
+							.filter((character) => character.isDead === false)
+							// .filter((character) => character.isDead === false)
 							.map((character, index) => {
 								const isCurrentTurn =
 									room.currentTurnCharacterId === character.characterId;
 								const isPlayer = character.userId === user?.uid;
 
+								// console.info("character", character);
 								return (
 									<div
 										key={character.id}
