@@ -11,11 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bug_form_log', function (Blueprint $table) {
+        Schema::create('reportLog', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->uuid('userId');           // ユーザーID（UUID）
+            $table->string('type');            // 種別（例: "daily", "weekly" など）
             $table->text('title');
             $table->text('content');
+
             $table->timestamps();
+
+            $table->foreign('userId')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -24,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bug_form_log');
+        Schema::dropIfExists('reportLog');
     }
 };
