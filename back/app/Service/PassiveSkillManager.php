@@ -75,33 +75,35 @@ class PassiveSkillManager
                 }
                 break;
 
-            // ロードバランシング: 自身が受ける通常攻撃のダメージを20%に軽減し、受けたダメージ分を他の味方全員に与える
             case 'ロードバランシング':
-                if ($eventType === 'on_damage_taken' && isset($context['target']) && $context['target']->id === $character->id && isset($context['damage'])) {
+                if (
+                    $eventType === 'on_damage_taken' &&
+                    isset($context['target']) &&
+                    $context['target']->id === $character->id &&
+                    isset($context['damage'])
+                ) {
                     $originalDamage = $context['damage'];
-                    $reducedDamage = $originalDamage * 0.2;
-                    $distributedDamage = $originalDamage - $reducedDamage;
+                    $reducedDamage = $originalDamage * 0.2; // ダメージを20%に軽減
 
                     // ダメージを軽減
                     $context['damage'] = $reducedDamage;
 
                     // 味方を取得（自分以外の同じチーム）
                     $allies = $room->characters->filter(function ($ally) use ($character) {
-                        return $ally->team_id === $character->team_id && $ally->id !== $character->id;
+                        return $ally->team_id === $character->team_id && $ally->id !== $character->id && !$ally->isDead;
                     });
 
-                    // 味方にダメージを分配
+                    // 味方に元のダメージをそのまま与える
                     $allyCount = $allies->count();
                     if ($allyCount > 0) {
-                        $damagePerAlly = $distributedDamage / $allyCount;
                         foreach ($allies as $ally) {
                             $ally->update([
-                                'life' => max(0, $ally->life - $damagePerAlly)
+                                'life' => max(0, $ally->life - $originalDamage)
                             ]);
                         }
                     }
 
-                    return "{$character->character->name} の「ロードバランシング」発動、自身が受ける通常攻撃のダメージを30%に軽減し、受けたダメージ分を他の味方全員に与える";
+                    return "{$character->character->name} の「ロードバランシング」発動、自身が受ける通常攻撃のダメージを20%に軽減し、受けたダメージ分を他の味方全員に与える";
                 }
                 break;
 
