@@ -16,7 +16,7 @@ return [
         'specialSkillDescription' => "自身の回避率を70%にする",
         'specialSkillTurn' => 20,
         'passiveSkillName' => "フレックスボックス",
-        'passiveSkillDescription' => "自身が受ける通常攻撃のダメージを10%軽減する",
+        'passiveSkillDescription' => "自身が受ける通常攻撃のダメージを8%軽減する",
     ],
     // Go
     [
