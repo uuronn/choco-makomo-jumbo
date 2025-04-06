@@ -1001,7 +1001,7 @@ class RoomController
                 return response()->json(['message' => '攻撃対象を指定してください'], 400);
             }
 
-            $room = Room::with(['hostUser', 'guestUser', 'roomCharacters'])->where('id', $roomId)->first();
+            $room = Room::with(['hostUser', 'guestUser', 'roomCharacter'])->where('id', $roomId)->first();
 
             if (!$room || $room->status !== 'battling') {
                 return response()->json(['message' => 'バトルが進行中ではありません'], 400);
