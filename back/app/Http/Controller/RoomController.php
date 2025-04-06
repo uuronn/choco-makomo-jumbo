@@ -1004,7 +1004,7 @@ class RoomController
 
             $room = Room::with(['hostUser', 'guestUser', 'roomCharacter.character'])->where('id', $roomId)->first();
 
-            Log::info('attack', "{$room}");
+            Log::info('attack: ' . $room);
 
             if (!$room || $room->status !== 'battling') {
                 return response()->json(['message' => 'バトルが進行中ではありません'], 400);
