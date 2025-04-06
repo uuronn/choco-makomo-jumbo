@@ -36,7 +36,8 @@ type CharacterType =
 	| "オペレーティングシステム"
 	| "実行環境"
 	| "ゲームエンジン"
-	| "コンテナー";
+	| "コンテナー"
+	| "ライブラリ";
 
 const typeColors: Record<CharacterType, string> = {
 	バージョン管理: "bg-red-500",
@@ -48,6 +49,7 @@ const typeColors: Record<CharacterType, string> = {
 	実行環境: "bg-pink-500",
 	ゲームエンジン: "bg-indigo-500",
 	コンテナー: "bg-teal-500",
+	ライブラリ: "bg-gray-500",
 };
 
 // Increment options for stat allocation
@@ -79,9 +81,11 @@ export default function CharacterDevelopment() {
 	}, [user]);
 
 	const fetchUserPoints = async (userId: string) => {
+		const token = await authUser?.getIdToken();
 		try {
 			const response = await fetch(
 				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}/point`,
+				{ headers: { Authorization: `Bearer ${token}` } },
 			);
 			if (!response.ok) throw new Error("Failed to fetch points");
 			const pointData = await response.json();
