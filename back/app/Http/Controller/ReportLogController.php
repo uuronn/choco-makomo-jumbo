@@ -16,9 +16,9 @@ class ReportLogController
         // 既に30件ある場合はエラーを返す
         $reportCount = ReportLog::where('userId', $userId)->count();
 
-        if ($reportCount >= 30) {
+        if ($reportCount >= 5) {
             return response()->json([
-                'message' => 'これ以上レポートを作成できません（最大30件）',
+                'message' => 'これ以上レポートを作成できません（最大5件）',
             ], 403);
         }
 

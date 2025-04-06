@@ -30,9 +30,9 @@ const DESCRIPTION_MAX_LENGTH = 2000;
 export default function BugReportForm() {
 	const { user } = useUserContext();
 	const [formData, setFormData] = useState({
-		reportType: "bug", // デフォルトはバグ報告
+		type: "bug", // デフォルトはバグ報告
 		title: "",
-		description: "",
+		content: "",
 	});
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -102,7 +102,7 @@ export default function BugReportForm() {
 
 		// 文字数制限を適用
 		if (name === "title" && value.length > TITLE_MAX_LENGTH) return;
-		if (name === "description" && value.length > DESCRIPTION_MAX_LENGTH) return;
+		if (name === "content" && value.length > DESCRIPTION_MAX_LENGTH) return;
 
 		// XSS対策のチェック
 		if (checkForMaliciousContent(value)) {
@@ -133,10 +133,10 @@ export default function BugReportForm() {
 			return `タイトルは${TITLE_MAX_LENGTH}文字以内で入力してください`;
 		if (checkForRepeatedCharacters(formData.title))
 			return "タイトルに同じ文字が連続して使われています";
-		if (!formData.description.trim()) return "詳細を入力してください";
-		if (formData.description.length > DESCRIPTION_MAX_LENGTH)
+		if (!formData.content.trim()) return "詳細を入力してください";
+		if (formData.content.length > DESCRIPTION_MAX_LENGTH)
 			return `詳細は${DESCRIPTION_MAX_LENGTH}文字以内で入力してください`;
-		if (checkForRepeatedCharacters(formData.description))
+		if (checkForRepeatedCharacters(formData.content))
 			return "詳細に同じ文字が連続して使われています";
 		if (securityWarning) return securityWarning;
 		return null;
@@ -144,7 +144,7 @@ export default function BugReportForm() {
 
 	// レポートタイプに基づいたラベルとプレースホルダーを取得
 	const getTitleLabel = () => {
-		switch (formData.reportType) {
+		switch (formData.type) {
 			case "bug":
 				return "バグのタイトル";
 			case "feature":
@@ -157,7 +157,7 @@ export default function BugReportForm() {
 	};
 
 	const getTitlePlaceholder = () => {
-		switch (formData.reportType) {
+		switch (formData.type) {
 			case "bug":
 				return "バグを簡潔に説明してください";
 			case "feature":
@@ -170,7 +170,7 @@ export default function BugReportForm() {
 	};
 
 	const getDescriptionLabel = () => {
-		switch (formData.reportType) {
+		switch (formData.type) {
 			case "bug":
 				return "バグの詳細説明";
 			case "feature":
@@ -183,7 +183,7 @@ export default function BugReportForm() {
 	};
 
 	const getDescriptionPlaceholder = () => {
-		switch (formData.reportType) {
+		switch (formData.type) {
 			case "bug":
 				return "バグの詳細を説明してください";
 			case "feature":
@@ -196,7 +196,7 @@ export default function BugReportForm() {
 	};
 
 	const getSuccessMessage = () => {
-		switch (formData.reportType) {
+		switch (formData.type) {
 			case "bug":
 				return "バグ報告を受け付けました。調査結果はメールでお知らせします。";
 			case "feature":
@@ -213,7 +213,7 @@ export default function BugReportForm() {
 		if (submissionsLeft <= 0) return "送信上限に達しました";
 		if (securityWarning) return "セキュリティ警告があります";
 
-		switch (formData.reportType) {
+		switch (formData.type) {
 			case "bug":
 				return "バグを報告する";
 			case "feature":
@@ -239,40 +239,19 @@ export default function BugReportForm() {
 		setSubmitStatus("idle");
 
 		try {
-			// 送信データの最終サニタイズ
+			if (!user) throw new Error("ユーザー情報が取得できません");
+
+			const token = await user.getIdToken();
+			const userId = user.uid;
+
 			const sanitizedData = {
-				reportType: DOMPurify.sanitize(formData.reportType),
+				type: DOMPurify.sanitize(formData.type),
 				title: DOMPurify.sanitize(formData.title),
-				description: DOMPurify.sanitize(formData.description),
+				content: DOMPurify.sanitize(formData.content),
 			};
 
-			// テスト用の非同期処理をシミュレート
-			await new Promise((resolve) => setTimeout(resolve, 1500));
-
-			// 送信回数を減らし、ポイントを加算
-			setSubmissionsLeft((prev) => prev - 1);
-			setTotalPoints((prev) => prev + 300);
-			setShowPointsAnimation(true);
-
-			// アニメーション終了後に非表示
-			setTimeout(() => {
-				setShowPointsAnimation(false);
-			}, 3000);
-
-			// 成功レスポンスをシミュレート
-			setSubmitStatus("success");
-			setFormData({
-				reportType: "bug",
-				title: "",
-				description: "",
-			});
-
-			// 実際のAPIが用意されたら以下のようなコードに置き換える
-
-			const token = await user?.getIdToken();
-
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/report`,
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/${userId}/report`,
 				{
 					method: "POST",
 					headers: {
@@ -283,24 +262,27 @@ export default function BugReportForm() {
 				},
 			);
 
-			const data = await response.json();
-
-			if (data.success) {
-				setSubmissionsLeft((prev) => prev - 1);
-				setTotalPoints((prev) => prev + 300);
-				setSubmitStatus("success");
-				setFormData({
-					reportType: "bug",
-					title: "",
-					description: "",
-				});
-			} else {
-				throw new Error(data.message || "送信中にエラーが発生しました");
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.message || "送信に失敗しました");
 			}
-		} catch (error) {
+
+			// 成功時処理
+			setSubmissionsLeft((prev) => prev - 1);
+			setTotalPoints((prev) => prev + 300);
+			setSubmitStatus("success");
+			setFormData({
+				type: "bug",
+				title: "",
+				content: "",
+			});
+			setShowPointsAnimation(true);
+			setTimeout(() => setShowPointsAnimation(false), 3000);
+		} catch (error: unknown) {
+			console.error("送信エラー:", error);
 			setSubmitStatus("error");
 			setErrorMessage(
-				"送信中にエラーが発生しました。後でもう一度お試しください。",
+				error?.message || "送信中に予期せぬエラーが発生しました。",
 			);
 		} finally {
 			setIsSubmitting(false);
@@ -413,7 +395,7 @@ export default function BugReportForm() {
 						<div className="space-y-2">
 							<Label className="text-green-300">レポートタイプ</Label>
 							<RadioGroup
-								value={formData.reportType}
+								value={formData.type}
 								onValueChange={handleReportTypeChange}
 								className="flex flex-wrap gap-4"
 							>
@@ -490,26 +472,26 @@ export default function BugReportForm() {
 
 						<div className="space-y-2">
 							<div className="flex justify-between">
-								<Label htmlFor="description" className="text-green-300">
+								<Label htmlFor="content" className="text-green-300">
 									{getDescriptionLabel()}
 								</Label>
 								<span
 									className={`text-xs ${getCounterColor(
-										formData.description.length,
+										formData.content.length,
 										DESCRIPTION_MAX_LENGTH,
 									)}`}
 								>
-									{formData.description.length}/{DESCRIPTION_MAX_LENGTH}
+									{formData.content.length}/{DESCRIPTION_MAX_LENGTH}
 								</span>
 							</div>
 							<Textarea
-								id="description"
-								name="description"
-								value={formData.description}
+								id="content"
+								name="content"
+								value={formData.content}
 								onChange={handleChange}
 								placeholder={getDescriptionPlaceholder()}
 								className={`bg-black/50 border-green-500/30 text-green-300 placeholder:text-green-300/50 min-h-[150px] ${
-									formData.description.length >= DESCRIPTION_MAX_LENGTH * 0.95
+									formData.content.length >= DESCRIPTION_MAX_LENGTH * 0.95
 										? "border-red-400"
 										: ""
 								}`}
