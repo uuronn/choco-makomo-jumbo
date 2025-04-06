@@ -250,6 +250,8 @@ export default function BugReportForm() {
 				content: DOMPurify.sanitize(formData.content),
 			};
 
+			console.info("sanitizedData", sanitizedData);
+
 			const response = await fetch(
 				`${process.env.NEXT_PUBLIC_BASE_URL}/api/${userId}/report`,
 				{
