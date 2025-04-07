@@ -926,7 +926,7 @@ class RoomController
             $roomId = $request->route('roomId');
             $userId = $request->route('userId');
 
-            $room = Room::with(['characters', 'hostUser', 'guestUser'])->where('id', $roomId)->first();
+            $room = Room::with(['roomCharacter', 'hostUser', 'guestUser'])->where('id', $roomId)->first();
 
             if (!$room) {
                 return response()->json(['message' => 'ルームが見つかりません'], 404);
