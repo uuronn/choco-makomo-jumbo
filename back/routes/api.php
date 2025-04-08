@@ -9,7 +9,7 @@ use App\Http\Controller\RoomLogController;
 use App\Http\Controller\UserCharacter\GetUserCharacterListController;
 use App\Http\Controller\UserCharacterController;
 use App\Http\Controller\UserController;
-use App\Http\Controllers\UserCharacter\LevelUpUserCharacterController;
+use App\Http\Controller\UserCharacter\LevelUpUserCharacterController;
 use Illuminate\Support\Facades\Route;
 
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\UserCharacter;
+namespace App\Http\Controller\UserCharacter;
 
 use App\Services\UserCharacterService;
 use Illuminate\Http\JsonResponse;
