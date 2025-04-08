@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controller\CharacterController;
+use App\Http\Controller\Character\GetCharacterController;
+use App\Http\Controller\Character\GetCharacterListController;
 use App\Http\Controller\GachaController;
 use App\Http\Controller\ReportLogController;
 use App\Http\Controller\RoomController;
@@ -86,10 +87,10 @@ Route::delete('/users/{userId}/characters', [UserCharacterController::class, 'de
 // キャラクター関連のAPI--------------------------------
 
 // すべてのキャラクターを取得する
-Route::get('/characters', [CharacterController::class, 'all']);
+Route::get('/characters', GetCharacterListController::class);
 
 // 特定のキャラクターを取得する
-Route::get('/characters/{characterId}', [CharacterController::class, 'find']);
+Route::get('/characters/{characterId}', GetCharacterController::class);
 
 
 
