@@ -78,7 +78,7 @@ Route::get('/users/{userId}/checkUser', [UserController::class, 'checkUser']);
 Route::put('/users/{userId}/point', [UserController::class, 'updatePoint']);
 
 // ユーザーのキャラクター一覧を取得する
-Route::get('/users/{userId}/characters', [GetUserCharacterListController::class]);
+Route::get('/users/{userId}/characters', GetUserCharacterListController::class);
 
 // ユーザーのキャラクターを全て削除する
 Route::delete('/users/{userId}/characters', [UserCharacterController::class, 'delete']);
