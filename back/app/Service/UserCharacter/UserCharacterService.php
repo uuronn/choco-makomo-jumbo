@@ -4,6 +4,7 @@ namespace App\Service\UserCharacter;
 
 use App\Model\UserCharacter;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class UserCharacterService
 {
@@ -31,7 +32,7 @@ class UserCharacterService
      * @param int $life 体力の増加量
      * @param int $power 攻撃力の増加量
      * @param int $speed 速度の増加量
-     * @return void 更新されたユーザーキャラ
+     * @return void
      * @throws Exception ユーザーキャラが見つからない場合、またはレベルが最大値を超える場合
      */
     public function levelUpUserCharacter(string $userId, string $characterId, int $life, int $power, int $speed): void
@@ -54,7 +55,14 @@ class UserCharacterService
         $userCharacter->speed += $speed;
         $userCharacter->level += $totalIncrease;
 
+        Log::info('userCharacter の型', [
+            'type' => gettype($userCharacter),
+            'value' => $userCharacter
+        ]);
+
         $userCharacter->save();
+
+        // return $userCharacter;
     }
 
     // /**
