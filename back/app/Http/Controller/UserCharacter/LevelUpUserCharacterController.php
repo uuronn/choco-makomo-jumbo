@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 readonly class LevelUpUserCharacterController
 {
@@ -55,6 +56,17 @@ readonly class LevelUpUserCharacterController
             return response()->noContent();
         } catch (Exception $e) {
             DB::rollBack();
+
+            Log::error('Level up failed', [
+                'userId' => $request->route('userId'),
+                'characterId' => $request->route('characterId'),
+                'life' => $request->input('life'),
+                'power' => $request->input('power'),
+                'speed' => $request->input('speed'),
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
             return response()->json([
                 'message' => 'Failed to level up character',
                 'error' => $e->getMessage(),
