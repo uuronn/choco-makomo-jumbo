@@ -31,10 +31,10 @@ class UserCharacterService
      * @param int $life 体力の増加量
      * @param int $power 攻撃力の増加量
      * @param int $speed 速度の増加量
-     * @return UserCharacter 更新されたユーザーキャラ
+     * @return void 更新されたユーザーキャラ
      * @throws Exception ユーザーキャラが見つからない場合、またはレベルが最大値を超える場合
      */
-    public function levelUpUserCharacter(string $userId, string $characterId, int $life, int $power, int $speed): UserCharacter
+    public function levelUpUserCharacter(string $userId, string $characterId, int $life, int $power, int $speed): void
     {
         $userCharacter = UserCharacter::where('userId', $userId)
             ->where('characterId', $characterId)
@@ -55,8 +55,6 @@ class UserCharacterService
         $userCharacter->level += $totalIncrease;
 
         $userCharacter->save();
-
-        return $userCharacter;
     }
 
     // /**

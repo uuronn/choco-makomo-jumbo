@@ -144,19 +144,19 @@ export default function CharacterDevelopment() {
 
 			if (!response.ok) throw new Error("キャラクター育成に失敗しました");
 
-			const data = (await response.json()) as LevelUpResult;
+			// const data = (await response.json()) as LevelUpResult;
 
 			// Update character with new stats
-			setSelectedCharacter((prev) => {
-				if (!prev) return prev;
-				return {
-					...prev,
-					level: data.level,
-					life: data.life,
-					power: data.power,
-					speed: data.speed,
-				};
-			});
+			// setSelectedCharacter((prev) => {
+			// 	if (!prev) return prev;
+			// 	return {
+			// 		...prev,
+			// 		level: data.level,
+			// 		life: data.life,
+			// 		power: data.power,
+			// 		speed: data.speed,
+			// 	};
+			// });
 
 			// Update available points
 			setAvailablePoints((prev) => prev - totalPointsUsed);
