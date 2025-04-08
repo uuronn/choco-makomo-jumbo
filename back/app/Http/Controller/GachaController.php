@@ -50,7 +50,7 @@ class GachaController
             'power' => $character->basePower,
             'speed' => $character->baseSpeed,
             'evasion' => $character->baseEvasion,
-            'level' => 1,
+            'level' => 0,
         ]);
 
         $userCharacter->save();
