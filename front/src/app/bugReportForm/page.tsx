@@ -25,7 +25,7 @@ import { useUserContext } from "~/context/UserProvider";
 
 // 文字数制限の定数
 const TITLE_MAX_LENGTH = 100;
-const DESCRIPTION_MAX_LENGTH = 2000;
+const DESCRIPTION_MAX_LENGTH = 1000;
 
 export default function BugReportForm() {
 	const { user } = useUserContext();
@@ -195,36 +195,6 @@ export default function BugReportForm() {
 		}
 	};
 
-	const getSuccessMessage = () => {
-		switch (formData.type) {
-			case "bug":
-				return "バグ報告を受け付けました。調査結果はメールでお知らせします。";
-			case "feature":
-				return "機能リクエストを受け付けました。検討結果はメールでお知らせします。";
-			case "other":
-				return "ご報告ありがとうございます。内容を確認させていただきます。";
-			default:
-				return "送信が完了しました。";
-		}
-	};
-
-	const getSubmitButtonText = () => {
-		if (isSubmitting) return "送信中...";
-		if (submissionsLeft <= 0) return "送信上限に達しました";
-		if (securityWarning) return "セキュリティ警告があります";
-
-		switch (formData.type) {
-			case "bug":
-				return "バグを報告する";
-			case "feature":
-				return "機能をリクエストする";
-			case "other":
-				return "報告を送信する";
-			default:
-				return "送信する";
-		}
-	};
-
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
@@ -266,9 +236,10 @@ export default function BugReportForm() {
 
 			if (!response.ok) {
 				const errorData = await response.json();
-				throw new Error(errorData.message || "送信に失敗しました");
+				throw new Error(errorData.message || "送信に失敗しました", {
+					cause: errorData.errorCode, // エラーコードをcauseに追加
+				});
 			}
-
 			// 成功時処理
 			setSubmissionsLeft((prev) => prev - 1);
 			setTotalPoints((prev) => prev + 300);
@@ -283,7 +254,15 @@ export default function BugReportForm() {
 		} catch (error: unknown) {
 			console.error("送信エラー:", error);
 			setSubmitStatus("error");
-			setErrorMessage("送信中に予期せぬエラーが発生しました。");
+			if (error instanceof Error && error.cause === "DUPLICATE_CONTENT") {
+				setErrorMessage("同じ内容のレポートが既に存在します");
+			} else {
+				setErrorMessage(
+					error instanceof Error
+						? error.message
+						: "送信中に予期せぬエラーが発生しました。",
+				);
+			}
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -292,14 +271,14 @@ export default function BugReportForm() {
 	return (
 		<div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 overflow-hidden">
 			{/* Background grid effect */}
-			<div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djJoLTJ2LTJoMnptMC00aDJ2MmgtMnYtMnptLTQgMHYyaC0ydi0yaDJ6bTIgMGgydjJoLTJ2LTJ6bS02IDBoMnYyaC0ydi0yem0yLTRoMnYyaC0ydi0yem0yIDBIMzZ2Mmgtc3YtMnptMCA0aDJ2MmgtMnYtMnoiLz48L2c+PC9nPjwvc3ZnPg==')]"></div>
+			<div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djJoLTJ2LTJoMnptMC00aDJ2MmgtMnYtMnptLTQgMHYyaC0ydi0yaDJ6bTIgMGgydjJoLTJ2LTJ6bS02IDBoMnYyaC0ydi0yem0yLTRoMnYyaC0ydi0yem0yIDBIMzZ2Mmgtc3YtMnptMCA0aDJ2MmgtMnYtMnoiLz48L2c+PC9nPjwvc3ZnPg==')]" />
 
 			{/* Animated circuit lines */}
 			<div className="absolute inset-0 overflow-hidden opacity-20">
-				<div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse"></div>
-				<div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse"></div>
-				<div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse"></div>
-				<div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse"></div>
+				<div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse" />
+				<div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse" />
+				<div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse" />
+				<div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse" />
 			</div>
 
 			{/* ポイント獲得アニメーション */}
@@ -377,7 +356,13 @@ export default function BugReportForm() {
 						)} */}
 
 						{submitStatus === "error" && (
-							<Alert className="bg-red-500/20 border-red-500 text-red-300">
+							<Alert
+								className={`${
+									errorMessage === "同じ内容のレポートが既に存在します"
+										? "bg-orange-500/20 border-orange-500 text-orange-300"
+										: "bg-red-500/20 border-red-500 text-red-300"
+								}`}
+							>
 								<AlertCircle className="h-4 w-4" />
 								<AlertTitle>エラー</AlertTitle>
 								<AlertDescription>{errorMessage}</AlertDescription>
