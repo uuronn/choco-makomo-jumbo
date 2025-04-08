@@ -2,9 +2,9 @@
 
 namespace App\Http\Controller\UserCharacter;
 
-use App\Services\UserCharacterService;
+use App\Service\User\UserService;
+use App\Service\UserCharacter\UserCharacterService;
 use Illuminate\Http\JsonResponse;
-use UserService;
 
 readonly class GetUserCharacterListController
 {

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controller\UserCharacter;
 
-use App\Services\UserCharacterService;
+use App\Service\UserCharacter\UserCharacterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

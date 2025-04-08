@@ -1,6 +1,9 @@
 <?php
 
+namespace App\Service\User;
+
 use App\Model\User;
+use Exception;
 
 class UserService
 {
