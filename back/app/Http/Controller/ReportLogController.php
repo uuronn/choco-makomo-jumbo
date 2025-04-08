@@ -14,11 +14,11 @@ class ReportLogController
      */
     public function store(Request $request, string $userId)
     {
-
         Log::info('ReportLogController@store', [
             'userId' => $userId,
             'request' => $request->all(),
         ]);
+
         // 既に30件ある場合はエラーを返す
         $reportCount = ReportLog::where('userId', $userId)->count();
 
@@ -34,6 +34,17 @@ class ReportLogController
             'content' => 'required|string',
             'type' => 'required|string',
         ]);
+
+        // contentが一致するレコードがあるか確認
+        $existingReport = ReportLog::where('userId', $userId)
+            ->where('content', $validated['content'])
+            ->first();
+
+        if ($existingReport) {
+            return response()->json([
+                'message' => '同じ内容のレポートが既に存在します',
+            ], 400); // 400 Bad Request を使用
+        }
 
         // レポート作成
         $report = ReportLog::create([
