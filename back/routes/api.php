@@ -9,6 +9,7 @@ use App\Http\Controller\RoomLogController;
 use App\Http\Controller\UserCharacter\GetUserCharacterListController;
 use App\Http\Controller\UserCharacterController;
 use App\Http\Controller\UserController;
+use App\Http\Controllers\UserCharacter\LevelUpUserCharacterController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -30,7 +31,7 @@ Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () 
     Route::post('/users', [UserController::class, 'create']);
 
     // ユーザーのキャラクターをレベルアップ
-    Route::put('/users/{userId}/characters/{characterId}', [UserCharacterController::class, 'levelUp']);
+    Route::put('/users/{userId}/characters/{characterId}', LevelUpUserCharacterController::class);
 
     Route::get('/onlineUsers', [UserController::class, 'getOnlineUsers']);
 
