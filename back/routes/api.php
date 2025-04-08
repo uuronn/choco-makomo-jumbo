@@ -6,6 +6,7 @@ use App\Http\Controller\GachaController;
 use App\Http\Controller\ReportLogController;
 use App\Http\Controller\RoomController;
 use App\Http\Controller\RoomLogController;
+use App\Http\Controller\UserCharacter\GetUserCharacterListController;
 use App\Http\Controller\UserCharacterController;
 use App\Http\Controller\UserController;
 use Illuminate\Support\Facades\Route;
@@ -76,7 +77,7 @@ Route::get('/users/{userId}/checkUser', [UserController::class, 'checkUser']);
 Route::put('/users/{userId}/point', [UserController::class, 'updatePoint']);
 
 // ユーザーのキャラクター一覧を取得する
-Route::get('/users/{userId}/characters', [UserCharacterController::class, 'list']);
+Route::get('/users/{userId}/characters', [GetUserCharacterListController::class]);
 
 // ユーザーのキャラクターを全て削除する
 Route::delete('/users/{userId}/characters', [UserCharacterController::class, 'delete']);
