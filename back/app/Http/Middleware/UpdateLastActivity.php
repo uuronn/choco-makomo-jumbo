@@ -6,37 +6,26 @@ use App\Model\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class UpdateLastActivity
 {
-    public function handle(Request $request, Closure $next)
+    /**
+     * 最終更新日時を更新するミドルウェア
+     *
+     * @param  Request  $request
+     * @param  Closure(Request): Response  $next
+     * @return Response
+     */
+    public function handle(Request $request, Closure $next): Response
     {
-        // ステップ1: 認証チェック
-        Log::info('Checking if user is authenticated');
-        if (Auth::check()) {
-            Log::info('User is authenticated');
+        $user = Auth::user();
 
-            // ステップ2: ユーザー取得
-            $user = Auth::user();
-            Log::info('User retrieved', ['user_id' => $user->id ?? 'null']);
-
-            // ステップ3: Userインスタンスか確認
-            if ($user instanceof User) {
-                Log::info('User is an instance of App\Models\User', ['user' => $user->toArray()]);
-
-                // ステップ4: 更新前を確認
-                Log::info('Before update', ['last_activity_at' => $user->last_activity_at]);
-
-                // ステップ5: 更新実行
-                $user->update(['last_activity_at' => now()]);
-                Log::info('After update', ['last_activity_at' => $user->last_activity_at]);
-            } else {
-                Log::warning('User is not an instance of App\Models\User', ['class' => get_class($user)]);
-            }
-        } else {
-            Log::info('User is not authenticated');
+        if (!$user instanceof User) {
+            return $next($request);
         }
+
+        $user->update(['last_activity_at' => now()]);
 
         return $next($request);
     }
