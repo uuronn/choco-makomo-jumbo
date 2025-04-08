@@ -24,6 +24,41 @@ class UserCharacterService
         return $userCharacterList;
     }
 
+    /**
+     * 特定のユーザーキャラを強化する
+     * @param string $userId ユーザーID
+     * @param string $characterId キャラクターID
+     * @param int $life 体力の増加量
+     * @param int $power 攻撃力の増加量
+     * @param int $speed 速度の増加量
+     * @return UserCharacter 更新されたユーザーキャラ
+     * @throws Exception ユーザーキャラが見つからない場合、またはレベルが最大値を超える場合
+     */
+    public function levelUpUserCharacter(string $userId, string $characterId, int $life, int $power, int $speed): UserCharacter
+    {
+        $userCharacter = UserCharacter::where('userId', $userId)
+            ->where('characterId', $characterId)
+            ->first();
+
+        if (!$userCharacter) {
+            throw new Exception('UserCharacter not found', 404);
+        }
+
+        $totalIncrease = $life + $power + $speed;
+        if ($userCharacter->level + $totalIncrease > 500) {
+            throw new Exception('レベルが最大値（500）を超えます', 400);
+        }
+
+        $userCharacter->life += $life;
+        $userCharacter->power += $power;
+        $userCharacter->speed += $speed;
+        $userCharacter->level += $totalIncrease;
+
+        $userCharacter->save();
+
+        return $userCharacter;
+    }
+
     // /**
     //  * キャラが重複してるかチェック
     //  */
