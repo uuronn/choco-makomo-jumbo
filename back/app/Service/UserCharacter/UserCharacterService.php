@@ -55,15 +55,16 @@ class UserCharacterService
         $userCharacter->speed += $speed;
         $userCharacter->level += $totalIncrease;
 
-        Log::info('userCharacter の型', [
-            'type' => gettype($userCharacter),
-            'value' => $userCharacter
-        ]);
-
-        $userCharacter->save();
-
-        // return $userCharacter;
+        UserCharacter::where('userId', $userId)
+            ->where('characterId', $characterId)
+            ->update([
+                'life' => $userCharacter->life,
+                'power' => $userCharacter->power,
+                'speed' => $userCharacter->speed,
+                'level' => $userCharacter->level,
+            ]);
     }
+
 
     // /**
     //  * キャラが重複してるかチェック
