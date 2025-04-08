@@ -60,7 +60,7 @@ Route::get('/users/{userId}/point', [UserController::class, 'getPoint']);
 // });
 
 
-Route::middleware(['restrict.domain'])->put('/users/{userId}/pointTest', [UserController::class, 'updatePointTest']);
+// Route::middleware(['restrict.domain'])->put('/users/{userId}/pointTest', [UserController::class, 'updatePointTest']);
 
 // すべてのユーザーを取得する
 // Route::get('/users', [UserController::class, 'all']);
