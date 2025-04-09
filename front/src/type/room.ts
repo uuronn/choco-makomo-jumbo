@@ -46,5 +46,6 @@ export type RoomCharacter = {
 	specialSkillName: string;
 	passiveSkillName: string;
 	passiveSkillDescription: string;
+	blockCount: number;
 	specialUsed: 0 | 1;
 };

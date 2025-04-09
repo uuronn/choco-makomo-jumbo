@@ -141,10 +141,8 @@ Route::delete('{userId}/{roomId}/delete', [RoomController::class, 'delete']);
 // 次のターンに進む
 Route::post('/{userId}/{roomId}/nextTurn', [RoomController::class, 'nextTurn']);
 
-
 // ルームログ取得
 Route::get('/rooms/{roomId}/log', [RoomLogController::class, 'logs']);
-
 
 // Route::post('/rooms/{roomId}/cpu-turn', [RoomController::class, 'handleCpuTurn']);
 

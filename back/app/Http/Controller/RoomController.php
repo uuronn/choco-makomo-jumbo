@@ -379,6 +379,47 @@ class RoomController
             $logs[] = "{$hostUser->name} が「OSトリオ」を発動、攻撃力15%アップ、スピード15%アップ、最大HP15%アップ、回避率15%アップ";
         }
 
+        // 9. Caddy（Goの効果でシールドを獲得）
+        if (in_array('Caddy', $characterNames)) {
+            $baseBlockCount = 3;
+            $totalBlockCount = $baseBlockCount;
+            $goBonus = false;
+
+            // Check for Go in the party
+            if (in_array('Go', $characterNames)) {
+                $totalBlockCount += 1;
+                $goBonus = true;
+            }
+
+            // Find and update Caddy's RoomCharacter
+            $caddyCharacter = RoomCharacter::where('roomId', $room->id)
+                ->where('userId', $hostUser->id)
+                ->whereHas('character', function ($query) {
+                    $query->where('name', 'Caddy');
+                })
+                ->first();
+
+            if ($caddyCharacter) {
+                $caddyCharacter->update(['blockCount' => $totalBlockCount]);
+
+                $logMessage = "{$hostUser->name} の Caddy が「自動HTTPS」を発動、{$baseBlockCount}枚のシールドを獲得";
+                if ($goBonus) {
+                    $logMessage .= "、Goの効果でさらに1枚追加（合計{$totalBlockCount}枚）";
+                }
+                $logs[] = $logMessage;
+            }
+        }
+
+        // ... (rest of the existing conditions)
+
+        return [
+            'powerMultiplier' => $powerMultiplier,
+            'speedMultiplier' => $speedMultiplier,
+            'lifeMultiplier' => $lifeMultiplier,
+            'evasionMultiplier' => $evasionMultiplier,
+            'logs' => $logs,
+        ];
+
         // 9. サーバーサイド言語（PHP, Go, Ruby）
         $serverSideLangs = ['PHP', 'Go', 'Ruby'];
         if (count(array_intersect($characterNames, $serverSideLangs)) >= 2) {
@@ -1006,8 +1047,6 @@ class RoomController
                 $query->with('character');
             }])->where('id', $roomId)->first();
 
-            // $room = Room::with(['hostUser', 'guestUser', 'roomCharacter.character'])->where('id', $roomId)->first();
-
             Log::info('attack: ' . $room);
 
             if (!$room || $room->status !== 'battling') {
@@ -1049,54 +1088,75 @@ class RoomController
 
                 if ($isHit) {
                     $damage = max(0, $attacker->power);
+                    $message = "";
 
-                    // パッシブスキル: ダメージを受ける前
-                    $context = ['attacker' => $attacker, 'target' => $target, 'damage' => &$damage];
-                    $passiveLogs = PassiveSkillManager::applyPassives($room, 'before_damage_taken', $context);
+                    // シールドチェック
+                    if ($target->blockCount > 0) {
+                        $target->update(['blockCount' => $target->blockCount - 1]);
+                        $damage = 0;
+                        $newLife = $target->life;
 
-                    // ダメージ適用
-                    $newLife = max(0, $target->life - $damage);
-                    $target->update(['life' => $newLife, 'isDead' => $newLife <= 0]);
-
-                    // パッシブスキル: ダメージを受けた後
-                    $context['damage'] = $damage; // 軽減後のダメージを渡す
-                    $passiveLogs = array_merge($passiveLogs, PassiveSkillManager::applyPassives($room, 'on_damage_taken', $context));
-                    $passiveLogs = array_merge($passiveLogs, PassiveSkillManager::applyPassives($room, 'on_attack_hit', $context));
-
-                    // ログ記録
-                    foreach ($passiveLogs as $log) {
                         RoomLog::create([
                             'roomId' => $roomId,
-                            'actionType' => 'passive',
-                            'actorUserId' => $log['userId'],
-                            'actorCharacterId' => $log['characterId'],
-                            'description' => $log['description'],
-                        ]);
-                    }
-
-                    // 攻撃ログ
-                    RoomLog::create([
-                        'roomId' => $roomId,
-                        'actionType' => 'attack',
-                        'actorUserId' => $attacker->userId,
-                        'actorCharacterId' => $attacker->characterId,
-                        'targetUserId' => $target->userId,
-                        'targetCharacterId' => $target->characterId,
-                        'value' => $damage,
-                        'description' => "{$attacker->character->name} が {$target->character->name} に {$damage} ダメージを与えました",
-                    ]);
-
-                    if ($newLife <= 0) {
-                        RoomLog::create([
-                            'roomId' => $roomId,
-                            'actionType' => 'death',
+                            'actionType' => 'shield',
+                            'actorUserId' => $attacker->userId,
+                            'actorCharacterId' => $attacker->characterId,
                             'targetUserId' => $target->userId,
                             'targetCharacterId' => $target->characterId,
-                            'description' => "{$target->character->name} がダウンしました",
+                            'value' => 0,
+                            'description' => "{$target->character->name} のシールドが攻撃を防いだ（残りシールド: {$target->blockCount}）",
                         ]);
-                    }
 
-                    $message = "{$attacker->character->name} が {$target->character->name} に {$damage} ダメージを与えました";
+                        $message = "{$attacker->character->name} の攻撃が {$target->character->name} のシールドに防がれました";
+                    } else {
+                        // パッシブスキル: ダメージを受ける前
+                        $context = ['attacker' => $attacker, 'target' => $target, 'damage' => &$damage];
+                        $passiveLogs = PassiveSkillManager::applyPassives($room, 'before_damage_taken', $context);
+
+                        // ダメージ適用
+                        $newLife = max(0, $target->life - $damage);
+                        $target->update(['life' => $newLife, 'isDead' => $newLife <= 0]);
+
+                        // パッシブスキル: ダメージを受けた後
+                        $context['damage'] = $damage; // 軽減後のダメージを渡す
+                        $passiveLogs = array_merge($passiveLogs, PassiveSkillManager::applyPassives($room, 'on_damage_taken', $context));
+                        $passiveLogs = array_merge($passiveLogs, PassiveSkillManager::applyPassives($room, 'on_attack_hit', $context));
+
+                        // ログ記録
+                        foreach ($passiveLogs as $log) {
+                            RoomLog::create([
+                                'roomId' => $roomId,
+                                'actionType' => 'passive',
+                                'actorUserId' => $log['userId'],
+                                'actorCharacterId' => $log['characterId'],
+                                'description' => $log['description'],
+                            ]);
+                        }
+
+                        // 攻撃ログ
+                        RoomLog::create([
+                            'roomId' => $roomId,
+                            'actionType' => 'attack',
+                            'actorUserId' => $attacker->userId,
+                            'actorCharacterId' => $attacker->characterId,
+                            'targetUserId' => $target->userId,
+                            'targetCharacterId' => $target->characterId,
+                            'value' => $damage,
+                            'description' => "{$attacker->character->name} が {$target->character->name} に {$damage} ダメージを与えました",
+                        ]);
+
+                        if ($newLife <= 0) {
+                            RoomLog::create([
+                                'roomId' => $roomId,
+                                'actionType' => 'death',
+                                'targetUserId' => $target->userId,
+                                'targetCharacterId' => $target->characterId,
+                                'description' => "{$target->character->name} がダウンしました",
+                            ]);
+                        }
+
+                        $message = "{$attacker->character->name} が {$target->character->name} に {$damage} ダメージを与えました";
+                    }
                 } else {
                     $damage = 0;
                     $newLife = $target->life;
@@ -1129,6 +1189,7 @@ class RoomController
                         'userId' => $target->userId,
                         'life' => $newLife,
                         'isDead' => $newLife <= 0,
+                        'blockCount' => $target->blockCount, // Add blockCount to response
                     ]],
                     'next_turn_user_id' => $nextTurn ? $nextTurn->userId : null,
                     'next_turn_character_id' => $nextTurn ? $nextTurn->characterId : null,

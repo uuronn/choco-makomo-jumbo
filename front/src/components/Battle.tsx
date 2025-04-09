@@ -377,6 +377,7 @@ export default function Battle({ room }: BattleProps) {
 									room.currentTurnCharacterId === character.characterId &&
 									!isMyTurn
 								}
+								blockCount={character.blockCount}
 							/>
 							<div className="block h-1 relative">
 								{isSelectingEnemy && character.life > 0 && (
@@ -443,6 +444,7 @@ export default function Battle({ room }: BattleProps) {
 													<Image
 														src={
 															characterToImagePath(character.character.id) ||
+															"/placeholder.svg" ||
 															"/placeholder.svg"
 														}
 														alt={character.character.name}
@@ -495,6 +497,7 @@ export default function Battle({ room }: BattleProps) {
 								room.currentTurnCharacterId === character.characterId &&
 								isMyTurn
 							}
+							blockCount={character.blockCount}
 						/>
 					))}
 				</div>

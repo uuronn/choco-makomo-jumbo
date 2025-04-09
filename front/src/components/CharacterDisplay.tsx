@@ -5,6 +5,7 @@ import Image from "next/image";
 import React from "react";
 import { motion } from "framer-motion";
 import { characterToImagePath } from "~/lib/utils";
+import { Shield } from "lucide-react";
 
 export const CharacterDisplay = React.memo(
 	({
@@ -13,6 +14,7 @@ export const CharacterDisplay = React.memo(
 		isActive,
 		effect,
 		onClick,
+		blockCount = 0,
 	}: {
 		character: RoomCharacter;
 		isSelected?: boolean;
@@ -20,6 +22,7 @@ export const CharacterDisplay = React.memo(
 		isActive?: boolean;
 		effect?: "blink" | "explosion" | "heal" | string;
 		onClick: () => void;
+		blockCount?: number;
 	}) => {
 		const hpPercentage = (character.life / character.maxLife) * 100;
 		let hpColor = "bg-green-500";
@@ -45,6 +48,31 @@ export const CharacterDisplay = React.memo(
 			},
 			idle: {
 				x: 0,
+			},
+		};
+
+		// Shield animation variants
+		const shieldPulseVariants = {
+			pulse: {
+				scale: [1, 1.1, 1],
+				opacity: [0.7, 1, 0.7],
+				transition: {
+					duration: 2,
+					repeat: Number.POSITIVE_INFINITY,
+					repeatType: "loop" as const,
+				},
+			},
+		};
+
+		const shieldRotateVariants = {
+			rotate: {
+				rotate: [0, 360],
+				transition: {
+					duration: 10,
+					repeat: Number.POSITIVE_INFINITY,
+					repeatType: "loop" as const,
+					ease: "linear",
+				},
 			},
 		};
 
@@ -173,6 +201,7 @@ export const CharacterDisplay = React.memo(
 						<Image
 							src={
 								characterToImagePath(character.character.id) ||
+								"/placeholder.svg" ||
 								"/placeholder.svg"
 							}
 							alt=""
@@ -206,6 +235,67 @@ export const CharacterDisplay = React.memo(
 								/>
 							</div>
 						)}
+
+						{/* Shield indicator */}
+						{blockCount > 0 && (
+							<div className="absolute -top-2 -right-2 z-20">
+								<div
+									className={`relative ${
+										isEnemy ? "text-red-400" : "text-green-400"
+									}`}
+								>
+									{/* Outer shield glow effect */}
+									<motion.div
+										className="absolute inset-0"
+										variants={shieldPulseVariants}
+										animate="pulse"
+									>
+										<Shield className="w-10 h-10 opacity-50" />
+									</motion.div>
+
+									{/* Inner shield with hexagon pattern */}
+									<motion.div
+										className="relative"
+										variants={shieldRotateVariants}
+										animate="rotate"
+									>
+										<svg
+											width="40"
+											height="40"
+											viewBox="0 0 24 24"
+											fill="none"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<path
+												d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+												stroke="currentColor"
+												strokeWidth="2"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												fill={
+													isEnemy
+														? "rgba(248, 113, 113, 0.2)"
+														: "rgba(74, 222, 128, 0.2)"
+												}
+											/>
+											<path
+												d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+												stroke="currentColor"
+												strokeWidth="2"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeDasharray="1 2"
+											/>
+										</svg>
+									</motion.div>
+
+									{/* Shield count */}
+									<div className="absolute inset-0 flex items-center justify-center font-bold text-sm">
+										{blockCount}
+									</div>
+								</div>
+							</div>
+						)}
 					</motion.div>
 				</div>
 				<div className="w-[200px] text-green-400 flex justify-center items-center">
@@ -225,6 +315,11 @@ export const CharacterDisplay = React.memo(
 					<div className="flex justify-center gap-3 w-full">
 						<span className="text-xs">スピード {character.speed}</span>
 						<span className="text-xs">回避率 {character.evasion}%</span>
+						{blockCount > 0 && (
+							<span className="text-xs font-bold text-cyan-300">
+								シールド {blockCount}
+							</span>
+						)}
 					</div>
 				</div>
 			</div>
@@ -236,7 +331,8 @@ export const CharacterDisplay = React.memo(
 			prevProps.isSelected === nextProps.isSelected &&
 			prevProps.isEnemy === nextProps.isEnemy &&
 			prevProps.isActive === nextProps.isActive &&
-			prevProps.effect === nextProps.effect
+			prevProps.effect === nextProps.effect &&
+			prevProps.blockCount === nextProps.blockCount
 		);
 	},
 );
