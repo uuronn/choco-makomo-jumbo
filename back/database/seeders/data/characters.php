@@ -457,11 +457,11 @@ return [
         'baseLife' => 2800,
         'baseSpeed' => 150,
         'baseEvasion' => 8,
-        'specialSkillName' => null,
-        'specialSkillDescription' => null,
-        'specialSkillTurn' => 0,
-        'passiveSkillName' => "高速キャッシュ",
-        'passiveSkillDescription' => "自身のスピードが10%増加する",
+        'specialSkillName' => 'HTTP/3通信',
+        'specialSkillDescription' => '自身のスピード分を相手キャラ',
+        'specialSkillTurn' => 15,
+        'passiveSkillName' => "LiteSpeed Cache",
+        'passiveSkillDescription' => "合計ラウンド数✖︎200ポイントスピードが増加する",
     ],
     // Caddy (ウェブサーバー)
     [
