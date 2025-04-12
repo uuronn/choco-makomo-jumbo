@@ -353,6 +353,48 @@ export default function Battle({ room }: BattleProps) {
         .blink {
           animation: blink 1s infinite;
         }
+        
+        @keyframes shieldCountPulse {
+          0% { transform: scale(1); box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.3); }
+          50% { transform: scale(1.1); box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.5); }
+          100% { transform: scale(1); box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.3); }
+        }
+
+        @keyframes glitch {
+          0% {
+            clip-path: inset(40% 0 61% 0);
+            transform: translate(-2px, 2px);
+          }
+          20% {
+            clip-path: inset(92% 0 1% 0);
+            transform: translate(1px, 3px);
+          }
+          40% {
+            clip-path: inset(43% 0 1% 0);
+            transform: translate(-1px, -3px);
+          }
+          60% {
+            clip-path: inset(25% 0 58% 0);
+            transform: translate(3px, 1px);
+          }
+          80% {
+            clip-path: inset(54% 0 7% 0);
+            transform: translate(-3px, -2px);
+          }
+          100% {
+            clip-path: inset(58% 0 43% 0);
+            transform: translate(2px, -1px);
+          }
+        }
+
+        @keyframes scan {
+          0% {
+            background-position: 0 -100vh;
+          }
+          35%, 100% {
+            background-position: 0 100vh;
+          }
+        }
       `}</style>
 			{/* 敵キャラ表示 */}
 			<div className="flex flex-col justify-between md:min-h-[580px] md:mt-4">

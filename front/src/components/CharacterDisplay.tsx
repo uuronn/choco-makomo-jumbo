@@ -5,7 +5,6 @@ import Image from "next/image";
 import React from "react";
 import { motion } from "framer-motion";
 import { characterToImagePath } from "~/lib/utils";
-import { Shield } from "lucide-react";
 
 export const CharacterDisplay = React.memo(
 	({
@@ -51,30 +50,17 @@ export const CharacterDisplay = React.memo(
 			},
 		};
 
-		// Shield animation variants
-		const shieldPulseVariants = {
-			pulse: {
-				scale: [1, 1.1, 1],
-				opacity: [0.7, 1, 0.7],
-				transition: {
-					duration: 2,
-					repeat: Number.POSITIVE_INFINITY,
-					repeatType: "loop" as const,
-				},
-			},
-		};
+		// Shield color based on enemy or ally
+		const shieldColor = isEnemy
+			? "rgba(239, 68, 68, 0.7)"
+			: // Enemy red
+				"rgba(34, 197, 94, 0.7)"; // Ally green
 
-		const shieldRotateVariants = {
-			rotate: {
-				rotate: [0, 360],
-				transition: {
-					duration: 10,
-					repeat: Number.POSITIVE_INFINITY,
-					repeatType: "loop" as const,
-					ease: "linear",
-				},
-			},
-		};
+		// Shield glow color
+		const shieldGlowColor = isEnemy
+			? "0 0 15px 5px rgba(239, 68, 68, 0.5)"
+			: // Enemy red glow
+				"0 0 15px 5px rgba(34, 197, 94, 0.5)"; // Ally green glow
 
 		return (
 			<div
@@ -198,6 +184,307 @@ export const CharacterDisplay = React.memo(
 						animate={effect === "blink" ? "blink" : "idle"}
 						variants={blinkVariants}
 					>
+						{/* Advanced Shield Effect */}
+						{blockCount > 0 && (
+							<>
+								{/* Completely new shield effect */}
+								<motion.div
+									className="absolute inset-0 z-10"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									transition={{ duration: 0.5 }}
+								>
+									{/* Digital barrier with glitch effect */}
+									<motion.div
+										className="absolute inset-0 overflow-hidden"
+										style={{
+											borderRadius: "10px",
+											background: "transparent",
+										}}
+									>
+										{/* Main shield barrier - digital wall */}
+										<motion.div
+											className="absolute inset-0"
+											style={{
+												background: isEnemy
+													? "linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%)"
+													: "linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.2) 100%)",
+												backdropFilter: "blur(2px)",
+												border: isEnemy
+													? "1px solid rgba(239, 68, 68, 0.5)"
+													: "1px solid rgba(34, 197, 94, 0.5)",
+												boxShadow: isEnemy
+													? "inset 0 0 20px rgba(239, 68, 68, 0.3)"
+													: "inset 0 0 20px rgba(34, 197, 94, 0.3)",
+											}}
+										/>
+
+										{/* Digital scan lines */}
+										<motion.div
+											className="absolute inset-0"
+											style={{
+												background: isEnemy
+													? `repeating-linear-gradient(
+                              0deg,
+                              transparent,
+                              transparent 2px,
+                              rgba(239, 68, 68, 0.1) 2px,
+                              rgba(239, 68, 68, 0.1) 4px
+                            )`
+													: `repeating-linear-gradient(
+                              0deg,
+                              transparent,
+                              transparent 2px,
+                              rgba(34, 197, 94, 0.1) 2px,
+                              rgba(34, 197, 94, 0.1) 4px
+                            )`,
+											}}
+											animate={{
+												backgroundPosition: ["0px 0px", "0px 100px"],
+											}}
+											transition={{
+												duration: 10,
+												repeat: Number.POSITIVE_INFINITY,
+												ease: "linear",
+											}}
+										/>
+
+										{/* Random glitch blocks */}
+										{[...Array(8)].map((_, i) => (
+											<motion.div
+												key={`glitch-${i}`}
+												className="absolute"
+												style={{
+													width: 10 + Math.random() * 30,
+													height: 2 + Math.random() * 10,
+													background: isEnemy
+														? `rgba(239, 68, 68, ${0.3 + Math.random() * 0.5})`
+														: `rgba(34, 197, 94, ${0.3 + Math.random() * 0.5})`,
+													left: `${Math.random() * 100}%`,
+													top: `${Math.random() * 100}%`,
+												}}
+												animate={{
+													opacity: [0, 1, 1, 0],
+													x: [0, Math.random() * 10 - 5],
+													scaleX: [1, 1.5, 0.5, 1],
+												}}
+												transition={{
+													duration: 0.2 + Math.random() * 0.3,
+													repeat: Number.POSITIVE_INFINITY,
+													repeatDelay: 1 + Math.random() * 3,
+													ease: "easeInOut",
+												}}
+											/>
+										))}
+
+										{/* Digital circuit patterns */}
+										<motion.div
+											className="absolute inset-0"
+											style={{
+												background: isEnemy
+													? `radial-gradient(circle at ${
+															Math.random() * 100
+														}% ${Math.random() * 100}%, rgba(239, 68, 68, 0.5) 0%, transparent 10%),
+                             radial-gradient(circle at ${
+																Math.random() * 100
+															}% ${Math.random() * 100}%, rgba(239, 68, 68, 0.5) 0%, transparent 5%),
+                             radial-gradient(circle at ${
+																Math.random() * 100
+															}% ${
+																Math.random() * 100
+															}%, rgba(239, 68, 68, 0.5) 0%, transparent 15%)`
+													: `radial-gradient(circle at ${
+															Math.random() * 100
+														}% ${Math.random() * 100}%, rgba(34, 197, 94, 0.5) 0%, transparent 10%),
+                             radial-gradient(circle at ${
+																Math.random() * 100
+															}% ${Math.random() * 100}%, rgba(34, 197, 94, 0.5) 0%, transparent 5%),
+                             radial-gradient(circle at ${
+																Math.random() * 100
+															}% ${
+																Math.random() * 100
+															}%, rgba(34, 197, 94, 0.5) 0%, transparent 15%)`,
+											}}
+											animate={{
+												opacity: [0.3, 0.7, 0.3],
+											}}
+											transition={{
+												duration: 3,
+												repeat: Number.POSITIVE_INFINITY,
+												ease: "easeInOut",
+											}}
+										/>
+									</motion.div>
+
+									{/* Lightning/energy arcs */}
+									{[...Array(4)].map((_, i) => (
+										<motion.div
+											key={`arc-${i}`}
+											className="absolute"
+											style={{
+												width: 2,
+												height: 40 + Math.random() * 60,
+												background: isEnemy
+													? "linear-gradient(to bottom, rgba(239, 68, 68, 0.8), transparent)"
+													: "linear-gradient(to bottom, rgba(34, 197, 94, 0.8), transparent)",
+												borderRadius: "50%",
+												transformOrigin: "top center",
+												left: `${10 + i * 25 + Math.random() * 10}%`,
+												top: "-10%",
+												filter: "blur(1px)",
+												zIndex: 5,
+											}}
+											animate={{
+												rotate: [
+													-10 + Math.random() * 20,
+													10 + Math.random() * 20,
+													-5 + Math.random() * 10,
+												],
+												scaleY: [0.7, 1.2, 0.7],
+												opacity: [0.5, 0.8, 0.5],
+											}}
+											transition={{
+												duration: 2 + Math.random(),
+												repeat: Number.POSITIVE_INFINITY,
+												ease: "easeInOut",
+											}}
+										/>
+									))}
+
+									{/* Floating data symbols */}
+									{[...Array(10)].map((_, i) => {
+										const symbols = [
+											"0",
+											"1",
+											"×",
+											"○",
+											"□",
+											"△",
+											"▽",
+											"◇",
+											"▷",
+											"◁",
+										];
+										return (
+											<motion.div
+												key={`symbol-${i}`}
+												className="absolute text-xs font-mono"
+												style={{
+													color: isEnemy
+														? "rgba(239, 68, 68, 0.8)"
+														: "rgba(34, 197, 94, 0.8)",
+													left: `${Math.random() * 100}%`,
+													top: `${Math.random() * 100}%`,
+													textShadow: isEnemy
+														? "0 0 5px rgba(239, 68, 68, 0.8)"
+														: "0 0 5px rgba(34, 197, 94, 0.8)",
+												}}
+												animate={{
+													y: [0, -20],
+													opacity: [0, 1, 0],
+												}}
+												transition={{
+													duration: 2 + Math.random() * 2,
+													repeat: Number.POSITIVE_INFINITY,
+													delay: Math.random() * 5,
+													ease: "easeInOut",
+												}}
+											>
+												{symbols[Math.floor(Math.random() * symbols.length)]}
+											</motion.div>
+										);
+									})}
+
+									{/* Shield count display - futuristic counter */}
+									<div className="absolute top-0 right-0 z-20">
+										<motion.div
+											className={`flex items-center justify-center w-10 h-10 ${
+												isEnemy ? "bg-red-900/70" : "bg-green-900/70"
+											} backdrop-blur-sm rounded-full border-2 ${
+												isEnemy ? "border-red-500" : "border-green-500"
+											}`}
+											style={{
+												boxShadow: isEnemy
+													? "0 0 10px rgba(239, 68, 68, 0.8)"
+													: "0 0 10px rgba(34, 197, 94, 0.8)",
+											}}
+											animate={{
+												scale: [1, 1.05, 1],
+												boxShadow: isEnemy
+													? [
+															"0 0 5px rgba(239, 68, 68, 0.5)",
+															"0 0 15px rgba(239, 68, 68, 0.8)",
+															"0 0 5px rgba(239, 68, 68, 0.5)",
+														]
+													: [
+															"0 0 5px rgba(34, 197, 94, 0.5)",
+															"0 0 15px rgba(34, 197, 94, 0.8)",
+															"0 0 5px rgba(34, 197, 94, 0.5)",
+														],
+											}}
+											transition={{
+												duration: 2,
+												repeat: Number.POSITIVE_INFINITY,
+												ease: "easeInOut",
+											}}
+										>
+											<div className="relative">
+												{/* Digital number effect */}
+												<div className="absolute inset-0 flex items-center justify-center">
+													<div
+														className={`text-lg font-bold ${
+															isEnemy ? "text-red-300" : "text-green-300"
+														} opacity-50`}
+														style={{
+															textShadow: isEnemy
+																? "0 0 5px rgba(239, 68, 68, 1)"
+																: "0 0 5px rgba(34, 197, 94, 1)",
+														}}
+													>
+														{blockCount}
+													</div>
+												</div>
+												<div
+													className={`text-lg font-bold ${
+														isEnemy ? "text-red-300" : "text-green-300"
+													}`}
+													style={{
+														textShadow: isEnemy
+															? "0 0 5px rgba(239, 68, 68, 1)"
+															: "0 0 5px rgba(34, 197, 94, 1)",
+													}}
+												>
+													{blockCount}
+												</div>
+											</div>
+										</motion.div>
+									</div>
+
+									{/* Edge highlight effect */}
+									<motion.div
+										className="absolute inset-0"
+										style={{
+											border: isEnemy
+												? "2px solid rgba(239, 68, 68, 0.5)"
+												: "2px solid rgba(34, 197, 94, 0.5)",
+											borderRadius: "10px",
+											boxShadow: isEnemy
+												? "0 0 10px rgba(239, 68, 68, 0.5)"
+												: "0 0 10px rgba(34, 197, 94, 0.5)",
+										}}
+										animate={{
+											opacity: [0.5, 1, 0.5],
+										}}
+										transition={{
+											duration: 2,
+											repeat: Number.POSITIVE_INFINITY,
+											ease: "easeInOut",
+										}}
+									/>
+								</motion.div>
+							</>
+						)}
+
 						<Image
 							src={
 								characterToImagePath(character.character.id) ||
@@ -235,67 +522,6 @@ export const CharacterDisplay = React.memo(
 								/>
 							</div>
 						)}
-
-						{/* Shield indicator */}
-						{blockCount > 0 && (
-							<div className="absolute -top-2 -right-2 z-20">
-								<div
-									className={`relative ${
-										isEnemy ? "text-red-400" : "text-green-400"
-									}`}
-								>
-									{/* Outer shield glow effect */}
-									<motion.div
-										className="absolute inset-0"
-										variants={shieldPulseVariants}
-										animate="pulse"
-									>
-										<Shield className="w-10 h-10 opacity-50" />
-									</motion.div>
-
-									{/* Inner shield with hexagon pattern */}
-									<motion.div
-										className="relative"
-										variants={shieldRotateVariants}
-										animate="rotate"
-									>
-										<svg
-											width="40"
-											height="40"
-											viewBox="0 0 24 24"
-											fill="none"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<path
-												d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
-												stroke="currentColor"
-												strokeWidth="2"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												fill={
-													isEnemy
-														? "rgba(248, 113, 113, 0.2)"
-														: "rgba(74, 222, 128, 0.2)"
-												}
-											/>
-											<path
-												d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
-												stroke="currentColor"
-												strokeWidth="2"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeDasharray="1 2"
-											/>
-										</svg>
-									</motion.div>
-
-									{/* Shield count */}
-									<div className="absolute inset-0 flex items-center justify-center font-bold text-sm">
-										{blockCount}
-									</div>
-								</div>
-							</div>
-						)}
 					</motion.div>
 				</div>
 				<div className="w-[200px] text-green-400 flex justify-center items-center">
@@ -316,7 +542,11 @@ export const CharacterDisplay = React.memo(
 						<span className="text-xs">スピード {character.speed}</span>
 						<span className="text-xs">回避率 {character.evasion}%</span>
 						{blockCount > 0 && (
-							<span className="text-xs font-bold text-cyan-300">
+							<span
+								className={`text-xs font-bold ${
+									isEnemy ? "text-red-300" : "text-cyan-300"
+								}`}
+							>
 								シールド {blockCount}
 							</span>
 						)}
