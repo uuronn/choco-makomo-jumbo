@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import {
 	Plus,
@@ -12,15 +12,16 @@ import {
 	Cpu,
 	Sparkles,
 	Lightbulb,
-	Info,
 	Layers,
 	Database,
+	AlertTriangle,
+	CheckCircle,
 } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { useUserContext } from "../../context/UserProvider";
-import type { Character, LevelUpResult } from "~/type/character";
+import type { Character } from "~/type/character";
 import { enqueueSnackbar } from "notistack";
 import { characterToImagePath } from "~/lib/utils";
 import { useUser } from "~/hook/useUser";
@@ -73,28 +74,185 @@ export default function CharacterDevelopment() {
 	const { data: userCharacterList, isLoading: isCharacterListLoading } =
 		useUserCharacterList(user?.id ?? null);
 
+	// Add a new state for tracking error state
+	const [isErrorState, setIsErrorState] = useState(false);
+	// Add state for animation
+	const [isAnimating, setIsAnimating] = useState(false);
+	// Add ref for canvas
+	const canvasRef = useRef<HTMLCanvasElement | null>(null);
+	// Add animation frame ref
+	const animationFrameRef = useRef<number | null>(null);
+
+	const fetchUserPoints = useCallback(
+		async (userId: string) => {
+			const token = await authUser?.getIdToken();
+			try {
+				const response = await fetch(
+					`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}/point`,
+					{
+						headers: { Authorization: `Bearer ${token}` },
+					},
+				);
+				if (!response.ok) throw new Error("Failed to fetch points");
+				const pointData = await response.json();
+				setAvailablePoints(pointData);
+			} catch (error) {
+				console.error("Error fetching points:", error);
+				enqueueSnackbar("ポイント情報の取得に失敗しました", {
+					variant: "error",
+				});
+			}
+		},
+		[authUser],
+	);
+
 	// Fetch available points when user data is loaded
 	useEffect(() => {
 		if (user?.id) {
 			fetchUserPoints(user.id);
 		}
-	}, [user]);
+	}, [user, fetchUserPoints]);
 
-	const fetchUserPoints = async (userId: string) => {
-		const token = await authUser?.getIdToken();
-		try {
-			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}/point`,
-				{ headers: { Authorization: `Bearer ${token}` } },
-			);
-			if (!response.ok) throw new Error("Failed to fetch points");
-			const pointData = await response.json();
-			setAvailablePoints(pointData);
-		} catch (error) {
-			console.error("Error fetching points:", error);
-			enqueueSnackbar("ポイント情報の取得に失敗しました", { variant: "error" });
-		}
-	};
+	// Add glitch animation styles
+	useEffect(() => {
+		const style = document.createElement("style");
+		style.textContent = `
+      @keyframes glitch {
+        0% { transform: translate(0) }
+        20% { transform: translate(-2px, 2px) }
+        40% { transform: translate(-2px, -2px) }
+        60% { transform: translate(2px, 2px) }
+        80% { transform: translate(2px, -2px) }
+        100% { transform: translate(0) }
+      }
+      
+      @keyframes flicker {
+        0% { opacity: 1; }
+        25% { opacity: 0.5; }
+        50% { opacity: 0.8; }
+        75% { opacity: 0.2; }
+        100% { opacity: 1; }
+      }
+      
+      @keyframes shake {
+        0% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        50% { transform: translateX(5px); }
+        75% { transform: translateX(-2px); }
+        100% { transform: translateX(0); }
+      }
+      
+      .character-image-container {
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .character-image-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      
+      .character-image-container.error::before {
+        opacity: 1;
+        background: linear-gradient(
+          rgba(255, 0, 0, 0.1),
+          transparent 10%,
+          rgba(255, 0, 0, 0.1) 20%,
+          transparent 30%
+        );
+        background-size: 100% 300%;
+        animation: scanline 4s linear infinite;
+      }
+      
+      @keyframes scanline {
+        0% { background-position: 0 0; }
+        100% { background-position: 0 300%; }
+      }
+      
+      .glitching {
+        animation: glitch 0.3s forwards;
+      }
+      
+      .error-overlay {
+        position: absolute;
+        inset: 0;
+        background-color: rgba(239, 68, 68, 0.2);
+        mix-blend-mode: overlay;
+        z-index: 2;
+        pointer-events: none;
+        animation: flicker 2s infinite;
+      }
+      
+      .error-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(12deg);
+        z-index: 3;
+        background-color: rgba(239, 68, 68, 0.8);
+        backdrop-filter: blur(4px);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        animation: shake 3s ease-in-out infinite;
+      }
+    `;
+		document.head.appendChild(style);
+
+		return () => {
+			document.head.removeChild(style);
+		};
+	}, []);
+
+	// Setup canvas for noise effect
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas || !isErrorState) return;
+
+		const ctx = canvas.getContext("2d");
+		if (!ctx) return;
+
+		// Set canvas size
+		canvas.width = canvas.offsetWidth;
+		canvas.height = canvas.offsetHeight;
+
+		// Draw noise
+		const drawNoise = () => {
+			const imageData = ctx.createImageData(canvas.width, canvas.height);
+			const data = imageData.data;
+
+			for (let i = 0; i < data.length; i += 4) {
+				// Only draw some pixels for performance
+				if (Math.random() > 0.97) {
+					const noise = Math.random() * 255 * 0.2;
+					data[i] = 255; // R
+					data[i + 1] = 0; // G
+					data[i + 2] = 0; // B
+					data[i + 3] = noise; // A
+				}
+			}
+
+			ctx.putImageData(imageData, 0, 0);
+			animationFrameRef.current = requestAnimationFrame(drawNoise);
+		};
+
+		drawNoise();
+
+		return () => {
+			if (animationFrameRef.current) {
+				cancelAnimationFrame(animationFrameRef.current);
+			}
+		};
+	}, [isErrorState]);
 
 	// Handle loading and error states
 	if (!authUser) return <Loading message="認証中" />;
@@ -193,6 +351,26 @@ export default function CharacterDevelopment() {
 		});
 	};
 
+	// Add a toggle function with animation
+	const toggleErrorState = () => {
+		// Start animation
+		setIsAnimating(true);
+
+		// Add glitch effect to the whole page
+		document.body.classList.add("glitching");
+
+		// After a short delay, toggle the error state
+		setTimeout(() => {
+			setIsErrorState((prev) => !prev);
+			document.body.classList.remove("glitching");
+
+			// End animation after transition
+			setTimeout(() => {
+				setIsAnimating(false);
+			}, 500);
+		}, 300);
+	};
+
 	const usedPoints = statPoints.life + statPoints.power + statPoints.speed;
 	const remainingPoints = availablePoints - usedPoints;
 
@@ -226,22 +404,129 @@ export default function CharacterDevelopment() {
 										{/* Character Image and Basic Info */}
 										<div className="flex flex-col items-center">
 											<div
-												className="relative w-32 h-32 md:w-80 md:h-80 mb-2 border-2 border-emerald-500 rounded-lg overflow-hidden shadow-lg"
+												className={`relative w-32 h-32 md:w-80 md:h-80 mb-2 border-2 rounded-lg overflow-hidden shadow-lg character-image-container ${
+													isErrorState ? "error" : ""
+												}`}
 												style={{
-													boxShadow: "0 0 10px rgba(16, 185, 129, 0.5)",
+													boxShadow: isErrorState
+														? "0 0 15px rgba(239, 68, 68, 0.7)"
+														: "0 0 10px rgba(16, 185, 129, 0.5)",
+													borderColor: isErrorState ? "#ef4444" : "#10b981",
+													transition:
+														"box-shadow 0.5s ease, border-color 0.5s ease",
 												}}
 											>
-												<Image
-													src={
-														characterToImagePath(
-															selectedCharacter.characterId,
-														) || "/placeholder.svg"
-													}
-													alt={selectedCharacter.name}
-													fill
-													className="object-cover"
-													priority
-												/>
+												{/* Normal image with transition */}
+												<div
+													className="absolute inset-0 transition-opacity duration-500 ease-in-out"
+													style={{
+														opacity: isErrorState ? 0 : 1,
+														transform: isAnimating ? "scale(1.05)" : "scale(1)",
+														transition:
+															"opacity 0.5s ease, transform 0.5s ease",
+													}}
+												>
+													<Image
+														src={
+															characterToImagePath(
+																selectedCharacter.characterId,
+															) || "/placeholder.svg"
+														}
+														alt={selectedCharacter.name}
+														fill
+														className="object-cover"
+														priority
+													/>
+												</div>
+
+												{/* Error image with transition */}
+												<div
+													className="absolute inset-0 transition-opacity duration-500 ease-in-out"
+													style={{
+														opacity: isErrorState ? 1 : 0,
+														transform: isAnimating ? "scale(1.05)" : "scale(1)",
+														transition:
+															"opacity 0.5s ease, transform 0.5s ease",
+														// filter: "hue-rotate(-45deg) contrast(1.2)",
+													}}
+												>
+													<Image
+														src={
+															characterToImagePath(
+																`${
+																	selectedCharacter.characterId ||
+																	"/placeholder.svg"
+																}-error`,
+															) || "/error-placeholder.svg"
+														}
+														alt={`${selectedCharacter.name} (エラー)`}
+														fill
+														className="object-cover"
+														priority
+													/>
+												</div>
+
+												{/* Error overlay */}
+												{isErrorState && <div className="error-overlay"></div>}
+
+												{/* Error icon */}
+												{/* {isErrorState && (
+													<div className="error-icon">
+														<AlertTriangle className="h-8 w-8 text-white" />
+													</div>
+												)} */}
+
+												{/* Canvas for noise effect */}
+												{isErrorState && (
+													<canvas
+														ref={canvasRef}
+														className="absolute inset-0 z-10 opacity-30 pointer-events-none"
+													/>
+												)}
+
+												{/* Toggle button */}
+												<div
+													className="absolute bottom-2 right-2 flex items-center gap-1 bg-gray-800/80 backdrop-blur-sm border rounded-md px-2 py-1 shadow-lg z-20"
+													style={{
+														borderColor: isErrorState
+															? "rgba(239, 68, 68, 0.5)"
+															: "rgba(16, 185, 129, 0.5)",
+														boxShadow: isErrorState
+															? "0 0 8px rgba(239, 68, 68, 0.5)"
+															: "0 0 8px rgba(16, 185, 129, 0.5)",
+														transition:
+															"border-color 0.3s ease, box-shadow 0.3s ease",
+													}}
+												>
+													<Button
+														className={`flex items-center gap-1 text-xs ${
+															isErrorState
+																? "bg-red-500/80 hover:bg-red-600 text-white"
+																: "bg-emerald-500/80 hover:bg-emerald-600 text-white"
+														}`}
+														onClick={toggleErrorState}
+														size="sm"
+														disabled={isAnimating}
+													>
+														<span
+															className="transition-transform duration-500"
+															style={{
+																transform: isAnimating
+																	? "rotate(180deg)"
+																	: "rotate(0deg)",
+															}}
+														>
+															{isErrorState ? (
+																<AlertTriangle className="h-3 w-3" />
+															) : (
+																<CheckCircle className="h-3 w-3" />
+															)}
+														</span>
+														<span>
+															{isErrorState ? "エラー状態" : "通常状態"}
+														</span>
+													</Button>
+												</div>
 											</div>
 											<h2 className="text-lg font-bold text-green-400">
 												{selectedCharacter.name}{" "}
@@ -534,7 +819,7 @@ function StatRow({
 	);
 }
 
-// Extracted component for character cards
+// Modify the CharacterCard component to include error state handling
 interface CharacterCardProps {
 	character: Character;
 	isSelected: boolean;
