@@ -1,9 +1,9 @@
 "use client";
 
 // Import the new components in your main file
-import CharacterImage from "./character-image";
-import DigitalNoise from "./digital-noise";
-import GlitchEffect from "./glitch-effect";
+import CharacterImage from "./image";
+import DigitalNoise from "./dig";
+import GlitchEffect from "./glig";
 import { useState } from "react";
 
 interface Character {

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, CheckCircle } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import GlitchEffect from "./glitch-effect";
+import GlitchEffect from "./glig";
 
 interface CharacterImageProps {
 	characterId: string;

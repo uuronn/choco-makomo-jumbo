@@ -485,20 +485,38 @@ export const CharacterDisplay = React.memo(
 							</>
 						)}
 
-						<Image
-							src={
-								characterToImagePath(character.character.id) ||
-								"/placeholder.svg" ||
-								"/placeholder.svg"
-							}
-							alt=""
-							width={100}
-							height={100}
-							className={`object-cover rounded-4xl ${auraColor}`}
-							style={{
-								filter: character.life === 0 ? "grayscale(100%)" : "none",
-							}}
-						/>
+						{character.isErrorMode ? (
+							<Image
+								src={
+									characterToImagePath(`${character.character.id}-error`) ||
+									"/placeholder.svg" ||
+									"/placeholder.svg"
+								}
+								alt=""
+								width={100}
+								height={100}
+								className={`object-cover rounded-4xl ${auraColor}`}
+								style={{
+									filter: character.life === 0 ? "grayscale(100%)" : "none",
+								}}
+							/>
+						) : (
+							<Image
+								src={
+									characterToImagePath(character.character.id) ||
+									"/placeholder.svg" ||
+									"/placeholder.svg"
+								}
+								alt=""
+								width={100}
+								height={100}
+								className={`object-cover rounded-4xl ${auraColor}`}
+								style={{
+									filter: character.life === 0 ? "grayscale(100%)" : "none",
+								}}
+							/>
+						)}
+
 						{effect === "explosion" && (
 							<div className="absolute inset-0 flex justify-center items-center">
 								<Image

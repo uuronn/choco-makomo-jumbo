@@ -48,4 +48,5 @@ export type RoomCharacter = {
 	passiveSkillDescription: string;
 	blockCount: number;
 	specialUsed: 0 | 1;
+	isErrorMode: boolean;
 };

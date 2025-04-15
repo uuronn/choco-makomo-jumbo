@@ -14,7 +14,7 @@ export default function DigitalNoise({
 	color = "rgba(255, 0, 0, 0.15)",
 }: DigitalNoiseProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const requestRef = useRef<number>();
+	const requestRef = useRef<number>(null);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
