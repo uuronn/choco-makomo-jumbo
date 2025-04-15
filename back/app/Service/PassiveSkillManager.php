@@ -57,10 +57,12 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Angular「双方向バインディング」: 自身が通常攻撃を受けた時、その攻撃を行った相手に、受けたダメージの50%を与える
+            // Angular「双方向バインディング」: 自身が通常攻撃を受けた時、その攻撃を行った相手に、受けたダメージの50%（isErrorModeがtrueなら80%）を与える
             case '双方向バインディング':
                 if ($eventType === 'on_damage_taken' && isset($context['target']) && $context['target']->id === $character->id && isset($context['attacker'])) {
-                    $reflectDamage = $context['damage'] * 0.5;
+                    // isErrorMode に応じて反射ダメージの割合を変更
+                    $reflectRatio = $character->isErrorMode ? 0.8 : 0.5;
+                    $reflectDamage = $context['damage'] * $reflectRatio;
                     $context['attacker']->update([
                         'life' => max(0, $context['attacker']->life - $reflectDamage)
                     ]);

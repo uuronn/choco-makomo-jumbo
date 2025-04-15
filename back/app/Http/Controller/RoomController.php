@@ -1491,8 +1491,10 @@ class RoomController
                             $newLife = min($target->maxLife, $target->life + $healAmount);
                             $target->update(['life' => $newLife]);
                         }
-                        $description = "{$attacker->character->name} が「依存性の注入」を発動、味方全員の体力を25%回復";
+                        $attacker->update(['isErrorMode' => true]);
+                        $description = "{$attacker->character->name} が「依存性の注入」を発動、味方全員の体力を25%回復し、エラー状態になる";
                         break;
+
                     case 'IEを削除': // windows用（全体回復の変形）
                         $targets = RoomCharacter::with('character')
                             ->where('roomId', $roomId)
