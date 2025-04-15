@@ -26,6 +26,7 @@ return new class extends Migration
             $table->tinyInteger('poisonCount')->unsigned()->default(0);
             $table->tinyInteger('specialSkillTurn')->unsigned()->default(0);
             $table->boolean('specialUsed')->default(false);
+            $table->boolean('isErrorMode')->default(false);
             $table->timestamps();
 
             // 外部キー制約

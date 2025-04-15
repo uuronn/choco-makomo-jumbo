@@ -31,7 +31,8 @@ class RoomCharacter extends Model
         'confusionCount',
         'poisonCount',
         'specialSkillTurn',
-        'specialUsed'
+        'specialUsed',
+        'isErrorMode',
     ];
 
     protected $casts = [
