@@ -1034,6 +1034,7 @@ class RoomController
      */
     public function attack(Request $request)
     {
+
         try {
             $roomId = $request->route('roomId');
             $userId = $request->route('userId');
@@ -1080,6 +1081,22 @@ class RoomController
                 if (!$target) {
                     throw new Exception('攻撃対象のキャラクターが見つかりません');
                 }
+
+                // battle_start イベントの呼び出し（必要に応じて）
+                // 戦闘開始時に一度だけ呼び出したい場合、approve メソッドなどで処理するのが適切
+                // ここでは例としてコメントアウト
+                // if ($room->totalTurns === 0) {
+                //     $battleStartLogs = PassiveSkillManager::applyPassives($room, 'battle_start');
+                //     foreach ($battleStartLogs as $log) {
+                //         RoomLog::create([
+                //             'roomId' => $roomId,
+                //             'actionType' => 'passive',
+                //             'actorUserId' => $log['userId'],
+                //             'actorCharacterId' => $log['characterId'],
+                //             'description' => $log['description'],
+                //         ]);
+                //     }
+                // }
 
                 // 回避判定
                 $evasionChance = $target->evasion;
@@ -1173,9 +1190,23 @@ class RoomController
                     $message = "{$attacker->character->name} の攻撃が {$target->character->name} に回避されました";
                 }
 
+                // 攻撃者のアクティブ状態を解除
                 $attacker->update(['isActive' => false]);
                 $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
 
+                // パッシブスキル: ターン終了時
+                $turnEndLogs = PassiveSkillManager::applyPassives($room, 'turn_end');
+                foreach ($turnEndLogs as $log) {
+                    RoomLog::create([
+                        'roomId' => $roomId,
+                        'actionType' => 'passive',
+                        'actorUserId' => $log['userId'],
+                        'actorCharacterId' => $log['characterId'],
+                        'description' => $log['description'],
+                    ]);
+                }
+
+                // 次のターンを更新
                 $nextTurn = $this->updateNextTurn($roomId);
                 $this->checkBattleEnd($room);
                 $room->refresh();
@@ -1189,7 +1220,7 @@ class RoomController
                         'userId' => $target->userId,
                         'life' => $newLife,
                         'isDead' => $newLife <= 0,
-                        'blockCount' => $target->blockCount, // Add blockCount to response
+                        'blockCount' => $target->blockCount,
                     ]],
                     'next_turn_user_id' => $nextTurn ? $nextTurn->userId : null,
                     'next_turn_character_id' => $nextTurn ? $nextTurn->characterId : null,
