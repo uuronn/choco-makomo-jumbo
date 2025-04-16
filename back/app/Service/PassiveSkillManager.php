@@ -141,14 +141,14 @@ class PassiveSkillManager
                 break;
 
             // JavaScript「ES6」: 攻撃力を30%増加、エラー状態で50%増加
-            case 'ES6':
-                if ($eventType === 'before_damage_taken') {
-                    $multiplier = $character->isErrorMode ? 1.50 : 1.30;
-                    $character->update(['power' => $character->power * $multiplier]);
-                    $percentage = $character->isErrorMode ? '50%' : '30%';
-                    return "{$character->character->name} の「ES6」発動、攻撃力{$percentage}増加";
-                }
-                break;
+            // case 'ES6':
+            //     if ($eventType === 'before_damage_taken') {
+            //         $multiplier = $character->isErrorMode ? 1.50 : 1.30;
+            //         $character->update(['power' => $character->power * $multiplier]);
+            //         $percentage = $character->isErrorMode ? '50%' : '30%';
+            //         return "{$character->character->name} の「ES6」発動、攻撃力{$percentage}増加";
+            //     }
+            //     break;
 
             // PHP「サーバーサイド」: 体力が20%未満のとき回避率が15%増加
             case 'サーバーサイド':
