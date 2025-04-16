@@ -326,9 +326,9 @@ class PassiveSkillManager
             // LiteSpeed「LiteSpeed Cache」: 合計ラウンド数 × 200ポイントのスピード増加
             case 'LiteSpeed Cache':
                 if ($eventType === 'turn_end') {
-                    $speedIncrease = $room->totalTurns * 200;
-                    $character->update(['speed' => $character->speed + $speedIncrease]);
-                    return "{$character->character->name} の「LiteSpeed Cache」発動、スピード{$speedIncrease}ポイント増加";
+                    // $speedIncrease = $room->totalTurns * 200;
+                    $character->update(['speed' => $character->speed + 200]);
+                    return "{$character->character->name} の「LiteSpeed Cache」発動、スピード200ポイント増加";
                 }
                 break;
 
