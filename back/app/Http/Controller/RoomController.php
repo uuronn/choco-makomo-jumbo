@@ -1085,18 +1085,18 @@ class RoomController
                 // battle_start イベントの呼び出し（必要に応じて）
                 // 戦闘開始時に一度だけ呼び出したい場合、approve メソッドなどで処理するのが適切
                 // ここでは例としてコメントアウト
-                // if ($room->totalTurns === 0) {
-                //     $battleStartLogs = PassiveSkillManager::applyPassives($room, 'battle_start');
-                //     foreach ($battleStartLogs as $log) {
-                //         RoomLog::create([
-                //             'roomId' => $roomId,
-                //             'actionType' => 'passive',
-                //             'actorUserId' => $log['userId'],
-                //             'actorCharacterId' => $log['characterId'],
-                //             'description' => $log['description'],
-                //         ]);
-                //     }
-                // }
+                if ($room->totalTurns === 0) {
+                    $battleStartLogs = PassiveSkillManager::applyPassives($room, 'battle_start');
+                    foreach ($battleStartLogs as $log) {
+                        RoomLog::create([
+                            'roomId' => $roomId,
+                            'actionType' => 'passive',
+                            'actorUserId' => $log['userId'],
+                            'actorCharacterId' => $log['characterId'],
+                            'description' => $log['description'],
+                        ]);
+                    }
+                }
 
                 // 回避判定
                 $evasionChance = $target->evasion;
