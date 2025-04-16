@@ -142,7 +142,7 @@ class PassiveSkillManager
 
             // JavaScript「ES6」: 攻撃力を30%増加、エラー状態で50%増加
             case 'ES6':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $multiplier = $character->isErrorMode ? 1.50 : 1.30;
                     $character->update(['power' => $character->power * $multiplier]);
                     $percentage = $character->isErrorMode ? '50%' : '30%';
@@ -162,7 +162,7 @@ class PassiveSkillManager
 
             // TypeScript「静的型付け」: 攻撃力が10%増加
             case '静的型付け':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $character->update(['power' => $character->power * 1.10]);
                     return "{$character->character->name} の「静的型付け」発動、攻撃力10%増加";
                 }
@@ -190,7 +190,7 @@ class PassiveSkillManager
 
             // Ruby on Rails「規約優先」: 味方全員の回避率が5%増加
             case '規約優先':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $allies = RoomCharacter::where('roomId', $room->id)
                         ->where('userId', $character->userId)
                         ->where('isDead', false)
@@ -214,7 +214,7 @@ class PassiveSkillManager
 
             // Azure, GAS「クラウド連携」: 味方全員のスピードが5%増加 (Azure), 3%増加 (GAS)
             case 'クラウド連携':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $multiplier = $character->character->name === 'Azure' ? 1.05 : 1.03;
                     $percentage = $character->character->name === 'Azure' ? '5%' : '3%';
                     $allies = RoomCharacter::where('roomId', $room->id)
@@ -230,7 +230,7 @@ class PassiveSkillManager
 
             // Google Cloud「データ解析」: 攻撃力が10%増加
             case 'データ解析':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $character->update(['power' => $character->power * 1.10]);
                     return "{$character->character->name} の「データ解析」発動、攻撃力10%増加";
                 }
@@ -238,7 +238,7 @@ class PassiveSkillManager
 
             // Mac「ユニックスベース」: スピードが10%増加
             case 'ユニックスベース':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $character->update(['speed' => $character->speed * 1.10]);
                     return "{$character->character->name} の「ユニックスベース」発動、スピード10%増加";
                 }
@@ -256,7 +256,7 @@ class PassiveSkillManager
 
             // MySQL「リレーショナル」: 味方全員の回避率が5%増加
             case 'リレーショナル':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $allies = RoomCharacter::where('roomId', $room->id)
                         ->where('userId', $character->userId)
                         ->where('isDead', false)
@@ -280,7 +280,7 @@ class PassiveSkillManager
 
             // Supabase, Firebase「リアルタイム」: スピードが10%増加
             case 'リアルタイム':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $character->update(['speed' => $character->speed * 1.10]);
                     return "{$character->character->name} の「リアルタイム」発動、スピード10%増加";
                 }
@@ -288,7 +288,7 @@ class PassiveSkillManager
 
             // Unity「クロスプラットフォーム」: 味方全員の攻撃力が5%増加
             case 'クロスプラットフォーム':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $allies = RoomCharacter::where('roomId', $room->id)
                         ->where('userId', $character->userId)
                         ->where('isDead', false)
@@ -334,7 +334,7 @@ class PassiveSkillManager
 
             // Caddy「自動HTTPS」: シールド3枚付与、Goがいる場合さらに1枚
             case '自動HTTPS':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $baseBlockCount = 3;
                     $totalBlockCount = $baseBlockCount;
                     $hasGo = RoomCharacter::where('roomId', $room->id)
@@ -374,7 +374,7 @@ class PassiveSkillManager
 
             // SQLite「軽量設計」: 回避率が10%増加
             case '軽量設計':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $character->update(['evasion' => $character->evasion + 10]);
                     return "{$character->character->name} の「軽量設計」発動、回避率10%増加";
                 }
@@ -382,7 +382,7 @@ class PassiveSkillManager
 
             // jQuery「DOM操作」: 攻撃力が10%増加
             case 'DOM操作':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $character->update(['power' => $character->power * 1.10]);
                     return "{$character->character->name} の「DOM操作」発動、攻撃力10%増加";
                 }
@@ -430,7 +430,7 @@ class PassiveSkillManager
 
             // C「低レベル制御」: スピードが10%増加
             case '低レベル制御':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $character->update(['speed' => $character->speed * 1.10]);
                     return "{$character->character->name} の「低レベル制御」発動、スピード10%増加";
                 }
@@ -438,7 +438,7 @@ class PassiveSkillManager
 
             // C++「オブジェクト指向」: 攻撃力が10%増加
             case 'オブジェクト指向':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $character->update(['power' => $character->power * 1.10]);
                     return "{$character->character->name} の「オブジェクト指向」発動、攻撃力10%増加";
                 }
@@ -462,7 +462,7 @@ class PassiveSkillManager
 
             // Fortran「高級言語の先駆者」: 攻撃力が10%増加
             case '高級言語の先駆者':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $character->update(['power' => $character->power * 1.10]);
                     return "{$character->character->name} の「高級言語の先駆者」発動、攻撃力10%増加";
                 }
@@ -470,7 +470,7 @@ class PassiveSkillManager
 
             // Laravel「エレガントな構文」: 味方全員のスピードが3%増加
             case 'エレガントな構文':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $allies = RoomCharacter::where('roomId', $room->id)
                         ->where('userId', $character->userId)
                         ->where('isDead', false)
@@ -484,7 +484,7 @@ class PassiveSkillManager
 
             // Python「可読性」: 味方全員の回避率が5%増加
             case '可読性':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $allies = RoomCharacter::where('roomId', $room->id)
                         ->where('userId', $character->userId)
                         ->where('isDead', false)
@@ -506,28 +506,28 @@ class PassiveSkillManager
 
             // SQL「クエリ最適化」: スピードが10%増加
             case 'クエリ最適化':
-                if ($eventType === 'battle_start') {
+                if ($eventType === 'before_damage_taken') {
                     $character->update(['speed' => $character->speed * 1.10]);
                     return "{$character->character->name} の「クエリ最適化」発動、スピード10%増加";
                 }
                 break;
 
             // Vite「ゼロコンフィグ」: 戦闘開始時、スペシャルスキル発動ターン数13以下の味方が即発動可能
-            case 'ゼロコンフィグ':
-                if ($eventType === 'battle_start') {
-                    $allies = RoomCharacter::where('roomId', $room->id)
-                        ->where('userId', $character->userId)
-                        ->where('isDead', false)
-                        ->whereHas('character', function ($query) {
-                            $query->where('specialSkillTurn', '<=', 13);
-                        })
-                        ->get();
-                    foreach ($allies as $ally) {
-                        $ally->update(['specialSkillTurn' => 0]);
-                    }
-                    return "{$character->character->name} の「ゼロコンフィグ」発動、スペシャルスキル発動ターン数13以下の味方が即発動可能";
-                }
-                break;
+            // case 'ゼロコンフィグ':
+            //     if ($eventType === 'battle_start') {
+            //         $allies = RoomCharacter::where('roomId', $room->id)
+            //             ->where('userId', $character->userId)
+            //             ->where('isDead', false)
+            //             ->whereHas('character', function ($query) {
+            //                 $query->where('specialSkillTurn', '<=', 13);
+            //             })
+            //             ->get();
+            //         foreach ($allies as $ally) {
+            //             $ally->update(['specialSkillTurn' => 0]);
+            //         }
+            //         return "{$character->character->name} の「ゼロコンフィグ」発動、スペシャルスキル発動ターン数13以下の味方が即発動可能";
+            //     }
+            //     break;
 
             default:
                 return null;
