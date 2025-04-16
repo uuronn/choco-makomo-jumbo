@@ -2,7 +2,7 @@
 
 import type { RoomCharacter } from "~/type/room";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { characterToImagePath } from "~/lib/utils";
 
@@ -14,14 +14,16 @@ export const CharacterDisplay = React.memo(
 		effect,
 		onClick,
 		blockCount = 0,
+		isErrorMode = false,
 	}: {
 		character: RoomCharacter;
 		isSelected?: boolean;
 		isEnemy: boolean;
 		isActive?: boolean;
-		effect?: "blink" | "explosion" | "heal" | string;
+		effect?: "blink" | "explosion" | "heal" | "error-glitch" | string;
 		onClick: () => void;
 		blockCount?: number;
+		isErrorMode?: boolean;
 	}) => {
 		const hpPercentage = (character.life / character.maxLife) * 100;
 		let hpColor = "bg-green-500";
@@ -50,6 +52,22 @@ export const CharacterDisplay = React.memo(
 			},
 		};
 
+		// Error glitch animation variants
+		const errorGlitchVariants = {
+			glitch: {
+				x: [0, -0.8, 0.8, -0.6, 0.6, 0, 0.4, -0.4, 0],
+				y: [0, 0.6, -0.6, 0.4, -0.4, 0.3, -0.3, 0],
+				rotate: [0, -0.1, 0.1, -0.08, 0.08, 0],
+				scale: [1, 1.002, 0.998, 1.0015, 0.9985, 1],
+				transition: {
+					duration: 0.5,
+					repeat: Number.POSITIVE_INFINITY,
+					repeatType: "loop" as const,
+					ease: "easeInOut",
+				},
+			},
+		};
+
 		// Shield color based on enemy or ally
 		const shieldColor = isEnemy
 			? "rgba(239, 68, 68, 0.7)"
@@ -61,6 +79,32 @@ export const CharacterDisplay = React.memo(
 			? "0 0 15px 5px rgba(239, 68, 68, 0.5)"
 			: // Enemy red glow
 				"0 0 15px 5px rgba(34, 197, 94, 0.5)"; // Ally green glow
+
+		// エラーモードに遅延を追加するための状態
+		const [delayedErrorMode, setDelayedErrorMode] = useState(false);
+
+		// Determine if we should show error mode
+		const showErrorMode =
+			isErrorMode || effect === "error-glitch" || character.isErrorMode;
+
+		// エラーモードが変更されたときに遅延を適用
+		useEffect(() => {
+			if (showErrorMode) {
+				// エラーモードになるまで2秒待つ
+				const timer = setTimeout(() => {
+					setDelayedErrorMode(true);
+				}, 2000); // 2秒の遅延
+
+				return () => {
+					clearTimeout(timer);
+				};
+			} else {
+				setDelayedErrorMode(false);
+			}
+		}, [showErrorMode]);
+
+		// 実際に表示するエラーモード（遅延適用後）
+		const displayErrorMode = delayedErrorMode;
 
 		return (
 			<div
@@ -176,13 +220,15 @@ export const CharacterDisplay = React.memo(
 						className={`absolute inset-0 rounded-lg overflow-hidden flex justify-center items-center`}
 						style={{
 							animation:
-								character.life > 0 && !effect
+								character.life > 0 && !effect && !showErrorMode
 									? `float 3s ease-in-out infinite`
 									: "none",
 						}}
 						// Apply the blink animation when effect is "blink"
-						animate={effect === "blink" ? "blink" : "idle"}
-						variants={blinkVariants}
+						animate={
+							effect === "blink" ? "blink" : showErrorMode ? "glitch" : "idle"
+						}
+						variants={showErrorMode ? errorGlitchVariants : blinkVariants}
 					>
 						{/* Advanced Shield Effect */}
 						{blockCount > 0 && (
@@ -485,20 +531,23 @@ export const CharacterDisplay = React.memo(
 							</>
 						)}
 
-						{character.isErrorMode ? (
+						{/* Error Mode Container */}
+						{displayErrorMode ? (
 							<Image
 								src={
-									characterToImagePath(`${character.character.id}-error`) ||
-									"/placeholder.svg" ||
+									characterToImagePath(
+										`${character.character.id || "/placeholder.svg"}-error`,
+									) ||
+									characterToImagePath(character.character.id) ||
 									"/placeholder.svg"
 								}
 								alt=""
 								width={100}
 								height={100}
-								className={`object-cover rounded-4xl ${auraColor}`}
-								style={{
-									filter: character.life === 0 ? "grayscale(100%)" : "none",
-								}}
+								className={`object-cover rounded-xl ${auraColor}`}
+								// style={{
+								// 	filter: character.life === 0 ? "grayscale(100%)" : "none",
+								// }}
 							/>
 						) : (
 							<Image
@@ -510,7 +559,7 @@ export const CharacterDisplay = React.memo(
 								alt=""
 								width={100}
 								height={100}
-								className={`object-cover rounded-4xl ${auraColor}`}
+								className={`object-cover rounded-xl ${auraColor}`}
 								style={{
 									filter: character.life === 0 ? "grayscale(100%)" : "none",
 								}}
@@ -580,7 +629,8 @@ export const CharacterDisplay = React.memo(
 			prevProps.isEnemy === nextProps.isEnemy &&
 			prevProps.isActive === nextProps.isActive &&
 			prevProps.effect === nextProps.effect &&
-			prevProps.blockCount === nextProps.blockCount
+			prevProps.blockCount === nextProps.blockCount &&
+			prevProps.isErrorMode === nextProps.isErrorMode
 		);
 	},
 );

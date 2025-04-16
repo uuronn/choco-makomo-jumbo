@@ -194,6 +194,7 @@ export default function Battle({ room }: BattleProps) {
 				(async () => {
 					await Promise.all(
 						decreasedLifeCharacters.map(async (ch) => {
+							// 元のダメージエフェクトのみを表示
 							await showEffect(ch.id, "explosion", 1200);
 							await showEffect(ch.id, "blink", 1000);
 						}),
@@ -395,6 +396,166 @@ export default function Battle({ room }: BattleProps) {
             background-position: 0 100vh;
           }
         }
+
+        @keyframes glitch-animation {
+          0% {
+            clip-path: inset(40% 0 61% 0);
+            transform: translate(-2px, 2px);
+          }
+          20% {
+            clip-path: inset(92% 0 1% 0);
+            transform: translate(1px, 3px);
+          }
+          40% {
+            clip-path: inset(43% 0 1% 0);
+            transform: translate(-1px, -3px);
+          }
+          60% {
+            clip-path: inset(25% 0 58% 0);
+            transform: translate(3px, 1px);
+          }
+          80% {
+            clip-path: inset(54% 0 7% 0);
+            transform: translate(-3px, -2px);
+          }
+          100% {
+            clip-path: inset(58% 0 43% 0);
+            transform: translate(2px, -1px);
+          }
+        }
+
+        @keyframes glitch-animation-2 {
+          0% {
+            clip-path: inset(25% 0 58% 0);
+            transform: translate(3px, 1px);
+          }
+          20% {
+            clip-path: inset(54% 0 7% 0);
+            transform: translate(-3px, -2px);
+          }
+          40% {
+            clip-path: inset(58% 0 43% 0);
+            transform: translate(2px, -1px);
+          }
+          60% {
+            clip-path: inset(40% 0 61% 0);
+            transform: translate(-2px, 2px);
+          }
+          80% {
+            clip-path: inset(92% 0 1% 0);
+            transform: translate(1px, 3px);
+          }
+          100% {
+            clip-path: inset(43% 0 1% 0);
+            transform: translate(-1px, -3px);
+          }
+        }
+
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+          20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes flicker {
+          0%, 100% { opacity: 1; }
+          10% { opacity: 0.8; }
+          20% { opacity: 0.6; }
+          30% { opacity: 0.9; }
+          40% { opacity: 0.4; }
+          50% { opacity: 0.7; }
+          60% { opacity: 0.5; }
+          70% { opacity: 0.8; }
+          80% { opacity: 0.3; }
+          90% { opacity: 0.6; }
+        }
+
+        @keyframes digital-noise {
+          0%, 100% { background-position: 0 0; }
+          10% { background-position: -5% -10%; }
+          20% { background-position: -15% 5%; }
+          30% { background-position: 7% -25%; }
+          40% { background-position: -5% 25%; }
+          50% { background-position: -15% -5%; }
+          60% { background-position: 15% 5%; }
+          70% { background-position: 5% 15%; }
+          80% { background-position: -25% 15%; }
+          90% { background-position: 10% -15%; }
+        }
+
+        .error-container {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .error-image {
+          position: relative;
+          z-index: 1;
+        }
+
+        .error-image-glitch {
+          animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both, 
+             flicker 0.3s step-end infinite;
+        }
+
+        .error-image-glitch::before,
+        .error-image-glitch::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: inherit;
+          background-size: cover;
+          background-position: center;
+          z-index: -1;
+        }
+
+        .error-image-glitch::before {
+          animation: glitch-animation 0.4s infinite linear alternate-reverse;
+          left: 2px;
+          text-shadow: -2px 0 #ff00ea;
+          background-color: rgba(255, 0, 234, 0.2);
+          mix-blend-mode: multiply;
+        }
+
+        .error-image-glitch::after {
+          animation: glitch-animation-2 0.3s infinite linear alternate-reverse;
+          left: -2px;
+          text-shadow: 2px 0 #00ffff;
+          background-color: rgba(0, 255, 255, 0.2);
+          mix-blend-mode: multiply;
+        }
+
+        .digital-noise {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+          opacity: 0.05;
+          z-index: 2;
+          pointer-events: none;
+          animation: digital-noise 0.2s steps(2) infinite;
+        }
+
+        .scan-line {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(to bottom, 
+                             transparent 0%, 
+                             rgba(32, 128, 32, 0.2) 50%, 
+                             transparent 100%);
+          background-size: 100% 8px;
+          z-index: 3;
+          pointer-events: none;
+          animation: scan 7s linear infinite;
+        }
       `}</style>
 			{/* 敵キャラ表示 */}
 			<div className="flex flex-col justify-between md:min-h-[580px] md:mt-4">
@@ -420,6 +581,9 @@ export default function Battle({ room }: BattleProps) {
 									!isMyTurn
 								}
 								blockCount={character.blockCount}
+								isErrorMode={
+									characterEffects[character.id]?.type === "explosion"
+								}
 							/>
 							<div className="block h-1 relative">
 								{isSelectingEnemy && character.life > 0 && (
@@ -487,6 +651,9 @@ export default function Battle({ room }: BattleProps) {
 														src={
 															characterToImagePath(character.character.id) ||
 															"/placeholder.svg" ||
+															"/placeholder.svg" ||
+															"/placeholder.svg" ||
+															"/placeholder.svg" ||
 															"/placeholder.svg"
 														}
 														alt={character.character.name}
@@ -540,6 +707,7 @@ export default function Battle({ room }: BattleProps) {
 								isMyTurn
 							}
 							blockCount={character.blockCount}
+							isErrorMode={characterEffects[character.id]?.type === "explosion"}
 						/>
 					))}
 				</div>
