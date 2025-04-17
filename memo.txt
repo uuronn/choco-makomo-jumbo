@@ -42,7 +42,6 @@ firebase
 jquery
 
 
-
 未実装技術
 
 github
@@ -50,3 +49,12 @@ gitlab
 
 ラズパイ
 アルディーノ
+
+エラー状態
+vba
+ruby on rails
+C
+css
+java
+php
+rust
