@@ -16,6 +16,8 @@ import {
 	Database,
 	AlertTriangle,
 	CheckCircle,
+	HandshakeIcon,
+	ActivityIcon,
 } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
@@ -559,10 +561,30 @@ export default function CharacterDevelopment() {
 												</div>
 											</div>
 
+											{/* Party Skill */}
+											<div className="mb-3 min-h-16">
+												<div className="flex items-center gap-1 text-sm">
+													<HandshakeIcon className="h-4 w-4 text-sky-400 flex-shrink-0" />
+													<span className="text-sky-400 font-bold">
+														パーティスキル:
+													</span>
+													<span className="text-white">
+														{selectedCharacter.passiveSkillName
+															? selectedCharacter.passiveSkillName
+															: "なし"}
+													</span>
+												</div>
+												{selectedCharacter.passiveSkillDescription && (
+													<div className="text-xs text-gray-300 ml-5 mt-1">
+														{selectedCharacter.passiveSkillDescription}
+													</div>
+												)}
+											</div>
+
 											{/* Passive Skill */}
 											<div className="mb-3 min-h-16">
 												<div className="flex items-center gap-1 text-sm">
-													<Lightbulb className="h-4 w-4 text-blue-300 flex-shrink-0" />
+													<ActivityIcon className="h-4 w-4 text-blue-300 flex-shrink-0" />
 													<span className="text-blue-300 font-bold">
 														パッシブスキル:
 													</span>
