@@ -7,7 +7,7 @@ use App\Service\PartyBonuses\AutoHttps;
 
 class PartyBonusManager {
     private static $bonusMap = [
-        '三大フロントエンドフレームワーク' => MajorFrameworks::class, // キー名をテーマに合わせて修正
+        '三大フロントエンドフレームワーク' => MajorFrameworks::class,
         '自動HTTPS' => AutoHttps::class,
     ];
 

@@ -4,9 +4,8 @@ namespace App\Service\PartyBonuses;
 
 use App\Model\Room;
 use App\Model\RoomCharacter;
-use Illuminate\Support\Facades\Cache;
 
-class AutoHttps implements PartyBonus {
+class AutoHTTPS implements PartyBonus {
     private $requiredIds = ['caddy'];
 
     public function supports(array $characterIds): bool {
@@ -14,19 +13,29 @@ class AutoHttps implements PartyBonus {
     }
 
     public function apply(Room $room, array $characterIds, array &$context): ?string {
+        $userId = $context['userId'] ?? null; // ホストまたはゲストの userId
+        if (!$userId) {
+            return null; // userId がない場合はスキップ
+        }
+
         $baseBlockCount = 3;
         $totalBlockCount = $baseBlockCount;
-        $hasGo = Cache::remember("room:{$room->id}:hasGo", 60, fn() => RoomCharacter::where('roomId', $room->id)
+        $hasGo = RoomCharacter::where('roomId', $room->id)
+            ->where('userId', $userId) // 同じパーティの Go をチェック
             ->whereIn('characterId', ['go'])
             ->where('isDead', false)
-            ->exists());
+            ->exists();
         if ($hasGo) {
             $totalBlockCount += 1;
         }
+
         RoomCharacter::where('roomId', $room->id)
+            ->where('userId', $userId) // 対象パーティのみ
             ->where('isDead', false)
             ->update(['blockCount' => $totalBlockCount]);
-        $log = "「自動HTTPS」発動、味方全員にシールド{$baseBlockCount}枚付与";
+
+        $partyLabel = $context['isHost'] ? 'ホスト' : 'ゲスト';
+        $log = "「自動HTTPS」発動、{$partyLabel}のパーティにシールド{$baseBlockCount}枚付与";
         if ($hasGo) {
             $log .= "、Goの効果でさらに1枚追加（合計{$totalBlockCount}枚）";
         }
