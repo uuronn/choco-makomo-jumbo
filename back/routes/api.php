@@ -37,9 +37,11 @@ Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () 
 
     Route::post('/{userId}/report', [ReportLogController::class, 'store']);
 
+    // ユーザーの所持キャラクター一覧を取得する
+    Route::get('/users/{userId}/characters', GetUserCharacterListController::class);
 
-// ユーザーのpointを取得する
-Route::get('/users/{userId}/point', [UserController::class, 'getPoint']);
+    // ユーザーのpointを取得する
+    Route::get('/users/{userId}/point', [UserController::class, 'getPoint']);
 
     // 他のルートもここに追加できる
     // Route::put('/users/{userId}/pointtest', [UserController::class, 'updatePointTest']);
@@ -77,11 +79,8 @@ Route::get('/users/{userId}/checkUser', [UserController::class, 'checkUser']);
 // ユーザーのpointを更新する
 Route::put('/users/{userId}/point', [UserController::class, 'updatePoint']);
 
-// ユーザーのキャラクター一覧を取得する
-Route::get('/users/{userId}/characters', GetUserCharacterListController::class);
-
 // ユーザーのキャラクターを全て削除する
-Route::delete('/users/{userId}/characters', [UserCharacterController::class, 'delete']);
+// Route::delete('/users/{userId}/characters', [UserCharacterController::class, 'delete']);
 
 
 
