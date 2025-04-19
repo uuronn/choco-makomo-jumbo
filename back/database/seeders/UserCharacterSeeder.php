@@ -94,7 +94,6 @@ class UserCharacterSeeder extends Seeder
                     'life' => $characterData['baseLife'],
                     'power' => $characterData['basePower'],
                     'speed' => $characterData['baseSpeed'],
-                    'evasion' => $characterData['baseEvasion'],
                 ]);
             }
         }
