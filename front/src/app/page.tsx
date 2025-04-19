@@ -327,7 +327,7 @@ export default function HomeScreen() {
 
 							<div className="flex-1">
 								{/* 名前表示/編集 */}
-								<div className="flex items-center">
+								<div className="flex items-center h-[34px]">
 									<AnimatePresence mode="wait">
 										{isEditingName ? (
 											<motion.div
