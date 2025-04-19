@@ -24,14 +24,10 @@ const UserContext = createContext<{
 	handleSignIn: () => void;
 	handleSignOut: () => void;
 	user: User | null | undefined;
-	havingCharacters: Character[];
-	fetchCharacters: () => void;
 }>({
 	handleSignIn: () => {},
 	handleSignOut: () => {},
 	user: null,
-	havingCharacters: [],
-	fetchCharacters: () => {},
 });
 
 export function useUserContext() {
@@ -45,7 +41,6 @@ type UserProviderProps = {
 export const UserProvider = ({ children }: UserProviderProps) => {
 	const [user, setUser] = useState<User | null>();
 	const [authenticating, setAuthenticating] = useState<boolean>(true);
-	const [havingCharacters, setHavingCharacters] = useState<Character[]>([]);
 
 	const router = useRouter();
 
@@ -63,8 +58,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 			const checkUser = await fetch(
 				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}/checkUser`,
 			);
-
-			// const token = await res.user.getIdToken();
 
 			if (checkUser.ok) {
 				setUser({ ...res.user, token: token });
@@ -98,18 +91,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 		router.push("/auth/signIn");
 	};
 
-	const fetchCharacters = async () => {
-		(async () => {
-			if (!user) return;
-			// キャラクター一覧を取得
-			const charRes = await fetch(
-				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
-			);
-			const charData = await charRes.json();
-			setHavingCharacters(charData);
-		})();
-	};
-
 	useEffect(() => {
 		auth.onAuthStateChanged(async (user) => {
 			if (user) {
@@ -136,14 +117,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 					});
 				}
 
-				(async () => {
-					// キャラクター一覧を取得
-					const charRes = await fetch(
-						`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/characters`,
-					);
-					const charData = await charRes.json();
-					setHavingCharacters(charData);
-				})();
 				(async () => {
 					const res = await fetch(
 						`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms`,
@@ -183,8 +156,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 				handleSignIn,
 				handleSignOut,
 				user,
-				havingCharacters,
-				fetchCharacters,
 			}}
 		>
 			{children}

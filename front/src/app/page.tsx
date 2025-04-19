@@ -80,40 +80,34 @@ const footerItems = [
 
 export default function HomeScreen() {
 	const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-	const [showTechPoints, setShowTechPoints] = useState(false);
-	const { user: authUser, handleSignOut } = useUserContext();
+	const { user: authUser } = useUserContext();
 	const [onlineUsers, setOnlineUsers] = useState<number>(0);
 
-	// 👇 常に useUser を呼ぶ（userId が null のときは SWR が fetch しない）
 	const { data: user, error, isLoading } = useUser(authUser?.uid ?? null);
 
 	useEffect(() => {
 		const fetchOnlineUsers = async () => {
 			try {
-				const token = await authUser?.getIdToken();
 				const res = await fetch(
 					`${process.env.NEXT_PUBLIC_BASE_URL}/api/onlineUsers`,
 					{
 						headers: {
 							"Content-Type": "application/json",
-							Authorization: `Bearer ${token}`,
+							Authorization: `Bearer ${authUser?.token}`,
 						},
 					},
 				);
 
 				const data = await res.json();
 
-				setOnlineUsers(data.length); // もしくは data.count に応じて
+				setOnlineUsers(data.length);
 			} catch (err) {
 				console.error("Failed to fetch online users:", err);
 			}
 		};
 
 		fetchOnlineUsers();
-		// const response = await fetch(
-		// 	`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}/point`,
-		// );
-	}, []);
+	}, [authUser?.token]);
 
 	// 👇 データの状態を見てレンダリングを制御
 	if (!authUser) return <Loading message="認証中" />;
