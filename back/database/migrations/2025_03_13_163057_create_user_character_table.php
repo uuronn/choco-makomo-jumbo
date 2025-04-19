@@ -16,7 +16,6 @@ return new class extends Migration
             $table->smallInteger('life')->unsigned();
             $table->smallInteger('power')->unsigned();
             $table->smallInteger('speed')->unsigned();
-            $table->tinyInteger('evasion')->unsigned();
             $table->timestamps();
 
             // 外部キー制約

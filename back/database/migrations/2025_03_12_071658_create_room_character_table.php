@@ -14,8 +14,8 @@ return new class extends Migration
             $table->uuid('characterId');
             $table->uuid('userId');
             $table->smallInteger('level')->unsigned();
-            $table->smallInteger('life')->unsigned();
             $table->smallInteger('maxLife')->unsigned();
+            $table->smallInteger('life')->unsigned();
             $table->smallInteger('power')->unsigned();
             $table->smallInteger('speed')->unsigned();
             $table->tinyInteger('evasion')->unsigned();

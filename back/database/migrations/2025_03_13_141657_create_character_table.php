@@ -13,15 +13,18 @@ return new class extends Migration
             $table->string('name');
             $table->string('officialName')->nullable();
             $table->string('type');
-            $table->smallInteger('basePower')->unsigned();
             $table->smallInteger('baseLife')->unsigned();
+            $table->smallInteger('basePower')->unsigned();
             $table->smallInteger('baseSpeed')->unsigned();
             $table->tinyInteger('baseEvasion')->unsigned();
-            $table->string('specialSkillName')->nullable();
-            $table->string('specialSkillDescription')->nullable();
-            $table->tinyInteger('specialSkillTurn')->unsigned();
+            $table->string('partySkillName')->nullable();
+            $table->string('partySkillDescription')->nullable();
+            $table->string('partySkillCondition')->nullable();
             $table->string('passiveSkillName')->nullable();
             $table->string('passiveSkillDescription')->nullable();
+            $table->string('specialSkillName')->nullable();
+            $table->string('specialSkillDescription')->nullable();
+            $table->tinyInteger('baseSpecialSkillTurn')->unsigned();
             $table->timestamps();
         });
     }
