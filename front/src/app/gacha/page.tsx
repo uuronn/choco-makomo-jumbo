@@ -360,6 +360,7 @@ export default function TechGacha() {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
+							Authorization: `Bearer ${user?.token}`,
 						},
 						body: JSON.stringify({
 							userId: user?.uid, // 実際の実装ではユーザーIDを使用
