@@ -18,10 +18,14 @@ export type Character = {
 	passiveSkillDescription: string;
 };
 
-const fetcher = async ([_, userId]: [string, string]): Promise<Character[]> => {
-	console.info("test", userId);
+const fetcher = async ([_, userId, token]: [string, string, string]): Promise<
+	Character[]
+> => {
 	const res = await fetch(
 		`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}/characters`,
+		{
+			headers: { Authorization: `Bearer ${token}` },
+		},
 	);
 
 	if (!res.ok) {
@@ -31,6 +35,9 @@ const fetcher = async ([_, userId]: [string, string]): Promise<Character[]> => {
 	return res.json();
 };
 
-export const useUserCharacterList = (userId: string | null) => {
+export const useUserCharacterList = (
+	userId: string | null,
+	token: string | null,
+) => {
 	return useSwr(userId ? ["characters", userId] : null, fetcher);
 };

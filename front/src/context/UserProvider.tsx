@@ -1,6 +1,10 @@
 "use client";
 
-import { signInWithPopup, signOut, type User } from "firebase/auth";
+import {
+	signInWithPopup,
+	signOut,
+	type User as FirebaseUser,
+} from "firebase/auth";
 import { useRouter } from "next/navigation";
 import {
 	createContext,
@@ -11,8 +15,10 @@ import {
 } from "react";
 import Loading from "~/components/Loading";
 import { auth, googleProvider } from "~/lib/firebase";
-import { Character } from "~/type/character";
-import { SelectingRoom } from "~/type/room";
+import type { Character } from "~/type/character";
+import type { SelectingRoom } from "~/type/room";
+
+type User = FirebaseUser & { token: string };
 
 const UserContext = createContext<{
 	handleSignIn: () => void;
@@ -58,8 +64,10 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}/checkUser`,
 			);
 
+			// const token = await res.user.getIdToken();
+
 			if (checkUser.ok) {
-				setUser(res.user);
+				setUser({ ...res.user, token: token });
 				router.push("/");
 				return;
 			}
@@ -77,7 +85,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 					photoUrl: res.user.photoURL,
 				}),
 			});
-			setUser(res.user);
+			setUser({ ...res.user, token: token });
 			router.push("/");
 		} catch (error) {
 			console.error("Google Sign-In Error", error);
@@ -105,7 +113,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 	useEffect(() => {
 		auth.onAuthStateChanged(async (user) => {
 			if (user) {
-				setUser(user);
+				setUser({ ...user, token: await user.getIdToken() });
 
 				// ユーザーが存在するか確認
 				const checkUser = await fetch(
@@ -156,7 +164,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 				setUser(null);
 			}
 		});
-	}, []);
+	}, [router.push]);
 
 	useEffect(() => {
 		if (user === null) {

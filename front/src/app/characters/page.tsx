@@ -74,7 +74,7 @@ export default function CharacterDevelopment() {
 	const { user: authUser } = useUserContext();
 	const { data: user, error, isLoading } = useUser(authUser?.uid ?? null);
 	const { data: userCharacterList, isLoading: isCharacterListLoading } =
-		useUserCharacterList(user?.id ?? null);
+		useUserCharacterList(user?.id ?? null, authUser?.token ?? null);
 
 	// Add a new state for tracking error state
 	const [isErrorState, setIsErrorState] = useState(false);
