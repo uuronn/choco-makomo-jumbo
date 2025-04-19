@@ -79,7 +79,7 @@ class UserCharacterSeeder extends Seeder
                         'baseEvasion' => $characterData['baseEvasion'],
                         'specialSkillName' => $characterData['specialSkillName'],
                         'specialSkillDescription' => $characterData['specialSkillDescription'],
-                        'specialSkillTurn' => $characterData['specialSkillTurn'],
+                        'baseSpecialSkillTurn' => $characterData['baseSpecialSkillTurn'],
                         'passiveSkillName' => $characterData['passiveSkillName'],
                         'passiveSkillDescription' => $characterData['passiveSkillDescription'],
                     ]
