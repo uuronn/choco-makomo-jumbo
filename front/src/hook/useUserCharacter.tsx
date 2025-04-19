@@ -39,5 +39,5 @@ export const useUserCharacterList = (
 	userId: string | null,
 	token: string | null,
 ) => {
-	return useSwr(userId ? ["characters", userId] : null, fetcher);
+	return useSwr(userId ? ["characters", userId, token] : null, fetcher);
 };

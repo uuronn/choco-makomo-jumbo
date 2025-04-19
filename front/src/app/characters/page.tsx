@@ -72,9 +72,16 @@ export default function CharacterDevelopment() {
 		useState<(typeof INCREMENT_OPTIONS)[number]>(1);
 
 	const { user: authUser } = useUserContext();
-	const { data: user, error, isLoading } = useUser(authUser?.uid ?? null);
-	const { data: userCharacterList, isLoading: isCharacterListLoading } =
-		useUserCharacterList(user?.id ?? null, authUser?.token ?? null);
+	const {
+		data: user,
+		error: userError,
+		isLoading: isUserLoading,
+	} = useUser(authUser?.uid ?? null);
+	const {
+		data: userCharacterList,
+		error: UserCharacterError,
+		isLoading: isCharacterListLoading,
+	} = useUserCharacterList(user?.id ?? null, authUser?.token ?? null);
 
 	// Add a new state for tracking error state
 	const [isErrorState, setIsErrorState] = useState(false);
@@ -87,12 +94,12 @@ export default function CharacterDevelopment() {
 
 	const fetchUserPoints = useCallback(
 		async (userId: string) => {
-			const token = await authUser?.getIdToken();
+			// const token = await authUser?.getIdToken();
 			try {
 				const response = await fetch(
 					`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}/point`,
 					{
-						headers: { Authorization: `Bearer ${token}` },
+						headers: { Authorization: `Bearer ${authUser?.token}` },
 					},
 				);
 				if (!response.ok) throw new Error("Failed to fetch points");
@@ -257,14 +264,14 @@ export default function CharacterDevelopment() {
 	}, [isErrorState]);
 
 	// Handle loading and error states
-	if (!authUser) return <Loading message="認証中" />;
-	if (isLoading) return <Loading message="ユーザー情報を取得中" />;
-	if (!user || error)
-		return (
-			<div className="p-4 text-red-400">
-				エラー: {error?.message || "ユーザー情報の取得に失敗しました"}
-			</div>
-		);
+	// ローディング・エラー処理（必要に応じて UI にも反映）
+	if (!authUser) return <Loading message="認証情報を確認中..." />;
+	if (isUserLoading) return <Loading message="ユーザー情報を取得中..." />;
+	if (!user || userError) return <p>ユーザー情報の取得に失敗しました</p>;
+	if (isCharacterListLoading)
+		return <Loading message="キャラクター一覧を取得中..." />;
+	if (!userCharacterList || UserCharacterError)
+		return <p>キャラクター情報の取得に失敗しました</p>;
 
 	const handleCharacterSelect = (character: Character) => {
 		setSelectedCharacter(character);
@@ -282,7 +289,7 @@ export default function CharacterDevelopment() {
 			return;
 		}
 
-		const token = await authUser.getIdToken();
+		// const token = await authUser.getIdToken();
 		// console.info("token", token);
 
 		try {
@@ -292,7 +299,7 @@ export default function CharacterDevelopment() {
 					method: "PUT",
 					headers: {
 						"Content-Type": "application/json",
-						Authorization: `Bearer ${token}`,
+						Authorization: `Bearer ${authUser.token}`,
 					},
 					body: JSON.stringify({
 						life: statPoints.life,
@@ -569,14 +576,19 @@ export default function CharacterDevelopment() {
 														パーティスキル:
 													</span>
 													<span className="text-white">
-														{selectedCharacter.passiveSkillName
-															? selectedCharacter.passiveSkillName
+														{selectedCharacter.partySkillName
+															? selectedCharacter.partySkillName
 															: "なし"}
 													</span>
 												</div>
-												{selectedCharacter.passiveSkillDescription && (
+												{selectedCharacter.partySkillDescription && (
 													<div className="text-xs text-gray-300 ml-5 mt-1">
 														{selectedCharacter.passiveSkillDescription}
+													</div>
+												)}
+												{selectedCharacter.partySkillCondition && (
+													<div className="text-xs text-gray-300 ml-5 mt-1">
+														{selectedCharacter.partySkillCondition}
 													</div>
 												)}
 											</div>
