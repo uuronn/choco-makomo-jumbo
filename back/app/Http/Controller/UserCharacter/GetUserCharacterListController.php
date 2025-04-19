@@ -47,7 +47,7 @@ readonly class GetUserCharacterListController
                 'baseEvasion' => $baseCharacter->baseEvasion,
                 'partySkillName' => $baseCharacter->partySkillName,
                 'partySkillDescription' => $baseCharacter->partySkillDescription,
-                'partySkillDescription' => $baseCharacter->partySkillDescription,
+                'partySkillCondition' => $baseCharacter->partySkillCondition,
                 'passiveSkillName' => $baseCharacter->passiveSkillName,
                 'passiveSkillDescription' => $baseCharacter->passiveSkillDescription,
                 'specialSkillName' => $baseCharacter->specialSkillName,
