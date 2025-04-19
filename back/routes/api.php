@@ -43,6 +43,11 @@ Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () 
     // ユーザーのpointを取得する
     Route::get('/users/{userId}/point', [UserController::class, 'getPoint']);
 
+
+    // ガチャを引く
+    Route::post('/gacha', [GachaController::class, 'gacha']);
+
+
     // 他のルートもここに追加できる
     // Route::put('/users/{userId}/pointtest', [UserController::class, 'updatePointTest']);
 });
@@ -152,8 +157,5 @@ Route::post('/rooms/{roomId}/cpu-act', [RoomController::class, 'cpuAct']);
 
 
 // ガチャ関連のAPI--------------------------------
-
-// ガチャを引く
-Route::post('/gacha', [GachaController::class, 'gacha']);
 
 
