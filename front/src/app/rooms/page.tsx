@@ -12,6 +12,7 @@ import type { SelectingRoom } from "~/type/room";
 import { FaLaptopCode } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { enqueueSnackbar } from "notistack";
+import { useUserCharacterList } from "~/hook/useUserCharacter";
 
 export default function GameInterface() {
 	const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);
@@ -19,9 +20,14 @@ export default function GameInterface() {
 	const [rooms, setRooms] = useState<SelectingRoom[]>([]);
 	const [showCpuOptions, setShowCpuOptions] = useState(false);
 
-	const { user, havingCharacters } = useUserContext();
+	const { user } = useUserContext();
 
 	const router = useRouter();
+
+	const { data: havingCharacters } = useUserCharacterList(
+		user?.uid ?? null,
+		user?.token ?? null,
+	);
 
 	const handleSelectCharacter = (character: Character) => {
 		if (
