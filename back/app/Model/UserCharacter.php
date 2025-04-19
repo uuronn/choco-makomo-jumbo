@@ -15,7 +15,7 @@ class UserCharacter extends Model
     protected $hidden = ['created_at', 'updated_at'];
 
     protected $fillable = [
-        'userId', 'characterId', 'level', 'life', 'power', 'speed', 'evasion'
+        'userId', 'characterId', 'level', 'life', 'power', 'speed'
     ];
 
     public $timestamps = true;

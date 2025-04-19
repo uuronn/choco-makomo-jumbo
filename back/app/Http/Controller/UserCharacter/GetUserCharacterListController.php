@@ -30,7 +30,7 @@ readonly class GetUserCharacterListController
 
         // レスポンス用にデータを整形
         $characterList = $userCharacterList->map(function ($userCharacter) {
-            $character = $userCharacter->character;
+            $baseCharacter = $userCharacter->character;
 
             return [
                 // UserCharacter（変動値）
@@ -40,15 +40,19 @@ readonly class GetUserCharacterListController
                 'life' => $userCharacter->life,
                 'power' => $userCharacter->power,
                 'speed' => $userCharacter->speed,
+
                 // Character（固定値）
-                'name' => $character->name,
-                'type' => $character->type,
-                'baseEvasion' => $character->baseEvasion, // TODO: 多分変動になる（装備機能も後に実装するから）
-                'specialSkillName' => $character->specialSkillName,
-                'specialSkillDescription' => $character->specialSkillDescription,
-                'specialSkillTurn' => $character->specialSkillTurn,
-                'passiveSkillName' => $character->passiveSkillName,
-                'passiveSkillDescription' => $character->passiveSkillDescription,
+                'name' => $baseCharacter->name,
+                'type' => $baseCharacter->type,
+                'baseEvasion' => $baseCharacter->baseEvasion,
+                'partySkillName' => $baseCharacter->partySkillName,
+                'partySkillDescription' => $baseCharacter->partySkillDescription,
+                'partySkillDescription' => $baseCharacter->partySkillDescription,
+                'passiveSkillName' => $baseCharacter->passiveSkillName,
+                'passiveSkillDescription' => $baseCharacter->passiveSkillDescription,
+                'specialSkillName' => $baseCharacter->specialSkillName,
+                'specialSkillDescription' => $baseCharacter->specialSkillDescription,
+                'baseSpecialSkillTurn' => $baseCharacter->baseSpecialSkillTurn,
             ];
         });
 

@@ -2,9 +2,12 @@
 
 namespace App\Service\UserCharacter;
 
+use App\Model\Character;
 use App\Model\UserCharacter;
 use Exception;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use RuntimeException;
+use Throwable;
 
 class UserCharacterService
 {
@@ -76,21 +79,37 @@ class UserCharacterService
     //         ->exists();
     // }
 
-    // /**
-    //  * 新しいユーザーキャラを作る（ガチャ用）
-    //  */
-    // public function createUserCharacter(int $userId, Character $character): UserCharacter
-    // {
-    //     $userCharacter = new UserCharacter([
-    //         'userId' => $userId,
-    //         'characterId' => $character->id,
-    //         'life' => $character->baseLife,
-    //         'power' => $character->basePower,
-    //         'speed' => $character->baseSpeed,
-    //         'evasion' => $character->baseEvasion,
-    //         'level' => 1,
-    //     ]);
-    //     $userCharacter->save();
-    //     return $userCharacter;
-    // }
+    /**
+     * 新しいユーザーキャラクターを作成する（ガチャ用）
+     *
+     * @param int $userId ユーザーID
+     * @param Character $character キャラクター
+     * @return UserCharacter 作成されたユーザーキャラクター
+     */
+    public function gachaUserCharacter(int $userId, Character $character): UserCharacter
+    {
+        try {
+            DB::beginTransaction();
+
+            $userCharacter = new UserCharacter([
+                'userId' => $userId,
+                'characterId' => $character->id,
+                'life' => $character->baseLife,
+                'power' => $character->basePower,
+                'speed' => $character->baseSpeed,
+                'level' => 0,
+            ]);
+
+            $userCharacter->save();
+
+            DB::commit();
+
+            return $userCharacter;
+        } catch (Throwable $e) {
+            DB::rollBack();
+
+            throw new RuntimeException('ユーザーキャラクターの作成に失敗しました', 500);
+        }
+    }
 }
+
