@@ -130,13 +130,13 @@ export default function TechGacha() {
 
 		const fetchOnlineUsers = async () => {
 			try {
-				const token = await user.getIdToken();
+				// const token = await user.getIdToken();
 				const res = await fetch(
 					`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.uid}/point`,
 					{
 						headers: {
 							"Content-Type": "application/json",
-							Authorization: `Bearer ${token}`,
+							Authorization: `Bearer ${user.token}`,
 						},
 					},
 				);
@@ -1146,7 +1146,7 @@ export default function TechGacha() {
 												animate={{ opacity: 0 }}
 												transition={{ duration: 1.5 }}
 											/>
-											<motion.div
+											{/* <motion.div
 												className="absolute inset-0 rounded-xl"
 												style={{
 													background:
@@ -1158,7 +1158,7 @@ export default function TechGacha() {
 													duration: 2,
 													repeat: Number.POSITIVE_INFINITY,
 												}}
-											/>
+											/> */}
 										</>
 									)}
 
