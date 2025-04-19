@@ -548,7 +548,7 @@ export default function CharacterDevelopment() {
 										{/* Skills Section */}
 										<div className="flex-1 bg-gray-800/80 p-3 rounded-md border border-emerald-500/30 h-full overflow-y-auto">
 											{/* タイプをスキルの上に移動 */}
-											<div className="mb-3 min-h-16">
+											<div className="mb-3 min-h-10">
 												<div className="flex items-center gap-1 text-sm">
 													<Layers className="h-4 w-4 text-emerald-400 flex-shrink-0" />
 													<span className="text-emerald-400 font-bold">
@@ -583,7 +583,7 @@ export default function CharacterDevelopment() {
 												</div>
 												{selectedCharacter.partySkillDescription && (
 													<div className="text-xs text-gray-300 ml-5 mt-1">
-														{selectedCharacter.passiveSkillDescription}
+														{selectedCharacter.partySkillDescription}
 													</div>
 												)}
 												{selectedCharacter.partySkillCondition && (
