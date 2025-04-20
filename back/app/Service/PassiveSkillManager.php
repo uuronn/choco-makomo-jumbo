@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Model\Room;
 use App\Model\RoomCharacter;
-use Illuminate\Support\Facades\Log;
 
 class PassiveSkillManager
 {
@@ -29,60 +28,68 @@ class PassiveSkillManager
         $targetCharacterId = $context['targetCharacterId'] ?? null;
 
         foreach ($characters as $character) {
-            if ($character->character->passiveSkillName) {
-                $skill = [
-                    'name' => $character->character->passiveSkillName,
-                    'trigger' => $eventType,
-                    // actor_only の設定（スキルごとの適用対象を制御）
-                    'actor_only' => in_array($character->character->passiveSkillName, [
-                        'ActiveRecord', // 自身が攻撃命中時
-                        'StrictMode',   // 自身が攻撃命中時
-                        'イベントブロック', // 自身が攻撃命中時
-                        'Write Once, Run Anywhere or debug everywhere', // 自身が攻撃命中時
-                    ]),
-                    // target_only: ターゲットに限定するスキル
-                    'target_only' => in_array($character->character->passiveSkillName, [
-                        '双方向バインディング', // 自身がダメージを受けた時
-                        'コンテナ化',           // 自身がダメージを受ける前
-                        'フレックスボックスシールド', // 自身がダメージを受ける前
-                        'サーバーサイド',      // 自身がダメージを受ける前
-                        '互換性',              // 自身がダメージを受ける前
-                        'メモリ安全',          // 自身がダメージを受ける前
-                        'ヌル安全',            // 自身がダメージを受ける前
-                        '正規表現',            // 自身がダメージを受ける前
-                    ]),
+            if (!$character->character->passiveSkillName) {
+                continue;
+            }
+
+            // スキルごとのトリガーと適用条件を定義（characters.php に準拠）
+            $skillDefinitions = [
+                'セマンティックHTML' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                '並行処理' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                'フレックスボックス' => ['trigger' => 'before_damage_taken', 'actor_only' => false, 'target_only' => true],
+                'ES6' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                '型安全な開発' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                'ActiveRecord' => ['trigger' => 'on_attack_hit', 'actor_only' => true, 'target_only' => false],
+                '双方向バインディング' => ['trigger' => 'on_damage_taken', 'actor_only' => false, 'target_only' => true],
+                'StrictMode' => ['trigger' => 'on_attack_hit', 'actor_only' => true, 'target_only' => false],
+                'CoC' => ['trigger' => 'on_attack_hit', 'actor_only' => true, 'target_only' => false],
+                'スケーラビリティ' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                'Azure Functions' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                'docker compose up -d' => ['trigger' => 'before_damage_taken', 'actor_only' => false, 'target_only' => true],
+                '偽マカフィー' => ['trigger' => 'on_damage_taken', 'actor_only' => false, 'target_only' => true],
+                'マルチプラットフォーム' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                'イベントブロック' => ['trigger' => 'on_attack_hit', 'actor_only' => true, 'target_only' => false],
+                'ビジュアルプログラミング' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                'ロードバランシング' => ['trigger' => 'on_damage_taken', 'actor_only' => false, 'target_only' => true],
+                'LiteSpeed Cache' => ['trigger' => 'turn_end', 'actor_only' => false, 'target_only' => false],
+                'Excelオーバーロード' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                'リアルタイムデータベース' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                '軽量設計' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                'ブループリント' => ['trigger' => 'on_action', 'actor_only' => false, 'target_only' => false],
+                'run anywhere or debug everywhere' => ['trigger' => 'on_attack_hit', 'actor_only' => true, 'target_only' => false],
+                '正規表現' => ['trigger' => 'before_damage_taken', 'actor_only' => false, 'target_only' => true],
+                'メモリ操作' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                'オブジェクト指向' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                '高級言語の先駆者' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                'クエリ最適化' => ['trigger' => 'on_action', 'actor_only' => true, 'target_only' => false],
+                'HotModuleReplacementPlugin' => ['trigger' => 'on_life_changed', 'actor_only' => false, 'target_only' => true],
+            ];
+
+            $skillName = $character->character->passiveSkillName;
+            $skill = $skillDefinitions[$skillName] ?? null;
+
+            if (!$skill || $skill['trigger'] !== $eventType) {
+                continue;
+            }
+
+            // 適用条件チェック
+            if ($skill['actor_only'] &&
+                ($character->userId !== $actorUserId || $character->characterId !== $actorCharacterId)) {
+                continue;
+            }
+
+            if ($skill['target_only'] &&
+                ($character->userId !== $targetUserId || $character->characterId !== $targetCharacterId)) {
+                continue;
+            }
+
+            $log = self::applyPassive($character, $eventType, $room, $context);
+            if ($log) {
+                $logs[] = [
+                    'characterId' => $character->id,
+                    'userId' => $character->userId,
+                    'description' => "[$eventType] $log"
                 ];
-
-                // 適用条件チェック
-                if ($skill['trigger'] !== $eventType) {
-                    continue;
-                }
-
-                // actor_only が true の場合、行動者のみ適用
-                if ($skill['actor_only'] &&
-                    ($character->userId !== $actorUserId || $character->characterId !== $actorCharacterId)) {
-                    continue;
-                }
-
-                // target_only が true の場合、ターゲットのみ適用
-                if ($skill['target_only'] &&
-                    ($character->userId !== $targetUserId || $character->characterId !== $targetCharacterId)) {
-                    continue;
-                }
-
-                // turn_end や味方全員対象のスキルは全員適用
-                if ($eventType === 'turn_end' || !$skill['actor_only'] && !$skill['target_only']) {
-                    // 処理続行
-                }
-
-                $log = self::applyPassive($character, $eventType, $room, $context);
-                if ($log) {
-                    $logs[] = [
-                        'characterId' => $character->id,
-                        'userId' => $character->userId,
-                        'description' => "[$eventType] $log"
-                    ];
-                }
             }
         }
         return $logs;
@@ -96,106 +103,75 @@ class PassiveSkillManager
         $skillName = $character->character->passiveSkillName;
 
         switch ($skillName) {
-            case 'ActiveRecord':
-                if ($eventType === 'on_attack_hit' && isset($context['attacker']) && $context['attacker']->id === $character->id) {
+            case 'セマンティックHTML':
+                if ($eventType === 'on_action') {
+                    $multiplier = $character->isErrorMode ? 1.3 : 1.1;
                     $character->update([
-                        'power' => $character->power * 1.20,
-                        'speed' => $character->speed * 1.20
+                        'power' => $character->power * $multiplier,
+                        'speed' => $character->speed * $multiplier
                     ]);
-                    return "{$character->character->name} の「ActiveRecord」発動、攻撃力とスピード20%増加";
-                }
-                break;
-
-            case '双方向バインディング':
-                if ($eventType === 'on_damage_taken' && isset($context['target']) && $context['target']->id === $character->id && isset($context['attacker'])) {
-                    $reflectRatio = $character->isErrorMode ? 0.8 : 0.5;
-                    $reflectDamage = $context['damage'] * $reflectRatio;
-                    $context['attacker']->update([
-                        'life' => max(0, $context['attacker']->life - $reflectDamage)
-                    ]);
-                    return "{$character->character->name} の「双方向バインディング」発動、{$reflectDamage}ダメージを{$context['attacker']->character->name}に反射";
-                }
-                break;
-
-            case 'コンテナ化':
-                if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
-                    $context['damage'] *= 0.95;
-                    return "{$character->character->name} の「コンテナ化」発動、受けるダメージ5%軽減";
-                }
-                break;
-
-            case 'ロードバランシング':
-                if ($eventType === 'on_damage_taken' && isset($context['target']) && $context['target']->id === $character->id && isset($context['damage'])) {
-                    $originalDamage = $context['damage'];
-                    $reducedDamage = $originalDamage * 0.2;
-                    $context['damage'] = $reducedDamage;
-
-                    Log::info("ロードバランシング発動: {$character->character->name} が受けるダメージ {$originalDamage} を {$reducedDamage} に軽減");
-
-                    $allies = collect($room->roomCharacter)->filter(function ($ally) use ($character) {
-                        return $ally->userId === $character->userId && $ally->id !== $character->id && !$ally->isDead;
-                    });
-
-                    foreach ($allies as $ally) {
-                        $newLife = max(0, $ally->life - $originalDamage);
-                        $ally->update([
-                            'life' => $newLife,
-                            'isDead' => $newLife <= 0
-                        ]);
-                        Log::info("ロードバランシング: {$character->character->name} が {$ally->character->name} に {$originalDamage} ダメージを与えました (残りライフ: {$newLife})");
-                    }
-
-                    return "{$character->character->name} の「ロードバランシング」発動、ダメージ20%に軽減し、受けたダメージを味方に分配";
-                }
-                break;
-
-            case 'フレックスボックスシールド':
-                if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
-                    $context['damage'] *= 0.9;
-                    return "{$character->character->name} の「フレックスボックスシールド」発動、受けるダメージ10%軽減";
+                    return "{$character->character->name} の「セマンティックHTML」発動、自身が行動するたびに、パワーとスピードを" . ($character->isErrorMode ? '1.3倍' : '1.1倍') . "にする。";
                 }
                 break;
 
             case '並行処理':
-                if ($eventType === 'turn_end') {
-                    $updates = ['speed' => $character->speed * 1.10];
+                if ($eventType === 'on_action') {
+                    $updates = ['speed' => $character->speed * 1.1];
                     if ($character->isErrorMode) {
-                        $updates['power'] = $character->power * 1.10;
+                        $updates['power'] = $character->power * 1.1;
                     }
                     $character->update($updates);
-                    $log = "{$character->character->name} の「並行処理」発動、スピード10%増加";
+                    $log = "{$character->character->name} の「並行処理」発動、自身が行動するたびに、スピードを1.1倍にする。";
                     if ($character->isErrorMode) {
-                        $log .= "、エラー状態で攻撃力10%増加";
+                        $log .= "（エラー状態でパワーも1.1倍）";
                     }
                     return $log;
                 }
                 break;
 
-            case 'セマンティックHTML':
-                if ($eventType === 'turn_end') {
-                    $multiplier = $character->isErrorMode ? 1.20 : 1.05;
+            case 'フレックスボックス':
+                if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
+                    $reduction = $character->isErrorMode ? 0.7 : 0.9;
+                    $context['damage'] *= $reduction;
+                    return "{$character->character->name} の「フレックスボックス」発動、自身が受ける通常攻撃のダメージを" . ($character->isErrorMode ? '30%' : '10%') . "軽減する。";
+                }
+                break;
+
+            case 'ES6':
+                if ($eventType === 'on_action') {
+                    $multiplier = $character->isErrorMode ? 1.3 : 1.1;
+                    $character->update(['power' => $character->power * $multiplier]);
+                    return "{$character->character->name} の「ES6」発動、自身が行動するたびに、パワーを" . ($character->isErrorMode ? '1.3倍' : '1.1倍') . "にする。";
+                }
+                break;
+
+            case '型安全な開発':
+                if ($eventType === 'on_action') {
+                    $evasionIncrease = $character->isErrorMode ? 2 : 1;
+                    $character->update(['evasion' => $character->evasion + $evasionIncrease]);
+                    return "{$character->character->name} の「型安全な開発」発動、自身が行動するたびに、回避率を" . ($character->isErrorMode ? '+2%' : '+1%') . "する。";
+                }
+                break;
+
+            case 'ActiveRecord':
+                if ($eventType === 'on_attack_hit' && isset($context['attacker']) && $context['attacker']->id === $character->id) {
+                    $multiplier = $character->isErrorMode ? 1.5 : 1.2;
                     $character->update([
                         'power' => $character->power * $multiplier,
                         'speed' => $character->speed * $multiplier
                     ]);
-                    $percentage = $character->isErrorMode ? '20%' : '5%';
-                    return "{$character->character->name} の「セマンティックHTML」発動、攻撃力とスピード{$percentage}増加";
+                    return "{$character->character->name} の「ActiveRecord」発動、自身が通常攻撃を行うたびに、パワーとスピードを" . ($character->isErrorMode ? '1.5倍' : '1.2倍') . "にする。";
                 }
                 break;
 
-            case 'サーバーサイド':
-                if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
-                    if ($character->life < $character->maxLife * 0.2) {
-                        $character->update(['evasion' => $character->evasion + 15]);
-                        return "{$character->character->name} の「サーバーサイド」発動、体力20%未満で回避率15%増加";
-                    }
-                }
-                break;
-
-            case '静的型付け':
-                if ($eventType === 'before_damage_taken') {
-                    $character->update(['power' => $character->power * 1.10]);
-                    return "{$character->character->name} の「静的型付け」発動、攻撃力10%増加";
+            case '双方向バインディング':
+                if ($eventType === 'on_damage_taken' && isset($context['target']) && $context['target']->id === $character->id && isset($context['attacker'])) {
+                    $reflectRatio = $character->isErrorMode ? 0.6 : 0.5;
+                    $reflectDamage = $context['damage'] * $reflectRatio;
+                    $context['attacker']->update([
+                        'life' => max(0, $context['attacker']->life - $reflectDamage)
+                    ]);
+                    return "{$character->character->name} の「双方向バインディング」発動、自身が通常攻撃を受けた時、その攻撃を行った相手に、受けたダメージの" . ($character->isErrorMode ? '60%' : '50%') . "を与える。";
                 }
                 break;
 
@@ -207,43 +183,38 @@ class PassiveSkillManager
                         ->inRandomOrder()
                         ->first();
                     if ($enemies) {
-                        $additionalDamage = $character->power * 0.5;
+                        $additionalDamage = $character->power * ($character->isErrorMode ? 0.75 : 0.5);
                         $newLife = max(0, $enemies->life - $additionalDamage);
                         $enemies->update([
                             'life' => $newLife,
                             'isDead' => $newLife <= 0
                         ]);
-                        return "{$character->character->name} の「StrictMode」発動、{$enemies->character->name} に追加ダメージ {$additionalDamage}";
+                        return "{$character->character->name} の「StrictMode」発動、通常攻撃が命中した時、ランダムな相手のキャラ1体に、自身のパワーの" . ($character->isErrorMode ? '75%' : '50%') . "の追加ダメージを与える。";
                     }
                 }
                 break;
 
-            case '規約優先':
-                if ($eventType === 'before_damage_taken') {
-                    $allies = RoomCharacter::where('roomId', $room->id)
-                        ->where('userId', $character->userId)
-                        ->where('isDead', false)
-                        ->get();
-                    foreach ($allies as $ally) {
-                        $ally->update(['evasion' => $ally->evasion + 5]);
-                    }
-                    return "{$character->character->name} の「規約優先」発動、味方全員の回避率5%増加";
+            case 'CoC':
+                if ($eventType === 'on_attack_hit' && isset($context['attacker']) && $context['attacker']->id === $character->id) {
+                    $evasionIncrease = $character->isErrorMode ? 3 : 1;
+                    $character->update(['evasion' => $character->evasion + $evasionIncrease]);
+                    return "{$character->character->name} の「CoC」発動、自身が通常攻撃を行うたびに、回避率を" . ($character->isErrorMode ? '+3%' : '+1%') . "する。";
                 }
                 break;
 
             case 'スケーラビリティ':
-                if ($eventType === 'turn_end') {
-                    $healAmount = $character->maxLife * 0.05;
+                if ($eventType === 'on_action') {
+                    $healRatio = $character->isErrorMode ? 0.2 : 0.1;
+                    $healAmount = $character->maxLife * $healRatio;
                     $newLife = min($character->maxLife, $character->life + $healAmount);
                     $character->update(['life' => $newLife]);
-                    return "{$character->character->name} の「スケーラビリティ」発動、体力5%回復";
+                    return "{$character->character->name} の「スケーラビリティ」発動、自身が行動するたびに、HPを" . ($character->isErrorMode ? '20%' : '10%') . "回復する。";
                 }
                 break;
 
-            case 'クラウド連携':
-                if ($eventType === 'before_damage_taken') {
-                    $multiplier = $character-> GRAND_CENTRAL_DISPATCH === 'Azure' ? 1.05 : 1.03;
-                    $percentage = $character-> GRAND_CENTRAL_DISPATCH === 'Azure' ? '5%' : '3%';
+            case 'Azure Functions':
+                if ($eventType === 'on_action') {
+                    $multiplier = $character->isErrorMode ? 1.5 : 1.2;
                     $allies = RoomCharacter::where('roomId', $room->id)
                         ->where('userId', $character->userId)
                         ->where('isDead', false)
@@ -251,72 +222,42 @@ class PassiveSkillManager
                     foreach ($allies as $ally) {
                         $ally->update(['speed' => $ally->speed * $multiplier]);
                     }
-                    return "{$character->character->name} の「クラウド連携」発動、味方全員のスピード{$percentage}増加";
+                    return "{$character->character->name} の「Azure Functions」発動、自身が行動するたびに、味方全員のスピードを" . ($character->isErrorMode ? '1.5倍' : '1.2倍') . "にする。";
                 }
                 break;
 
-            case 'データ解析':
-                if ($eventType === 'before_damage_taken') {
-                    $character->update(['power' => $character->power * 1.10]);
-                    return "{$character->character->name} の「データ解析」発動、攻撃力10%増加";
-                }
-                break;
-
-            case 'ユニックスベース':
-                if ($eventType === 'before_damage_taken') {
-                    $character->update(['speed' => $character->speed * 1.10]);
-                    return "{$character->character->name} の「ユニックスベース」発動、スピード10%増加";
-                }
-                break;
-
-            case '互換性':
+            case 'docker compose up -d':
                 if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
-                    if ($character->life < $character->maxLife * 0.2) {
-                        $character->update(['power' => $character->power * 1.15]);
-                        return "{$character->character->name} の「互換性」発動、体力20%未満で攻撃力15%増加";
+                    $reduction = $character->isErrorMode ? 0.8 : 0.9;
+                    $context['damage'] *= $reduction;
+                    return "{$character->character->name} の「docker compose up -d」発動、自身が受ける通常攻撃のダメージを" . ($character->isErrorMode ? '20%' : '10%') . "軽減する。";
+                }
+                break;
+
+            case '偽マカフィー':
+                if ($eventType === 'on_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
+                    $chance = $character->isErrorMode ? 30 : 10;
+                    if (rand(0, 100) < $chance) {
+                        $character->update(['blockCount' => $character->blockCount + 1]);
+                        return "{$character->character->name} の「偽マカフィー」発動、通常攻撃でダメージを受けた時、" . ($character->isErrorMode ? '30%' : '10%') . "の確率で自身にシールドを一枚付与する。";
                     }
                 }
                 break;
 
-            case 'リレーショナル':
-                if ($eventType === 'before_damage_taken') {
+            case 'マルチプラットフォーム':
+                if ($eventType === 'on_action') {
+                    $multiplier = $character->isErrorMode ? 1.3 : 1.1;
                     $allies = RoomCharacter::where('roomId', $room->id)
                         ->where('userId', $character->userId)
                         ->where('isDead', false)
                         ->get();
                     foreach ($allies as $ally) {
-                        $ally->update(['evasion' => $ally->evasion + 5]);
+                        $ally->update([
+                            'power' => $ally->power * $multiplier,
+                            'speed' => $ally->speed * $multiplier
+                        ]);
                     }
-                    return "{$character->character->name} の「リレーショナル」発動、味方全員の回避率5%増加";
-                }
-                break;
-
-            case '堅牢性':
-                if ($eventType === 'turn_end') {
-                    $healAmount = $character->maxLife * 0.03;
-                    $newLife = min($character->maxLife, $character->life + $healAmount);
-                    $character->update(['life' => $newLife]);
-                    return "{$character->character->name} の「堅牢性」発動、体力3%回復";
-                }
-                break;
-
-            case 'リアルタイム':
-                if ($eventType === 'before_damage_taken') {
-                    $character->update(['speed' => $character->speed * 1.10]);
-                    return "{$character->character->name} の「リアルタイム」発動、スピード10%増加";
-                }
-                break;
-
-            case 'クロスプラットフォーム':
-                if ($eventType === 'before_damage_taken') {
-                    $allies = RoomCharacter::where('roomId', $room->id)
-                        ->where('userId', $character->userId)
-                        ->where('isDead', false)
-                        ->get();
-                    foreach ($allies as $ally) {
-                        $ally->update(['power' => $ally->power * 1.05]);
-                    }
-                    return "{$character->character->name} の「クロスプラットフォーム」発動、味方全員の攻撃力5%増加";
+                    return "{$character->character->name} の「マルチプラットフォーム」発動、自身が行動するたびに、味方全員のパワーとスピードを" . ($character->isErrorMode ? '1.3倍' : '1.1倍') . "にする。";
                 }
                 break;
 
@@ -325,103 +266,134 @@ class PassiveSkillManager
                     if (rand(0, 100) < 50) {
                         $isPower = rand(0, 1);
                         $field = $isPower ? 'power' : 'speed';
-                        $character->update([$field => $character->$field * 1.30]);
-                        $fieldName = $isPower ? '攻撃力' : 'スピード';
-                        return "{$character->character->name} の「イベントブロック」発動、{$fieldName}30%増加";
+                        $multiplier = $character->isErrorMode ? 1.5 : 1.3;
+                        $character->update([$field => $character->$field * $multiplier]);
+                        $fieldName = $isPower ? 'パワー' : 'スピード';
+                        return "{$character->character->name} の「イベントブロック」発動、攻撃時、50%の確率で{$fieldName}を" . ($character->isErrorMode ? '1.5倍' : '1.3倍') . "にする。";
                     }
                 }
                 break;
 
-            case 'ビジュアルコーディング':
-                if ($eventType === 'turn_end') {
-                    $healAmount = $character->maxLife * 0.02;
-                    $newLife = min($character->maxLife, $character->life + $healAmount);
-                    $character->update(['life' => $newLife]);
-                    return "{$character->character->name} の「ビジュアルコーディング」発動、体力2%回復";
+            case 'ビジュアルプログラミング':
+                if ($eventType === 'on_action') {
+                    $multiplier = $character->isErrorMode ? 1.5 : 1.2;
+                    $character->update([
+                        'power' => $character->power * $multiplier,
+                        'speed' => $character->speed * $multiplier
+                    ]);
+                    return "{$character->character->name} の「ビジュアルプログラミング」発動、自身が行動するたびに、パワーとスピードを" . ($character->isErrorMode ? '1.5倍' : '1.2倍') . "にする。";
+                }
+                break;
+
+            case 'ロードバランシング':
+                if ($eventType === 'on_damage_taken' && isset($context['target']) && $context['target']->id === $character->id && isset($context['damage'])) {
+                    $reduction = $character->isErrorMode ? 0.8 : 0.7;
+                    $reducedDamage = $context['damage'] * $reduction;
+                    $context['damage'] = $reducedDamage;
+
+                    $allies = collect($room->roomCharacter)->filter(function ($ally) use ($character) {
+                        return $ally->userId === $character->userId && $ally->id !== $character->id && !$ally->isDead;
+                    });
+
+                    $allyCount = $allies->count();
+                    if ($allyCount > 0) {
+                        $damagePerAlly = ($context['damage'] * (1 - $reduction)) / $allyCount;
+                        foreach ($allies as $ally) {
+                            $newLife = max(0, $ally->life - $damagePerAlly);
+                            $ally->update([
+                                'life' => $newLife,
+                                'isDead' => $newLife <= 0
+                            ]);
+                        }
+                    }
+
+                    return "{$character->character->name} の「ロードバランシング」発動、自身が受ける通常攻撃のダメージを" . ($character->isErrorMode ? '20%' : '30%') . "軽減し、受けたダメージ分を他の味方全員に与える。";
                 }
                 break;
 
             case 'LiteSpeed Cache':
                 if ($eventType === 'turn_end') {
-                    $character->update(['speed' => $character->speed + 200]);
-                    return "{$character->character->name} の「LiteSpeed Cache」発動、スピード200ポイント増加";
-                }
-                break;
-
-            case '自動HTTPS':
-                if ($eventType === 'before_damage_taken') {
-                    $baseBlockCount = 3;
-                    $totalBlockCount = $baseBlockCount;
-                    $hasGo = RoomCharacter::where('roomId', $room->id)
-                        ->where('userId', $character->userId)
-                        ->whereHas('character', function ($query) {
-                            $query->where('name', 'Go');
-                        })
-                        ->where('isDead', false)
-                        ->exists();
-                    if ($hasGo) {
-                        $totalBlockCount += 1;
-                    }
-                    $character->update(['blockCount' => $totalBlockCount]);
-                    $log = "{$character->character->name} の「自動HTTPS」発動、シールド{$baseBlockCount}枚獲得";
-                    if ($hasGo) {
-                        $log .= "、Goの効果でさらに1枚追加（合計{$totalBlockCount}枚）";
-                    }
-                    return $log;
-                }
-                break;
-
-            case 'ヌル安全':
-                if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
-                    $context['damage'] *= 0.95;
-                    return "{$character->character->name} の「ヌル安全」発動、受けるダメージ5%軽減";
+                    $speedIncrease = $room->totalTurns * 200;
+                    $character->update(['speed' => $character->speed + $speedIncrease]);
+                    return "{$character->character->name} の「LiteSpeed Cache」発動、合計ラウンド数×200ポイントのスピードを増加する。";
                 }
                 break;
 
             case 'Excelオーバーロード':
-                if ($eventType === 'turn_end') {
-                    $character->update(['power' => $character->power * 1.05]);
-                    return "{$character->character->name} の「Excelオーバーロード」発動、攻撃力5%増加";
+                if ($eventType === 'on_action') {
+                    $healAmount = $character->maxLife * 0.05;
+                    $newLife = min($character->maxLife, $character->life + $healAmount);
+                    $character->update(['life' => $newLife]);
+                    return "{$character->character->name} の「Excelオーバーロード」発動、自身が行動するたびに、HPが5%回復する。";
+                }
+                break;
+
+            case 'リアルタイムデータベース':
+                if ($eventType === 'on_action') {
+                    $multiplier = $character->isErrorMode ? 2.0 : 1.2;
+                    $allies = RoomCharacter::where('roomId', $room->id)
+                        ->where('userId', $character->userId)
+                        ->where('isDead', false)
+                        ->get();
+                    foreach ($allies as $ally) {
+                        $ally->update(['speed' => $ally->speed * $multiplier]);
+                    }
+                    return "{$character->character->name} の「リアルタイムデータベース」発動、自身が行動するたびに、味方全員のスピードを" . ($character->isErrorMode ? '2倍' : '1.2倍') . "にする。";
                 }
                 break;
 
             case '軽量設計':
-                if ($eventType === 'before_damage_taken') {
-                    $character->update(['evasion' => $character->evasion + 10]);
-                    return "{$character->character->name} の「軽量設計」発動、回避率10%増加";
-                }
-                break;
-
-            case 'DOM操作':
-                if ($eventType === 'before_damage_taken') {
-                    $character->update(['power' => $character->power * 1.10]);
-                    return "{$character->character->name} の「DOM操作」発動、攻撃力10%増加";
+                if ($eventType === 'on_action') {
+                    $healRatio = $character->isErrorMode ? 0.2 : 0.1;
+                    $allies = RoomCharacter::where('roomId', $room->id)
+                        ->where('userId', $character->userId)
+                        ->where('isDead', false)
+                        ->get();
+                    foreach ($allies as $ally) {
+                        $healAmount = $ally->maxLife * $healRatio;
+                        $newLife = min($ally->maxLife, $ally->life + $healAmount);
+                        $ally->update(['life' => $newLife]);
+                    }
+                    return "{$character->character->name} の「軽量設計」発動、自身が行動するたびに、味方全員のHPを" . ($character->isErrorMode ? '20%' : '10%') . "回復する。";
                 }
                 break;
 
             case 'ブループリント':
-                if ($eventType === 'turn_end') {
-                    $character->update(['power' => $character->power * 1.05]);
-                    return "{$character->character->name} の「ブループリント」発動、攻撃力5%増加";
+                if ($eventType === 'on_action') {
+                    $multiplier = $character->isErrorMode ? 1.3 : 1.1;
+                    $character->update([
+                        'power' => $character->power * $multiplier,
+                        'speed' => $character->speed * $multiplier
+                    ]);
+                    return "{$character->character->name} の「ブループリント」発動、味方のキャラが行動する度に、自身のパワー、スピードが" . ($character->isErrorMode ? '1.3倍' : '1.1倍') . "。";
                 }
                 break;
 
-            case 'Write Once, Run Anywhere or debug everywhere':
+            case 'run anywhere or debug everywhere':
                 if ($eventType === 'on_attack_hit' && isset($context['attacker']) && $context['attacker']->id === $character->id) {
                     $allies = RoomCharacter::where('roomId', $room->id)
                         ->where('userId', $character->userId)
                         ->where('isDead', false)
                         ->get();
-                    $isBug = rand(0, 100) < 20;
-                    $multiplier = $isBug ? 0.90 : 1.05;
-                    $action = $isBug ? '10%減少' : '5%上昇';
-                    foreach ($allies as $ally) {
-                        $ally->update([
-                            'power' => $ally->power * $multiplier,
-                            'speed' => $ally->speed * $multiplier
-                        ]);
+                    $isBug = rand(0, 100) < 30;
+                    if ($isBug) {
+                        foreach ($allies as $ally) {
+                            $damage = $ally->life * 0.1;
+                            $newLife = max(0, $ally->life - $damage);
+                            $ally->update([
+                                'life' => $newLife,
+                                'isDead' => $newLife <= 0
+                            ]);
+                        }
+                    } else {
+                        foreach ($allies as $ally) {
+                            $ally->update([
+                                'power' => $ally->power * 1.2,
+                                'speed' => $ally->speed * 1.2
+                            ]);
+                        }
                     }
-                    return "{$character->character->name} の「Write Once, Run Anywhere or debug everywhere」発動、味方全体の攻撃力とスピード{$action}";
+                    return "{$character->character->name} の「run anywhere or debug everywhere」発動、通常攻撃でダメージを与えると、味方全員のパワーとスピードを1.2倍にするが、30%の確率で10%のダメージ。";
                 }
                 break;
 
@@ -430,90 +402,71 @@ class PassiveSkillManager
                     $specialSkillLength = mb_strlen($context['attacker']->character->specialSkillName ?? '');
                     $passiveSkillLength = mb_strlen($context['attacker']->character->passiveSkillName ?? '');
                     $totalLength = $specialSkillLength + $passiveSkillLength;
-                    $damageReduction = $totalLength * 30;
+                    $damageReduction = $totalLength * ($character->isErrorMode ? 50 : 30);
                     $context['damage'] = max(0, $context['damage'] - $damageReduction);
-                    return "{$character->character->name} の「正規表現」発動、スキル名文字数に基づきダメージ{$damageReduction}軽減";
+                    return "{$character->character->name} の「正規表現」発動、通常攻撃を受ける際、攻撃時のスペシャルスキル名とパッシブスキル名の合計文字数×" . ($character->isErrorMode ? '50' : '30') . "のダメージを軽減する。";
                 }
                 break;
 
-            case '低レベル制御':
-                if ($eventType === 'before_damage_taken') {
-                    $character->update(['speed' => $character->speed * 1.10]);
-                    return "{$character->character->name} の「低レベル制御」発動、スピード10%増加";
+            case 'メモリ操作':
+                if ($eventType === 'on_action') {
+                    $multiplier = $character->isErrorMode ? 1.3 : 1.1;
+                    $character->update([
+                        'power' => $character->power * $multiplier,
+                        'speed' => $character->speed * $multiplier
+                    ]);
+                    return "{$character->character->name} の「メモリ操作」発動、自身が行動するたびに、自身のパワーとスピードを" . ($character->isErrorMode ? '1.3倍' : '1.1倍') . "にする。";
                 }
                 break;
 
             case 'オブジェクト指向':
-                if ($eventType === 'before_damage_taken') {
-                    $character->update(['power' => $character->power * 1.10]);
-                    return "{$character->character->name} の「オブジェクト指向」発動、攻撃力10%増加";
-                }
-                break;
-
-            case '.NET連携':
-                if ($eventType === 'turn_end') {
+                if ($eventType === 'on_action') {
+                    $multiplier = $character->isErrorMode ? 1.3 : 1.1;
                     $allies = RoomCharacter::where('roomId', $room->id)
                         ->where('userId', $character->userId)
                         ->where('isDead', false)
                         ->get();
                     foreach ($allies as $ally) {
-                        $healAmount = $ally->maxLife * 0.02;
-                        $newLife = min($ally->maxLife, $ally->life + $healAmount);
-                        $ally->update(['life' => $newLife]);
+                        $ally->update(['speed' => $ally->speed * $multiplier]);
                     }
-                    return "{$character->character->name} の「.NET連携」発動、味方全員の体力2%回復";
+                    return "{$character->character->name} の「オブジェクト指向」発動、自身が行動するたびに、味方全員のスピードを" . ($character->isErrorMode ? '1.3倍' : '1.1倍') . "にする。";
                 }
                 break;
 
             case '高級言語の先駆者':
-                if ($eventType === 'before_damage_taken') {
-                    $character->update(['power' => $character->power * 1.10]);
-                    return "{$character->character->name} の「高級言語の先駆者」発動、攻撃力10%増加";
-                }
-                break;
-
-            case 'エレガントな構文':
-                if ($eventType === 'before_damage_taken') {
+                if ($eventType === 'on_action') {
+                    $multiplier = $character->isErrorMode ? 1.5 : 1.2;
                     $allies = RoomCharacter::where('roomId', $room->id)
                         ->where('userId', $character->userId)
                         ->where('isDead', false)
                         ->get();
                     foreach ($allies as $ally) {
-                        $ally->update(['speed' => $ally->speed * 1.03]);
+                        $ally->update(['speed' => $ally->speed * $multiplier]);
                     }
-                    return "{$character->character->name} の「エレガントな構文」発動、味方全員のスピード3%増加";
-                }
-                break;
-
-            case '可読性':
-                if ($eventType === 'before_damage_taken') {
-                    $allies = RoomCharacter::where('roomId', $room->id)
-                        ->where('userId', $character->userId)
-                        ->where('isDead', false)
-                        ->get();
-                    foreach ($allies as $ally) {
-                        $ally->update(['evasion' => $ally->evasion + 5]);
-                    }
-                    return "{$character->character->name} の「可読性」発動、味方全員の回避率5%増加";
-                }
-                break;
-
-            case 'メモリ安全':
-                if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
-                    $context['damage'] *= 0.95;
-                    return "{$character->character->name} の「メモリ安全」発動、受けるダメージ5%軽減";
+                    return "{$character->character->name} の「高級言語の先駆者」発動、自身が行動するたびに、味方全員のスピードを" . ($character->isErrorMode ? '1.5倍' : '1.2倍') . "にする。";
                 }
                 break;
 
             case 'クエリ最適化':
-                if ($eventType === 'before_damage_taken') {
-                    $character->update(['speed' => $character->speed * 1.10]);
-                    return "{$character->character->name} の「クエリ最適化」発動、スピード10%増加";
+                if ($eventType === 'on_action') {
+                    $healRatio = $character->isErrorMode ? 0.15 : 0.1;
+                    $healAmount = $character->maxLife * $healRatio;
+                    $newLife = min($character->maxLife, $character->life + $healAmount);
+                    $character->update(['life' => $newLife]);
+                    return "{$character->character->name} の「クエリ最適化」発動、自身が行動するたびに、自身のHPを" . ($character->isErrorMode ? '15%' : '10%') . "回復する。";
                 }
                 break;
 
-            default:
-                return null;
+            case 'HotModuleReplacementPlugin':
+                if ($eventType === 'on_life_changed' && isset($context['target']) && $context['target']->id === $character->id) {
+                    $multiplier = $character->isErrorMode ? 1.2 : 1.1;
+                    $character->update([
+                        'power' => $character->power * $multiplier,
+                        'speed' => $character->speed * $multiplier
+                    ]);
+                    return "{$character->character->name} の「HotModuleReplacementPlugin」発動、自身のHPに変更があるたびに、パワーとスピードを" . ($character->isErrorMode ? '1.2倍' : '1.1倍') . "にする。";
+                }
+                break;
         }
         return null;
     }

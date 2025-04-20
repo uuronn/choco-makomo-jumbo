@@ -1523,7 +1523,8 @@ class RoomController
                         $passiveLogs = array_merge(
                             $passiveLogs,
                             PassiveSkillManager::applyPassives($room, 'on_damage_taken', $context),
-                            PassiveSkillManager::applyPassives($room, 'on_attack_hit', $context)
+                            PassiveSkillManager::applyPassives($room, 'on_attack_hit', $context),
+                            PassiveSkillManager::applyPassives($room, 'on_life_changed', array_merge($context, ['target' => $target]))
                         );
 
                         foreach ($passiveLogs as $log) {
@@ -1578,9 +1579,19 @@ class RoomController
                 $attacker->update(['isActive' => false]);
                 $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
 
-                $context = [];
-                $turnEndLogs = PassiveSkillManager::applyPassives($room, 'turn_end', $context);
-                foreach ($turnEndLogs as $log) {
+                // 行動後のパッシブスキル発動
+                $context = [
+                    'attacker' => $attacker,
+                    'actorUserId' => $attacker->userId,
+                    'actorCharacterId' => $attacker->characterId,
+                ];
+                $passiveLogs = PassiveSkillManager::applyPassives($room, 'on_action', $context);
+                $passiveLogs = array_merge(
+                    $passiveLogs,
+                    PassiveSkillManager::applyPassives($room, 'turn_end', $context)
+                );
+
+                foreach ($passiveLogs as $log) {
                     RoomLog::create([
                         'roomId' => $roomId,
                         'actionType' => 'passive',
@@ -1719,7 +1730,8 @@ class RoomController
                         $passiveLogs = array_merge(
                             $passiveLogs,
                             PassiveSkillManager::applyPassives($room, 'on_damage_taken', $context),
-                            PassiveSkillManager::applyPassives($room, 'on_skill_hit', $context)
+                            PassiveSkillManager::applyPassives($room, 'on_skill_hit', $context),
+                            PassiveSkillManager::applyPassives($room, 'on_life_changed', array_merge($context, ['target' => $target]))
                         );
                         $description = "{$attacker->character->name} が自爆し {$target->character->name} に {$damage} ダメージ";
                         $targets = [$target];
@@ -1738,7 +1750,7 @@ class RoomController
                             'targetUserId' => $attacker->userId,
                             'targetCharacterId' => $attacker->characterId,
                             'description' => "{$attacker->character->name} がダウンしました",
-                        ]);
+                            ]);
                         break;
 
                     case '全体攻撃':
@@ -1766,7 +1778,8 @@ class RoomController
                             $passiveLogs = array_merge(
                                 $passiveLogs,
                                 PassiveSkillManager::applyPassives($room, 'on_damage_taken', $context),
-                                PassiveSkillManager::applyPassives($room, 'on_skill_hit', $context)
+                                PassiveSkillManager::applyPassives($room, 'on_skill_hit', $context),
+                                PassiveSkillManager::applyPassives($room, 'on_life_changed', array_merge($context, ['target' => $target]))
                             );
                             if ($newLife <= 0) {
                                 RoomLog::create([
@@ -1808,9 +1821,19 @@ class RoomController
                     $attacker->update(['isActive' => false]);
                     $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
 
-                    $context = [];
-                    $turnEndLogs = PassiveSkillManager::applyPassives($room, 'turn_end', $context);
-                    foreach ($turnEndLogs as $log) {
+                    // 行動後のパッシブスキル発動
+                    $context = [
+                        'attacker' => $attacker,
+                        'actorUserId' => $attacker->userId,
+                        'actorCharacterId' => $attacker->characterId,
+                    ];
+                    $passiveLogs = PassiveSkillManager::applyPassives($room, 'on_action', $context);
+                    $passiveLogs = array_merge(
+                        $passiveLogs,
+                        PassiveSkillManager::applyPassives($room, 'turn_end', $context)
+                    );
+
+                    foreach ($passiveLogs as $log) {
                         RoomLog::create([
                             'roomId' => $roomId,
                             'actionType' => 'passive',
