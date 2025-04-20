@@ -23,14 +23,64 @@ class PassiveSkillManager
             ->get();
 
         $logs = [];
+        $actorUserId = $context['actorUserId'] ?? null;
+        $actorCharacterId = $context['actorCharacterId'] ?? null;
+        $targetUserId = $context['targetUserId'] ?? null;
+        $targetCharacterId = $context['targetCharacterId'] ?? null;
+
         foreach ($characters as $character) {
             if ($character->character->passiveSkillName) {
+                $skill = [
+                    'name' => $character->character->passiveSkillName,
+                    'trigger' => $eventType,
+                    // actor_only の設定（スキルごとの適用対象を制御）
+                    'actor_only' => in_array($character->character->passiveSkillName, [
+                        'ActiveRecord', // 自身が攻撃命中時
+                        'StrictMode',   // 自身が攻撃命中時
+                        'イベントブロック', // 自身が攻撃命中時
+                        'Write Once, Run Anywhere or debug everywhere', // 自身が攻撃命中時
+                    ]),
+                    // target_only: ターゲットに限定するスキル
+                    'target_only' => in_array($character->character->passiveSkillName, [
+                        '双方向バインディング', // 自身がダメージを受けた時
+                        'コンテナ化',           // 自身がダメージを受ける前
+                        'フレックスボックスシールド', // 自身がダメージを受ける前
+                        'サーバーサイド',      // 自身がダメージを受ける前
+                        '互換性',              // 自身がダメージを受ける前
+                        'メモリ安全',          // 自身がダメージを受ける前
+                        'ヌル安全',            // 自身がダメージを受ける前
+                        '正規表現',            // 自身がダメージを受ける前
+                    ]),
+                ];
+
+                // 適用条件チェック
+                if ($skill['trigger'] !== $eventType) {
+                    continue;
+                }
+
+                // actor_only が true の場合、行動者のみ適用
+                if ($skill['actor_only'] &&
+                    ($character->userId !== $actorUserId || $character->characterId !== $actorCharacterId)) {
+                    continue;
+                }
+
+                // target_only が true の場合、ターゲットのみ適用
+                if ($skill['target_only'] &&
+                    ($character->userId !== $targetUserId || $character->characterId !== $targetCharacterId)) {
+                    continue;
+                }
+
+                // turn_end や味方全員対象のスキルは全員適用
+                if ($eventType === 'turn_end' || !$skill['actor_only'] && !$skill['target_only']) {
+                    // 処理続行
+                }
+
                 $log = self::applyPassive($character, $eventType, $room, $context);
                 if ($log) {
                     $logs[] = [
                         'characterId' => $character->id,
                         'userId' => $character->userId,
-                        'description' => $log
+                        'description' => "[$eventType] $log"
                     ];
                 }
             }
@@ -46,7 +96,6 @@ class PassiveSkillManager
         $skillName = $character->character->passiveSkillName;
 
         switch ($skillName) {
-            // Ruby「ActiveRecord」: 自身が通常攻撃を行うたびに、攻撃力とスピードが20%増加
             case 'ActiveRecord':
                 if ($eventType === 'on_attack_hit' && isset($context['attacker']) && $context['attacker']->id === $character->id) {
                     $character->update([
@@ -57,7 +106,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Angular「双方向バインディング」: 自身が通常攻撃を受けた時、その攻撃を行った相手に、受けたダメージの50%（isErrorModeがtrueなら80%）を与える
             case '双方向バインディング':
                 if ($eventType === 'on_damage_taken' && isset($context['target']) && $context['target']->id === $character->id && isset($context['attacker'])) {
                     $reflectRatio = $character->isErrorMode ? 0.8 : 0.5;
@@ -69,7 +117,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Docker「コンテナ化」: 自身が受けるダメージを5%軽減
             case 'コンテナ化':
                 if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
                     $context['damage'] *= 0.95;
@@ -77,7 +124,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Nginx「ロードバランシング」: 自身が受ける通常攻撃のダメージを20%に軽減し、受けたダメージ分を他の味方全員に与える
             case 'ロードバランシング':
                 if ($eventType === 'on_damage_taken' && isset($context['target']) && $context['target']->id === $character->id && isset($context['damage'])) {
                     $originalDamage = $context['damage'];
@@ -99,11 +145,10 @@ class PassiveSkillManager
                         Log::info("ロードバランシング: {$character->character->name} が {$ally->character->name} に {$originalDamage} ダメージを与えました (残りライフ: {$newLife})");
                     }
 
-                    return "{$character->character->name} の「ロードバランシング」発動、自身が受ける通常攻撃のダメージを20%に軽減し、受けたダメージ分を他の味方全員に与える";
+                    return "{$character->character->name} の「ロードバランシング」発動、ダメージ20%に軽減し、受けたダメージを味方に分配";
                 }
                 break;
 
-            // CSS「フレックスボックスシールド」: 通常攻撃のダメージを10%軽減
             case 'フレックスボックスシールド':
                 if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
                     $context['damage'] *= 0.9;
@@ -111,7 +156,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Go「並行処理」: 毎ターンスピードが10%増加、エラー状態で攻撃力も10%増加
             case '並行処理':
                 if ($eventType === 'turn_end') {
                     $updates = ['speed' => $character->speed * 1.10];
@@ -121,13 +165,12 @@ class PassiveSkillManager
                     $character->update($updates);
                     $log = "{$character->character->name} の「並行処理」発動、スピード10%増加";
                     if ($character->isErrorMode) {
-                        $log .= "、エラー状態により攻撃力10%増加";
+                        $log .= "、エラー状態で攻撃力10%増加";
                     }
                     return $log;
                 }
                 break;
 
-            // HTML「セマンティックHTML」: 毎ターン攻撃力とスピードが5%増加、エラー状態で20%増加
             case 'セマンティックHTML':
                 if ($eventType === 'turn_end') {
                     $multiplier = $character->isErrorMode ? 1.20 : 1.05;
@@ -140,17 +183,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // JavaScript「ES6」: 攻撃力を30%増加、エラー状態で50%増加
-            // case 'ES6':
-            //     if ($eventType === 'before_damage_taken') {
-            //         $multiplier = $character->isErrorMode ? 1.50 : 1.30;
-            //         $character->update(['power' => $character->power * $multiplier]);
-            //         $percentage = $character->isErrorMode ? '50%' : '30%';
-            //         return "{$character->character->name} の「ES6」発動、攻撃力{$percentage}増加";
-            //     }
-            //     break;
-
-            // PHP「サーバーサイド」: 体力が20%未満のとき回避率が15%増加
             case 'サーバーサイド':
                 if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
                     if ($character->life < $character->maxLife * 0.2) {
@@ -160,7 +192,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // TypeScript「静的型付け」: 攻撃力が10%増加
             case '静的型付け':
                 if ($eventType === 'before_damage_taken') {
                     $character->update(['power' => $character->power * 1.10]);
@@ -168,7 +199,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // React「StrictMode」: 通常攻撃命中時、ランダムな敵に攻撃力の50%の追加ダメージ
             case 'StrictMode':
                 if ($eventType === 'on_attack_hit' && isset($context['attacker']) && $context['attacker']->id === $character->id) {
                     $enemies = RoomCharacter::where('roomId', $room->id)
@@ -188,7 +218,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Ruby on Rails「規約優先」: 味方全員の回避率が5%増加
             case '規約優先':
                 if ($eventType === 'before_damage_taken') {
                     $allies = RoomCharacter::where('roomId', $room->id)
@@ -202,7 +231,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // AWS「スケーラビリティ」: 毎ターン体力が5%回復
             case 'スケーラビリティ':
                 if ($eventType === 'turn_end') {
                     $healAmount = $character->maxLife * 0.05;
@@ -212,11 +240,10 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Azure, GAS「クラウド連携」: 味方全員のスピードが5%増加 (Azure), 3%増加 (GAS)
             case 'クラウド連携':
                 if ($eventType === 'before_damage_taken') {
-                    $multiplier = $character->character->name === 'Azure' ? 1.05 : 1.03;
-                    $percentage = $character->character->name === 'Azure' ? '5%' : '3%';
+                    $multiplier = $character-> GRAND_CENTRAL_DISPATCH === 'Azure' ? 1.05 : 1.03;
+                    $percentage = $character-> GRAND_CENTRAL_DISPATCH === 'Azure' ? '5%' : '3%';
                     $allies = RoomCharacter::where('roomId', $room->id)
                         ->where('userId', $character->userId)
                         ->where('isDead', false)
@@ -228,7 +255,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Google Cloud「データ解析」: 攻撃力が10%増加
             case 'データ解析':
                 if ($eventType === 'before_damage_taken') {
                     $character->update(['power' => $character->power * 1.10]);
@@ -236,7 +262,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Mac「ユニックスベース」: スピードが10%増加
             case 'ユニックスベース':
                 if ($eventType === 'before_damage_taken') {
                     $character->update(['speed' => $character->speed * 1.10]);
@@ -244,7 +269,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Windows「互換性」: 体力が20%未満のとき攻撃力が15%増加
             case '互換性':
                 if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
                     if ($character->life < $character->maxLife * 0.2) {
@@ -254,7 +278,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // MySQL「リレーショナル」: 味方全員の回避率が5%増加
             case 'リレーショナル':
                 if ($eventType === 'before_damage_taken') {
                     $allies = RoomCharacter::where('roomId', $room->id)
@@ -268,7 +291,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // PostgreSQL「堅牢性」: 毎ターン体力が3%回復
             case '堅牢性':
                 if ($eventType === 'turn_end') {
                     $healAmount = $character->maxLife * 0.03;
@@ -278,7 +300,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Supabase, Firebase「リアルタイム」: スピードが10%増加
             case 'リアルタイム':
                 if ($eventType === 'before_damage_taken') {
                     $character->update(['speed' => $character->speed * 1.10]);
@@ -286,7 +307,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Unity「クロスプラットフォーム」: 味方全員の攻撃力が5%増加
             case 'クロスプラットフォーム':
                 if ($eventType === 'before_damage_taken') {
                     $allies = RoomCharacter::where('roomId', $room->id)
@@ -300,7 +320,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Scratch「イベントブロック」: 攻撃時、50%の確率で攻撃力またはスピードが30%増加
             case 'イベントブロック':
                 if ($eventType === 'on_attack_hit' && isset($context['attacker']) && $context['attacker']->id === $character->id) {
                     if (rand(0, 100) < 50) {
@@ -313,7 +332,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Viscuit「ビジュアルコーディング」: 毎ターン体力が2%回復
             case 'ビジュアルコーディング':
                 if ($eventType === 'turn_end') {
                     $healAmount = $character->maxLife * 0.02;
@@ -323,16 +341,13 @@ class PassiveSkillManager
                 }
                 break;
 
-            // LiteSpeed「LiteSpeed Cache」: 合計ラウンド数 × 200ポイントのスピード増加
             case 'LiteSpeed Cache':
                 if ($eventType === 'turn_end') {
-                    // $speedIncrease = $room->totalTurns * 200;
                     $character->update(['speed' => $character->speed + 200]);
                     return "{$character->character->name} の「LiteSpeed Cache」発動、スピード200ポイント増加";
                 }
                 break;
 
-            // Caddy「自動HTTPS」: シールド3枚付与、Goがいる場合さらに1枚
             case '自動HTTPS':
                 if ($eventType === 'before_damage_taken') {
                     $baseBlockCount = 3;
@@ -356,7 +371,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Kotlin「ヌル安全」: ダメージを5%軽減
             case 'ヌル安全':
                 if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
                     $context['damage'] *= 0.95;
@@ -364,7 +378,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // VBA「Excelオーバーロード」: 毎ターン攻撃力が5%増加
             case 'Excelオーバーロード':
                 if ($eventType === 'turn_end') {
                     $character->update(['power' => $character->power * 1.05]);
@@ -372,7 +385,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // SQLite「軽量設計」: 回避率が10%増加
             case '軽量設計':
                 if ($eventType === 'before_damage_taken') {
                     $character->update(['evasion' => $character->evasion + 10]);
@@ -380,7 +392,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // jQuery「DOM操作」: 攻撃力が10%増加
             case 'DOM操作':
                 if ($eventType === 'before_damage_taken') {
                     $character->update(['power' => $character->power * 1.10]);
@@ -388,7 +399,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Unreal Engine「ブループリント」: 毎ターン攻撃力が5%増加
             case 'ブループリント':
                 if ($eventType === 'turn_end') {
                     $character->update(['power' => $character->power * 1.05]);
@@ -396,7 +406,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Java「Write Once, Run Anywhere or debug everywhere」: 通常攻撃ダメージ時、味方全体の攻撃力とスピードが5%上昇、20%の確率で10%減少
             case 'Write Once, Run Anywhere or debug everywhere':
                 if ($eventType === 'on_attack_hit' && isset($context['attacker']) && $context['attacker']->id === $character->id) {
                     $allies = RoomCharacter::where('roomId', $room->id)
@@ -416,7 +425,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Perl「正規表現」: 攻撃時のスキル名文字数 × 30のダメージ軽減
             case '正規表現':
                 if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
                     $specialSkillLength = mb_strlen($context['attacker']->character->specialSkillName ?? '');
@@ -428,7 +436,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // C「低レベル制御」: スピードが10%増加
             case '低レベル制御':
                 if ($eventType === 'before_damage_taken') {
                     $character->update(['speed' => $character->speed * 1.10]);
@@ -436,7 +443,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // C++「オブジェクト指向」: 攻撃力が10%増加
             case 'オブジェクト指向':
                 if ($eventType === 'before_damage_taken') {
                     $character->update(['power' => $character->power * 1.10]);
@@ -444,7 +450,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // C#「.NET連携」: 味方全員の体力が毎ターン2%回復
             case '.NET連携':
                 if ($eventType === 'turn_end') {
                     $allies = RoomCharacter::where('roomId', $room->id)
@@ -460,7 +465,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Fortran「高級言語の先駆者」: 攻撃力が10%増加
             case '高級言語の先駆者':
                 if ($eventType === 'before_damage_taken') {
                     $character->update(['power' => $character->power * 1.10]);
@@ -468,7 +472,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Laravel「エレガントな構文」: 味方全員のスピードが3%増加
             case 'エレガントな構文':
                 if ($eventType === 'before_damage_taken') {
                     $allies = RoomCharacter::where('roomId', $room->id)
@@ -482,7 +485,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Python「可読性」: 味方全員の回避率が5%増加
             case '可読性':
                 if ($eventType === 'before_damage_taken') {
                     $allies = RoomCharacter::where('roomId', $room->id)
@@ -496,7 +498,6 @@ class PassiveSkillManager
                 }
                 break;
 
-            // Rust「メモリ安全」: ダメージを5%軽減
             case 'メモリ安全':
                 if ($eventType === 'before_damage_taken' && isset($context['target']) && $context['target']->id === $character->id) {
                     $context['damage'] *= 0.95;
@@ -504,30 +505,12 @@ class PassiveSkillManager
                 }
                 break;
 
-            // SQL「クエリ最適化」: スピードが10%増加
             case 'クエリ最適化':
                 if ($eventType === 'before_damage_taken') {
                     $character->update(['speed' => $character->speed * 1.10]);
                     return "{$character->character->name} の「クエリ最適化」発動、スピード10%増加";
                 }
                 break;
-
-            // Vite「ゼロコンフィグ」: 戦闘開始時、スペシャルスキル発動ターン数13以下の味方が即発動可能
-            // case 'ゼロコンフィグ':
-            //     if ($eventType === 'battle_start') {
-            //         $allies = RoomCharacter::where('roomId', $room->id)
-            //             ->where('userId', $character->userId)
-            //             ->where('isDead', false)
-            //             ->whereHas('character', function ($query) {
-            //                 $query->where('specialSkillTurn', '<=', 13);
-            //             })
-            //             ->get();
-            //         foreach ($allies as $ally) {
-            //             $ally->update(['specialSkillTurn' => 0]);
-            //         }
-            //         return "{$character->character->name} の「ゼロコンフィグ」発動、スペシャルスキル発動ターン数13以下の味方が即発動可能";
-            //     }
-            //     break;
 
             default:
                 return null;

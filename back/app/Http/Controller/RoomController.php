@@ -1434,7 +1434,6 @@ class RoomController
      */
     public function attack(Request $request)
     {
-
         try {
             $roomId = $request->route('roomId');
             $userId = $request->route('userId');
@@ -1447,8 +1446,6 @@ class RoomController
             $room = Room::with(['hostUser', 'guestUser', 'roomCharacter' => function ($query) {
                 $query->with('character');
             }])->where('id', $roomId)->first();
-
-            Log::info('attack: ' . $room);
 
             if (!$room || $room->status !== 'battling') {
                 return response()->json(['message' => 'バトルが進行中ではありません'], 400);
@@ -1482,23 +1479,6 @@ class RoomController
                     throw new Exception('攻撃対象のキャラクターが見つかりません');
                 }
 
-                // battle_start イベントの呼び出し（必要に応じて）
-                // 戦闘開始時に一度だけ呼び出したい場合、approve メソッドなどで処理するのが適切
-                // ここでは例としてコメントアウト
-                // if ($room->totalTurns === 0) {
-                //     $battleStartLogs = PassiveSkillManager::applyPassives($room, 'battle_start');
-                //     foreach ($battleStartLogs as $log) {
-                //         RoomLog::create([
-                //             'roomId' => $roomId,
-                //             'actionType' => 'passive',
-                //             'actorUserId' => $log['userId'],
-                //             'actorCharacterId' => $log['characterId'],
-                //             'description' => $log['description'],
-                //         ]);
-                //     }
-                // }
-
-                // 回避判定
                 $evasionChance = $target->evasion;
                 $hitRoll = rand(0, 100);
                 $isHit = $hitRoll > $evasionChance;
@@ -1507,7 +1487,6 @@ class RoomController
                     $damage = max(0, $attacker->power);
                     $message = "";
 
-                    // シールドチェック
                     if ($target->blockCount > 0) {
                         $target->update(['blockCount' => $target->blockCount - 1]);
                         $damage = 0;
@@ -1526,20 +1505,27 @@ class RoomController
 
                         $message = "{$attacker->character->name} の攻撃が {$target->character->name} のシールドに防がれました";
                     } else {
-                        // パッシブスキル: ダメージを受ける前
-                        $context = ['attacker' => $attacker, 'target' => $target, 'damage' => &$damage];
+                        $context = [
+                            'attacker' => $attacker,
+                            'target' => $target,
+                            'damage' => &$damage,
+                            'actorUserId' => $attacker->userId,
+                            'actorCharacterId' => $attacker->characterId,
+                            'targetUserId' => $target->userId,
+                            'targetCharacterId' => $target->characterId,
+                        ];
                         $passiveLogs = PassiveSkillManager::applyPassives($room, 'before_damage_taken', $context);
 
-                        // ダメージ適用
                         $newLife = max(0, $target->life - $damage);
                         $target->update(['life' => $newLife, 'isDead' => $newLife <= 0]);
 
-                        // パッシブスキル: ダメージを受けた後
-                        $context['damage'] = $damage; // 軽減後のダメージを渡す
-                        $passiveLogs = array_merge($passiveLogs, PassiveSkillManager::applyPassives($room, 'on_damage_taken', $context));
-                        $passiveLogs = array_merge($passiveLogs, PassiveSkillManager::applyPassives($room, 'on_attack_hit', $context));
+                        $context['damage'] = $damage;
+                        $passiveLogs = array_merge(
+                            $passiveLogs,
+                            PassiveSkillManager::applyPassives($room, 'on_damage_taken', $context),
+                            PassiveSkillManager::applyPassives($room, 'on_attack_hit', $context)
+                        );
 
-                        // ログ記録
                         foreach ($passiveLogs as $log) {
                             RoomLog::create([
                                 'roomId' => $roomId,
@@ -1550,7 +1536,6 @@ class RoomController
                             ]);
                         }
 
-                        // 攻撃ログ
                         RoomLog::create([
                             'roomId' => $roomId,
                             'actionType' => 'attack',
@@ -1590,12 +1575,11 @@ class RoomController
                     $message = "{$attacker->character->name} の攻撃が {$target->character->name} に回避されました";
                 }
 
-                // 攻撃者のアクティブ状態を解除
                 $attacker->update(['isActive' => false]);
                 $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
 
-                // パッシブスキル: ターン終了時
-                $turnEndLogs = PassiveSkillManager::applyPassives($room, 'turn_end');
+                $context = [];
+                $turnEndLogs = PassiveSkillManager::applyPassives($room, 'turn_end', $context);
                 foreach ($turnEndLogs as $log) {
                     RoomLog::create([
                         'roomId' => $roomId,
@@ -1606,7 +1590,6 @@ class RoomController
                     ]);
                 }
 
-                // 次のターンを更新
                 $nextTurn = $this->updateNextTurn($roomId);
                 $this->checkBattleEnd($room);
                 $room->refresh();
@@ -1634,9 +1617,6 @@ class RoomController
         }
     }
 
-    /**
-     * キャラクターがスペシャルスキルを使用する
-     */
     public function skill(Request $request)
     {
         try {
@@ -1687,6 +1667,14 @@ class RoomController
                     throw new Exception('単体スキルの場合、ターゲットを指定してください');
                 }
 
+                $context = [
+                    'attacker' => $attacker,
+                    'target' => null,
+                    'actorUserId' => $attacker->userId,
+                    'actorCharacterId' => $attacker->characterId,
+                ];
+                $passiveLogs = PassiveSkillManager::applyPassives($room, 'before_skill_used', $context);
+
                 switch ($skillType) {
                     case '単体攻撃力強化':
                         $target = RoomCharacter::with('character')
@@ -1710,6 +1698,14 @@ class RoomController
                             ->first();
                         if (!$target) throw new Exception('対象が見つかりません');
                         $damage = $attacker->power * 5;
+                        $context['target'] = $target;
+                        $context['damage'] = &$damage;
+                        $context['targetUserId'] = $target->userId;
+                        $context['targetCharacterId'] = $target->characterId;
+                        $passiveLogs = array_merge(
+                            $passiveLogs,
+                            PassiveSkillManager::applyPassives($room, 'before_damage_taken', $context)
+                        );
                         $newLife = max(0, $target->life - $damage);
                         $target->update([
                             'life' => $newLife,
@@ -1719,6 +1715,12 @@ class RoomController
                             'life' => 0,
                             'isDead' => true,
                         ]);
+                        $context['damage'] = $damage;
+                        $passiveLogs = array_merge(
+                            $passiveLogs,
+                            PassiveSkillManager::applyPassives($room, 'on_damage_taken', $context),
+                            PassiveSkillManager::applyPassives($room, 'on_skill_hit', $context)
+                        );
                         $description = "{$attacker->character->name} が自爆し {$target->character->name} に {$damage} ダメージ";
                         $targets = [$target];
                         if ($newLife <= 0) {
@@ -1747,11 +1749,25 @@ class RoomController
                             ->get();
                         $damage = $attacker->power * 2;
                         foreach ($targets as $target) {
+                            $context['target'] = $target;
+                            $context['damage'] = &$damage;
+                            $context['targetUserId'] = $target->userId;
+                            $context['targetCharacterId'] = $target->characterId;
+                            $passiveLogs = array_merge(
+                                $passiveLogs,
+                                PassiveSkillManager::applyPassives($room, 'before_damage_taken', $context)
+                            );
                             $newLife = max(0, $target->life - $damage);
                             $target->update([
                                 'life' => $newLife,
                                 'isDead' => $newLife <= 0,
                             ]);
+                            $context['damage'] = $damage;
+                            $passiveLogs = array_merge(
+                                $passiveLogs,
+                                PassiveSkillManager::applyPassives($room, 'on_damage_taken', $context),
+                                PassiveSkillManager::applyPassives($room, 'on_skill_hit', $context)
+                            );
                             if ($newLife <= 0) {
                                 RoomLog::create([
                                     'roomId' => $roomId,
@@ -1765,209 +1781,18 @@ class RoomController
                         $description = "{$attacker->character->name} が全体攻撃で {$damage} ダメージ";
                         break;
 
-                    case '全体回復':
-                        $targets = RoomCharacter::with('character')
-                            ->where('roomId', $roomId)
-                            ->where('userId', $userId)
-                            ->where('isDead', false)
-                            ->get();
-                        foreach ($targets as $target) {
-                            $newLife = $target->maxLife;
-                            $target->update(['life' => $newLife]);
-                        }
-                        $description = "{$attacker->character->name} が味方全員を全回復";
-                        break;
-
-                    case '全体スタン':
-                        $targets = RoomCharacter::with('character')
-                            ->where('roomId', $roomId)
-                            ->where('userId', '!=', $userId)
-                            ->where('isDead', false)
-                            ->get();
-                        foreach ($targets as $target) {
-                            $target->update(['isActive' => false]);
-                        }
-                        $description = "{$attacker->character->name} が敵全員を次ターン行動不能に";
-                        break;
-
-                    case 'LiveScript':
-                        $targets = RoomCharacter::with('character')
-                            ->where('roomId', $roomId)
-                            ->where('userId', '!=', $userId)
-                            ->where('isDead', false)
-                            ->get();
-                        foreach ($targets as $target) {
-                            $target->update(['isActive' => false]);
-                        }
-                        $description = "{$attacker->character->name}が「LiveScript」を発動、敵全員の次ターンを飛ばした";
-                        break;
-
-                    case 'SQLインジェクション':
-                        $targets = RoomCharacter::with('character')
-                            ->where('roomId', $roomId)
-                            ->where('userId', '!=', $userId)
-                            ->where('isDead', false)
-                            ->get();
-                        foreach ($targets as $target) {
-                            $oldPower = $target->power;
-                            $oldSpeed = $target->speed;
-                            $target->update([
-                                'power' => $oldSpeed,
-                                'speed' => $oldPower,
-                            ]);
-                        }
-                        $description = "{$attacker->character->name} が敵全員の攻撃力とスピードを入れ替えた";
-                        break;
-
-                    case 'rm -rf /':
-                        $targets = RoomCharacter::with('character')
-                        ->where('roomId', $roomId)
-                        ->where('userId', '!=', $userId)
-                        ->where('isDead', false)
-                        ->get();
-                        $damage = $attacker->power * 2;
-                        foreach ($targets as $target) {
-                            // $newLife = max(0, $target->life - $damage);
-                            $newLife = 0;
-                            $target->update([
-                                'life' => $newLife,
-                                'isDead' => $newLife <= 0,
-                            ]);
-                            if ($newLife <= 0) {
-                                RoomLog::create([
-                                    'roomId' => $roomId,
-                                    'actionType' => 'death',
-                                    'targetUserId' => $target->userId,
-                                    'targetCharacterId' => $target->characterId,
-                                    'description' => "{$target->character->name} がダウンしました",
-                                ]);
-                            }
-                        }
-                        $description = "{$attacker->character->name} が「rm -rf」を発動、敵全員の体力を0にした。";
-                        break;
-
-                    case 'ゴルーチンラッシュ': // Go用（全体攻撃の変形）
-                        $targets = RoomCharacter::with('character')
-                            ->where('roomId', $roomId)
-                            ->where('userId', '!=', $userId)
-                            ->where('isDead', false)
-                            ->get();
-                        $damage = $attacker->power * 2.0; // 全体攻撃（2倍）より少し強め
-                        foreach ($targets as $target) {
-                            $newLife = max(0, $target->life - $damage);
-                            $target->update([
-                                'life' => $newLife,
-                                'isDead' => $newLife <= 0,
-                            ]);
-                            if ($newLife <= 0) {
-                                RoomLog::create([
-                                    'roomId' => $roomId,
-                                    'actionType' => 'death',
-                                    'targetUserId' => $target->userId,
-                                    'targetCharacterId' => $target->characterId,
-                                    'description' => "{$target->character->name} がダウンしました",
-                                ]);
-                            }
-                        }
-                        $description = "{$attacker->character->name} が「ゴルーチンラッシュ」を発動、敵全員に {$damage} ダメージ";
-                        break;
-
-                    // case 'Eloquentストライク': // ruby on rails用（全体攻撃の変形）
-                    //     $targets = RoomCharacter::with('character')
-                    //         ->where('roomId', $roomId)
-                    //         ->where('userId', '!=', $userId)
-                    //         ->where('isDead', false)
-                    //         ->get();
-                    //     $damage = $attacker->power * 2.0; // 全体攻撃（2倍）より少し強め
-                    //     foreach ($targets as $target) {
-                    //         $newLife = max(0, $target->life - $damage);
-                    //         $target->update([
-                    //             'life' => $newLife,
-                    //             'isDead' => $newLife <= 0,
-                    //         ]);
-                    //         if ($newLife <= 0) {
-                    //             RoomLog::create([
-                    //                 'roomId' => $roomId,
-                    //                 'actionType' => 'death',
-                    //                 'targetUserId' => $target->userId,
-                    //                 'targetCharacterId' => $target->characterId,
-                    //                 'description' => "{$target->character->name} がダウンしました",
-                    //             ]);
-                    //         }
-                    //     }
-                    //     $description = "{$attacker->character->name} が「Eloquentストライク」を発動、敵全員に {$damage} ダメージ";
-                    //     break;
-
-
-                    case 'セマンティックHTML': // html用（回避アップ）
-                        $targets = RoomCharacter::with('character')
-                            ->where('roomId', $roomId)
-                            ->where('userId', $userId)
-                            ->where('isDead', false)
-                            ->get();
-                        foreach ($targets as $target) {
-                            $target->update(['evasion' => $target->evasion + 30]); // 10より少し強め
-                        }
-                        $description = "{$attacker->character->name} が「セマンティックHTML」を発動、味方全員の回避率が30アップ";
-                        break;
-
-                    case '依存性の注入': // Angular用（全体回復の変形）
-                        $targets = RoomCharacter::with('character')
-                            ->where('roomId', $roomId)
-                            ->where('userId', $userId)
-                            ->where('isDead', false)
-                            ->get();
-                        foreach ($targets as $target) {
-                            $healAmount = (int)($target->maxLife * 0.25); // 30%より少し弱め
-                            $newLife = min($target->maxLife, $target->life + $healAmount);
-                            $target->update(['life' => $newLife]);
-                        }
-                        $attacker->update(['isErrorMode' => true]);
-                        $description = "{$attacker->character->name} が「依存性の注入」を発動、味方全員の体力を25%回復し、エラー状態になる";
-                        break;
-
-                    case 'IEを削除': // windows用（全体回復の変形）
-                        $targets = RoomCharacter::with('character')
-                            ->where('roomId', $roomId)
-                            ->where('userId', $userId)
-                            ->where('isDead', false)
-                            ->get();
-                        foreach ($targets as $target) {
-                            $healAmount = (int)($target->maxLife * 0.4); // 全回復より弱め
-                            $newLife = min($target->maxLife, $target->life + $healAmount);
-                            $target->update(['life' => $newLife]);
-                        }
-                        $description = "{$attacker->character->name} が「IEを削除」を発動、味方全員の体力を40%回復";
-                        break;
-
-                    case 'docker compose up': // windows用（全体回復の変形）
-                        $targets = RoomCharacter::with('character')
-                            ->where('roomId', $roomId)
-                            ->where('userId', $userId)
-                            ->where('isDead', false)
-                            ->get();
-                        foreach ($targets as $target) {
-                            $healAmount = (int)($target->maxLife * 0.5); // 全回復より弱め
-                            $newLife = min($target->maxLife, $target->life + $healAmount);
-                            $target->update(['life' => $newLife]);
-                        }
-                        $description = "{$attacker->character->name} が「docker compose up」を発動、味方全員の体力を50%回復";
-                        break;
-
-                    case '物理エンジン操作': // Unity用（スピードデバフ）
-                        $targets = RoomCharacter::with('character')
-                            ->where('roomId', $roomId)
-                            ->where('userId', '!=', $userId)
-                            ->where('isDead', false)
-                            ->get();
-                        foreach ($targets as $target) {
-                            $target->update(['speed' => (int)($target->speed * 0.10)]); // 30%より少し弱め
-                        }
-                        $description = "{$attacker->character->name} が「物理エンジン操作」を発動、敵全員のスピードが90%ダウン";
-                        break;
-
                     default:
                         throw new Exception('未実装のスペシャルスキルです');
+                }
+
+                foreach ($passiveLogs as $log) {
+                    RoomLog::create([
+                        'roomId' => $roomId,
+                        'actionType' => 'passive',
+                        'actorUserId' => $log['userId'],
+                        'actorCharacterId' => $log['characterId'],
+                        'description' => $log['description'],
+                    ]);
                 }
 
                 if ($skillType !== 'rm -rfff') {
@@ -1982,6 +1807,18 @@ class RoomController
 
                     $attacker->update(['isActive' => false]);
                     $room->update(['totalTurns' => DB::raw('totalTurns + 1')]);
+
+                    $context = [];
+                    $turnEndLogs = PassiveSkillManager::applyPassives($room, 'turn_end', $context);
+                    foreach ($turnEndLogs as $log) {
+                        RoomLog::create([
+                            'roomId' => $roomId,
+                            'actionType' => 'passive',
+                            'actorUserId' => $log['userId'],
+                            'actorCharacterId' => $log['characterId'],
+                            'description' => $log['description'],
+                        ]);
+                    }
 
                     $nextTurn = $this->updateNextTurn($roomId);
                 } else {
