@@ -20,6 +20,25 @@ return [
         'passiveSkillName' => 'セマンティックHTML',
         'passiveSkillDescription' => '自身が行動するたびに、パワーとスピードを1.1倍にする。（エラー状態で1.3倍）',
     ],
+    // Go
+    [
+        'id' => 'go',
+        'name' => 'Go',
+        'officialName' => null,
+        'type' => '言語',
+        'basePower' => 560,
+        'baseLife' => 3000,
+        'baseSpeed' => 100,
+        'baseEvasion' => 9,
+        'partySkillName' => 'チームGopher',
+        'partySkillDescription' => '味方全員のスピードを1.3倍、回避率を1.2倍にする',
+        'partySkillCondition' => 'パーティが「言語」タイプだけで構成されている場合に発動',
+        'specialSkillName' => 'ゴルーチンラッシュ',
+        'specialSkillDescription' => '自身の攻撃力の1.4倍分のダメージ相手キャラ全員に与え、自身をエラー状態にする',
+        'baseSpecialSkillTurn' => 14,
+        'passiveSkillName' => '並行処理',
+        'passiveSkillDescription' => '自身が行動するたびに、スピードを1.1倍にする。（エラー状態でパワーも1.1倍）',
+    ],
     // CSS
     [
         'id' => 'css',
@@ -476,6 +495,7 @@ return [
         'passiveSkillName' => null,
         'passiveSkillDescription' => null,
     ],
+
     // Nginx
     [
         'id' => 'nginx',
