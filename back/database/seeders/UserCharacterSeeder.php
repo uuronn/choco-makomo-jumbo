@@ -90,7 +90,7 @@ class UserCharacterSeeder extends Seeder
                     'userId' => $user->id,
                     'characterId' => $character->id,
                 ], [
-                    'level' => 1,
+                    'level' => 0,
                     'life' => $characterData['baseLife'],
                     'power' => $characterData['basePower'],
                     'speed' => $characterData['baseSpeed'],
