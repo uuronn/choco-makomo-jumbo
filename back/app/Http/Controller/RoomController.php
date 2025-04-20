@@ -22,78 +22,6 @@ class RoomController
      * @param int $roomId ルームID
      * @return void
      */
-    public function approve(Request $request)
-    {
-        $user = $request->user();
-        $roomId = $request->input('roomId');
-        $characterIdList = $request->input('characterIdList');
-
-        if ($user === null) {
-            return response()->json(['message' => 'ユーザーが見つかりません'], 404);
-        }
-
-        $room = Room::findOrFail($roomId);
-
-        if ($room->hostUserId !== $user->id) {
-            return response()->json(['message' => 'ルームのホストではありません'], 403);
-        }
-
-        if ($room->status !== 'waiting') {
-            return response()->json(['message' => 'ルームが待機状態ではありません'], 400);
-        }
-
-        if ($room->hostUserId === $room->guestUserId) {
-            return response()->json(['message' => 'ホストとゲストが同じユーザーです'], 400);
-        }
-
-        $characterIds = Character::whereIn('id', $characterIdList)->pluck('id')->toArray();
-        if (count($characterIds) !== count($characterIdList)) {
-            return response()->json(['message' => '無効なキャラクターIDが含まれています'], 400);
-        }
-
-        DB::transaction(function () use ($roomId, $characterIdList, $user, $room) {
-            RoomCharacter::where('roomId', $roomId)
-                ->where('userId', $user->id)
-                ->delete();
-
-            foreach ($characterIdList as $characterId) {
-                $character = Character::findOrFail($characterId);
-                RoomCharacter::create([
-                    'roomId' => $roomId,
-                    'userId' => $user->id,
-                    'characterId' => $characterId,
-                    'life' => $character->baseLife,
-                    'maxLife' => $character->baseLife,
-                    'power' => $character->basePower,
-                    'speed' => $character->baseSpeed,
-                    'evasion' => $character->baseEvasion,
-                ]);
-            }
-
-            // パーティボーナス適用
-            $partyBonusLogs = PartyBonusManager::applyBonuses($room);
-            foreach ($partyBonusLogs as $log) {
-                RoomLog::create([
-                    'roomId' => $room->id,
-                    'actionType' => 'partyBonus',
-                    'actorUserId' => $log['userId'],
-                    'description' => $log['description'],
-                ]);
-            }
-
-            $room->update(['status' => 'in_battle']);
-
-            RoomLog::create([
-                'roomId' => $room->id,
-                'characterId' => null,
-                'userId' => null,
-                'description' => '戦闘が開始されました。',
-            ]);
-        });
-
-        return response()->json(['message' => '承認が完了しました']);
-    }
-
     public function approveManually($roomId)
     {
         $room = Room::findOrFail($roomId);
@@ -101,14 +29,55 @@ class RoomController
             throw new \Exception('ルームが待機状態ではありません。');
         }
 
-        // パーティボーナス適用
-        $partyBonusLogs = PartyBonusManager::applyBonuses($room);
-        foreach ($partyBonusLogs as $log) {
+        // ホストとゲストのキャラクターを取得
+        $hostCharacters = RoomCharacter::where('roomId', $roomId)
+            ->where('userId', $room->hostUserId)
+            ->with('character')
+            ->get();
+        $guestCharacters = RoomCharacter::where('roomId', $roomId)
+            ->where('userId', $room->guestUserId)
+            ->with('character')
+            ->get();
+
+        // ホストのパーティボーナス適用
+        $hostCharacterNames = $hostCharacters->pluck('character.name')->toArray();
+        $hostBonuses = $this->applyPartyBonuses($hostCharacterNames, $room->hostUser, $room);
+        foreach ($hostCharacters as $character) {
+            RoomCharacter::where('id', $character->id)->update([
+                'life' => $character->life * $hostBonuses['lifeMultiplier'],
+                'maxLife' => $character->maxLife * $hostBonuses['lifeMultiplier'],
+                'power' => $character->power * $hostBonuses['powerMultiplier'],
+                'speed' => $character->speed * $hostBonuses['speedMultiplier'],
+                'evasion' => $character->evasion * $hostBonuses['evasionMultiplier'],
+            ]);
+        }
+        foreach ($hostBonuses['logs'] as $log) {
             RoomLog::create([
                 'roomId' => $room->id,
                 'actionType' => 'partyBonus',
-                'actorUserId' => $log['userId'],
-                'description' => $log['description'],
+                'actorUserId' => $room->hostUserId,
+                'description' => $log,
+            ]);
+        }
+
+        // ゲストのパーティボーナス適用
+        $guestCharacterNames = $guestCharacters->pluck('character.name')->toArray();
+        $guestBonuses = $this->applyPartyBonuses($guestCharacterNames, $room->guestUser, $room);
+        foreach ($guestCharacters as $character) {
+            RoomCharacter::where('id', $character->id)->update([
+                'life' => $character->life * $guestBonuses['lifeMultiplier'],
+                'maxLife' => $character->maxLife * $guestBonuses['lifeMultiplier'],
+                'power' => $character->power * $guestBonuses['powerMultiplier'],
+                'speed' => $character->speed * $guestBonuses['speedMultiplier'],
+                'evasion' => $character->evasion * $guestBonuses['evasionMultiplier'],
+            ]);
+        }
+        foreach ($guestBonuses['logs'] as $log) {
+            RoomLog::create([
+                'roomId' => $room->id,
+                'actionType' => 'partyBonus',
+                'actorUserId' => $room->guestUserId,
+                'description' => $log,
             ]);
         }
 
@@ -1214,126 +1183,126 @@ class RoomController
         }
     }
 
-    // public function approve(Request $request)
-    // {
-    //     try {
-    //         $roomId = $request->route('roomId');
-    //         $userId = $request->route('userId');
+    public function approve(Request $request)
+    {
+        try {
+            $roomId = $request->route('roomId');
+            $userId = $request->route('userId');
 
-    //         $room = Room::with(['hostUser', 'guestUser'])->where('id', $roomId)->first();
+            $room = Room::with(['hostUser', 'guestUser'])->where('id', $roomId)->first();
 
-    //         if (!$room) {
-    //             return response()->json(['message' => 'ルームが見つかりません'], 404);
-    //         }
+            if (!$room) {
+                return response()->json(['message' => 'ルームが見つかりません'], 404);
+            }
 
-    //         if ($room->hostUserId !== $userId) {
-    //             return response()->json(['message' => '承認の権限がありません'], 403);
-    //         }
+            if ($room->hostUserId !== $userId) {
+                return response()->json(['message' => '承認の権限がありません'], 403);
+            }
 
-    //         if ($room->status !== 'pending') {
-    //             return response()->json(['message' => '現在承認を受け付けていません'], 400);
-    //         }
-    //         if (!$room->guestUserId) {
-    //             return response()->json(['message' => 'ゲストが申請していません'], 400);
-    //         }
+            if ($room->status !== 'pending') {
+                return response()->json(['message' => '現在承認を受け付けていません'], 400);
+            }
+            if (!$room->guestUserId) {
+                return response()->json(['message' => 'ゲストが申請していません'], 400);
+            }
 
-    //         DB::transaction(function () use ($roomId, $room) {
-    //             $hostCharacters = RoomCharacter::where('roomId', $roomId)
-    //                 ->where('userId', $room->hostUserId)
-    //                 ->with('character')
-    //                 ->get();
-    //             $guestCharacters = RoomCharacter::where('roomId', $roomId)
-    //                 ->where('userId', $room->guestUserId)
-    //                 ->with('character')
-    //                 ->get();
+            DB::transaction(function () use ($roomId, $room) {
+                $hostCharacters = RoomCharacter::where('roomId', $roomId)
+                    ->where('userId', $room->hostUserId)
+                    ->with('character')
+                    ->get();
+                $guestCharacters = RoomCharacter::where('roomId', $roomId)
+                    ->where('userId', $room->guestUserId)
+                    ->with('character')
+                    ->get();
 
-    //             // ホストのパーティボーナス適用
-    //             $hostCharacterNames = $hostCharacters->pluck('character.name')->toArray();
-    //             $hostBonuses = $this->applyPartyBonuses($hostCharacterNames, $room->hostUser, $room);
-    //             if (!array_diff(['Warrior', 'Mage', 'Healer'], $hostCharacterNames)) {
-    //                 $hostBonuses['powerMultiplier'] *= 1.2;
-    //                 $hostBonuses['speedMultiplier'] *= 1.1;
-    //                 $hostBonuses['logs'][] = "{$room->hostUser->name} のパーティ ['Warrior', 'Mage', 'Healer'] で攻撃力が20%増、スピードが10%増";
-    //             }
-    //             foreach ($hostCharacters as $character) {
-    //                 RoomCharacter::where('id', $character->id)->update([
-    //                     'life' => $character->life * $hostBonuses['lifeMultiplier'],
-    //                     'maxLife' => $character->maxLife * $hostBonuses['lifeMultiplier'],
-    //                     'power' => $character->power * $hostBonuses['powerMultiplier'],
-    //                     'speed' => $character->speed * $hostBonuses['speedMultiplier'],
-    //                     'evasion' => $character->evasion * $hostBonuses['evasionMultiplier'],
-    //                 ]);
-    //             }
-    //             if (!empty($hostBonuses['logs'])) {
-    //                 RoomLog::create([
-    //                     'roomId' => $roomId,
-    //                     'actionType' => 'partyBonus',
-    //                     'actorUserId' => $room->hostUserId,
-    //                     'description' => implode(' / ', $hostBonuses['logs']),
-    //                 ]);
-    //             }
+                // ホストのパーティボーナス適用
+                $hostCharacterNames = $hostCharacters->pluck('character.name')->toArray();
+                $hostBonuses = $this->applyPartyBonuses($hostCharacterNames, $room->hostUser, $room);
+                if (!array_diff(['Warrior', 'Mage', 'Healer'], $hostCharacterNames)) {
+                    $hostBonuses['powerMultiplier'] *= 1.2;
+                    $hostBonuses['speedMultiplier'] *= 1.1;
+                    $hostBonuses['logs'][] = "{$room->hostUser->name} のパーティ ['Warrior', 'Mage', 'Healer'] で攻撃力が20%増、スピードが10%増";
+                }
+                foreach ($hostCharacters as $character) {
+                    RoomCharacter::where('id', $character->id)->update([
+                        'life' => $character->life * $hostBonuses['lifeMultiplier'],
+                        'maxLife' => $character->maxLife * $hostBonuses['lifeMultiplier'],
+                        'power' => $character->power * $hostBonuses['powerMultiplier'],
+                        'speed' => $character->speed * $hostBonuses['speedMultiplier'],
+                        'evasion' => $character->evasion * $hostBonuses['evasionMultiplier'],
+                    ]);
+                }
+                if (!empty($hostBonuses['logs'])) {
+                    RoomLog::create([
+                        'roomId' => $roomId,
+                        'actionType' => 'partyBonus',
+                        'actorUserId' => $room->hostUserId,
+                        'description' => implode(' / ', $hostBonuses['logs']),
+                    ]);
+                }
 
-    //             // ゲストのパーティボーナス適用
-    //             $guestCharacterNames = $guestCharacters->pluck('character.name')->toArray();
-    //             $guestBonuses = $this->applyPartyBonuses($guestCharacterNames, $room->guestUser, $room);
-    //             if (!array_diff(['Archer', 'Tank', 'Support'], $guestCharacterNames)) {
-    //                 $guestBonuses['speedMultiplier'] *= 1.25;
-    //                 $guestBonuses['powerMultiplier'] *= 1.15;
-    //                 $guestBonuses['logs'][] = "{$room->guestUser->name} のパーティ ['Archer', 'Tank', 'Support'] でスピードが25%増、攻撃力が15%増";
-    //             }
-    //             foreach ($guestCharacters as $character) {
-    //                 RoomCharacter::where('id', $character->id)->update([
-    //                     'life' => $character->life * $guestBonuses['lifeMultiplier'],
-    //                     'maxLife' => $character->maxLife * $guestBonuses['lifeMultiplier'],
-    //                     'power' => $character->power * $guestBonuses['powerMultiplier'],
-    //                     'speed' => $character->speed * $guestBonuses['speedMultiplier'],
-    //                     'evasion' => $character->evasion * $guestBonuses['evasionMultiplier'],
-    //                 ]);
-    //             }
-    //             if (!empty($guestBonuses['logs'])) {
-    //                 RoomLog::create([
-    //                     'roomId' => $roomId,
-    //                     'actionType' => 'partyBonus',
-    //                     'actorUserId' => $room->guestUserId,
-    //                     'description' => implode(' / ', $guestBonuses['logs']),
-    //                 ]);
-    //             }
+                // ゲストのパーティボーナス適用
+                $guestCharacterNames = $guestCharacters->pluck('character.name')->toArray();
+                $guestBonuses = $this->applyPartyBonuses($guestCharacterNames, $room->guestUser, $room);
+                if (!array_diff(['Archer', 'Tank', 'Support'], $guestCharacterNames)) {
+                    $guestBonuses['speedMultiplier'] *= 1.25;
+                    $guestBonuses['powerMultiplier'] *= 1.15;
+                    $guestBonuses['logs'][] = "{$room->guestUser->name} のパーティ ['Archer', 'Tank', 'Support'] でスピードが25%増、攻撃力が15%増";
+                }
+                foreach ($guestCharacters as $character) {
+                    RoomCharacter::where('id', $character->id)->update([
+                        'life' => $character->life * $guestBonuses['lifeMultiplier'],
+                        'maxLife' => $character->maxLife * $guestBonuses['lifeMultiplier'],
+                        'power' => $character->power * $guestBonuses['powerMultiplier'],
+                        'speed' => $character->speed * $guestBonuses['speedMultiplier'],
+                        'evasion' => $character->evasion * $guestBonuses['evasionMultiplier'],
+                    ]);
+                }
+                if (!empty($guestBonuses['logs'])) {
+                    RoomLog::create([
+                        'roomId' => $roomId,
+                        'actionType' => 'partyBonus',
+                        'actorUserId' => $room->guestUserId,
+                        'description' => implode(' / ', $guestBonuses['logs']),
+                    ]);
+                }
 
-    //             RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
+                RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
 
-    //             $characters = RoomCharacter::where('roomId', $roomId)
-    //                 ->orderBy('speed', 'desc')
-    //                 ->get();
+                $characters = RoomCharacter::where('roomId', $roomId)
+                    ->orderBy('speed', 'desc')
+                    ->get();
 
-    //             if ($characters->isEmpty()) {
-    //                 throw new Exception('ルームにキャラクターが存在しません');
-    //             }
+                if ($characters->isEmpty()) {
+                    throw new Exception('ルームにキャラクターが存在しません');
+                }
 
-    //             $firstTurn = $characters->first();
-    //             if (!$firstTurn->userId) {
-    //                 throw new Exception('最初のターンユーザーIDがnullです');
-    //             }
+                $firstTurn = $characters->first();
+                if (!$firstTurn->userId) {
+                    throw new Exception('最初のターンユーザーIDがnullです');
+                }
 
-    //             $room->update([
-    //                 'status' => 'battling',
-    //                 'currentTurnUserId' => $firstTurn->userId,
-    //                 'currentTurnCharacterId' => $firstTurn->characterId,
-    //             ]);
-    //         });
+                $room->update([
+                    'status' => 'battling',
+                    'currentTurnUserId' => $firstTurn->userId,
+                    'currentTurnCharacterId' => $firstTurn->characterId,
+                ]);
+            });
 
-    //         $room->refresh();
+            $room->refresh();
 
-    //         return response()->json([
-    //             'message' => '参加申請が承認されました',
-    //             'room' => $room,
-    //         ], 200);
-    //     } catch (Exception $e) {
-    //         return response()->json([
-    //             'message' => '承認処理に失敗しました',
-    //             'error' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
+            return response()->json([
+                'message' => '参加申請が承認されました',
+                'room' => $room,
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => '承認処理に失敗しました',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
     /**
      * ルーム情報を取得
