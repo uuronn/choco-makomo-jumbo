@@ -2,8 +2,8 @@
 
 import type { RoomCharacter } from "~/type/room";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { characterToImagePath } from "~/lib/utils";
 
 export const CharacterDisplay = React.memo(
@@ -106,10 +106,86 @@ export const CharacterDisplay = React.memo(
 		// 実際に表示するエラーモード（遅延適用後）
 		const displayErrorMode = delayedErrorMode;
 
+		const prevBlockCountRef = useRef(blockCount);
+		const [isBreaking, setIsBreaking] = useState(false);
+		const [isFinalBreak, setIsFinalBreak] = useState(false);
+		const containerRef = useRef<HTMLDivElement>(null);
+
+		// Detect shield break (when blockCount decreases)
+		useEffect(() => {
+			if (
+				prevBlockCountRef.current > blockCount &&
+				prevBlockCountRef.current > 0
+			) {
+				// Shield was broken or reduced
+				const willBeFinalBreak =
+					prevBlockCountRef.current === 1 && blockCount === 0;
+
+				// Apply screen shake to the parent when shield breaks
+				if (containerRef.current) {
+					// More intense shake if it's the final shield
+					if (willBeFinalBreak) {
+						containerRef.current.animate(
+							[
+								{ transform: "translate(0, 0)" },
+								{ transform: "translate(-15px, 12px)" },
+								{ transform: "translate(18px, -10px)" },
+								{ transform: "translate(-18px, -12px)" },
+								{ transform: "translate(15px, 15px)" },
+								{ transform: "translate(-12px, -18px)" },
+								{ transform: "translate(10px, 12px)" },
+								{ transform: "translate(-6px, -10px)" },
+								{ transform: "translate(0, 0)" },
+							],
+							{
+								duration: 800,
+								easing: "ease-in-out",
+							},
+						);
+					} else {
+						containerRef.current.animate(
+							[
+								{ transform: "translate(0, 0)" },
+								{ transform: "translate(-8px, 6px)" },
+								{ transform: "translate(10px, -4px)" },
+								{ transform: "translate(-10px, -5px)" },
+								{ transform: "translate(8px, 8px)" },
+								{ transform: "translate(-4px, -8px)" },
+								{ transform: "translate(0, 0)" },
+							],
+							{
+								duration: 500,
+								easing: "ease-in-out",
+							},
+						);
+					}
+				}
+
+				// 破壊エフェクトをトリガー
+				setIsFinalBreak(willBeFinalBreak);
+				setIsBreaking(true);
+
+				// Reset the effect after animation completes - longer for final break
+				const timer = setTimeout(
+					() => {
+						setIsBreaking(false);
+						setIsFinalBreak(false);
+					},
+					willBeFinalBreak ? 2500 : 1500,
+				);
+
+				return () => clearTimeout(timer);
+			}
+
+			// Update the ref with current value for next comparison
+			prevBlockCountRef.current = blockCount;
+		}, [blockCount]);
+
 		return (
 			<div
 				className={`flex flex-col items-center rounded-lg transition-all`}
 				onClick={onClick}
+				ref={containerRef}
 			>
 				<div className="relative w-full h-32 mb-2 flex items-center justify-center">
 					{isActive && (
@@ -233,7 +309,6 @@ export const CharacterDisplay = React.memo(
 						{/* Advanced Shield Effect */}
 						{blockCount > 0 && (
 							<>
-								{/* Completely new shield effect */}
 								<motion.div
 									className="absolute inset-0 z-10"
 									initial={{ opacity: 0 }}
@@ -356,6 +431,28 @@ export const CharacterDisplay = React.memo(
 											}}
 											transition={{
 												duration: 3,
+												repeat: Number.POSITIVE_INFINITY,
+												ease: "easeInOut",
+											}}
+										/>
+
+										{/* Edge highlight effect */}
+										<motion.div
+											className="absolute inset-0"
+											style={{
+												border: isEnemy
+													? "2px solid rgba(239, 68, 68, 0.5)"
+													: "2px solid rgba(34, 197, 94, 0.5)",
+												borderRadius: "10px",
+												boxShadow: isEnemy
+													? "0 0 10px rgba(239, 68, 68, 0.5)"
+													: "0 0 10px rgba(34, 197, 94, 0.5)",
+											}}
+											animate={{
+												opacity: [0.5, 1, 0.5],
+											}}
+											transition={{
+												duration: 2,
 												repeat: Number.POSITIVE_INFINITY,
 												ease: "easeInOut",
 											}}
@@ -505,31 +602,351 @@ export const CharacterDisplay = React.memo(
 											</div>
 										</motion.div>
 									</div>
-
-									{/* Edge highlight effect */}
-									<motion.div
-										className="absolute inset-0"
-										style={{
-											border: isEnemy
-												? "2px solid rgba(239, 68, 68, 0.5)"
-												: "2px solid rgba(34, 197, 94, 0.5)",
-											borderRadius: "10px",
-											boxShadow: isEnemy
-												? "0 0 10px rgba(239, 68, 68, 0.5)"
-												: "0 0 10px rgba(34, 197, 94, 0.5)",
-										}}
-										animate={{
-											opacity: [0.5, 1, 0.5],
-										}}
-										transition={{
-											duration: 2,
-											repeat: Number.POSITIVE_INFINITY,
-											ease: "easeInOut",
-										}}
-									/>
 								</motion.div>
 							</>
 						)}
+
+						{/* Shield Break Effect - Completely separate from the shield itself */}
+						<AnimatePresence>
+							{isBreaking && (
+								<motion.div
+									className="absolute inset-0 z-30 pointer-events-none"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+								>
+									{/* 強化された閃光効果 - より明るく、より大きく */}
+									<motion.div
+										className="absolute inset-0"
+										style={{
+											background: isEnemy
+												? "radial-gradient(circle at center, rgba(255, 255, 255, 0.95) 0%, rgba(239, 68, 68, 0.9) 30%, transparent 70%)"
+												: "radial-gradient(circle at center, rgba(255, 255, 255, 0.95) 0%, rgba(34, 197, 94, 0.9) 30%, transparent 70%)",
+										}}
+										animate={{
+											opacity: [0, 1, 0],
+											scale: [0.2, 1.8, 2.5],
+										}}
+										transition={{
+											duration: 0.7,
+											ease: "easeOut",
+										}}
+									/>
+
+									{/* Final shield break special effect (1 to 0) */}
+									{isFinalBreak && (
+										<>
+											{/* Massive explosion effect for final shield break */}
+											<motion.div
+												className="absolute inset-0 z-31"
+												style={{
+													background: isEnemy
+														? "radial-gradient(circle at center, rgba(255, 255, 255, 1) 0%, rgba(239, 68, 68, 1) 20%, rgba(239, 68, 68, 0.8) 40%, transparent 80%)"
+														: "radial-gradient(circle at center, rgba(255, 255, 255, 1) 0%, rgba(34, 197, 94, 1) 20%, rgba(34, 197, 94, 0.8) 40%, transparent 80%)",
+												}}
+												animate={{
+													opacity: [0, 1, 0.8, 0],
+													scale: [0.2, 2, 3],
+												}}
+												transition={{
+													duration: 1.5,
+													ease: "easeOut",
+												}}
+											/>
+
+											{/* Secondary explosion rings - より多く、より大きく */}
+											{[...Array(5)].map((_, i) => (
+												<motion.div
+													key={`explosion-ring-${i}`}
+													className="absolute inset-0 rounded-full"
+													style={{
+														border: isEnemy
+															? `${3 + i}px solid rgba(239, 68, 68, ${
+																	0.95 - i * 0.15
+																})`
+															: `${3 + i}px solid rgba(34, 197, 94, ${
+																	0.95 - i * 0.15
+																})`,
+														boxShadow: isEnemy
+															? `0 0 ${20 + i * 15}px rgba(239, 68, 68, ${
+																	0.9 - i * 0.15
+																})`
+															: `0 0 ${20 + i * 15}px rgba(34, 197, 94, ${
+																	0.9 - i * 0.15
+																})`,
+													}}
+													animate={{
+														scale: [0, 1 + i * 0.6, 2.5 + i * 1],
+														opacity: [0, 0.9, 0],
+													}}
+													transition={{
+														duration: 1.8 + i * 0.4,
+														delay: i * 0.15,
+														ease: "easeOut",
+													}}
+												/>
+											))}
+
+											{/* Extra particles for final break - more and larger */}
+											{[...Array(80)].map((_, i) => {
+												const size = 4 + Math.random() * 15;
+												const angle = Math.random() * 360;
+												const distance = 60 + Math.random() * 300;
+												return (
+													<motion.div
+														key={`final-particle-${i}`}
+														className="absolute top-1/2 left-1/2 rounded-full"
+														style={{
+															width: size,
+															height: size,
+															background: isEnemy
+																? `rgba(239, 68, 68, ${
+																		0.8 + Math.random() * 0.2
+																	})`
+																: `rgba(34, 197, 94, ${
+																		0.8 + Math.random() * 0.2
+																	})`,
+															boxShadow: isEnemy
+																? `0 0 ${
+																		8 + Math.random() * 12
+																	}px rgba(239, 68, 68, 0.95)`
+																: `0 0 ${
+																		8 + Math.random() * 12
+																	}px rgba(34, 197, 94, 0.95)`,
+															zIndex: 32,
+														}}
+														initial={{
+															x: 0,
+															y: 0,
+															opacity: 1,
+															scale: 1,
+														}}
+														animate={{
+															x: Math.cos(angle * (Math.PI / 180)) * distance,
+															y: Math.sin(angle * (Math.PI / 180)) * distance,
+															opacity: [1, 0.8, 0],
+															scale: [1, Math.random() * 1.5 + 2.5, 0.5],
+															rotate: Math.random() * 720 - 360,
+														}}
+														transition={{
+															duration: 2 + Math.random() * 1.5,
+															delay: 0.05 + Math.random() * 0.3,
+															ease: [0.1, 0.5, 0.2, 1], // Custom easing for more explosive movement
+														}}
+													/>
+												);
+											})}
+
+											{/* Flash effect - より強く */}
+											<motion.div
+												className="absolute inset-0 z-40"
+												style={{
+													background: isEnemy
+														? "rgba(255, 255, 255, 0.95)"
+														: "rgba(255, 255, 255, 0.95)",
+												}}
+												animate={{
+													opacity: [0, 0.95, 0],
+												}}
+												transition={{
+													duration: 0.7,
+													ease: "easeOut",
+												}}
+											/>
+
+											{/* 衝撃波エフェクト - 新しい要素 */}
+											<motion.div
+												className="absolute inset-0 z-35"
+												style={{
+													background: "transparent",
+													border: isEnemy
+														? "8px solid rgba(239, 68, 68, 0.8)"
+														: "8px solid rgba(34, 197, 94, 0.8)",
+													borderRadius: "50%",
+													boxShadow: isEnemy
+														? "inset 0 0 30px rgba(239, 68, 68, 0.8), 0 0 30px rgba(239, 68, 68, 0.8)"
+														: "inset 0 0 30px rgba(34, 197, 94, 0.8), 0 0 30px rgba(34, 197, 94, 0.8)",
+												}}
+												initial={{ scale: 0, opacity: 1 }}
+												animate={{
+													scale: [0, 2.5],
+													opacity: [1, 0],
+												}}
+												transition={{
+													duration: 1.2,
+													ease: "easeOut",
+												}}
+											/>
+										</>
+									)}
+
+									{/* Enhanced Fracture lines - ALWAYS SHOW THESE FOR ANY SHIELD BREAK */}
+									{/* 亀裂線を増やし、より太く、より目立つように */}
+									{[...Array(36)].map((_, i) => {
+										const angle = i * (360 / 36) + Math.random() * 10;
+										const length = 60 + Math.random() * 200;
+										const thickness = 2 + Math.random() * 3.5; // より太く
+										const delay = i * 0.015; // より速く広がる
+
+										return (
+											<motion.div
+												key={`fracture-${i}`}
+												className="absolute top-1/2 left-1/2"
+												style={{
+													width: thickness,
+													height: length,
+													background: isEnemy
+														? `linear-gradient(to bottom, rgba(255, 255, 255, ${0.95}), rgba(239, 68, 68, ${0.95}), transparent)`
+														: `linear-gradient(to bottom, rgba(255, 255, 255, ${0.95}), rgba(34, 197, 94, ${0.95}), transparent)`,
+													transformOrigin: "top center",
+													transform: `rotate(${angle}deg)`,
+													boxShadow: isEnemy
+														? "0 0 15px rgba(239, 68, 68, 0.95)"
+														: "0 0 15px rgba(34, 197, 94, 0.95)",
+													zIndex: 33,
+												}}
+												initial={{ opacity: 0, scaleY: 0 }}
+												animate={{
+													opacity: [0, 1, 0.8, 0],
+													scaleY: [0, 1, 1],
+													y: [0, length * 0.6, length],
+												}}
+												transition={{
+													duration: 1.2,
+													delay: delay,
+													ease: [0.17, 0.67, 0.83, 0.67], // Elastic-like effect
+												}}
+											/>
+										);
+									})}
+
+									{/* 亀裂の交差点に光る点を追加 - 新しい要素 */}
+									{[...Array(15)].map((_, i) => {
+										const size = 3 + Math.random() * 8;
+										const posX = -50 + Math.random() * 100;
+										const posY = -50 + Math.random() * 100;
+										return (
+											<motion.div
+												key={`crack-point-${i}`}
+												className="absolute top-1/2 left-1/2 rounded-full"
+												style={{
+													width: size,
+													height: size,
+													background: isEnemy
+														? "rgba(255, 255, 255, 0.95)"
+														: "rgba(255, 255, 255, 0.95)",
+													boxShadow: isEnemy
+														? `0 0 15px rgba(239, 68, 68, 0.95)`
+														: `0 0 15px rgba(34, 197, 94, 0.95)`,
+													transform: `translate(${posX}px, ${posY}px)`,
+													zIndex: 34,
+												}}
+												animate={{
+													opacity: [0, 1, 0],
+													scale: [0.5, 1.5, 0.8],
+												}}
+												transition={{
+													duration: 0.8,
+													delay: 0.1 + Math.random() * 0.3,
+													ease: "easeOut",
+												}}
+											/>
+										);
+									})}
+
+									{/* Enhanced Shattered particles - ALWAYS SHOW THESE FOR ANY SHIELD BREAK */}
+									{/* より多くの破片パーティクル、より大きく、より長く表示 */}
+									{[...Array(60)].map((_, i) => {
+										const size = 3 + Math.random() * 10;
+										const angle = Math.random() * 360;
+										const distance = 40 + Math.random() * 250;
+										const shape =
+											Math.random() > 0.7
+												? "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)" // ダイヤモンド形
+												: Math.random() > 0.5
+													? "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)" // 五角形
+													: ""; // 円形
+
+										return (
+											<motion.div
+												key={`particle-${i}`}
+												className="absolute top-1/2 left-1/2"
+												style={{
+													width: size,
+													height: size,
+													background: isEnemy
+														? `rgba(239, 68, 68, ${0.8 + Math.random() * 0.2})`
+														: `rgba(34, 197, 94, ${0.8 + Math.random() * 0.2})`,
+													boxShadow: isEnemy
+														? "0 0 10px rgba(239, 68, 68, 0.95)"
+														: "0 0 10px rgba(34, 197, 94, 0.95)",
+													borderRadius: shape ? "0" : "50%",
+													clipPath: shape,
+													zIndex: 34,
+												}}
+												initial={{
+													x: 0,
+													y: 0,
+													opacity: 1,
+													scale: 1,
+												}}
+												animate={{
+													x: Math.cos(angle * (Math.PI / 180)) * distance,
+													y: Math.sin(angle * (Math.PI / 180)) * distance,
+													opacity: [1, 0.8, 0],
+													scale: [1, Math.random() * 0.8 + 1.8, 0.5],
+													rotate: Math.random() * 360,
+												}}
+												transition={{
+													duration: 1.5,
+													delay: 0.05 + Math.random() * 0.2,
+													ease: [0.19, 0.69, 0.01, 0.99], // Custom easing for more dynamic movement
+												}}
+											/>
+										);
+									})}
+
+									{/* 破片の軌跡エフェクト - 新しい要素 */}
+									{[...Array(20)].map((_, i) => {
+										const angle = Math.random() * 360;
+										const distance = 30 + Math.random() * 150;
+										return (
+											<motion.div
+												key={`trail-${i}`}
+												className="absolute top-1/2 left-1/2"
+												style={{
+													width: 2,
+													height: 20 + Math.random() * 40,
+													background: isEnemy
+														? `linear-gradient(to bottom, rgba(239, 68, 68, 0.9), transparent)`
+														: `linear-gradient(to bottom, rgba(34, 197, 94, 0.9), transparent)`,
+													transformOrigin: "top center",
+													transform: `rotate(${angle}deg)`,
+													zIndex: 32,
+												}}
+												initial={{
+													x: 0,
+													y: 0,
+													opacity: 0,
+													scaleY: 0,
+												}}
+												animate={{
+													x: Math.cos(angle * (Math.PI / 180)) * distance * 0.5,
+													y: Math.sin(angle * (Math.PI / 180)) * distance * 0.5,
+													opacity: [0, 0.8, 0],
+													scaleY: [0, 1, 0.5],
+												}}
+												transition={{
+													duration: 0.8,
+													delay: 0.1 + Math.random() * 0.3,
+													ease: "easeOut",
+												}}
+											/>
+										);
+									})}
+								</motion.div>
+							)}
+						</AnimatePresence>
 
 						{/* Error Mode Container */}
 						{displayErrorMode ? (
