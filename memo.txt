@@ -49,12 +49,3 @@ gitlab
 
 ラズパイ
 アルディーノ
-
-エラー状態
-vba
-ruby on rails
-C
-css
-java
-php
-rust
