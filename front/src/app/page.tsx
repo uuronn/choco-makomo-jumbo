@@ -217,8 +217,6 @@ export default function HomeScreen() {
 		};
 
 		fetchOnlineUsers();
-
-		// 実際のアプリではここで技術力データをAPIから取得
 	}, [authUser?.token]);
 
 	// 名前編集モードを開始
