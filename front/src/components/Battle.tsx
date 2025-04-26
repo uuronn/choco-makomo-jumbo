@@ -47,74 +47,91 @@ export default function Battle({ room }: BattleProps) {
 		Record<string, EffectInfo>
 	>({});
 	const [showSurrenderModal, setShowSurrenderModal] = useState<boolean>(false);
+	const [isSelectingEnemy, setIsSelectingEnemy] = useState<boolean>(false); // isSelectingEnemy を定義
 
-	const isSelectingEnemy =
-		(isMyTurn && selectedAction === "attack") ||
-		(selectedAction === "skill" &&
-			activeCharacter?.character.specialSkillName.includes("単体"));
+	// スクロール位置を追跡するための状態とref
+	const [userHasScrolled, setUserHasScrolled] = useState(false);
+	const logContainerRef = useRef<HTMLDivElement>(null);
+	const prevLogLengthRef = useRef<number>(0);
 
+	// エフェクト表示用の関数
 	const showEffect = useCallback(
-		(
-			roomCharacterId: string,
-			effectType: "blink" | string,
-			durationMs: number,
-		): Promise<void> => {
+		(characterId: string, type: string, duration: number) => {
 			return new Promise<void>((resolve) => {
-				const now = Date.now();
-				setCharacterEffects((prev) => ({
-					...prev,
-					[roomCharacterId]: {
-						type: effectType,
-						endTime: now + durationMs,
-						resolve,
+				setCharacterEffects((prevEffects) => ({
+					...prevEffects,
+					[characterId]: {
+						type: type,
+						endTime: Date.now() + duration,
+						resolve: resolve, // resolve 関数を保存
 					},
 				}));
+
+				// duration 後にエフェクトを削除
+				setTimeout(() => {
+					setCharacterEffects((prevEffects) => {
+						const newEffects = { ...prevEffects };
+						delete newEffects[characterId];
+						return newEffects;
+					});
+					resolve(); // Promise を解決
+				}, duration);
 			});
 		},
 		[],
 	);
 
-	// characterEffects の終了チェック
-	useEffect(() => {
-		if (Object.keys(characterEffects).length === 0) return;
+	// ユーザーのスクロール操作を検出
+	const handleScroll = () => {
+		if (!logContainerRef.current) return;
 
-		const checkEffectsInterval = setInterval(() => {
-			const now = Date.now();
-			let hasExpired = false;
+		const { scrollTop, scrollHeight, clientHeight } = logContainerRef.current;
+		// 最下部からある程度離れているかどうかをチェック
+		const isAtBottom = scrollHeight - scrollTop - clientHeight < 10;
 
-			Object.entries(characterEffects).forEach(([_, effectInfo]) => {
-				if (effectInfo.endTime <= now) {
-					hasExpired = true;
-				}
-			});
-
-			if (hasExpired) {
-				setCharacterEffects((prev) => {
-					const newEffects = { ...prev };
-					Object.keys(newEffects).forEach((characterId) => {
-						if (newEffects[characterId].endTime <= now) {
-							// エフェクトが終了したら Promise を解決
-							if (newEffects[characterId].resolve) {
-								newEffects[characterId].resolve();
-							}
-							delete newEffects[characterId];
-						}
-					});
-					return newEffects;
-				});
-			}
-		}, 100);
-
-		return () => clearInterval(checkEffectsInterval);
-	}, [characterEffects]);
+		// 最下部にいない場合はユーザーがスクロールしたと判断
+		setUserHasScrolled(!isAtBottom);
+	};
 
 	// battleLog が更新されたらスクロール
 	useEffect(() => {
-		const logContainer = document.getElementById("battle-log");
-		if (logContainer) {
-			logContainer.scrollTop = logContainer.scrollHeight;
+		const logContainer = logContainerRef.current;
+		if (!logContainer) return;
+
+		// 新しいログが追加された場合のみ処理
+		const hasNewLogs = battleLog.length > prevLogLengthRef.current;
+		prevLogLengthRef.current = battleLog.length;
+
+		// 新しいログが追加され、かつユーザーが手動でスクロールしていない場合、
+		// または最初のレンダリング時は自動スクロール
+		if (hasNewLogs && !userHasScrolled) {
+			setTimeout(() => {
+				if (logContainer) {
+					logContainer.scrollTop = logContainer.scrollHeight;
+				}
+			}, 50);
 		}
-	}, [battleLog]);
+	}, [battleLog, userHasScrolled]);
+
+	const isActionLog = (log: string): boolean => {
+		// 行動ログを識別するキーワード
+		const actionKeywords = [
+			"攻撃",
+			"スキル",
+			"使用",
+			"発動",
+			"ダメージ",
+			"回復",
+			"防御",
+			"の攻撃",
+			"のスキル",
+			"を使用",
+			"を発動",
+			"にダメージ",
+			"を回復",
+		];
+		return actionKeywords.some((keyword) => log.includes(keyword));
+	};
 
 	// main effect: 部屋情報が変わるたびに実行
 	useEffect(() => {
@@ -654,6 +671,11 @@ export default function Battle({ room }: BattleProps) {
 															"/placeholder.svg" ||
 															"/placeholder.svg" ||
 															"/placeholder.svg" ||
+															"/placeholder.svg" ||
+															"/placeholder.svg" ||
+															"/placeholder.svg" ||
+															"/placeholder.svg" ||
+															"/placeholder.svg" ||
 															"/placeholder.svg"
 														}
 														alt={character.character.name}
@@ -717,11 +739,20 @@ export default function Battle({ room }: BattleProps) {
 				<div className="relative">
 					<div
 						id="battle-log"
-						className="bg-gray-800 border border-green-500/50 rounded-lg py-2 px-4 h-32 overflow-y-hidden mb-4"
+						ref={logContainerRef}
+						onScroll={handleScroll}
+						className="bg-gray-800 border border-green-500/50 rounded-lg py-2 px-4 h-32 overflow-y-auto mb-4 scrollbar-thin scrollbar-track-gray-700/30 scrollbar-thumb-green-500/30"
 					>
 						<div className="space-y-1">
 							{battleLog.map((log, index) => (
-								<div key={index} className="text-sm font-mono text-green-300">
+								<div
+									key={index}
+									className="text-sm font-mono text-green-300 animate-in fade-in slide-in-from-bottom-2 duration-300"
+									style={{
+										animationDelay: `${50 * (battleLog.length - index)}ms`,
+										animationFillMode: "backwards",
+									}}
+								>
 									{log}
 								</div>
 							))}
@@ -741,6 +772,7 @@ export default function Battle({ room }: BattleProps) {
 						onClick={() => {
 							setSelectedAction("attack");
 							setIsSelectingAction(false);
+							setIsSelectingEnemy(true); // 攻撃選択時に敵選択を有効にする
 						}}
 						className={`flex items-center justify-center gap-2 p-3 rounded-lg ${
 							isSelectingAction && !loading
