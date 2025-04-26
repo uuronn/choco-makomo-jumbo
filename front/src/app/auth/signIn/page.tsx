@@ -142,9 +142,7 @@ export default function Home() {
 					</div>
 
 					<div className="mt-8 text-center">
-						<p className="text-emerald-300/60 text-xs">
-							技術大戦争 | TECHNOLOGY WAR
-						</p>
+						<p className="text-emerald-300/60 text-xs">技術大戦争 | TECH WAR</p>
 					</div>
 				</div>
 			</div>
