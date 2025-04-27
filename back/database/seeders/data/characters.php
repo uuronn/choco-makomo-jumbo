@@ -607,8 +607,8 @@ return [
         'specialSkillName' => 'バスGAS爆発',
         'specialSkillDescription' => '味方全員に体力の15%のダメージを与え、エラー状態にする。',
         'baseSpecialSkillTurn' => 16,
-        'passiveSkillName' => null,
-        'passiveSkillDescription' => null,
+        'passiveSkillName' => "特攻",
+        'passiveSkillDescription' => "クラウドタイプのキャラに与えるダメージ20%アップ",
     ],
     // Firebase
     [
