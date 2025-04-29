@@ -569,7 +569,7 @@ return [
         'specialSkillName' => null,
         'specialSkillDescription' => null,
         'baseSpecialSkillTurn' => 0,
-        'passiveSkillName' => null,
+        'passiveSkillName' => "1.5倍",
         'passiveSkillDescription' => null,
     ],
     // VBA
