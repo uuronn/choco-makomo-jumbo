@@ -6,6 +6,7 @@ type User = {
 	email: string;
 	photoUrl: string;
 	point: number;
+	rating: number;
 };
 
 const fetcher = async (userId: string): Promise<User> => {

@@ -23,6 +23,7 @@ import { Coins } from "lucide-react";
 import { useUserContext } from "~/context/UserProvider";
 import { useUser } from "~/hook/useUser";
 import Loading from "~/components/Loading";
+import { auth } from "~/lib/firebase";
 
 // 技術力に応じた称号を取得する関数
 const getTechTitle = (
@@ -107,7 +108,7 @@ const getTechTitle = (
 			glowColor: "shadow-[0_0_8px_rgba(20,184,166,0.4)]",
 		};
 	return {
-		title: "テックルーキー",
+		title: "駆け出しエンジニア",
 		color: "text-gray-300",
 		bgColor: "bg-gray-900/30",
 		borderColor: "border-gray-500/50",
@@ -185,15 +186,15 @@ export default function HomeScreen() {
 	// サンプルの技術力値（実際のアプリではAPIから取得）
 	const [techPower, setTechPower] = useState<number>(720);
 
-	// 技術力に応じた称号を取得
-	const techTitle = getTechTitle(techPower);
-
 	const {
 		data: user,
 		error,
 		isLoading,
 		mutate,
 	} = useUser(authUser?.uid ?? null);
+
+	// 技術力に応じた称号を取得
+	const techTitle = getTechTitle(user?.rating ?? 0);
 
 	useEffect(() => {
 		const fetchOnlineUsers = async () => {
@@ -445,7 +446,7 @@ export default function HomeScreen() {
 							>
 								<Zap className="h-4 w-4 text-yellow-400" />
 								<span className="text-sm text-yellow-400 font-mono">
-									技術力: <span className="font-bold">{techPower}</span>
+									技術力: <span className="font-bold">{user.rating}</span>
 								</span>
 							</motion.div>
 						</div>
