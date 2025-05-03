@@ -35,73 +35,81 @@ const getTechTitle = (
 	borderColor: string;
 	glowColor: string;
 } => {
-	if (techPower >= 1000)
+	if (techPower >= 10000)
 		return {
-			title: "テックレジェンド",
+			title: "グランドマスターエンジニア",
 			color: "text-purple-300",
 			bgColor: "bg-purple-900/30",
 			borderColor: "border-purple-500/50",
 			glowColor: "shadow-[0_0_8px_rgba(168,85,247,0.4)]",
 		};
-	if (techPower >= 900)
+	if (techPower >= 8000)
 		return {
-			title: "テックマスター",
+			title: "レジェンドエンジニア",
+			color: "text-purple-300",
+			bgColor: "bg-purple-900/30",
+			borderColor: "border-purple-500/50",
+			glowColor: "shadow-[0_0_8px_rgba(168,85,247,0.4)]",
+		};
+	if (techPower >= 6000)
+		return {
+			title: "リードエンジニア",
 			color: "text-red-300",
 			bgColor: "bg-red-900/30",
 			borderColor: "border-red-500/50",
 			glowColor: "shadow-[0_0_8px_rgba(239,68,68,0.4)]",
 		};
-	if (techPower >= 800)
+	if (techPower >= 5000)
 		return {
-			title: "エキスパートエンジニア",
+			title: "シニアエンジニア",
 			color: "text-orange-300",
 			bgColor: "bg-orange-900/30",
 			borderColor: "border-orange-500/50",
 			glowColor: "shadow-[0_0_8px_rgba(249,115,22,0.4)]",
 		};
-	if (techPower >= 700)
+	if (techPower >= 4500)
 		return {
-			title: "シニアデベロッパー",
+			title: "シニアエンジニア",
 			color: "text-yellow-300",
 			bgColor: "bg-yellow-900/30",
 			borderColor: "border-yellow-500/50",
 			glowColor: "shadow-[0_0_8px_rgba(234,179,8,0.4)]",
 		};
-	if (techPower >= 600)
+	if (techPower >= 4000)
 		return {
-			title: "ミドルエンジニア",
+			title: "ちょっとできるエンジニア",
 			color: "text-green-300",
 			bgColor: "bg-green-900/30",
 			borderColor: "border-green-500/50",
 			glowColor: "shadow-[0_0_8px_rgba(34,197,94,0.4)]",
 		};
-	if (techPower >= 500)
+	if (techPower >= 3500)
 		return {
-			title: "ジュニアデベロッパー",
+			title: "ミドルエンジニア",
 			color: "text-blue-300",
 			bgColor: "bg-blue-900/30",
 			borderColor: "border-blue-500/50",
 			glowColor: "shadow-[0_0_8px_rgba(59,130,246,0.4)]",
 		};
-	if (techPower >= 400)
+	if (techPower >= 3000)
 		return {
-			title: "コードアーティスト",
+			title: "なんも分からんエンジニア",
 			color: "text-indigo-300",
 			bgColor: "bg-indigo-900/30",
 			borderColor: "border-indigo-500/50",
 			glowColor: "shadow-[0_0_8px_rgba(99,102,241,0.4)]",
 		};
-	if (techPower >= 300)
+	if (techPower >= 2500)
 		return {
-			title: "テックアプレンティス",
+			title: "ジュニアエンジニア",
 			color: "text-cyan-300",
 			bgColor: "bg-cyan-900/30",
 			borderColor: "border-cyan-500/50",
 			glowColor: "shadow-[0_0_8px_rgba(34,211,238,0.4)]",
 		};
-	if (techPower >= 200)
+	if (techPower >= 2000)
 		return {
-			title: "コードビギナー",
+			title: "完全に理解したエンジニア",
 			color: "text-teal-300",
 			bgColor: "bg-teal-900/30",
 			borderColor: "border-teal-500/50",
