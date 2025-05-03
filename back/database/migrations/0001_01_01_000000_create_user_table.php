@@ -15,6 +15,7 @@ return new class extends Migration
             $table->mediumInteger('point')->unsigned();
             $table->string('photoUrl');
             $table->timestamp('last_activity_at')->nullable();
+            $table->mediumInteger('rating')->default(1500);
             $table->timestamps();
         });
 
