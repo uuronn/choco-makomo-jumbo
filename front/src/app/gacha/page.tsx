@@ -895,7 +895,7 @@ export default function TabbedGacha() {
 							<TabsTrigger
 								value="github"
 								disabled={isAnimating}
-								className="data-[state=active]:bg-green-900/50 data-[state=active]:text-green-300 text-green-500"
+								className="data-[state=active]:bg-green-900/50 data-[state=active]:text-green-300 text-green-500 cursor-pointer"
 							>
 								<div className="flex items-center gap-2">
 									<Github className="h-4 w-4" />
@@ -916,7 +916,7 @@ export default function TabbedGacha() {
 												</span>
 											</TooltipTrigger>
 											<TooltipContent className="bg-black/90 border-green-500/50 text-green-300 max-w-[200px]">
-												GitHubリポジトリからキャラクターを取得します
+												GitHubリポジトリ(public)で使用している技術から、キャラクターをランダムで一体取得します
 											</TooltipContent>
 										</Tooltip>
 									</TooltipProvider>
@@ -1648,7 +1648,7 @@ export default function TabbedGacha() {
 								<Link href="/" className="w-1/2">
 									<Button
 										disabled={isAnimating}
-										className="w-full relative bg-black hover:bg-green-900 text-green-400 border border-green-500/50 px-8 py-6 text-xl rounded-md shadow-[0_0_10px_rgba(0,255,128,0.3)] transition-all hover:shadow-[0_0_15px_rgba(0,255,128,0.5)] disabled:opacity-70 disabled:hover:shadow-[0_0_10px_rgba(0,255,128,0.3)] overflow-hidden group"
+										className="w-full relative bg-black hover:bg-green-900 text-green-400 border border-green-500/50 px-8 py-6 text-xl rounded-md shadow-[0_0_10px_rgba(0,255,128,0.3)] transition-all hover:shadow-[0_0_15px_rgba(0,255,128,0.5)] disabled:opacity-70 disabled:hover:shadow-[0_0_10px_rgba(0,255,128,0.3)] overflow-hidden group cursor-pointer"
 									>
 										{/* Button glow effect */}
 										<div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
@@ -1674,7 +1674,7 @@ export default function TabbedGacha() {
 									<Button
 										onClick={pullGacha}
 										disabled={isAnimating || availablePoints < 10}
-										className="w-1/2 relative bg-black hover:bg-green-900 text-green-400 border border-green-500/50 px-8 py-6 text-xl rounded-md shadow-[0_0_10px_rgba(0,255,128,0.3)] transition-all hover:shadow-[0_0_15px_rgba(0,255,128,0.5)] disabled:opacity-70 disabled:hover:shadow-[0_0_10px_rgba(0,255,128,0.3)] overflow-hidden group"
+										className="w-1/2 relative cursor-pointer bg-black hover:bg-green-900 text-green-400 border border-green-500/50 px-8 py-6 text-xl rounded-md shadow-[0_0_10px_rgba(0,255,128,0.3)] transition-all hover:shadow-[0_0_15px_rgba(0,255,128,0.5)] disabled:opacity-70 disabled:hover:shadow-[0_0_10px_rgba(0,255,128,0.3)] overflow-hidden group"
 									>
 										{/* Button glow effect */}
 										<div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
@@ -1735,7 +1735,7 @@ export default function TabbedGacha() {
 							)}
 
 							{/* Animated dots */}
-							<div className="mt-4 flex items-center justify-center gap-2">
+							{/* <div className="mt-4 flex items-center justify-center gap-2">
 								{Array.from({ length: 10 }).map((_, i) => (
 									<motion.div
 										key={i}
@@ -1748,7 +1748,7 @@ export default function TabbedGacha() {
 										}}
 									></motion.div>
 								))}
-							</div>
+							</div> */}
 						</div>
 					</Tabs>
 				</div>
