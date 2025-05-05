@@ -7,6 +7,7 @@ use App\Model\Character;
 use App\Model\UserCharacter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class GachaController
 {
@@ -93,7 +94,7 @@ class GachaController
 
         try {
             // 環境変数から外部APIトークンを取得
-            $token = config('custom.github_language_api_token');
+            $token = env('GITHUB_LANGUAGE_API_TOKEN');
             if (empty($token)) {
                 return response()->json(['message' => '外部APIトークンが設定されていません'], 500);
             }
@@ -111,12 +112,20 @@ class GachaController
             }
             $techData = $response->json();
 
+            // デバッグ: 外部APIのレスポンスをログに出力
+            Log::info('API Response: ', $techData);
+
             // キャラクターIDを小文字で取得
             $characterIds = array_map('strtolower', array_column(include base_path('database/seeders/data/characters.php'), 'id'));
             $matchingCharacters = [];
 
-            // 言語を抽出（techDataが言語名をキーとするオブジェクト、またはlanguagesキーを持つと仮定）
+            // デバッグ: キャラクターIDをログに出力
+            Log::info('Character IDs: ', $characterIds);
+
+            // 言語を抽出
             $languages = array_keys($techData['languages'] ?? $techData);
+            Log::info('Extracted Languages: ', $languages);
+
             foreach ($languages as $language) {
                 $language = strtolower($language);
                 // 直接一致する場合
@@ -146,7 +155,11 @@ class GachaController
                     'vba' => 'vba',
                     'google apps script' => 'gas',
                     'scratch' => 'scratch',
-                    'viscuit' => 'viscuit'
+                    'viscuit' => 'viscuit',
+                    // 追加のマッピング（必要に応じて）
+                    'objective-c' => 'objc',
+                    'scala' => 'scala',
+                    'r' => 'r',
                 ];
                 if (isset($languageMap[$language]) && in_array($languageMap[$language], $characterIds)) {
                     $matchingCharacters[] = $languageMap[$language];
@@ -160,7 +173,9 @@ class GachaController
                 'spring', 'express', 'jquery', 'aws', 'azure', 'google cloud', 'firebase',
                 'supabase', 'mysql', 'postgresql', 'sqlite', 'mongodb', 'docker', 'kubernetes',
                 'nginx', 'apache', 'litespeed', 'caddy', 'unity', 'unreal engine', 'git',
-                'webpack', 'vite'
+                'webpack', 'vite',
+                // 追加のキーワード（必要に応じて）
+                'node.js', 'next.js', 'svelte', 'nuxt.js', 'gatsby',
             ];
             foreach ($readmeKeywords as $keyword) {
                 if (stripos($readmeContent, $keyword) !== false && in_array(strtolower($keyword), $characterIds)) {
@@ -168,10 +183,34 @@ class GachaController
                 }
             }
 
+            // デバッグ: マッチング結果をログに出力
+            Log::info('Matching Characters: ', $matchingCharacters);
+
             // 重複を排除
             $matchingCharacters = array_unique($matchingCharacters);
 
             if (empty($matchingCharacters)) {
+                // デフォルトキャラクターを返すフォールバック
+                $defaultCharacter = Character::where('id', 'default')->first();
+                if ($defaultCharacter) {
+                    $user->point -= self::GACHA_COST;
+                    $user->save();
+                    $userCharacter = new UserCharacter([
+                        'userId' => $user->id,
+                        'characterId' => $defaultCharacter->id,
+                        'life' => $defaultCharacter->baseLife,
+                        'power' => $defaultCharacter->basePower,
+                        'speed' => $defaultCharacter->baseSpeed,
+                        'evasion' => $defaultCharacter->baseEvasion,
+                        'level' => 0,
+                    ]);
+                    $userCharacter->save();
+                    return response()->json([
+                        'message' => '対応するキャラクターが見つかりませんでした。デフォルトキャラクターを獲得しました！',
+                        'character' => $defaultCharacter,
+                        'new_point' => $user->point
+                    ], 200);
+                }
                 return response()->json(['message' => 'このリポジトリに対応するキャラクターが見つかりません'], 404);
             }
 
@@ -222,6 +261,7 @@ class GachaController
             ], 201);
 
         } catch (\Exception $e) {
+            Log::error('Exception in githubGacha: ' . $e->getMessage());
             return response()->json(['message' => 'リポジトリの処理中にエラーが発生しました: ' . $e->getMessage()], 500);
         }
     }
