@@ -47,6 +47,9 @@ Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () 
     // ガチャを引く
     Route::post('/gacha', [GachaController::class, 'gacha']);
 
+    // ガチャを引く
+    Route::post('/githubGacha', [GachaController::class, 'githubGacha']);
+
 
     // 他のルートもここに追加できる
     // Route::put('/users/{userId}/pointtest', [UserController::class, 'updatePointTest']);
