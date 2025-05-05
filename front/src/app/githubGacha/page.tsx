@@ -49,7 +49,7 @@ type GachaResult = {
 };
 
 export default function GithubGacha() {
-	const { user, havingCharacters } = useUserContext();
+	const { user } = useUserContext();
 	const [githubUrl, setGithubUrl] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [isAnimating, setIsAnimating] = useState(false);

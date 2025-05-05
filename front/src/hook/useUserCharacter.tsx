@@ -16,6 +16,9 @@ export type Character = {
 	specialSkillTurn: number;
 	passiveSkillName: string;
 	passiveSkillDescription: string;
+	partySkillName: string;
+	partySkillDescription: string;
+	partySkillCondition: string;
 };
 
 const fetcher = async ([_, userId, token]: [string, string, string]): Promise<
