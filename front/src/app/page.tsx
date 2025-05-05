@@ -192,7 +192,7 @@ export default function HomeScreen() {
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	// サンプルの技術力値（実際のアプリではAPIから取得）
-	const [techPower, setTechPower] = useState<number>(720);
+	// const [techPower, setTechPower] = useState<number>(720);
 
 	const {
 		data: user,
