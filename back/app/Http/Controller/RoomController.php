@@ -1993,6 +1993,57 @@ class RoomController
 
         if (!$hostAlive || !$guestAlive) {
             $winUserId = !$hostAlive ? $room->guestUserId : $room->hostUserId;
+            $loseUserId = !$hostAlive ? $room->hostUserId : $room->guestUserId;
+
+            // 勝者と敗者のユーザー情報を取得
+            $winner = User::find($winUserId);
+            $loser = User::find($loseUserId);
+
+            if ($winner && $loser) {
+                // Eloレーティング計算
+                $kFactor = 32; // K値
+                $ratingA = $winner->rating; // 勝者の現在のレート
+                $ratingB = $loser->rating; // 敗者の現在のレート
+
+                // 期待勝率の計算
+                $expectedA = 1 / (1 + pow(10, ($ratingB - $ratingA) / 400));
+                $expectedB = 1 / (1 + pow(10, ($ratingA - $ratingB) / 400));
+
+                // 実際の結果（勝ち=1、負け=0）
+                $scoreA = 1;
+                $scoreB = 0;
+
+                // 新しいレートを計算
+                $newRatingA = $ratingA + $kFactor * ($scoreA - $expectedA);
+                $newRatingB = $ratingB + $kFactor * ($scoreB - $expectedB);
+
+                // レートを更新
+                $winner->update(['rating' => round($newRatingA)]);
+                $loser->update(['rating' => round($newRatingB)]);
+
+                // レート変動量を計算
+                $winnerRateChange = round($newRatingA) - $ratingA;
+                $loserRateChange = round($newRatingB) - $ratingB;
+
+                // バトル結果ログを保存
+                RoomLog::create([
+                    'roomId' => $room->id,
+                    'actionType' => 'rating_update',
+                    'description' => "レート更新: {$winner->name} +{$winnerRateChange}, {$loser->name} {$loserRateChange}",
+                ]);
+
+                // battle_result_logsテーブルに保存
+                DB::table('battle_result_logs')->insert([
+                    'roomId' => $room->id,
+                    'winnerUserId' => $winUserId,
+                    'loserUserId' => $loseUserId,
+                    'winnerRateChange' => $winnerRateChange,
+                    'loserRateChange' => $loserRateChange,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
             $room->update([
                 'status' => 'finish',
                 'winUserId' => $winUserId
@@ -2005,62 +2056,6 @@ class RoomController
         }
     }
 
-    /**
-     * 次のターンに進む
-     */
-    // public function nextTurn(Request $request)
-    // {
-    //     try {
-    //         $roomId = $request->route('roomId');
-    //         $userId = $request->route('userId'); // 現在の行動ユーザー
-
-    //         $room = Room::where('id', $roomId)->first();
-
-    //         if (!$room || $room->status !== 'battling') {
-    //             return response()->json(['message' => 'バトルが進行中ではありません'], 400);
-    //         }
-
-    //         if ($room->currentTurnUserId !== $userId) {
-    //             return response()->json(['message' => 'あなたのターンではありません'], 403);
-    //         }
-
-    //         return DB::transaction(function () use ($roomId, $userId, $room) {
-    //             // 現在のユーザーの最速キャラクターを行動不能に
-    //             RoomCharacter::where('roomId', $roomId)
-    //                 ->where('userId', $userId)
-    //                 ->where('isActive', true)
-    //                 ->orderBy('speed', 'desc')
-    //                 ->limit(1)
-    //                 ->update(['isActive' => false]);
-
-    //             $nextTurn = RoomCharacter::where('roomId', $roomId)
-    //                 ->where('isActive', true)
-    //                 ->orderBy('speed', 'desc')
-    //                 ->first();
-
-    //             if (!$nextTurn) {
-    //                 RoomCharacter::where('roomId', $roomId)->update(['isActive' => true]);
-    //                 $nextTurn = RoomCharacter::where('roomId', $roomId)
-    //                     ->where('isActive', true)
-    //                     ->orderBy('speed', 'desc')
-    //                     ->first();
-    //             }
-
-    //             $room->update(['currentTurnUserId' => $nextTurn->userId, 'currentTurnCharacterId' => $nextTurn->characterId]);
-
-    //             return response()->json([
-    //                 'message' => '次のターンに進みました',
-    //                 'room' => $room,
-    //                 'next_turn_user_id' => $nextTurn->userId
-    //             ], 200);
-    //         });
-    //     } catch (Exception $e) {
-    //         return response()->json([
-    //             'message' => 'ターン進行に失敗しました',
-    //             'error' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
 
     /**
      * 特定のルームを削除
