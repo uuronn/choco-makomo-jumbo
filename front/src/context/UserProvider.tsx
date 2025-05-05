@@ -18,7 +18,7 @@ import { auth, googleProvider } from "~/lib/firebase";
 import type { Character } from "~/type/character";
 import type { SelectingRoom } from "~/type/room";
 
-type User = FirebaseUser & { token: string };
+type User = FirebaseUser & { token: string; rate: number };
 
 const UserContext = createContext<{
 	handleSignIn: () => void;
