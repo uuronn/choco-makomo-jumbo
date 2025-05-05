@@ -122,8 +122,8 @@ class GachaController
             // デバッグ: キャラクターIDをログに出力
             Log::info('Character IDs: ', $characterIds);
 
-            // 言語を抽出
-            $languages = array_keys($techData['languages'] ?? $techData);
+            // 言語を抽出（配列形式またはlanguagesキーに対応）
+            $languages = is_array($techData) ? $techData : (isset($techData['languages']) ? array_keys($techData['languages']) : []);
             Log::info('Extracted Languages: ', $languages);
 
             foreach ($languages as $language) {
@@ -131,6 +131,7 @@ class GachaController
                 // 直接一致する場合
                 if (in_array($language, $characterIds)) {
                     $matchingCharacters[] = $language;
+                    Log::info("Matched directly: {$language}");
                 }
                 // 特殊な言語名のマッピング
                 $languageMap = [
@@ -156,30 +157,29 @@ class GachaController
                     'google apps script' => 'gas',
                     'scratch' => 'scratch',
                     'viscuit' => 'viscuit',
-                    // 追加のマッピング（必要に応じて）
                     'objective-c' => 'objc',
                     'scala' => 'scala',
                     'r' => 'r',
                 ];
                 if (isset($languageMap[$language]) && in_array($languageMap[$language], $characterIds)) {
                     $matchingCharacters[] = $languageMap[$language];
+                    Log::info("Matched via mapping: {$language} -> {$languageMap[$language]}");
                 }
             }
 
             // READMEやメタデータからフレームワークやツールを抽出
-            $readmeContent = $techData['readme'] ?? '';
+            $readmeContent = isset($techData['readme']) ? $techData['readme'] : '';
             $readmeKeywords = [
                 'react', 'vue', 'angular', 'ruby on rails', 'laravel', 'django', 'flask',
                 'spring', 'express', 'jquery', 'aws', 'azure', 'google cloud', 'firebase',
                 'supabase', 'mysql', 'postgresql', 'sqlite', 'mongodb', 'docker', 'kubernetes',
                 'nginx', 'apache', 'litespeed', 'caddy', 'unity', 'unreal engine', 'git',
-                'webpack', 'vite',
-                // 追加のキーワード（必要に応じて）
-                'node.js', 'next.js', 'svelte', 'nuxt.js', 'gatsby',
+                'webpack', 'vite', 'node.js', 'next.js', 'svelte', 'nuxt.js', 'gatsby',
             ];
             foreach ($readmeKeywords as $keyword) {
                 if (stripos($readmeContent, $keyword) !== false && in_array(strtolower($keyword), $characterIds)) {
                     $matchingCharacters[] = strtolower($keyword);
+                    Log::info("Matched via README: {$keyword}");
                 }
             }
 
