@@ -17,6 +17,7 @@ import {
 	Lightbulb,
 	Github,
 	Gamepad2,
+	Info,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -26,6 +27,12 @@ import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import confetti from "canvas-confetti";
 import { useUserContext } from "~/context/UserProvider";
 import { characterToImagePath } from "~/lib/utils";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "~/components/ui/tooltip";
 
 // Define the character type
 type Character = {
@@ -56,6 +63,7 @@ type GachaResult = {
 export default function TabbedGacha() {
 	const { user } = useUserContext();
 	const [activeTab, setActiveTab] = useState("regular");
+	// const [showGithubInfo, setShowGithubInfo] = useState(false);
 
 	// Regular Gacha State
 	const [availablePoints, setAvailablePoints] = useState(0);
@@ -873,11 +881,11 @@ export default function TabbedGacha() {
 						onValueChange={handleTabChange}
 						className="w-full"
 					>
-						<TabsList className="grid w-full grid-cols-2 bg-black/50 border border-green-500/30">
+						<TabsList className="grid w-full h-full grid-cols-2 bg-black/50 border border-green-500/30">
 							<TabsTrigger
 								value="regular"
 								disabled={isAnimating}
-								className="data-[state=active]:bg-green-900/50 data-[state=active]:text-green-300 text-green-500"
+								className="data-[state=active]:bg-green-900/50 data-[state=active]:text-green-300 text-green-500 cursor-pointer"
 							>
 								<div className="flex items-center gap-2">
 									<Gamepad2 className="h-4 w-4" />
@@ -892,6 +900,26 @@ export default function TabbedGacha() {
 								<div className="flex items-center gap-2">
 									<Github className="h-4 w-4" />
 									<span>GitHub ガチャ</span>
+									<TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger asChild={true}>
+												<span
+													onKeyDown={() => {}}
+													// type="button"
+													className="ml-1 text-green-400 hover:text-green-300 transition-colors"
+													onClick={(e) => {
+														e.stopPropagation();
+														// setShowGithubInfo(true);
+													}}
+												>
+													<Info className="h-3.5 w-3.5" />
+												</span>
+											</TooltipTrigger>
+											<TooltipContent className="bg-black/90 border-green-500/50 text-green-300 max-w-[200px]">
+												GitHubリポジトリからキャラクターを取得します
+											</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
 								</div>
 							</TabsTrigger>
 						</TabsList>
@@ -1697,12 +1725,12 @@ export default function TabbedGacha() {
 
 							{/* Cost indicator for regular gacha */}
 							{activeTab === "regular" ? (
-								<div className="mt-2 text-xs text-green-500/70 font-mono text-center">
-									コスト: 10 ポイント / 1回
+								<div className="mt-2 text-md text-green-400 font-mono text-center">
+									コスト: 10 技術ポイント / 1回
 								</div>
 							) : (
-								<div className="mt-2 text-xs text-green-500/70 font-mono text-center">
-									コスト: 100 ポイント / 1回
+								<div className="mt-2 text-md text-green-400 font-mono text-center">
+									コスト: 100 技術ポイント / 1回
 								</div>
 							)}
 
