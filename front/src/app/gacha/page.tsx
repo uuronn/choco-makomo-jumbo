@@ -54,7 +54,7 @@ type GachaResult = {
 };
 
 export default function TabbedGacha() {
-	const { user, havingCharacters } = useUserContext();
+	const { user } = useUserContext();
 	const [activeTab, setActiveTab] = useState("regular");
 
 	// Regular Gacha State
