@@ -112,7 +112,7 @@ class GachaController
             $techData = $response->json();
 
             // キャラクターIDを小文字で取得
-            $characterIds = array_map('strtolower', array_column(include base_path('characters.php'), 'id'));
+            $characterIds = array_map('strtolower', array_column(include base_path('database/seeders/data/characters.php'), 'id'));
             $matchingCharacters = [];
 
             // 言語を抽出（techDataが言語名をキーとするオブジェクト、またはlanguagesキーを持つと仮定）
