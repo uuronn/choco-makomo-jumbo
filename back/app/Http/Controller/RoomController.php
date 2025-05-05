@@ -1357,73 +1357,73 @@ class RoomController
     /**
      * ルーム内で降参する
      */
-    public function surrender(Request $request)
-    {
-        try {
-            $roomId = $request->route('roomId');
-            $userId = $request->route('userId');
+    // public function surrender(Request $request)
+    // {
+    //     try {
+    //         $roomId = $request->route('roomId');
+    //         $userId = $request->route('userId');
 
-            $room = Room::with(['roomCharacter', 'hostUser', 'guestUser'])->where('id', $roomId)->first();
+    //         $room = Room::with(['roomCharacter', 'hostUser', 'guestUser'])->where('id', $roomId)->first();
 
-            if (!$room) {
-                return response()->json(['message' => 'ルームが見つかりません'], 404);
-            }
+    //         if (!$room) {
+    //             return response()->json(['message' => 'ルームが見つかりません'], 404);
+    //         }
 
-            if ($room->status !== 'battling') {
-                return response()->json(['message' => 'バトルが進行中ではありません'], 400);
-            }
+    //         if ($room->status !== 'battling') {
+    //             return response()->json(['message' => 'バトルが進行中ではありません'], 400);
+    //         }
 
-            if ($room->hostUserId !== $userId && $room->guestUserId !== $userId) {
-                return response()->json(['message' => 'このルームにアクセスする権限がありません'], 403);
-            }
+    //         if ($room->hostUserId !== $userId && $room->guestUserId !== $userId) {
+    //             return response()->json(['message' => 'このルームにアクセスする権限がありません'], 403);
+    //         }
 
-            return DB::transaction(function () use ($roomId, $userId, $room) {
-                // 降参した側の全キャラを死にさせる
-                RoomCharacter::where('roomId', $roomId)
-                    ->where('userId', $userId)
-                    ->where('isDead', false)
-                    ->update([
-                        'life' => 0,
-                        'isDead' => true,
-                        'isActive' => false,
-                    ]);
+    //         return DB::transaction(function () use ($roomId, $userId, $room) {
+    //             // 降参した側の全キャラを死にさせる
+    //             RoomCharacter::where('roomId', $roomId)
+    //                 ->where('userId', $userId)
+    //                 ->where('isDead', false)
+    //                 ->update([
+    //                     'life' => 0,
+    //                     'isDead' => true,
+    //                     'isActive' => false,
+    //                 ]);
 
-                // 勝者を決定（降参した側と反対）
-                $winnerUserId = ($userId === $room->hostUserId) ? $room->guestUserId : $room->hostUserId;
-                $loserName = ($userId === $room->hostUserId) ? $room->hostUser->name : $room->guestUser->name;
-                $winnerName = ($userId === $room->hostUserId) ? $room->guestUser->name : $room->hostUser->name;
+    //             // 勝者を決定（降参した側と反対）
+    //             $winnerUserId = ($userId === $room->hostUserId) ? $room->guestUserId : $room->hostUserId;
+    //             $loserName = ($userId === $room->hostUserId) ? $room->hostUser->name : $room->guestUser->name;
+    //             $winnerName = ($userId === $room->hostUserId) ? $room->guestUser->name : $room->hostUser->name;
 
-                // ルームのステータスを終了に更新
-                $room->update([
-                    'status' => 'finish',
-                    'winUserId' => $winnerUserId,
-                    'currentTurnUserId' => null,
-                    'currentTurnCharacterId' => null,
-                ]);
+    //             // ルームのステータスを終了に更新
+    //             $room->update([
+    //                 'status' => 'finish',
+    //                 'winUserId' => $winnerUserId,
+    //                 'currentTurnUserId' => null,
+    //                 'currentTurnCharacterId' => null,
+    //             ]);
 
-                // 降参ログを記録
-                RoomLog::create([
-                    'roomId' => $roomId,
-                    'actionType' => 'surrender',
-                    'actorUserId' => $userId,
-                    'description' => "{$loserName} が降参しました。{$winnerName} の勝利です。",
-                ]);
+    //             // 降参ログを記録
+    //             RoomLog::create([
+    //                 'roomId' => $roomId,
+    //                 'actionType' => 'surrender',
+    //                 'actorUserId' => $userId,
+    //                 'description' => "{$loserName} が降参しました。{$winnerName} の勝利です。",
+    //             ]);
 
-                $room->refresh();
+    //             $room->refresh();
 
-                return response()->json([
-                    'message' => "{$loserName} が降参しました。{$winnerName} の勝利です。",
-                    'room' => $room,
-                    'winner_user_id' => $winnerUserId,
-                ], 200);
-            });
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => '降参処理に失敗しました',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
+    //             return response()->json([
+    //                 'message' => "{$loserName} が降参しました。{$winnerName} の勝利です。",
+    //                 'room' => $room,
+    //                 'winner_user_id' => $winnerUserId,
+    //             ], 200);
+    //         });
+    //     } catch (Exception $e) {
+    //         return response()->json([
+    //             'message' => '降参処理に失敗しました',
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
     /**
      * キャラクターが別のキャラクターに通常攻撃する
@@ -1976,12 +1976,69 @@ class RoomController
 
         return $nextTurn;
     }
+/**
+     * レートを更新する共通ロジック
+     */
+    private function updateRatings($room, $winUserId, $loseUserId)
+    {
+        // 勝者と敗者のユーザー情報を取得
+        $winner = User::find($winUserId);
+        $loser = User::find($loseUserId);
+
+        if ($winner && $loser) {
+            // Eloレーティング計算
+            $kFactor = 32; // K値
+            $ratingA = $winner->rating ?? 1500; // 勝者の現在のレート（デフォルト1500）
+            $ratingB = $loser->rating ?? 1500; // 敗者の現在のレート（デフォルト1500）
+
+            // 期待勝率の計算
+            $expectedA = 1 / (1 + pow(10, ($ratingB - $ratingA) / 400));
+            $expectedB = 1 / (1 + pow(10, ($ratingA - $ratingB) / 400));
+
+            // 実際の結果（勝ち=1、負け=0）
+            $scoreA = 1;
+            $scoreB = 0;
+
+            // 新しいレートを計算
+            $newRatingA = $ratingA + $kFactor * ($scoreA - $expectedA);
+            $newRatingB = $ratingB + $kFactor * ($scoreB - $expectedB);
+
+            // レートを更新
+            $winner->update(['rating' => round($newRatingA)]);
+            $loser->update(['rating' => round($newRatingB)]);
+
+            // レート変動量を計算
+            $winnerRateChange = round($newRatingA) - $ratingA;
+            $loserRateChange = round($newRatingB) - $ratingB;
+
+            // バトル結果ログを保存
+            RoomLog::create([
+                'roomId' => $room->id,
+                'actionType' => 'rating_update',
+                'description' => "レート更新: {$winner->name} +{$winnerRateChange}, {$loser->name} {$loserRateChange}",
+            ]);
+
+            // battle_result_logsテーブルに保存
+            DB::table('battle_result_logs')->insert([
+                'roomId' => $room->id,
+                'winnerUserId' => $winUserId,
+                'loserUserId' => $loseUserId,
+                'winnerRateChange' => $winnerRateChange,
+                'loserRateChange' => $loserRateChange,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+    }
 
     /**
      * バトル終了をチェック
      */
     private function checkBattleEnd($room)
     {
+        // リレーションをロード
+        $room->load(['hostUser', 'guestUser']);
+
         $hostAlive = RoomCharacter::where('roomId', $room->id)
             ->where('userId', $room->hostUserId)
             ->where('isDead', false)
@@ -1995,54 +2052,8 @@ class RoomController
             $winUserId = !$hostAlive ? $room->guestUserId : $room->hostUserId;
             $loseUserId = !$hostAlive ? $room->hostUserId : $room->guestUserId;
 
-            // 勝者と敗者のユーザー情報を取得
-            $winner = User::find($winUserId);
-            $loser = User::find($loseUserId);
-
-            if ($winner && $loser) {
-                // Eloレーティング計算
-                $kFactor = 32; // K値
-                $ratingA = $winner->rating; // 勝者の現在のレート
-                $ratingB = $loser->rating; // 敗者の現在のレート
-
-                // 期待勝率の計算
-                $expectedA = 1 / (1 + pow(10, ($ratingB - $ratingA) / 400));
-                $expectedB = 1 / (1 + pow(10, ($ratingA - $ratingB) / 400));
-
-                // 実際の結果（勝ち=1、負け=0）
-                $scoreA = 1;
-                $scoreB = 0;
-
-                // 新しいレートを計算
-                $newRatingA = $ratingA + $kFactor * ($scoreA - $expectedA);
-                $newRatingB = $ratingB + $kFactor * ($scoreB - $expectedB);
-
-                // レートを更新
-                $winner->update(['rating' => round($newRatingA)]);
-                $loser->update(['rating' => round($newRatingB)]);
-
-                // レート変動量を計算
-                $winnerRateChange = round($newRatingA) - $ratingA;
-                $loserRateChange = round($newRatingB) - $ratingB;
-
-                // バトル結果ログを保存
-                RoomLog::create([
-                    'roomId' => $room->id,
-                    'actionType' => 'rating_update',
-                    'description' => "レート更新: {$winner->name} +{$winnerRateChange}, {$loser->name} {$loserRateChange}",
-                ]);
-
-                // battle_result_logsテーブルに保存
-                DB::table('battle_result_logs')->insert([
-                    'roomId' => $room->id,
-                    'winnerUserId' => $winUserId,
-                    'loserUserId' => $loseUserId,
-                    'winnerRateChange' => $winnerRateChange,
-                    'loserRateChange' => $loserRateChange,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+            // レート更新
+            $this->updateRatings($room, $winUserId, $loseUserId);
 
             $room->update([
                 'status' => 'finish',
@@ -2053,6 +2064,81 @@ class RoomController
                 'actionType' => 'finish',
                 'description' => !$hostAlive ? "{$room->hostUser->name} 側が全滅し、バトルが終了しました" : "{$room->guestUser->name} 側が全滅し、バトルが終了しました",
             ]);
+        }
+    }
+
+    /**
+     * ルーム内で降参する
+     */
+    public function surrender(Request $request)
+    {
+        try {
+            $roomId = $request->route('roomId');
+            $userId = $request->route('userId');
+
+            $room = Room::with(['roomCharacter', 'hostUser', 'guestUser'])->where('id', $roomId)->first();
+
+            if (!$room) {
+                return response()->json(['message' => 'ルームが見つかりません'], 404);
+            }
+
+            if ($room->status !== 'battling') {
+                return response()->json(['message' => 'バトルが進行中ではありません'], 400);
+            }
+
+            if ($room->hostUserId !== $userId && $room->guestUserId !== $userId) {
+                return response()->json(['message' => 'このルームにアクセスする権限がありません'], 403);
+            }
+
+            return DB::transaction(function () use ($roomId, $userId, $room) {
+                // 降参した側の全キャラを死にさせる
+                RoomCharacter::where('roomId', $roomId)
+                    ->where('userId', $userId)
+                    ->where('isDead', false)
+                    ->update([
+                        'life' => 0,
+                        'isDead' => true,
+                        'isActive' => false,
+                    ]);
+
+                // 勝者を決定（降参した側と反対）
+                $winnerUserId = ($userId === $room->hostUserId) ? $room->guestUserId : $room->hostUserId;
+                $loserUserId = ($userId === $room->hostUserId) ? $room->hostUserId : $room->guestUserId;
+                $winnerName = ($userId === $room->hostUserId) ? $room->guestUser->name : $room->hostUser->name;
+                $loserName = ($userId === $room->hostUserId) ? $room->hostUser->name : $room->guestUser->name;
+
+                // レート更新
+                $this->updateRatings($room, $winnerUserId, $loserUserId);
+
+                // ルームのステータスを終了に更新
+                $room->update([
+                    'status' => 'finish',
+                    'winUserId' => $winnerUserId,
+                    'currentTurnUserId' => null,
+                    'currentTurnCharacterId' => null,
+                ]);
+
+                // 降参ログを記録
+                RoomLog::create([
+                    'roomId' => $roomId,
+                    'actionType' => 'surrender',
+                    'actorUserId' => $userId,
+                    'description' => "{$loserName} が降参しました。{$winnerName} の勝利です。",
+                ]);
+
+                $room->refresh();
+
+                return response()->json([
+                    'message' => "{$loserName} が降参しました。{$winnerName} の勝利です。",
+                    'room' => $room,
+                    'winner_user_id' => $winnerUserId,
+                ], 200);
+            });
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => '降参処理に失敗しました',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 
