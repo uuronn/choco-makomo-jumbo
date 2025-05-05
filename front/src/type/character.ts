@@ -14,9 +14,9 @@ export type Character = {
 	specialSkillTurn: number;
 	passiveSkillName: string;
 	passiveSkillDescription: string;
-	partySkillName: string;
-	partySkillDescription: string;
-	partySkillCondition: string;
+	// partySkillName: string;
+	// partySkillDescription: string;
+	// partySkillCondition: string;
 };
 
 export type LevelUpResult = {
