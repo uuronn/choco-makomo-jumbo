@@ -616,7 +616,7 @@ export default function TabbedGacha() {
 			}
 
 			const data = await response.json();
-			setResult(data);
+			setResult(data.character);
 
 			// 初獲得かどうかのフラグを設定
 			const isNewCharacter = data.isNew || false;
