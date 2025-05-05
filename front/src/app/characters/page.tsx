@@ -569,7 +569,7 @@ export default function CharacterDevelopment() {
 											</div>
 
 											{/* Party Skill */}
-											<div className="mb-3 min-h-16">
+											{/* <div className="mb-3 min-h-16">
 												<div className="flex items-center gap-1 text-sm">
 													<HandshakeIcon className="h-4 w-4 text-sky-400 flex-shrink-0" />
 													<span className="text-sky-400 font-bold">
@@ -591,7 +591,7 @@ export default function CharacterDevelopment() {
 														{selectedCharacter.partySkillCondition}
 													</div>
 												)}
-											</div>
+											</div> */}
 
 											{/* Passive Skill */}
 											<div className="mb-3 min-h-16">
