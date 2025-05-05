@@ -18,7 +18,7 @@ import { auth, googleProvider } from "~/lib/firebase";
 import type { Character } from "~/type/character";
 import type { SelectingRoom } from "~/type/room";
 
-type User = FirebaseUser & { token: string; rate: number };
+type User = FirebaseUser & { token: string };
 
 const UserContext = createContext<{
 	handleSignIn: () => void;
@@ -58,6 +58,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 			const checkUser = await fetch(
 				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${res.user.uid}/checkUser`,
 			);
+
+			const checkUserData = await checkUser.json();
 
 			if (checkUser.ok) {
 				setUser({ ...res.user, token: token });
@@ -113,6 +115,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 							name: user.displayName,
 							email: user.email,
 							photoUrl: user.photoURL,
+							rate: 1500,
 						}),
 					});
 				}

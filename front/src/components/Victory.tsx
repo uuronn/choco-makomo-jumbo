@@ -9,6 +9,8 @@ import { LuSwords } from "react-icons/lu";
 import { useRouter } from "next/navigation";
 import { useUserContext } from "~/context/UserProvider";
 import type { Room } from "~/type/room";
+import { useUser } from "~/hook/useUser";
+import Loading from "./Loading";
 
 export default function Victory({ room }: { room: Room }) {
 	const [showScreen, setShowScreen] = useState(false);
@@ -18,16 +20,23 @@ export default function Victory({ room }: { room: Room }) {
 	const [rateIncrease, setRateIncrease] = useState(0);
 	const [animationComplete, setAnimationComplete] = useState(false);
 	const sparklesRef = useRef<HTMLDivElement>(null);
-	const { user } = useUserContext();
+	const { user: authUser } = useUserContext();
 
 	const router = useRouter();
+
+	const {
+		data: user,
+		error,
+		isLoading,
+		mutate,
+	} = useUser(authUser?.uid ?? null);
 
 	// レートポイントのカウントアップアニメーション
 	useEffect(() => {
 		if (!showRateIncrease) return;
 
 		// 仮のレート増加値（APIから取得するか、roomオブジェクトから取得する）
-		const baseRate = user?.rate || 1000; // ユーザーの現在のレート
+		const baseRate = user?.rating || 1000; // ユーザーの現在のレート
 		const increase = 15; // 勝利による増加ポイント
 
 		setPreviousRate(baseRate);
@@ -115,6 +124,12 @@ export default function Victory({ room }: { room: Room }) {
 			);
 		})();
 	}, [room.hostUserId, room.id]);
+
+	// 👇 データの状態を見てレンダリングを制御
+	if (!authUser) return <Loading message="認証中" />;
+	if (isLoading) return <Loading message="ユーザー情報を取得中" />;
+
+	if (!user || error) return <div>エラー: {error.message}</div>;
 
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
