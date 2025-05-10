@@ -27,28 +27,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 		const result = await signInWithPopup(auth, googleProvider);
 		const token = await result.user.getIdToken();
 
-		// Laravelに確認
-		const check = await fetch(
-			`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${result.user.uid}/checkUser`,
-		);
-
-		if (!check.ok) {
-			await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users`, {
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${token}`,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					id: result.user.uid,
-					name: result.user.displayName,
-					email: result.user.email,
-					photoUrl: result.user.photoURL,
-				}),
-			});
-		}
-
-		// ✅ Laravelとの同期が完了した後にCookie保存
 		await fetch("/api/auth/login", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -58,6 +36,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 		setUser(result.user);
 		router.push("/");
 	};
+
 	const handleSignOut = async () => {
 		await signOut(auth);
 		await fetch("/api/auth/logout", { method: "POST" });
@@ -84,7 +63,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 		return () => unsubscribe();
 	}, []);
 
-	if (user === undefined) return <div>認証中...</div>;
+	if (user === undefined) return <div>Loading...</div>;
 
 	return (
 		<UserContext.Provider value={{ user, handleSignIn, handleSignOut }}>
