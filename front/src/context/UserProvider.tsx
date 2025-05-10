@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { auth, googleProvider } from "~/lib/firebase";
 
 type UserContextType = {
-	user: any;
+	user: { uid: string; name?: string } | null | undefined;
 	handleSignIn: () => void;
 	handleSignOut: () => void;
 };
@@ -20,7 +20,9 @@ const UserContext = createContext<UserContextType>({
 export const useUserContext = () => useContext(UserContext);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-	const [user, setUser] = useState<any>(undefined);
+	const [user, setUser] = useState<
+		{ uid: string; name?: string } | null | undefined
+	>(undefined);
 	const router = useRouter();
 
 	const handleSignIn = async () => {
