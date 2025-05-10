@@ -1,18 +1,25 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { auth } from "./lib/firebase";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export async function middleware(req: NextRequest) {
-  const user = auth.currentUser;
-  const url = req.nextUrl.clone();
+export function middleware(req: NextRequest) {
+	const token = req.cookies.get("token")?.value;
+	const url = req.nextUrl.clone();
 
-  if (!user && url.pathname.startsWith("/[userId]")) {
-    url.pathname = "/auth/signIn";
-    return NextResponse.redirect(url);
-  }
+	// ここでは verifyIdToken は使わず、Cookieがあるかだけ見る
+	if (!token && url.pathname.startsWith("/[userId]")) {
+		url.pathname = "/auth/signIn";
+		return NextResponse.redirect(url);
+	}
 
-  return NextResponse.next();
+	const ua = req.headers.get("user-agent") || "";
+	const isMobile = /iPhone|Android|Mobile|iPad/.test(ua);
+
+	const res = NextResponse.next();
+	res.cookies.set("device", isMobile ? "mobile" : "desktop");
+
+	return res;
 }
 
 export const config = {
-  matcher: ["/:path*"],
+	matcher: ["/:path*"],
 };
