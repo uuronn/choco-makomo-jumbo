@@ -1,8 +1,10 @@
 "use client";
 
+import type React from "react";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Plus, Users, ChevronRight, Cpu } from "lucide-react";
+import { Plus, Users, ChevronRight, Cpu, Info } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import { characterToImagePath, cn } from "~/lib/utils";
@@ -13,12 +15,17 @@ import { FaLaptopCode } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { enqueueSnackbar } from "notistack";
 import { useUserCharacterList } from "~/hook/useUserCharacter";
+import CharacterDetailModal from "./chara-modal";
 
 export default function GameInterface() {
 	const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);
 	const [selectedRoom, setSelectedRoom] = useState<SelectingRoom | null>(null);
 	const [rooms, setRooms] = useState<SelectingRoom[]>([]);
 	const [showCpuOptions, setShowCpuOptions] = useState(false);
+	const [detailCharacter, setDetailCharacter] = useState<Character | null>(
+		null,
+	);
+	const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
 	const { user } = useUserContext();
 
@@ -140,6 +147,12 @@ export default function GameInterface() {
 		setRooms(roomsData);
 	};
 
+	const openCharacterDetail = (character: Character, e: React.MouseEvent) => {
+		e.stopPropagation(); // 親要素のクリックイベントを停止
+		setDetailCharacter(character);
+		setIsDetailModalOpen(true);
+	};
+
 	return (
 		<div className="h-screen bg-gray-900 text-white p-3 flex flex-col overflow-hidden pl-20">
 			{/* 技術選択セクション */}
@@ -171,6 +184,7 @@ export default function GameInterface() {
 											<Image
 												src={
 													characterToImagePath(character.characterId) ||
+													"/placeholder.svg" ||
 													"/placeholder.svg"
 												}
 												alt={character.name}
@@ -200,7 +214,15 @@ export default function GameInterface() {
 												回避率 {character.baseEvasion}%
 											</h5>
 										</div>
-										<div className="ml-auto">
+										<div className="ml-auto flex">
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-7 w-7 rounded-full text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/10 mr-1"
+												onClick={(e) => openCharacterDetail(character, e)}
+											>
+												<Info className="h-4 w-4" />
+											</Button>
 											<Button
 												variant="ghost"
 												size="icon"
@@ -227,7 +249,7 @@ export default function GameInterface() {
 										<div
 											key={character.characterId}
 											className={cn(
-												"flex flex-col justify-center items-center p-1.5 rounded-lg border transition-all cursor-pointer h-[150px] w-[150px]",
+												"flex flex-col justify-center items-center p-1.5 rounded-lg border transition-all cursor-pointer h-[150px] w-[150px] relative",
 												selectedCharacters.find(
 													(c) => c.characterId === character.characterId,
 												)
@@ -254,6 +276,15 @@ export default function GameInterface() {
 											<p className="text-xs text-green-400/70">
 												レベル {character.level}
 											</p>
+
+											<Button
+												variant="ghost"
+												size="icon"
+												className="absolute top-1 right-1 h-6 w-6 rounded-full text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/10 p-1"
+												onClick={(e) => openCharacterDetail(character, e)}
+											>
+												<Info className="h-4 w-4" />
+											</Button>
 										</div>
 									))}
 							</div>
@@ -292,18 +323,6 @@ export default function GameInterface() {
 			<section className="border border-green-400/30 rounded-lg p-3 backdrop-blur-sm backdrop-filter bg-black/20 h-[38%] overflow-hidden">
 				{showCpuOptions ? (
 					<div className="space-y-4 h-[calc(100%-40px)] flex flex-col justify-center">
-						{/* <div className="bg-black/30 border border-green-400/20 rounded-lg p-4">
-							<h3 className="text-sm font-semibold text-green-400/80 mb-2">
-								CPU対戦情報
-							</h3>
-							<p className="text-xs text-green-400/70 mb-1">
-								CPUと思う存分対戦しよう！
-							</p>
-							<p className="text-xs text-green-400/70">
-								※ CPU対戦ではレベル経験値が通常の80%になります
-							</p>
-						</div> */}
-
 						<div className="flex justify-center mt-4">
 							<Button
 								onClick={startCpuBattle}
@@ -388,6 +407,13 @@ export default function GameInterface() {
 					</>
 				)}
 			</section>
+
+			{/* キャラクター詳細モーダル */}
+			<CharacterDetailModal
+				character={detailCharacter}
+				isOpen={isDetailModalOpen}
+				onClose={() => setIsDetailModalOpen(false)}
+			/>
 		</div>
 	);
 }
