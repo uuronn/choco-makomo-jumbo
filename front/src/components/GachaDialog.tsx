@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { characterToImagePath, cn } from "~/lib/utils";
+import Image from "next/image";
 
 interface Character {
 	id: string;
@@ -99,7 +100,7 @@ export default function GachaDialog() {
 												{/* Character Image */}
 												<div className="w-20 h-20 flex-shrink-0 bg-gray-800 rounded-sm overflow-hidden border border-emerald-800">
 													{character.id ? (
-														<img
+														<Image
 															src={
 																characterToImagePath(character.id) ||
 																"/placeholder.svg"
