@@ -182,6 +182,86 @@ const footerItems = [
 	},
 ];
 
+// デバイスサイズの判定用カスタムフック
+const useIsMobile = () => {
+	const [isMobile, setIsMobile] = useState(false);
+
+	useEffect(() => {
+		const checkIsMobile = () => {
+			setIsMobile(window.innerWidth <= 660);
+		};
+
+		checkIsMobile();
+		window.addEventListener("resize", checkIsMobile);
+
+		return () => window.removeEventListener("resize", checkIsMobile);
+	}, []);
+
+	return isMobile;
+};
+
+// SP版のメインコンポーネント
+const MobileHomeScreen = ({ user, onlineUsers, ...props }) => {
+	return (
+		<div className="min-h-screen bg-gray-900 flex flex-col p-3">
+			{/* ユーザープロフィール */}
+			<div className="bg-black/80 rounded-xl shadow-lg border border-green-500/30 p-3 mb-3">
+				<div className="flex items-center gap-3">
+					<Image
+						src={user.photoUrl || "/placeholder.svg"}
+						alt="ユーザーアバター"
+						width={40}
+						height={40}
+						className="rounded-full border-2 border-green-500/50"
+					/>
+					<div>
+						<h2 className="text-lg font-bold text-green-300">{user.name}</h2>
+						<div className="flex items-center gap-2">
+							<Database className="h-3 w-3 text-green-400" />
+							<span className="text-xs text-green-400">TP: {user.point}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* ナビゲーションカード */}
+			<div className="grid grid-cols-2 gap-2">
+				{navItems.map((item) => (
+					<Link
+						href={item.path}
+						key={item.id}
+						className="bg-gradient-to-br border border-green-500/30 rounded-lg p-3"
+					>
+						<div className="flex flex-col items-center text-center">
+							{item.icon}
+							<h3 className="text-sm font-bold mt-2 text-white">
+								{item.title}
+							</h3>
+							<p className="text-xs text-white/80 mt-1">{item.description}</p>
+						</div>
+					</Link>
+				))}
+			</div>
+
+			{/* フッター */}
+			<div className="mt-auto pt-4">
+				<div className="flex justify-around border-t border-green-500/30 pt-3">
+					{footerItems.map((item) => (
+						<Link
+							key={item.id}
+							href={item.path}
+							className="flex flex-col items-center gap-1 text-green-400"
+						>
+							{item.icon}
+							<span className="text-xs">{item.title}</span>
+						</Link>
+					))}
+				</div>
+			</div>
+		</div>
+	);
+};
+
 export default function HomeScreen() {
 	const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 	const { user: authUser } = useUserContext();
@@ -190,6 +270,7 @@ export default function HomeScreen() {
 	const [newName, setNewName] = useState("");
 	const [nameError, setNameError] = useState("");
 	const inputRef = useRef<HTMLInputElement>(null);
+	const isMobile = useIsMobile();
 
 	// サンプルの技術力値（実際のアプリではAPIから取得）
 	// const [techPower, setTechPower] = useState<number>(720);
@@ -300,7 +381,17 @@ export default function HomeScreen() {
 
 	if (!user || error) return <div>エラー: {error.message}</div>;
 
-	return (
+	// デバイスに応じてコンポーネントを切り替え
+	return isMobile ? (
+		<MobileHomeScreen
+			user={user}
+			onlineUsers={onlineUsers}
+			isEditingName={isEditingName}
+			startEditingName={startEditingName}
+			// ... 他の必要なprops
+		/>
+	) : (
+		// 既存のPC版レイアウトをそのまま維持
 		<div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 overflow-hidden">
 			{/* Background grid effect */}
 			<div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djJoLTJ2LTJoMnptMC00aDJ2MmgtMnYtMnptLTQgMHYyaC0ydi0yaDJ6bTIgMGgydjJoLTJ2LTJ6bS02IDBoMnYyaC0ydi0yem0yLTRoMnYyaC0ydi0yem0yIDBIMzZ2Mmgtc3YtMnptMCA0aDJ2MmgtMnYtMnoiLz48L2c+PC9nPjwvc3ZnPg==')]" />
