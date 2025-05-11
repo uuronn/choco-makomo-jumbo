@@ -10,6 +10,8 @@ use App\Http\Controller\UserCharacter\GetUserCharacterListController;
 use App\Http\Controller\UserCharacterController;
 use App\Http\Controller\UserController;
 use App\Http\Controller\UserCharacter\LevelUpUserCharacterController;
+use App\Http\Controller\TeamController;
+use App\Http\Controller\TeamRoomController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -160,5 +162,26 @@ Route::post('/rooms/{roomId}/cpu-act', [RoomController::class, 'cpuAct']);
 
 
 // ガチャ関連のAPI--------------------------------
+
+
+
+// チーム関連
+Route::post('/teams/create', [TeamController::class, 'create']);
+Route::post('/teams/{teamId}/join', [TeamController::class, 'join']);
+Route::post('/teams/{teamId}/approve', [TeamController::class, 'approve']);
+Route::post('/teams/{teamId}/cancel', [TeamController::class, 'cancel']);
+Route::post('/teams/{teamId}/disband', [TeamController::class, 'disband']);
+Route::post('/teams/{teamId}/select-character', [TeamController::class, 'selectCharacter']);
+Route::get('/teams/{teamId}', [TeamController::class, 'get']);
+Route::get('/teams', [TeamController::class, 'list']);
+
+// チーム対戦ルーム関連
+Route::post('/team-rooms/create', [TeamRoomController::class, 'create']);
+Route::post('/team-rooms/{roomId}/join', [TeamRoomController::class, 'join']);
+Route::post('/team-rooms/{roomId}/approve', [TeamRoomController::class, 'approve']);
+Route::post('/team-rooms/{roomId}/cancel', [TeamRoomController::class, 'cancel']);
+Route::post('/team-rooms/{roomId}/attack', [TeamRoomController::class, 'attack']);
+Route::get('/team-rooms/{userId}/{roomId}/status', [TeamRoomController::class, 'status']);
+Route::get('/team-rooms', [TeamRoomController::class, 'list']);
 
 
