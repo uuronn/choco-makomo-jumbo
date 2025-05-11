@@ -166,15 +166,17 @@ Route::post('/rooms/{roomId}/cpu-act', [RoomController::class, 'cpuAct']);
 
 
 // チーム関連
-Route::post('/teams/create', [TeamController::class, 'create']);
-Route::get('/teams/my-team', [TeamController::class, 'getMyTeam']);
-Route::get('/teams', [TeamController::class, 'list']);
-Route::post('/teams/{teamId}/join', [TeamController::class, 'join']);
-Route::post('/teams/{teamId}/approve', [TeamController::class, 'approve']);
-Route::post('/teams/{teamId}/cancel', [TeamController::class, 'cancel']);
-Route::post('/teams/{teamId}/disband', [TeamController::class, 'disband']);
-Route::post('/teams/{teamId}/select-character', [TeamController::class, 'selectCharacter']);
-Route::get('/teams/{teamId}', [TeamController::class, 'get']);
+Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () {
+    Route::post('/teams/create', [TeamController::class, 'create']);
+    Route::get('/teams/my-team', [TeamController::class, 'getMyTeam']);
+    Route::get('/teams', [TeamController::class, 'list']);
+    Route::post('/teams/{teamId}/join', [TeamController::class, 'join']);
+    Route::post('/teams/{teamId}/approve', [TeamController::class, 'approve']);
+    Route::post('/teams/{teamId}/cancel', [TeamController::class, 'cancel']);
+    Route::post('/teams/{teamId}/disband', [TeamController::class, 'disband']);
+    Route::post('/teams/{teamId}/select-character', [TeamController::class, 'selectCharacter']);
+    Route::get('/teams/{teamId}', [TeamController::class, 'get']);
+});
 
 // チーム対戦ルーム関連
 Route::post('/team-rooms/create', [TeamRoomController::class, 'create']);
