@@ -19,7 +19,12 @@ class TeamController
     public function create(Request $request)
     {
         try {
-            $userId = $request->user()->id;
+            // ユーザー認証チェックを追加
+            $user = $request->user();
+            if (!$user) {
+                return response()->json(['message' => '認証が必要です'], 401);
+            }
+            $userId = $user->id;
 
             // 既存のチームがないか確認
             $existingTeam = Team::where('leaderUserId', $userId)
@@ -38,18 +43,20 @@ class TeamController
                 ]);
 
                 // 作成したチームを再取得してリレーションをロード
-                return Team::with(['leaderUser', 'memberUser', 'characters.character'])
+                $newTeam = Team::with(['leaderUser', 'memberUser', 'characters.character'])
                     ->find($team->id);
-            });
 
-            if (!$team) {
-                throw new Exception('チームの作成に失敗しました');
-            }
+                if (!$newTeam) {
+                    throw new Exception('チームの作成に失敗しました');
+                }
+
+                return $newTeam;
+            });
 
             return response()->json($team, 201);
         } catch (Exception $e) {
             Log::error('Team creation failed: ' . $e->getMessage());
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['message' => 'チームの作成に失敗しました: ' . $e->getMessage()], 500);
         }
     }
 
@@ -59,8 +66,13 @@ class TeamController
     public function join(Request $request)
     {
         try {
+            $user = $request->user();
+            if (!$user) {
+                return response()->json(['message' => '認証が必要です'], 401);
+            }
+
             $teamId = $request->teamId;
-            $userId = $request->userId;
+            $userId = $user->id;  // リクエストから直接取るのではなく、認証済みユーザーのIDを使用
 
             $team = Team::find($teamId);
 
@@ -281,7 +293,11 @@ class TeamController
     public function getMyTeam(Request $request)
     {
         try {
-            $userId = $request->user()->id;
+            $user = $request->user();
+            if (!$user) {
+                return response()->json(['message' => '認証が必要です'], 401);
+            }
+            $userId = $user->id;
 
             $team = Team::where(function ($query) use ($userId) {
                 $query->where('leaderUserId', $userId)
@@ -290,8 +306,13 @@ class TeamController
             ->with(['leaderUser', 'memberUser', 'characters.character'])
             ->first();
 
+            if (!$team) {
+                return response()->json(null);  // チームが存在しない場合はnullを返す
+            }
+
             return response()->json($team);
         } catch (Exception $e) {
+            Log::error('Get my team failed: ' . $e->getMessage());
             return response()->json(['message' => 'チーム情報の取得に失敗しました'], 500);
         }
     }
