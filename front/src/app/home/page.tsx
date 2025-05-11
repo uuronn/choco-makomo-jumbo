@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
-import PcHomePage from "./components/pc";
-import SpHomePage from "./components/sp";
 import { getDeviceFromCookies } from "~/utils/device";
 import { getTokenFromCookies } from "~/utils/token";
 import { fetchUserFromToken } from "~/lib/user";
+import SpHomeScreen from './components/sp';
+import PcHomeScreen from './components/pc';
 
 export default async function HomePage() {
 	const cookieStore = await cookies();
@@ -17,8 +17,8 @@ export default async function HomePage() {
 	}
 
 	if (device === "mobile") {
-		return <SpHomePage user={user} />;
+		return <SpHomeScreen user={user} />;
 	}
 
-	return <PcHomePage user={user} />;
+	return <PcHomeScreen user={user} />;
 }
