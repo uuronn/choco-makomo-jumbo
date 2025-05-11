@@ -104,19 +104,26 @@ class TeamController
     public function selectCharacter(Request $request)
     {
         try {
-            $teamId = $request->teamId;
-            $userId = $request->userId;
-            $characterId = $request->characterId;
-
-            $team = Team::with('characters')->find($teamId);
-
-            if (!$team) {
-                return response()->json(['message' => 'チームが見つかりません'], 404);
+            // firebase_uidから取得
+            $userId = $request->attributes->get('firebase_uid');
+            if (!$userId) {
+                return response()->json(['message' => '認証が必要です'], 401);
             }
 
-            // チームメンバーかチェック
-            if ($team->leaderUserId !== $userId && $team->memberUserId !== $userId) {
-                return response()->json(['message' => 'このチームのメンバーではありません'], 403);
+            $teamId = $request->teamId;
+            $characterId = $request->characterId;
+
+            // チームの存在確認とリレーションのロード
+            $team = Team::with(['characters', 'leaderUser', 'memberUser'])
+                ->where('id', $teamId)
+                ->where(function ($query) use ($userId) {
+                    $query->where('leaderUserId', $userId)
+                        ->orWhere('memberUserId', $userId);
+                })
+                ->first();
+
+            if (!$team) {
+                return response()->json(['message' => 'チームが見つからないか、所属していません'], 404);
             }
 
             // キャラクター重複チェック
@@ -133,15 +140,21 @@ class TeamController
                 return response()->json(['message' => 'これ以上キャラクターを選択できません'], 400);
             }
 
+            // キャラクター選択を保存
             TeamCharacter::create([
                 'teamId' => $teamId,
                 'userId' => $userId,
                 'characterId' => $characterId
             ]);
 
-            return response()->json(['message' => 'キャラクターを選択しました'], 200);
+            // 更新後のチーム情報を返す
+            $updatedTeam = Team::with(['leaderUser', 'memberUser', 'characters.character'])
+                ->find($teamId);
+
+            return response()->json($updatedTeam, 200);
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            Log::error('Character selection failed: ' . $e->getMessage());
+            return response()->json(['message' => 'キャラクター選択に失敗しました'], 500);
         }
     }
 

@@ -271,13 +271,21 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 								<div
 									key={character.characterId}
 									className={`p-4 rounded-lg border cursor-pointer ${
-										selectedCharacters.some(
+										myTeam.characters?.some(
 											(c) => c.characterId === character.characterId,
 										)
 											? "border-green-400 bg-green-400/20"
 											: "border-green-400/30 hover:bg-green-400/10"
 									}`}
-									onClick={() => selectCharacter(character)}
+									onClick={() => {
+										if (
+											!myTeam.characters?.some(
+												(c) => c.characterId === character.characterId,
+											)
+										) {
+											selectCharacter(character);
+										}
+									}}
 								>
 									<div className="relative w-16 h-16 mx-auto mb-2">
 										<Image
@@ -296,6 +304,9 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 									</p>
 								</div>
 							))}
+						</div>
+						<div className="mt-4 text-sm text-green-400/70">
+							選択済み: {myTeam.characters?.length || 0}/3
 						</div>
 					</div>
 				</div>
