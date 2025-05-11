@@ -17,6 +17,7 @@ return new class extends Migration
 
             $table->foreign('teamId')->references('id')->on('team')->onDelete('cascade');
             $table->unique(['teamId', 'characterId']); // チーム内でのキャラ重複を防ぐ
+            $table->unique(['teamId', 'userId', 'characterId']); // 同じユーザーが同じキャラを選択できないように
         });
     }
 

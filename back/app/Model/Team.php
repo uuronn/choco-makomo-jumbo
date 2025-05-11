@@ -12,7 +12,6 @@ class Team extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'id',
         'leaderUserId',
         'memberUserId',
         'status'
@@ -28,6 +27,11 @@ class Team extends Model
         });
     }
 
+    public function characters()
+    {
+        return $this->hasMany(TeamCharacter::class, 'teamId')->with('character');
+    }
+
     public function leaderUser()
     {
         return $this->belongsTo(User::class, 'leaderUserId');
@@ -36,10 +40,5 @@ class Team extends Model
     public function memberUser()
     {
         return $this->belongsTo(User::class, 'memberUserId');
-    }
-
-    public function characters()
-    {
-        return $this->hasMany(TeamCharacter::class, 'teamId');
     }
 } 

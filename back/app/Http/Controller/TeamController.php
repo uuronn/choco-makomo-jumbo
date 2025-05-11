@@ -101,23 +101,15 @@ class TeamController
     /**
      * キャラクター選択
      */
-    public function selectCharacter(Request $request)
+    public function selectCharacter(Request $request, $teamId)
     {
         try {
-            // firebase_uidから取得
             $userId = $request->attributes->get('firebase_uid');
             if (!$userId) {
                 return response()->json(['message' => '認証が必要です'], 401);
             }
 
-            $teamId = $request->route('teamId'); // URLパラメータから取得
             $characterId = $request->characterId;
-
-            Log::info('Selecting character:', [
-                'userId' => $userId,
-                'teamId' => $teamId,
-                'characterId' => $characterId
-            ]);
 
             // チームの存在確認とリレーションのロード
             $team = Team::where(function ($query) use ($userId) {
@@ -125,43 +117,27 @@ class TeamController
                     ->orWhere('memberUserId', $userId);
             })
             ->where('id', $teamId)
-            ->with(['characters', 'leaderUser', 'memberUser'])
+            ->with(['characters.character', 'leaderUser', 'memberUser'])
             ->first();
 
             if (!$team) {
-                Log::error('Team not found or user not member:', [
-                    'teamId' => $teamId,
-                    'userId' => $userId
-                ]);
                 return response()->json(['message' => 'チームが見つからないか、所属していません'], 404);
             }
 
-            // キャラクター重複チェック
-            if ($team->characters->contains('characterId', $characterId)) {
-                return response()->json(['message' => 'このキャラクターは既に選択されています'], 400);
-            }
-
-            // ユーザーの選択済みキャラ数チェック
-            $userCharCount = TeamCharacter::where('teamId', $teamId)
-                ->where('userId', $userId)
-                ->count();
-
-            if ($userCharCount >= 3) {
-                return response()->json(['message' => 'これ以上キャラクターを選択できません'], 400);
-            }
-
-            // キャラクター選択を保存
-            TeamCharacter::create([
-                'teamId' => $teamId,
-                'userId' => $userId,
-                'characterId' => $characterId
-            ]);
+            // トランザクションで処理
+            DB::transaction(function () use ($team, $userId, $characterId) {
+                TeamCharacter::create([
+                    'teamId' => $team->id,
+                    'userId' => $userId,
+                    'characterId' => $characterId
+                ]);
+            });
 
             // 更新後のチーム情報を返す
             $updatedTeam = Team::with(['leaderUser', 'memberUser', 'characters.character'])
                 ->find($teamId);
 
-            return response()->json($updatedTeam, 200);
+            return response()->json($updatedTeam);
         } catch (Exception $e) {
             Log::error('Character selection failed:', ['error' => $e->getMessage()]);
             return response()->json(['message' => 'キャラクター選択に失敗しました'], 500);

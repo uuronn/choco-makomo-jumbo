@@ -23,7 +23,6 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 	const [myTeam, setMyTeam] = useState<Team | null>(null);
 
 	const { user } = useUserContext();
-	const router = useRouter();
 
 	const { data: havingCharacters } = useUserCharacterList(
 		user?.uid ?? null,
@@ -209,12 +208,19 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 						{teams.map((team) => (
 							<div
 								key={team.id}
+								role="button"
+								tabIndex={0}
 								className={`p-4 rounded-lg border cursor-pointer ${
 									selectedTeam?.id === team.id
 										? "border-green-400 bg-green-400/20"
 										: "border-green-400/30 hover:bg-green-400/10"
 								}`}
 								onClick={() => setSelectedTeam(team)}
+								onKeyDown={(e) => {
+									if (e.key === "Enter" || e.key === " ") {
+										setSelectedTeam(team);
+									}
+								}}
 							>
 								<div className="flex items-center gap-4">
 									<Image
@@ -269,6 +275,8 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 							{havingCharacters?.map((character) => (
 								<div
 									key={character.characterId}
+									role="button"
+									tabIndex={0}
 									className={`p-4 rounded-lg border cursor-pointer ${
 										myTeam.characters?.some(
 											(c) => c.characterId === character.characterId,
@@ -278,6 +286,16 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 									}`}
 									onClick={() => {
 										if (
+											!myTeam.characters?.some(
+												(c) => c.characterId === character.characterId,
+											)
+										) {
+											selectCharacter(character);
+										}
+									}}
+									onKeyDown={(e) => {
+										if (
+											(e.key === "Enter" || e.key === " ") &&
 											!myTeam.characters?.some(
 												(c) => c.characterId === character.characterId,
 											)
