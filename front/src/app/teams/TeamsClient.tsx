@@ -131,21 +131,21 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 					},
 				);
 				const data = await res.json();
-				setTeams(data);
+				if (res.ok) {
+					setTeams(data);
+				}
 			} catch (e) {
 				console.error("チーム一覧の取得に失敗しました", e);
 			}
 		};
 
 		fetchTeams();
-		const interval = setInterval(fetchTeams, 3000);
-		return () => clearInterval(interval);
 	}, [initialToken]);
 
 	// 自分のチーム情報取得
 	useEffect(() => {
-		if (!user) return;
 		const fetchMyTeam = async () => {
+			if (!user) return;
 			try {
 				const res = await fetch(
 					`${process.env.NEXT_PUBLIC_BASE_URL}/api/teams/my-team`,
@@ -155,18 +155,16 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 						},
 					},
 				);
-				if (res.ok) {
-					const data = await res.json();
+				const data = await res.json();
+				if (res.ok && data) {
 					setMyTeam(data);
 				}
 			} catch (e) {
-				console.error("チーム情報の取得に失敗しました", e);
+				console.error("自分のチーム情報の取得に失敗しました", e);
 			}
 		};
 
 		fetchMyTeam();
-		const interval = setInterval(fetchMyTeam, 3000);
-		return () => clearInterval(interval);
 	}, [user, initialToken]);
 
 	return (
@@ -196,7 +194,7 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 			)}
 
 			{/* チーム一覧 */}
-			{!myTeam && (
+			{!myTeam && teams.length > 0 && (
 				<div className="mb-8">
 					<h2 className="text-xl font-bold text-green-400 mb-4">
 						参加可能なチーム
@@ -241,26 +239,14 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 					<div className="mb-8">
 						<h3 className="text-lg font-bold text-green-400 mb-2">メンバー</h3>
 						<div className="flex gap-4">
-							<div className="p-4 rounded-lg border border-green-400/30">
-								<Image
-									src={myTeam.leaderUser.photoUrl || "/placeholder.svg"}
-									alt={myTeam.leaderUser.name}
-									width={48}
-									height={48}
-									className="rounded-full mb-2"
-								/>
-								<p className="text-green-400">{myTeam.leaderUser.name}</p>
-								<p className="text-sm text-green-400/70">リーダー</p>
-							</div>
+							{myTeam.leaderUser && (
+								<div className="p-4 rounded-lg border border-green-400/30">
+									<p className="text-green-400">{myTeam.leaderUser.name}</p>
+									<p className="text-sm text-green-400/70">リーダー</p>
+								</div>
+							)}
 							{myTeam.memberUser && (
 								<div className="p-4 rounded-lg border border-green-400/30">
-									<Image
-										src={myTeam.memberUser.photoUrl || "/placeholder.svg"}
-										alt={myTeam.memberUser.name}
-										width={48}
-										height={48}
-										className="rounded-full mb-2"
-									/>
 									<p className="text-green-400">{myTeam.memberUser.name}</p>
 									<p className="text-sm text-green-400/70">メンバー</p>
 								</div>

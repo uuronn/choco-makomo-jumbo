@@ -174,6 +174,7 @@ Route::post('/teams/{teamId}/disband', [TeamController::class, 'disband']);
 Route::post('/teams/{teamId}/select-character', [TeamController::class, 'selectCharacter']);
 Route::get('/teams/{teamId}', [TeamController::class, 'get']);
 Route::get('/teams', [TeamController::class, 'list']);
+Route::get('/teams/my-team', [TeamController::class, 'getMyTeam']);
 
 // チーム対戦ルーム関連
 Route::post('/team-rooms/create', [TeamRoomController::class, 'create']);

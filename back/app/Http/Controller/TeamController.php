@@ -262,5 +262,26 @@ class TeamController
         }
     }
 
+    /**
+     * 自分のチーム情報を取得
+     */
+    public function getMyTeam(Request $request)
+    {
+        try {
+            $userId = $request->user()->id;
+            
+            $team = Team::where(function ($query) use ($userId) {
+                $query->where('leaderUserId', $userId)
+                      ->orWhere('memberUserId', $userId);
+            })
+            ->with(['leaderUser', 'memberUser', 'characters.character'])
+            ->first();
+
+            return response()->json($team);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'チーム情報の取得に失敗しました'], 500);
+        }
+    }
+
     // 他のメソッド（承認、キャンセルなど）も同様に実装...
 } 
