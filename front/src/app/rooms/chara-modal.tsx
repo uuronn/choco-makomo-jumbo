@@ -72,14 +72,14 @@ export default function CharacterDetailModal({
 						<Info className="mr-2 h-5 w-5" /> キャラクター詳細
 						<div className="h-px flex-grow ml-4 bg-gradient-to-r from-emerald-400 to-transparent" />
 					</DialogTitle>
-					<Button
+					{/* <Button
 						variant="ghost"
 						size="icon"
 						onClick={onClose}
 						className="absolute right-4 top-4 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/10 rounded-full h-8 w-8"
 					>
 						<X className="h-4 w-4" />
-					</Button>
+					</Button> */}
 				</DialogHeader>
 
 				<div className="p-4">
