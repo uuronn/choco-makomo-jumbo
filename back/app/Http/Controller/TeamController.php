@@ -18,25 +18,24 @@ class TeamController
     public function create(Request $request)
     {
         try {
-            $leaderUserId = $request->userId;
+            $userId = $request->user()->id;
 
-            // 既存のチームをチェック
-            $existingTeam = Team::where('leaderUserId', $leaderUserId)
-                ->orWhere('memberUserId', $leaderUserId)
+            // 既存のチームがないか確認
+            $existingTeam = Team::where('leaderUserId', $userId)
+                ->orWhere('memberUserId', $userId)
                 ->first();
 
             if ($existingTeam) {
-                return response()->json(['message' => '既に所属しているチームが存在します'], 409);
+                return response()->json(['message' => '既にチームに所属しています'], 400);
             }
 
-            $team = DB::transaction(function () use ($leaderUserId) {
-                $team = Team::create([
-                    'leaderUserId' => $leaderUserId,
-                    'status' => 'waiting'
-                ]);
+            $team = Team::create([
+                'leaderUserId' => $userId,
+                'status' => 'waiting'
+            ]);
 
-                return $team;
-            });
+            // リレーションをロードして返す
+            $team->load(['leaderUser', 'memberUser', 'characters.character']);
 
             return response()->json($team, 201);
         } catch (Exception $e) {
@@ -249,11 +248,15 @@ class TeamController
     /**
      * チーム一覧の取得
      */
-    public function list()
+    public function list(Request $request)
     {
         try {
+            $userId = $request->user()->id;
+
             $teams = Team::with(['leaderUser', 'memberUser'])
-                ->where('status', 'ready')
+                ->where('status', 'waiting')
+                ->where('leaderUserId', '!=', $userId)
+                ->whereNull('memberUserId') // メンバーが未設定のチームのみ
                 ->get();
 
             return response()->json($teams, 200);

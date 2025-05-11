@@ -131,6 +131,7 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 					},
 				);
 				const data = await res.json();
+				console.log("Fetched teams:", data); // デバッグ用
 				if (res.ok) {
 					setTeams(data);
 				}
