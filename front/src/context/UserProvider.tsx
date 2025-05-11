@@ -58,7 +58,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 		});
 
 		setUser(result.user);
-		router.push("/");
+		router.push("/home");
 	};
 	const handleSignOut = async () => {
 		await signOut(auth);
