@@ -123,6 +123,10 @@ class TeamController
                 ->first();
 
             if (!$team) {
+                Log::error('Team not found or user not member:', [
+                    'teamId' => $teamId,
+                    'userId' => $userId
+                ]);
                 return response()->json(['message' => 'チームが見つからないか、所属していません'], 404);
             }
 

@@ -107,16 +107,15 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 						Authorization: `Bearer ${initialToken}`,
 					},
 					body: JSON.stringify({
-						userId: user.uid,
 						characterId: character.characterId,
 					}),
 				},
 			);
+			const data = await res.json();
 			if (res.ok) {
-				setSelectedCharacters([...selectedCharacters, character]);
+				setMyTeam(data);
 				enqueueSnackbar("キャラクターを選択しました", { variant: "success" });
 			} else {
-				const data = await res.json();
 				enqueueSnackbar(data.message, { variant: "error" });
 			}
 		} catch (e) {
