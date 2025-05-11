@@ -9,6 +9,7 @@ use App\Model\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TeamController
 {
@@ -29,16 +30,25 @@ class TeamController
                 return response()->json(['message' => '既にチームに所属しています'], 400);
             }
 
-            $team = Team::create([
-                'leaderUserId' => $userId,
-                'status' => 'waiting'
-            ]);
+            // トランザクション内でチーム作成を行う
+            $team = DB::transaction(function () use ($userId) {
+                $team = Team::create([
+                    'leaderUserId' => $userId,
+                    'status' => 'waiting'
+                ]);
 
-            // リレーションをロードして返す
-            $team->load(['leaderUser', 'memberUser', 'characters.character']);
+                // 作成したチームを再取得してリレーションをロード
+                return Team::with(['leaderUser', 'memberUser', 'characters.character'])
+                    ->find($team->id);
+            });
+
+            if (!$team) {
+                throw new Exception('チームの作成に失敗しました');
+            }
 
             return response()->json($team, 201);
         } catch (Exception $e) {
+            Log::error('Team creation failed: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
@@ -272,7 +282,7 @@ class TeamController
     {
         try {
             $userId = $request->user()->id;
-            
+
             $team = Team::where(function ($query) use ($userId) {
                 $query->where('leaderUserId', $userId)
                       ->orWhere('memberUserId', $userId);
@@ -287,4 +297,4 @@ class TeamController
     }
 
     // 他のメソッド（承認、キャンセルなど）も同様に実装...
-} 
+}
