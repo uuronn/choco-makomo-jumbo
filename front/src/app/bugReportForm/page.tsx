@@ -211,7 +211,8 @@ export default function BugReportForm() {
 		try {
 			if (!user) throw new Error("ユーザー情報が取得できません");
 
-			const token = await user.getIdToken();
+			// const token = await user.getIdToken();
+			const token = "sample";
 			const userId = user.uid;
 
 			const sanitizedData = {

@@ -33,7 +33,7 @@ export default function GameInterface() {
 
 	const { data: havingCharacters } = useUserCharacterList(
 		user?.uid ?? null,
-		user?.token ?? null,
+		"user?.token ?? null,",
 	);
 
 	const handleSelectCharacter = (character: Character) => {

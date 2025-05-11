@@ -238,7 +238,7 @@ export default function GithubGacha() {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
-						Authorization: `Bearer ${user.token}`,
+						Authorization: `Bearer ${"user.token"}`,
 					},
 					body: JSON.stringify({
 						githubUrl: githubUrl,

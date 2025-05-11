@@ -77,11 +77,12 @@ export default function CharacterDevelopment() {
 		error: userError,
 		isLoading: isUserLoading,
 	} = useUser(authUser?.uid ?? null);
+
 	const {
 		data: userCharacterList,
 		error: UserCharacterError,
 		isLoading: isCharacterListLoading,
-	} = useUserCharacterList(user?.id ?? null, authUser?.token ?? null);
+	} = useUserCharacterList(user?.id ?? null, "token");
 
 	// Add a new state for tracking error state
 	const [isErrorState, setIsErrorState] = useState(false);
@@ -99,7 +100,7 @@ export default function CharacterDevelopment() {
 				const response = await fetch(
 					`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}/point`,
 					{
-						headers: { Authorization: `Bearer ${authUser?.token}` },
+						headers: { Authorization: `Bearer ${"authUser?.token"}` },
 					},
 				);
 				if (!response.ok) throw new Error("Failed to fetch points");
@@ -299,7 +300,7 @@ export default function CharacterDevelopment() {
 					method: "PUT",
 					headers: {
 						"Content-Type": "application/json",
-						Authorization: `Bearer ${authUser.token}`,
+						Authorization: `Bearer ${"authUser.token"}`,
 					},
 					body: JSON.stringify({
 						life: statPoints.life,

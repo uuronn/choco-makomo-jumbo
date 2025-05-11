@@ -154,7 +154,7 @@ export default function TabbedGacha() {
 					{
 						headers: {
 							"Content-Type": "application/json",
-							Authorization: `Bearer ${user.token}`,
+							Authorization: `Bearer ${"user.token"}`,
 						},
 					},
 				);
@@ -375,7 +375,7 @@ export default function TabbedGacha() {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
-							Authorization: `Bearer ${user?.token}`,
+							Authorization: `Bearer ${"user?.token"}`,
 						},
 						body: JSON.stringify({
 							userId: user?.uid,
@@ -579,7 +579,7 @@ export default function TabbedGacha() {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
-						Authorization: `Bearer ${user.token}`,
+						Authorization: `Bearer ${"user.token"}`,
 					},
 					body: JSON.stringify({
 						githubUrl: githubUrl,

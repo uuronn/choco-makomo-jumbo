@@ -14,6 +14,7 @@ export type Character = {
 	specialSkillName: string;
 	specialSkillDescription: string;
 	specialSkillTurn: number;
+	baseSpecialSkillTurn: number;
 	passiveSkillName: string;
 	passiveSkillDescription: string;
 	partySkillName: string;
