@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { getTokenFromCookies } from "~/utils/token";
 import { fetchUserFromToken } from "~/lib/user";
 import { RoomsClient } from "./RoomsClient";
+import BattleModeTabs from "~/components/BattleModeTabs";
 
 export default async function RoomsPage() {
 	const cookieStore = await cookies();
@@ -14,10 +15,15 @@ export default async function RoomsPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 overflow-hidden">
-			<Suspense fallback={<div>読み込み中...</div>}>
-				<RoomsClient initialToken={token} />
-			</Suspense>
+		<div className="min-h-screen bg-gray-900 flex flex-col items-center p-4">
+			<div className="w-full max-w-4xl">
+				<BattleModeTabs />
+				<div className="mt-8">
+					<Suspense fallback={<div>読み込み中...</div>}>
+						<RoomsClient initialToken={token} />
+					</Suspense>
+				</div>
+			</div>
 		</div>
 	);
 }
