@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { adminAuth } from "~/lib/firebase-admin";
-import MobileHome from "./components/sp"; // ← SP版コンポーネント
-import DesktopHome from "./components/pc"; // ← PC版コンポーネント
+import PcHomePage from "./components/pc";
+import SpHomePage from "./components/sp";
 
 export default async function HomePage() {
 	const cookieStore = await cookies();
@@ -35,8 +35,8 @@ export default async function HomePage() {
 	}
 
 	if (device === "mobile") {
-		return <MobileHome user={user} />;
+		return <SpHomePage user={user} />;
 	}
 
-	return <DesktopHome user={user} />;
+	return <PcHomePage user={user} />;
 }

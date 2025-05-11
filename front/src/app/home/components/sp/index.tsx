@@ -1,4 +1,4 @@
-export default function MobileHome({
+export default function SpHomePage({
 	user,
 }: { user: { uid: string; name?: string } }) {
 	return (
