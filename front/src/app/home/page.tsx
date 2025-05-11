@@ -2,8 +2,8 @@ import { cookies } from "next/headers";
 import { getDeviceFromCookies } from "~/utils/device";
 import { getTokenFromCookies } from "~/utils/token";
 import { fetchUserFromToken } from "~/lib/user";
-import SpHomeScreen from './components/sp';
-import PcHomeScreen from './components/pc';
+import SpHomeScreen from "./components/sp";
+import PcHomeScreen from "./components/pc";
 
 export default async function HomePage() {
 	const cookieStore = await cookies();
