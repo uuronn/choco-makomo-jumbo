@@ -110,17 +110,23 @@ class TeamController
                 return response()->json(['message' => '認証が必要です'], 401);
             }
 
-            $teamId = $request->teamId;
+            $teamId = $request->route('teamId'); // URLパラメータから取得
             $characterId = $request->characterId;
 
+            Log::info('Selecting character:', [
+                'userId' => $userId,
+                'teamId' => $teamId,
+                'characterId' => $characterId
+            ]);
+
             // チームの存在確認とリレーションのロード
-            $team = Team::with(['characters', 'leaderUser', 'memberUser'])
-                ->where('id', $teamId)
-                ->where(function ($query) use ($userId) {
-                    $query->where('leaderUserId', $userId)
-                        ->orWhere('memberUserId', $userId);
-                })
-                ->first();
+            $team = Team::where(function ($query) use ($userId) {
+                $query->where('leaderUserId', $userId)
+                    ->orWhere('memberUserId', $userId);
+            })
+            ->where('id', $teamId)
+            ->with(['characters', 'leaderUser', 'memberUser'])
+            ->first();
 
             if (!$team) {
                 Log::error('Team not found or user not member:', [
@@ -157,7 +163,7 @@ class TeamController
 
             return response()->json($updatedTeam, 200);
         } catch (Exception $e) {
-            Log::error('Character selection failed: ' . $e->getMessage());
+            Log::error('Character selection failed:', ['error' => $e->getMessage()]);
             return response()->json(['message' => 'キャラクター選択に失敗しました'], 500);
         }
     }
