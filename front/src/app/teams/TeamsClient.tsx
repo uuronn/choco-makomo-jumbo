@@ -34,6 +34,9 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 	const createTeam = async () => {
 		if (!user) return;
 		try {
+			// デバッグ用にトークンを確認
+			console.log("Token being sent:", initialToken);
+
 			const res = await fetch(
 				`${process.env.NEXT_PUBLIC_BASE_URL}/api/teams/create`,
 				{
@@ -42,12 +45,14 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 						"Content-Type": "application/json",
 						Authorization: `Bearer ${initialToken}`,
 					},
-					body: JSON.stringify({
-						userId: user.uid,
-					}),
 				},
 			);
+
+			// デバッグ用にレスポンスを確認
+			console.log("Response status:", res.status);
 			const data = await res.json();
+			console.log("Response data:", data);
+
 			if (res.ok) {
 				setMyTeam(data);
 				enqueueSnackbar("チームを作成しました", { variant: "success" });
@@ -55,6 +60,7 @@ export function TeamsClient({ initialToken }: TeamsClientProps) {
 				enqueueSnackbar(data.message, { variant: "error" });
 			}
 		} catch (e) {
+			console.error("Team creation error:", e);
 			enqueueSnackbar("チーム作成に失敗しました", { variant: "error" });
 		}
 	};

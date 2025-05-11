@@ -19,12 +19,11 @@ class TeamController
     public function create(Request $request)
     {
         try {
-            // ユーザー認証チェックを追加
-            $user = $request->user();
-            if (!$user) {
+            // firebase_uidから取得
+            $userId = $request->attributes->get('firebase_uid');
+            if (!$userId) {
                 return response()->json(['message' => '認証が必要です'], 401);
             }
-            $userId = $user->id;
 
             // 既存のチームがないか確認
             $existingTeam = Team::where('leaderUserId', $userId)
