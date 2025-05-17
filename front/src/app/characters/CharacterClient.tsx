@@ -596,7 +596,7 @@ export function CharacterClient({ initialToken }: CharacterClientProps) {
 										キャラクターを選択してください
 									</p>
 									<p className="text-green-400/50 text-sm mt-2">
-										下のリストから育成したい技術を選んでください
+										「所持技術」から育成したい技術を選んでください
 									</p>
 								</div>
 							</div>
