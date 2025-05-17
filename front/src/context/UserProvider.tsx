@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { auth, googleProvider } from "~/lib/firebase";
+import Loading from '~/components/Loading';
 
 type UserContextType = {
 	user: { uid: string; name?: string } | null | undefined;
@@ -86,7 +87,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 		return () => unsubscribe();
 	}, []);
 
-	if (user === undefined) return <div>認証中...</div>;
+	if (user === undefined) return  <Loading message="認証中" />;
 
 	return (
 		<UserContext.Provider value={{ user, handleSignIn, handleSignOut }}>
