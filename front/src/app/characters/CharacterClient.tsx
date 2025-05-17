@@ -587,7 +587,7 @@ export function CharacterClient({ initialToken }: CharacterClientProps) {
 							</div>
 						) : (
 							/* Placeholder content */
-							<div className="flex items-center justify-center h-full min-h-[340px]">
+							<div className="flex items-center justify-center h-full min-h-[292px]">
 								<div className="text-center w-full max-w-md">
 									<div className="mb-4 text-emerald-400 opacity-50">
 										<Zap className="h-16 w-16 mx-auto" />
