@@ -17,6 +17,13 @@ import {
 	CheckCircle,
 	HandshakeIcon,
 	ActivityIcon,
+	CpuIcon,
+	ZapIcon,
+	HeartIcon,
+	BicepsFlexedIcon,
+	CrosshairIcon,
+	FootprintsIcon,
+	GhostIcon,
 } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
@@ -28,6 +35,9 @@ import { characterToImagePath } from "~/lib/utils";
 import { useUser } from "~/hook/useUser";
 import Loading from "~/components/Loading";
 import { useUserCharacterList } from "~/hook/useUserCharacter";
+import { SectionContainer } from "~/components/SectionContainer";
+import { MainContainer } from "~/components/MainContainer";
+import { TechPoint } from "~/components/techPoint";
 
 type CharacterClientProps = {
 	initialToken: string;
@@ -85,12 +95,12 @@ function StatRow({
 }: StatRowProps) {
 	return (
 		<div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
-			<div className="w-24 text-green-200 flex items-center whitespace-nowrap">
+			<div className="w-36 text-sm text-green-200 flex items-center whitespace-nowrap">
 				{icon}
-				{label}:
+				{label}：
 			</div>
 			<div className="flex-1 mx-2">
-				<div className="text-md text-green-400">
+				<div className="text-sm text-green-400 font-bold">
 					{baseValue}
 					{addedPoints > 0 && (
 						<span className="text-emerald-400">{` (+${addedPoints})`}</span>
@@ -98,23 +108,22 @@ function StatRow({
 				</div>
 			</div>
 			<div className="flex items-center gap-1">
-				<Button
-					className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
-					size="icon"
+				<button
+					type="button"
 					onClick={onDecrement}
 					disabled={!canDecrement}
+					className="bg-gray-800 p-1 rounded-sm hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
 				>
-					<Minus className="h-4 w-4" />
-				</Button>
-				<Button
-					className="bg-gray-800 hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
-					size="icon"
+					<Minus className="size-3" />
+				</button>
+				<button
+					type="button"
 					onClick={onIncrement}
 					disabled={!canIncrement}
+					className="bg-gray-800 p-1 rounded-sm hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
 				>
-					<Plus className="h-4 w-4" />
-				</Button>
-				<div className="w-12 text-center text-emerald-400">{addedPoints}</div>
+					<Plus className="size-3" />
+				</button>
 			</div>
 		</div>
 	);
@@ -313,358 +322,313 @@ export function CharacterClient({ initialToken }: CharacterClientProps) {
 	const remainingPoints = availablePoints - usedPoints;
 
 	return (
-		<div
-			className="bg-gray-900 min-h-screen"
-			style={{
-				backgroundImage: `
-					radial-gradient(rgba(16, 185, 129, 0.15) 1px, transparent 1px),
-					linear-gradient(to right, rgba(16, 185, 129, 0.05) 1px, transparent 1px),
-					linear-gradient(to bottom, rgba(16, 185, 129, 0.05) 1px, transparent 1px)
-				`,
-				backgroundSize: "20px 20px, 20px 20px, 20px 20px, 20px 20px",
-			}}
-		>
-			<div className="container mx-auto p-4 flex flex-col h-screen max-h-screen">
-				<h1 className="text-2xl font-bold mb-4 text-green-400 flex items-center">
-					<Zap className="mr-2 h-6 w-6 text-emerald-400" />
-					技術育成
-					<span className="text-sm ml-2 text-green-400/70">(最大3体)</span>
-					<div className="h-px flex-grow ml-4 bg-gradient-to-r from-emerald-400 to-transparent" />
-				</h1>
-
-				{/* Character Status Section */}
-				<div className="flex-1 mb-4">
-					<Card className="w-full border border-emerald-500/50 bg-gray-900/90">
-						<CardContent className="p-4 h-full flex flex-col">
-							{selectedCharacter ? (
-								<div className="flex flex-col max-h-[340px]">
-									{/* Character Info and Skills - Horizontal Layout */}
-									<div className="flex flex-col md:flex-row gap-4 mb-4">
-										{/* Character Image and Basic Info */}
-										<div className="flex flex-col items-center">
+		<MainContainer title="技術育成" icon={<ZapIcon size={40} />}>
+			<TechPoint />
+			<div className="flex-1 mb-4">
+				<Card className="w-full border border-emerald-500/50 bg-gray-900/90">
+					<CardContent className="h-full flex flex-col">
+						{selectedCharacter ? (
+							<div className="flex flex-col max-h-[340px]">
+								{/* Character Info and Skills - Horizontal Layout */}
+								<div className="flex flex-col md:flex-row gap-4">
+									{/* Character Image and Basic Info */}
+									<div className="flex flex-col items-center">
+										<div
+											className={`relative w-32 h-32 md:w-64 md:h-64 mb-2 border-2 rounded-lg overflow-hidden shadow-lg character-image-container ${
+												isErrorState ? "error" : ""
+											}`}
+											style={{
+												boxShadow: isErrorState
+													? "0 0 15px rgba(239, 68, 68, 0.7)"
+													: "0 0 10px rgba(16, 185, 129, 0.5)",
+												borderColor: isErrorState ? "#ef4444" : "#10b981",
+												transition:
+													"box-shadow 0.5s ease, border-color 0.5s ease",
+											}}
+										>
+											{/* Normal image with transition */}
 											<div
-												className={`relative w-32 h-32 md:w-80 md:h-80 mb-2 border-2 rounded-lg overflow-hidden shadow-lg character-image-container ${
-													isErrorState ? "error" : ""
-												}`}
+												className="absolute inset-0 transition-opacity duration-500 ease-in-out"
 												style={{
-													boxShadow: isErrorState
-														? "0 0 15px rgba(239, 68, 68, 0.7)"
-														: "0 0 10px rgba(16, 185, 129, 0.5)",
-													borderColor: isErrorState ? "#ef4444" : "#10b981",
-													transition:
-														"box-shadow 0.5s ease, border-color 0.5s ease",
+													opacity: isErrorState ? 0 : 1,
+													transform: isAnimating ? "scale(1.05)" : "scale(1)",
+													transition: "opacity 0.5s ease, transform 0.5s ease",
 												}}
 											>
-												{/* Normal image with transition */}
-												<div
-													className="absolute inset-0 transition-opacity duration-500 ease-in-out"
-													style={{
-														opacity: isErrorState ? 0 : 1,
-														transform: isAnimating ? "scale(1.05)" : "scale(1)",
-														transition:
-															"opacity 0.5s ease, transform 0.5s ease",
-													}}
-												>
-													<Image
-														src={
-															characterToImagePath(
-																selectedCharacter.characterId,
-															) || "/placeholder.svg"
-														}
-														alt={selectedCharacter.name}
-														fill
-														className="object-cover"
-														priority
-													/>
-												</div>
-
-												{/* Error image with transition */}
-												<div
-													className="absolute inset-0 transition-opacity duration-500 ease-in-out"
-													style={{
-														opacity: isErrorState ? 1 : 0,
-														transform: isAnimating ? "scale(1.05)" : "scale(1)",
-														transition:
-															"opacity 0.5s ease, transform 0.5s ease",
-													}}
-												>
-													<Image
-														src={
-															characterToImagePath(
-																`${selectedCharacter.characterId}-error`,
-															) || "/error-placeholder.svg"
-														}
-														alt={`${selectedCharacter.name} (エラー)`}
-														fill
-														className="object-cover"
-														priority
-													/>
-												</div>
-
-												{/* Error overlay */}
-												{isErrorState && <div className="error-overlay"></div>}
-
-												{/* Canvas for noise effect */}
-												{isErrorState && (
-													<canvas
-														ref={canvasRef}
-														className="absolute inset-0 z-10 opacity-30 pointer-events-none"
-													/>
-												)}
-											</div>
-											<h2 className="text-lg font-bold text-green-400">
-												{selectedCharacter.name}{" "}
-												<span className="text-sm">
-													【Lv.{selectedCharacter.level}】
-												</span>
-											</h2>
-										</div>
-
-										{/* Skills Section */}
-										<div className="flex-1 bg-gray-800/80 p-3 rounded-md border border-emerald-500/30 h-full overflow-y-auto">
-											{/* タイプをスキルの上に移動 */}
-											<div className="mb-3 min-h-10">
-												<div className="flex items-center gap-1 text-sm">
-													<Layers className="h-4 w-4 text-emerald-400 flex-shrink-0" />
-													<span className="text-emerald-400 font-bold">
-														タイプ:
-													</span>
-													<span className="text-white">
-														<Badge
-															className={`${
-																typeColors[
-																	selectedCharacter.type as CharacterType
-																] || "bg-gray-500"
-															} text-white ml-1`}
-														>
-															{selectedCharacter.type}
-														</Badge>
-													</span>
-												</div>
-											</div>
-
-											{/* Party Skill */}
-											<div className="mb-3 min-h-16">
-												<div className="flex items-center gap-1 text-sm">
-													<HandshakeIcon className="h-4 w-4 text-sky-400 flex-shrink-0" />
-													<span className="text-sky-400 font-bold">
-														パーティスキル:
-													</span>
-													<span className="text-white">
-														{selectedCharacter.partySkillName
-															? selectedCharacter.partySkillName
-															: "なし"}
-													</span>
-												</div>
-												{selectedCharacter.partySkillDescription && (
-													<div className="text-xs text-gray-300 ml-5 mt-1">
-														{selectedCharacter.partySkillDescription}
-													</div>
-												)}
-												{selectedCharacter.partySkillCondition && (
-													<div className="text-xs text-gray-300 ml-5 mt-1">
-														{selectedCharacter.partySkillCondition}
-													</div>
-												)}
-											</div>
-
-											{/* Passive Skill */}
-											<div className="mb-3 min-h-16">
-												<div className="flex items-center gap-1 text-sm">
-													<ActivityIcon className="h-4 w-4 text-blue-300 flex-shrink-0" />
-													<span className="text-blue-300 font-bold">
-														パッシブスキル:
-													</span>
-													<span className="text-white">
-														{selectedCharacter.passiveSkillName
-															? selectedCharacter.passiveSkillName
-															: "なし"}
-													</span>
-												</div>
-												{selectedCharacter.passiveSkillDescription && (
-													<div className="text-xs text-gray-300 ml-5 mt-1">
-														{selectedCharacter.passiveSkillDescription}
-													</div>
-												)}
-											</div>
-
-											{/* Special Skill */}
-											<div className="min-h-16">
-												<div className="flex items-center gap-1 text-sm">
-													<Sparkles className="h-4 w-4 text-yellow-300 flex-shrink-0" />
-													<span className="text-yellow-300 font-bold">
-														スペシャルスキル:
-													</span>
-													<span className="text-white">
-														{selectedCharacter.specialSkillName
-															? selectedCharacter.specialSkillName
-															: "なし"}
-													</span>
-												</div>
-												{selectedCharacter.specialSkillDescription && (
-													<div className="text-xs text-gray-300 ml-5 mt-1">
-														{selectedCharacter.specialSkillDescription}
-														{selectedCharacter.specialSkillTurn && (
-															<span className="text-yellow-200 block mt-1">
-																ターン: {selectedCharacter.specialSkillTurn}
-															</span>
-														)}
-													</div>
-												)}
-											</div>
-										</div>
-
-										<div className="flex-1 max-h-[346px] bg-gray-800/50 rounded-md border border-emerald-500/30 p-3">
-											<div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-												<div className="flex items-center">
-													<Database className="h-4 w-4 mr-1 text-emerald-400" />
-													<span className="text-green-400 font-semibold">
-														技術ポイント:
-													</span>
-													<span className="text-emerald-400 text-xl ml-1">
-														{availablePoints}
-													</span>
-												</div>
-												<div className="flex items-center gap-2">
-													<span className="text-sm text-green-200">
-														増減量:
-													</span>
-													<div className="flex gap-1">
-														{INCREMENT_OPTIONS.map((amount) => (
-															<Button
-																key={amount}
-																size="sm"
-																variant="outline"
-																className={`px-2 py-1 h-7 ${
-																	incrementAmount === amount
-																		? "bg-emerald-500 text-gray-900 border-emerald-500"
-																		: "bg-gray-800 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20"
-																}`}
-																onClick={() => setIncrementAmount(amount)}
-															>
-																{amount}
-															</Button>
-														))}
-													</div>
-												</div>
-											</div>
-
-											<div className="space-y-2">
-												{/* HP Stat */}
-												<StatRow
-													label="HP"
-													icon={
-														<Shield className="h-4 w-4 text-blue-300 mr-1" />
+												<Image
+													src={
+														characterToImagePath(
+															selectedCharacter.characterId,
+														) || "/placeholder.svg"
 													}
-													baseValue={selectedCharacter.life}
-													addedPoints={statPoints.life}
-													onDecrement={() => handleStatChange("life", false)}
-													onIncrement={() => handleStatChange("life", true)}
-													canDecrement={statPoints.life > 0}
-													canIncrement={remainingPoints > 0}
+													alt={selectedCharacter.name}
+													fill
+													className="object-cover"
+													priority
 												/>
-
-												{/* Power Stat */}
-												<StatRow
-													label="パワー"
-													icon={<Zap className="h-4 w-4 text-red-300 mr-1" />}
-													baseValue={selectedCharacter.power}
-													addedPoints={statPoints.power}
-													onDecrement={() => handleStatChange("power", false)}
-													onIncrement={() => handleStatChange("power", true)}
-													canDecrement={statPoints.power > 0}
-													canIncrement={remainingPoints > 0}
-												/>
-
-												{/* Speed Stat */}
-												<StatRow
-													label="スピード"
-													icon={<Cpu className="h-4 w-4 text-green-300 mr-1" />}
-													baseValue={selectedCharacter.speed}
-													addedPoints={statPoints.speed}
-													onDecrement={() => handleStatChange("speed", false)}
-													onIncrement={() => handleStatChange("speed", true)}
-													canDecrement={statPoints.speed > 0}
-													canIncrement={remainingPoints > 0}
-												/>
-
-												{/* Evasion Stat (non-modifiable) */}
-												<div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
-													<div className="w-24 text-green-200 flex items-center whitespace-nowrap">
-														<Sparkles className="h-4 w-4 text-yellow-300 mr-1" />
-														回避率:
-													</div>
-													<div className="flex-1 mx-2">
-														<div className="text-md text-green-400">
-															{selectedCharacter.baseEvasion}%
-														</div>
-													</div>
-													<div className="flex items-center gap-1" />
-												</div>
 											</div>
 
-											<Button
-												className="mt-4 w-full bg-emerald-500 text-gray-900 hover:bg-green-400 font-bold"
-												style={{ boxShadow: "0 0 8px rgba(16, 185, 129, 0.5)" }}
-												onClick={handleDevelop}
-												disabled={usedPoints === 0}
+											{/* Error image with transition */}
+											<div
+												className="absolute inset-0 transition-opacity duration-500 ease-in-out"
+												style={{
+													opacity: isErrorState ? 1 : 0,
+													transform: isAnimating ? "scale(1.05)" : "scale(1)",
+													transition: "opacity 0.5s ease, transform 0.5s ease",
+												}}
 											>
-												育成する
-											</Button>
+												<Image
+													src={
+														characterToImagePath(
+															`${selectedCharacter.characterId}-error`,
+														) || "/error-placeholder.svg"
+													}
+													alt={`${selectedCharacter.name} (エラー)`}
+													fill
+													className="object-cover"
+													priority
+												/>
+											</div>
+
+											{/* Error overlay */}
+											{isErrorState && <div className="error-overlay"></div>}
+
+											{/* Canvas for noise effect */}
+											{isErrorState && (
+												<canvas
+													ref={canvasRef}
+													className="absolute inset-0 z-10 opacity-30 pointer-events-none"
+												/>
+											)}
+										</div>
+										<h2 className="text-lg font-bold text-green-400">
+											{selectedCharacter.name}{" "}
+											<span className="text-sm">
+												【Lv.{selectedCharacter.level}】
+											</span>
+										</h2>
+									</div>
+
+									{/* Skills Section */}
+									<div className="flex-1 h-[290px] p-3 rounded-md border border-emerald-500/30 overflow-hidden overflow-y-scroll">
+										{/* タイプをスキルの上に移動 */}
+										<div className="mb-3">
+											<div className="flex items-center gap-1 text-sm">
+												<Layers className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+												<span className="text-emerald-400 font-bold">
+													タイプ:
+												</span>
+												<span className="text-white">
+													<Badge
+														className={`${
+															typeColors[
+																selectedCharacter.type as CharacterType
+															] || "bg-gray-500"
+														} text-white ml-1`}
+													>
+														{selectedCharacter.type}
+													</Badge>
+												</span>
+											</div>
+										</div>
+
+										{/* Party Skill */}
+										<div className="mb-3 min-h-16">
+											<div className="flex items-center gap-1 text-sm">
+												<HandshakeIcon className="h-4 w-4 text-sky-400 flex-shrink-0" />
+												<span className="text-sky-400 font-bold">
+													パーティスキル:
+												</span>
+												<span className="text-white">
+													{selectedCharacter.partySkillName
+														? selectedCharacter.partySkillName
+														: "null"}
+												</span>
+											</div>
+											{selectedCharacter.partySkillDescription && (
+												<div className="text-xs text-gray-300 ml-5 mt-1">
+													{selectedCharacter.partySkillDescription}
+												</div>
+											)}
+											{selectedCharacter.partySkillCondition && (
+												<div className="text-xs text-gray-300 ml-5 mt-1">
+													{selectedCharacter.partySkillCondition}
+												</div>
+											)}
+										</div>
+
+										{/* Passive Skill */}
+										<div className="mb-3 min-h-16">
+											<div className="flex items-center gap-1 text-sm">
+												<ActivityIcon className="h-4 w-4 text-blue-300 flex-shrink-0" />
+												<span className="text-blue-300 font-bold">
+													パッシブスキル:
+												</span>
+												<span className="text-white">
+													{selectedCharacter.passiveSkillName
+														? selectedCharacter.passiveSkillName
+														: "null"}
+												</span>
+											</div>
+											{selectedCharacter.passiveSkillDescription && (
+												<div className="text-xs text-gray-300 ml-5 mt-1">
+													{selectedCharacter.passiveSkillDescription}
+												</div>
+											)}
+										</div>
+
+										{/* Special Skill */}
+										<div className="min-h-16">
+											<div className="flex items-center gap-1 text-sm">
+												<Sparkles className="h-4 w-4 text-orange-300 flex-shrink-0" />
+												<span className="text-orange-300 font-bold">
+													スペシャルスキル:
+												</span>
+												<span className="text-white">
+													{selectedCharacter.specialSkillName
+														? selectedCharacter.specialSkillName
+														: "null"}
+												</span>
+											</div>
+											{selectedCharacter.specialSkillDescription && (
+												<div className="text-xs text-gray-300 ml-5 mt-1">
+													{selectedCharacter.specialSkillDescription}
+													{selectedCharacter.specialSkillTurn && (
+														<span className="text-yellow-200 block mt-1">
+															ターン: {selectedCharacter.specialSkillTurn}
+														</span>
+													)}
+												</div>
+											)}
 										</div>
 									</div>
-								</div>
-							) : (
-								/* Placeholder content */
-								<div className="flex items-center justify-center h-full min-h-[340px]">
-									<div className="text-center w-full max-w-md">
-										<div className="mb-4 text-emerald-400 opacity-50">
-											<Zap className="h-16 w-16 mx-auto" />
+
+									<div className="flex-1 h-[290px] bg-gray-800/50 rounded-md border border-emerald-500/30 p-3">
+										<div className="space-y-1">
+											{/* HP Stat */}
+											<StatRow
+												label="HP"
+												icon={
+													<HeartIcon className="h-4 w-4 text-green-300 mr-1" />
+												}
+												baseValue={selectedCharacter.life}
+												addedPoints={statPoints.life}
+												onDecrement={() => handleStatChange("life", false)}
+												onIncrement={() => handleStatChange("life", true)}
+												canDecrement={statPoints.life > 0}
+												canIncrement={remainingPoints > 0}
+											/>
+
+											{/* Power Stat */}
+											<StatRow
+												label="パワー"
+												icon={
+													<BicepsFlexedIcon className="h-4 w-4 text-red-300 mr-1" />
+												}
+												baseValue={selectedCharacter.power}
+												addedPoints={statPoints.power}
+												onDecrement={() => handleStatChange("power", false)}
+												onIncrement={() => handleStatChange("power", true)}
+												canDecrement={statPoints.power > 0}
+												canIncrement={remainingPoints > 0}
+											/>
+
+											{/* Speed Stat */}
+											<StatRow
+												label="スピード"
+												icon={
+													<FootprintsIcon className="h-4 w-4 text-blue-300 mr-1" />
+												}
+												baseValue={selectedCharacter.speed}
+												addedPoints={statPoints.speed}
+												onDecrement={() => handleStatChange("speed", false)}
+												onIncrement={() => handleStatChange("speed", true)}
+												canDecrement={statPoints.speed > 0}
+												canIncrement={remainingPoints > 0}
+											/>
+
+											{/* Evasion Stat (non-modifiable) */}
+											<div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
+												<div className="w-36 text-sm text-green-200 flex items-center  whitespace-nowrap">
+													<GhostIcon className="h-4 w-4 text-gray-300 mr-1" />
+													回避率：
+												</div>
+												<div className="flex-1 mx-2">
+													<div className="text-sm font-bold text-green-400">
+														{selectedCharacter.baseEvasion}%
+													</div>
+												</div>
+												<div className="flex items-center gap-1" />
+											</div>
+											{/* Evasion Stat (non-modifiable) */}
+											<div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
+												<div className="w-36 text-sm text-green-200 gap-1 flex items-center whitespace-nowrap">
+													<CrosshairIcon className="h-4 w-4 text-yellow-300" />
+													クリティカル率：
+												</div>
+												<div className="flex-1 mx-2 text-sm font-bold text-green-400">
+													{/* <div className="text-md text-green-400"> */}
+													{selectedCharacter.baseEvasion}%{/* </div> */}
+												</div>
+												<div className="flex items-center gap-1" />
+											</div>
 										</div>
-										<p className="text-green-200 text-lg">
-											キャラクターを選択してください
-										</p>
-										<p className="text-green-400/50 text-sm mt-2">
-											下のリストから育成したい技術を選んでください
-										</p>
+
+										<Button
+											className="mt-4 w-full bg-emerald-500 text-gray-900 hover:bg-green-400 font-bold"
+											style={{ boxShadow: "0 0 8px rgba(16, 185, 129, 0.5)" }}
+											onClick={handleDevelop}
+											disabled={usedPoints === 0}
+										>
+											育成する
+										</Button>
 									</div>
 								</div>
-							)}
-						</CardContent>
-					</Card>
-				</div>
-
-				{/* Character List Section */}
-				<div className="overflow-auto border h-full rounded-lg p-4 border-emerald-500/30 bg-gray-900/80">
-					<h2 className="text-xl font-bold mb-4 text-green-400 flex items-center">
-						所持技術
-						<div className="h-px flex-grow ml-4 bg-gradient-to-r from-emerald-400 to-transparent" />
-					</h2>
-
-					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-						{isCharacterListLoading ? (
-							<div className="col-span-full text-center py-8 text-green-400/50">
-								キャラクター取得中...
 							</div>
-						) : userCharacterList && userCharacterList.length > 0 ? (
-							userCharacterList.map((character) => (
-								<CharacterCard
-									key={character.characterId}
-									character={character}
-									isSelected={
-										selectedCharacter?.characterId === character.characterId
-									}
-									onSelect={() => handleCharacterSelect(character)}
-								/>
-							))
 						) : (
-							<div className="col-span-full text-center py-8 text-green-400/50">
-								技術がありません。ガチャを引いて技術を獲得しましょう。
+							/* Placeholder content */
+							<div className="flex items-center justify-center h-full min-h-[340px]">
+								<div className="text-center w-full max-w-md">
+									<div className="mb-4 text-emerald-400 opacity-50">
+										<Zap className="h-16 w-16 mx-auto" />
+									</div>
+									<p className="text-green-200 text-lg">
+										キャラクターを選択してください
+									</p>
+									<p className="text-green-400/50 text-sm mt-2">
+										下のリストから育成したい技術を選んでください
+									</p>
+								</div>
 							</div>
 						)}
-					</div>
-				</div>
+					</CardContent>
+				</Card>
 			</div>
-		</div>
+
+			<SectionContainer title="所持技術" icon={<CpuIcon />}>
+				<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+					{isCharacterListLoading ? (
+						<div className="col-span-full text-center py-8 text-green-400/50">
+							キャラクター取得中...
+						</div>
+					) : userCharacterList && userCharacterList.length > 0 ? (
+						userCharacterList.map((character) => (
+							<CharacterCard
+								key={character.characterId}
+								character={character}
+								isSelected={
+									selectedCharacter?.characterId === character.characterId
+								}
+								onSelect={() => handleCharacterSelect(character)}
+							/>
+						))
+					) : (
+						<div className="col-span-full text-center py-8 text-green-400/50">
+							技術がありません。ガチャを引いて技術を獲得しましょう。
+						</div>
+					)}
+				</div>
+			</SectionContainer>
+		</MainContainer>
 	);
 }
