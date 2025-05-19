@@ -38,6 +38,8 @@ import { useUserCharacterList } from "~/hook/useUserCharacter";
 import { SectionContainer } from "~/components/SectionContainer";
 import { MainContainer } from "~/components/MainContainer";
 import { TechPoint } from "~/components/techPoint";
+import { CharacterStatusEditer } from "~/components/CharacterStatusEditer";
+import { CharacterStatus } from "~/components/CharacterStatus";
 
 type CharacterClientProps = {
 	initialToken: string;
@@ -69,65 +71,6 @@ const typeColors: Record<CharacterType, string> = {
 };
 
 const INCREMENT_OPTIONS = [1, 10, 100] as const;
-
-// StatRowコンポーネントの型定義
-interface StatRowProps {
-	label: string;
-	icon: React.ReactNode;
-	baseValue: number;
-	addedPoints: number;
-	onIncrement: () => void;
-	onDecrement: () => void;
-	canIncrement: boolean;
-	canDecrement: boolean;
-}
-
-// StatRowコンポーネント
-function StatRow({
-	label,
-	icon,
-	baseValue,
-	addedPoints,
-	onIncrement,
-	onDecrement,
-	canIncrement,
-	canDecrement,
-}: StatRowProps) {
-	return (
-		<div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
-			<div className="w-36 text-sm text-green-200 flex items-center whitespace-nowrap">
-				{icon}
-				{label}：
-			</div>
-			<div className="flex-1 mx-2">
-				<div className="text-sm text-green-400 font-bold">
-					{baseValue}
-					{addedPoints > 0 && (
-						<span className="text-emerald-400">{` (+${addedPoints})`}</span>
-					)}
-				</div>
-			</div>
-			<div className="flex items-center gap-1">
-				<button
-					type="button"
-					onClick={onDecrement}
-					disabled={!canDecrement}
-					className="bg-gray-800 p-1 rounded-sm hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
-				>
-					<Minus className="size-3" />
-				</button>
-				<button
-					type="button"
-					onClick={onIncrement}
-					disabled={!canIncrement}
-					className="bg-gray-800 p-1 rounded-sm hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
-				>
-					<Plus className="size-3" />
-				</button>
-			</div>
-		</div>
-	);
-}
 
 // CharacterCardコンポーネントの型定義
 interface CharacterCardProps {
@@ -506,7 +449,7 @@ export function CharacterClient({ initialToken }: CharacterClientProps) {
 									<div className="flex-1 h-[290px] bg-gray-800/50 rounded-md border border-emerald-500/30 p-3">
 										<div className="space-y-1">
 											{/* HP Stat */}
-											<StatRow
+											<CharacterStatusEditer
 												label="HP"
 												icon={
 													<HeartIcon className="h-4 w-4 text-green-300 mr-1" />
@@ -520,7 +463,7 @@ export function CharacterClient({ initialToken }: CharacterClientProps) {
 											/>
 
 											{/* Power Stat */}
-											<StatRow
+											<CharacterStatusEditer
 												label="パワー"
 												icon={
 													<BicepsFlexedIcon className="h-4 w-4 text-red-300 mr-1" />
@@ -534,7 +477,7 @@ export function CharacterClient({ initialToken }: CharacterClientProps) {
 											/>
 
 											{/* Speed Stat */}
-											<StatRow
+											<CharacterStatusEditer
 												label="スピード"
 												icon={
 													<FootprintsIcon className="h-4 w-4 text-blue-300 mr-1" />
@@ -548,30 +491,18 @@ export function CharacterClient({ initialToken }: CharacterClientProps) {
 											/>
 
 											{/* Evasion Stat (non-modifiable) */}
-											<div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
-												<div className="w-36 text-sm text-green-200 flex items-center  whitespace-nowrap">
-													<GhostIcon className="h-4 w-4 text-gray-300 mr-1" />
-													回避率：
-												</div>
-												<div className="flex-1 mx-2">
-													<div className="text-sm font-bold text-green-400">
-														{selectedCharacter.baseEvasion}%
-													</div>
-												</div>
-												<div className="flex items-center gap-1" />
-											</div>
-											{/* Evasion Stat (non-modifiable) */}
-											<div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
-												<div className="w-36 text-sm text-green-200 gap-1 flex items-center whitespace-nowrap">
-													<CrosshairIcon className="h-4 w-4 text-yellow-300" />
-													クリティカル率：
-												</div>
-												<div className="flex-1 mx-2 text-sm font-bold text-green-400">
-													{/* <div className="text-md text-green-400"> */}
-													{selectedCharacter.baseEvasion}%{/* </div> */}
-												</div>
-												<div className="flex items-center gap-1" />
-											</div>
+											<CharacterStatus
+												label="回避率"
+												icon={<GhostIcon />}
+												value={selectedCharacter.baseEvasion}
+											/>
+
+											{/* TODO: クリティカル率を入れる */}
+											<CharacterStatus
+												label="クリティカル率"
+												icon={<CrosshairIcon />}
+												value={selectedCharacter.baseEvasion}
+											/>
 										</div>
 
 										<Button

@@ -24,6 +24,7 @@ import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { characterToImagePath } from "~/lib/utils";
 import type { Character } from "~/type/character";
+import { CharacterStatus } from "~/components/CharacterStatus";
 
 interface CharacterDetailModalProps {
 	character: Character | null;
@@ -124,28 +125,28 @@ export default function CharacterDetailModal({
 
 							<div className="space-y-2">
 								{/* HP */}
-								<StatRow
+								<CharacterStatus
 									icon={<Shield className="h-4 w-4 text-blue-300" />}
 									label="HP"
 									value={character.life}
 								/>
 
 								{/* パワー */}
-								<StatRow
+								<CharacterStatus
 									icon={<Zap className="h-4 w-4 text-red-300" />}
 									label="パワー"
 									value={character.power}
 								/>
 
 								{/* スピード */}
-								<StatRow
+								<CharacterStatus
 									icon={<Clock className="h-4 w-4 text-green-300" />}
 									label="スピード"
 									value={character.speed}
 								/>
 
 								{/* 回避率 */}
-								<StatRow
+								<CharacterStatus
 									icon={<Sparkles className="h-4 w-4 text-yellow-300" />}
 									label="回避率"
 									value={`${character.baseEvasion}%`}
