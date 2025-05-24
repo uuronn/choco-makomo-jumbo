@@ -41,11 +41,6 @@ export const pullGacha = async () => {
 	if (!user) return console.error("User not found");
 
 	try {
-		console.info(
-			"process.env.NEXT_PUBLIC_BASE_URL",
-			process.env.NEXT_PUBLIC_BASE_URL,
-		);
-		console.info("user", user);
 		const response = await fetch(
 			`${process.env.NEXT_PUBLIC_BASE_URL}/api/gacha`,
 			{
@@ -71,7 +66,6 @@ export const pullGacha = async () => {
 
 		const data = await response.json();
 
-		console.info("Gacha result:", data);
 		// setResult(data);
 		// setShowNewBadge(data.isNew || false);
 		// setShowResult(true);
