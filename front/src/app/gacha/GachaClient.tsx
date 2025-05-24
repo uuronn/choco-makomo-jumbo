@@ -33,6 +33,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { pullGacha } from "./pullGacha";
 
 // キャラクタータイプの定義
 type Character = {
@@ -140,70 +141,70 @@ export function GachaClient({ initialToken }: GachaClientProps) {
 		}
 	};
 
-	// 通常ガチャを引く関数
-	const pullGacha = async () => {
-		if (availablePoints < 10) return;
+	// // 通常ガチャを引く関数
+	// const pullGacha = async () => {
+	// 	if (availablePoints < 10) return;
 
-		setAvailablePoints((prev) => prev - 10);
-		setIsAnimating(true);
-		setShowResult(false);
-		setLoadingProgress(0);
+	// 	setAvailablePoints((prev) => prev - 10);
+	// 	setIsAnimating(true);
+	// 	setShowResult(false);
+	// 	setLoadingProgress(0);
 
-		// ローディングバーのアニメーション
-		let progress = 0;
-		const loadingInterval = setInterval(() => {
-			progress += 2;
-			setLoadingProgress(progress);
+	// 	// ローディングバーのアニメーション
+	// 	let progress = 0;
+	// 	const loadingInterval = setInterval(() => {
+	// 		progress += 2;
+	// 		setLoadingProgress(progress);
 
-			if (progress > 85) {
-				setLoadingBarColor("bg-yellow-500");
-			} else if (progress > 65) {
-				setLoadingBarColor("bg-blue-500");
-			}
+	// 		if (progress > 85) {
+	// 			setLoadingBarColor("bg-yellow-500");
+	// 		} else if (progress > 65) {
+	// 			setLoadingBarColor("bg-blue-500");
+	// 		}
 
-			if (progress >= 100) {
-				clearInterval(loadingInterval);
-			}
-		}, 50);
+	// 		if (progress >= 100) {
+	// 			clearInterval(loadingInterval);
+	// 		}
+	// 	}, 50);
 
-		try {
-			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BASE_URL}/api/gacha`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${initialToken}`,
-					},
-					body: JSON.stringify({
-						userId: user?.uid,
-					}),
-				},
-			);
+	// 	try {
+	// 		const response = await fetch(
+	// 			`${process.env.NEXT_PUBLIC_BASE_URL}/api/gacha`,
+	// 			{
+	// 				method: "POST",
+	// 				headers: {
+	// 					"Content-Type": "application/json",
+	// 					Authorization: `Bearer ${initialToken}`,
+	// 				},
+	// 				body: JSON.stringify({
+	// 					userId: user?.uid,
+	// 				}),
+	// 			},
+	// 		);
 
-			clearInterval(loadingInterval);
-			setLoadingProgress(100);
+	// 		clearInterval(loadingInterval);
+	// 		setLoadingProgress(100);
 
-			if (!response.ok) {
-				throw new Error("API request failed");
-			}
+	// 		if (!response.ok) {
+	// 			throw new Error("API request failed");
+	// 		}
 
-			const data = await response.json();
-			setResult(data);
-			setShowNewBadge(data.isNew || false);
-			setShowResult(true);
+	// 		const data = await response.json();
+	// 		setResult(data);
+	// 		setShowNewBadge(data.isNew || false);
+	// 		setShowResult(true);
 
-			if (data.isNew) {
-				triggerConfetti();
-			}
-		} catch (error) {
-			console.error("Gacha API error:", error);
-			clearInterval(loadingInterval);
-			setError("ガチャの実行中にエラーが発生しました");
-		} finally {
-			setIsAnimating(false);
-		}
-	};
+	// 		if (data.isNew) {
+	// 			triggerConfetti();
+	// 		}
+	// 	} catch (error) {
+	// 		console.error("Gacha API error:", error);
+	// 		clearInterval(loadingInterval);
+	// 		setError("ガチャの実行中にエラーが発生しました");
+	// 	} finally {
+	// 		setIsAnimating(false);
+	// 	}
+	// };
 
 	// GitHubガチャを実行する関数
 	const getCharacterByGithubUrl = async () => {
