@@ -37,9 +37,10 @@ import Loading from "~/components/Loading";
 import { useUserCharacterList } from "~/hook/useUserCharacter";
 import { SectionContainer } from "~/components/SectionContainer";
 import { MainContainer } from "~/components/MainContainer";
-import { TechPoint } from "~/components/techPoint";
 import { CharacterStatusEditer } from "~/components/CharacterStatusEditer";
 import { CharacterStatus } from "~/components/CharacterStatus";
+import { TechPoint } from "~/components/TechPoint";
+import CharacterList from "./components/CharacterList";
 
 type CharacterClientProps = {
 	initialToken: string;
@@ -80,7 +81,7 @@ interface CharacterCardProps {
 }
 
 // CharacterCardコンポーネント
-function CharacterCard({
+export function CharacterCard({
 	character,
 	isSelected,
 	onSelect,
@@ -244,9 +245,8 @@ export function CharacterClient({ initialToken }: CharacterClientProps) {
 				return pointsToAdd > 0
 					? { ...prev, [stat]: currentValue + pointsToAdd }
 					: prev;
-			} else {
-				return { ...prev, [stat]: Math.max(0, currentValue - incrementAmount) };
 			}
+			return { ...prev, [stat]: Math.max(0, currentValue - incrementAmount) };
 		});
 	};
 
@@ -334,7 +334,7 @@ export function CharacterClient({ initialToken }: CharacterClientProps) {
 											</div>
 
 											{/* Error overlay */}
-											{isErrorState && <div className="error-overlay"></div>}
+											{isErrorState && <div className="error-overlay" />}
 
 											{/* Canvas for noise effect */}
 											{isErrorState && (
@@ -537,28 +537,11 @@ export function CharacterClient({ initialToken }: CharacterClientProps) {
 			</div>
 
 			<SectionContainer title="所持技術" icon={<CpuIcon />}>
-				<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-					{isCharacterListLoading ? (
-						<div className="col-span-full text-center py-8 text-green-400/50">
-							キャラクター取得中...
-						</div>
-					) : userCharacterList && userCharacterList.length > 0 ? (
-						userCharacterList.map((character) => (
-							<CharacterCard
-								key={character.characterId}
-								character={character}
-								isSelected={
-									selectedCharacter?.characterId === character.characterId
-								}
-								onSelect={() => handleCharacterSelect(character)}
-							/>
-						))
-					) : (
-						<div className="col-span-full text-center py-8 text-green-400/50">
-							技術がありません。ガチャを引いて技術を獲得しましょう。
-						</div>
-					)}
-				</div>
+				<CharacterList
+					initialToken={initialToken}
+					selectedCharacter={selectedCharacter}
+					onCharacterSelect={handleCharacterSelect}
+				/>
 			</SectionContainer>
 		</MainContainer>
 	);
