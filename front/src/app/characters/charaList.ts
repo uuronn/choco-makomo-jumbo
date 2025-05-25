@@ -7,7 +7,6 @@ import { getTokenFromCookies } from "~/utils/token";
 export const getCharaList = async () => {
 	const cookieStore = await cookies();
 	const token = getTokenFromCookies(cookieStore);
-	// const device = getDeviceFromCookies(cookieStore);
 
 	const user = await fetchUserFromToken(token);
 

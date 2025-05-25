@@ -1,4 +1,3 @@
-import type { User } from "~/type/user";
 import { adminAuth } from "./firebase-admin";
 
 export const fetchUserFromToken = async (token: string) => {
@@ -14,7 +13,7 @@ export const fetchUserFromToken = async (token: string) => {
 
 		if (!res.ok) throw new Error("Failed to fetch user data");
 
-		const user = (await res.json()) as User;
+		const user = await res.json();
 
 		if (!user) {
 			throw new Error("ユーザーが見つかりませんでした。");
