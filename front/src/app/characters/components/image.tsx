@@ -120,7 +120,7 @@ export default function CharacterImage({
 							{/* Random glitch blocks */}
 							{Array.from({ length: 5 }).map((_, i) => (
 								<motion.div
-									key={i}
+									key={`key${i}`}
 									className="absolute bg-red-500/30 mix-blend-screen"
 									style={{
 										width: `${Math.random() * 30 + 10}px`,
