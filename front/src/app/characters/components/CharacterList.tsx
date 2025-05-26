@@ -5,17 +5,17 @@ import { useUserContext } from "~/context/UserProvider";
 import { CharacterCard } from "../CharacterClient";
 import type { Character } from "~/type/character";
 
-interface CharacterListProps {
+type Props = {
 	initialToken: string;
 	selectedCharacter: Character | null;
 	onCharacterSelect: (character: Character) => void;
-}
+};
 
 export default function CharacterList({
 	initialToken,
 	selectedCharacter,
 	onCharacterSelect,
-}: CharacterListProps) {
+}: Props) {
 	const { user: authUser } = useUserContext();
 	const { data: userCharacterList, isLoading: isCharacterListLoading } =
 		useUserCharacterList(authUser?.uid ?? null, initialToken);
