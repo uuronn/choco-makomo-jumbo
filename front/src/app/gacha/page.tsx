@@ -4,6 +4,9 @@ import { getTokenFromCookies } from "~/utils/token";
 import { fetchUserFromToken } from "~/lib/user";
 import { GachaClient } from "./GachaClient";
 import { getDeviceFromCookies } from "~/utils/device";
+import { MainContainer } from "~/components/MainContainer";
+import { ZapIcon } from "lucide-react";
+import { TechPoint } from "~/components/TechPoint";
 
 export default async function GachaPage() {
 	const cookieStore = await cookies();
@@ -16,11 +19,9 @@ export default async function GachaPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 overflow-hidden">
-			ｆｄｆｄｄｆ{" "}
-			<Suspense fallback={<div>読み込み中...</div>}>
-				<GachaClient initialToken={token} />
-			</Suspense>
-		</div>
+		<MainContainer title="技術ガチャ" icon={<ZapIcon />}>
+			<TechPoint />
+			<GachaClient initialToken={token} />
+		</MainContainer>
 	);
 }
