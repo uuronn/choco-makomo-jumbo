@@ -1,10 +1,7 @@
 "use client";
 
-// import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { UserProvider } from "../context/UserProvider";
-// import { Sidebar } from "~/components/SideBar";
 import { SnackbarProvider } from "notistack";
 import { MaintenanceModal } from "~/components/MaintenanceModal";
 import { Sidebar } from "~/components/SideBar";
@@ -32,7 +29,8 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				{/* <MaintenanceModal /> */}
+				{/* TODO: メンテナンス終わったら解除する */}
+				<MaintenanceModal />
 				<SnackbarProvider
 					anchorOrigin={{
 						vertical: "top",
@@ -41,11 +39,9 @@ export default function RootLayout({
 					maxSnack={3}
 					style={{ maxWidth: 300 }}
 				/>
-				{/* <UserProvider> */}
-				{/* TODO: メンテナンス終わったら解除する */}
+
 				<Sidebar />
 				{children}
-				{/* </UserProvider> */}
 			</body>
 		</html>
 	);
