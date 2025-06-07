@@ -1,6 +1,4 @@
-import { ZapIcon } from "lucide-react";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
-import { twMerge } from "tailwind-merge";
 
 type Props = {
 	title: string;
@@ -20,7 +18,7 @@ export const MainContainer = ({ title, icon, children }: Props) => {
 				backgroundSize: "20px 20px, 20px 20px, 20px 20px, 20px 20px",
 			}}
 		>
-			<div className="container mx-auto p-4 flex flex-col h-screen max-h-screen">
+			<div className="container mx-auto p-4 flex flex-col h-screen max-h-[calc(100vh-56px)]">
 				<h1 className="gap-3 text-2xl font-bold mb-4 text-green-400 flex items-center">
 					{icon}
 					{title}
