@@ -25,7 +25,7 @@ export const SectionContainer = ({
 				<div className="h-px flex-grow bg-gradient-to-r from-emerald-400 to-transparent" />
 			</h2>
 
-			<div className="overflow-y-scroll h-[calc(100%-44px)]">{children}</div>
+			<div>{children}</div>
 		</section>
 	);
 };
