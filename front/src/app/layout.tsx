@@ -1,10 +1,6 @@
-"use client";
-
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SnackbarProvider } from "notistack";
-import { MaintenanceModal } from "~/components/MaintenanceModal";
-import { Sidebar } from "~/components/SideBar";
+import { ClientProviders } from "./client-providers";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -29,19 +25,7 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				{/* TODO: メンテナンス終わったら解除する */}
-				<MaintenanceModal />
-				<SnackbarProvider
-					anchorOrigin={{
-						vertical: "top",
-						horizontal: "right",
-					}}
-					maxSnack={3}
-					style={{ maxWidth: 300 }}
-				/>
-
-				<Sidebar />
-				{children}
+				<ClientProviders>{children}</ClientProviders>
 			</body>
 		</html>
 	);
