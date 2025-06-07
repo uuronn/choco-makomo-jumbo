@@ -4,13 +4,66 @@ import { useState, useEffect, useRef } from "react";
 import { LucideShieldAlert } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
-import { useUserContext } from "~/context/UserProvider";
+import { signInWithPopup } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { auth, googleProvider } from "~/lib/firebase";
 
-export default function Home() {
+export default function Login() {
 	const [error, _] = useState<string | null>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
-	const { handleSignIn } = useUserContext();
+	const router = useRouter();
+
+	// const { handleSignIn } = useUserContext();
+
+	const handleSignIn = async () => {
+		try {
+			// FirebaseでGoogleログイン
+			const result = await signInWithPopup(auth, googleProvider);
+
+			// IDトークンを強制再取得（古いtoken対策）
+			const token = await result.user.getIdToken(true);
+
+			// Laravel にユーザーが存在するか確認
+			const checkUser = await fetch(
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${result.user.uid}/checkUser`,
+			);
+
+			// 存在しないなら作成
+			if (!checkUser.ok) {
+				await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users`, {
+					method: "POST",
+					headers: {
+						Authorization: `Bearer ${token}`,
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						id: result.user.uid,
+						name: result.user.displayName,
+						email: result.user.email,
+						photoUrl: result.user.photoURL,
+					}),
+				});
+			}
+
+			// App Router のAPIにトークン送信 → Cookie保存
+			const loginRes = await fetch("/api/auth/login", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ token }),
+			});
+
+			if (!loginRes.ok) {
+				throw new Error("トークン送信に失敗しました");
+			}
+
+			// 遷移
+			router.push("/home");
+		} catch (err) {
+			console.error("ログイン処理でエラーが発生しました:", err);
+			alert("ログインに失敗しました。もう一度お試しください。");
+		}
+	};
 
 	// Canvas Matrix Effect
 	useEffect(() => {

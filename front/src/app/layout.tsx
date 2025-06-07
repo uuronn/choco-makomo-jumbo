@@ -41,11 +41,11 @@ export default function RootLayout({
 					maxSnack={3}
 					style={{ maxWidth: 300 }}
 				/>
-				<UserProvider>
-					{/* TODO: メンテナンス終わったら解除する */}
-					<Sidebar />
-					{children}
-				</UserProvider>
+				{/* <UserProvider> */}
+				{/* TODO: メンテナンス終わったら解除する */}
+				<Sidebar />
+				{children}
+				{/* </UserProvider> */}
 			</body>
 		</html>
 	);
