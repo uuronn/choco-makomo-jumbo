@@ -1,8 +1,6 @@
 import { cookies } from "next/headers";
-import { Suspense } from "react";
 import { getTokenFromCookies } from "~/utils/token";
 import { fetchUserFromToken } from "~/lib/user";
-import { CharacterClient } from "./CharacterClient";
 import { TechPoint } from "~/components/TechPoint";
 import { CpuIcon, ZapIcon } from "lucide-react";
 import { MainContainer } from "~/components/MainContainer";
@@ -20,8 +18,6 @@ export default async function CharactersPage() {
 	}
 
 	const userCharacterList = await getCharaList();
-
-	console.info("userCharacterList", userCharacterList);
 
 	return (
 		<MainContainer title="技術育成" icon={<ZapIcon size={40} />}>
