@@ -373,7 +373,7 @@ export function GachaClient({ initialToken }: GachaClientProps) {
 						)}
 
 						{/* 結果表示 */}
-						{showResult && result && (
+						{result && (
 							<div className="text-center">
 								{showNewBadge && (
 									<div className="bg-yellow-500 text-black px-3 py-1 rounded-full font-bold text-sm inline-block mb-2">
@@ -421,14 +421,15 @@ export function GachaClient({ initialToken }: GachaClientProps) {
 							</Link>
 							<Button
 								onClick={
-									activeTab === "regular" ? pullGacha : getCharacterByGithubUrl
+									activeTab === "regular"
+										? async () => {
+												const h = await pullGacha();
+												console.info("Gacha result:", h);
+												setResult(h);
+											}
+										: getCharacterByGithubUrl
 								}
-								disabled={
-									isAnimating ||
-									(activeTab === "regular"
-										? availablePoints < 10
-										: !githubUrl.trim())
-								}
+								disabled={isAnimating}
 								className="flex-1 bg-black hover:bg-green-900 text-green-400 border border-green-500/50"
 							>
 								{activeTab === "regular" ? (
