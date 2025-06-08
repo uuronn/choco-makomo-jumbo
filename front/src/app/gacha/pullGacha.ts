@@ -66,6 +66,8 @@ export const pullGacha = async () => {
 
 		const data = await response.json();
 
+		return data;
+
 		// setResult(data);
 		// setShowNewBadge(data.isNew || false);
 		// setShowResult(true);
