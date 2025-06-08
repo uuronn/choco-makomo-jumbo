@@ -41,6 +41,7 @@ import { CharacterStatusEditer } from "~/components/CharacterStatusEditer";
 import { CharacterStatus } from "~/components/CharacterStatus";
 import { TechPoint } from "~/components/TechPoint";
 import CharacterList from "./components/CharacterList";
+import Link from "next/link";
 
 type CharacterClientProps = {
 	initialToken: string;
@@ -87,7 +88,7 @@ export function CharacterCard({
 	onSelect,
 }: CharacterCardProps) {
 	return (
-		<div
+		<Link
 			className={`cursor-pointer p-2 rounded-lg transition-all ${
 				isSelected
 					? "bg-emerald-500/20 border border-emerald-500"
@@ -105,6 +106,7 @@ export function CharacterCard({
 			tabIndex={0}
 			role="button"
 			aria-pressed={isSelected}
+			href={`/characters/${character.characterId}`}
 		>
 			<div className="flex flex-col items-center">
 				<div className="relative w-16 h-16 mb-2 overflow-hidden rounded-lg">
@@ -124,7 +126,7 @@ export function CharacterCard({
 					Lv.{character.level}
 				</div>
 			</div>
-		</div>
+		</Link>
 	);
 }
 
