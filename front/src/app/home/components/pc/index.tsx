@@ -11,6 +11,7 @@ import { OnlineUserCounter } from "../OnlineUserCounter";
 import { EditUserName } from "../EditUserName";
 import { FOOTER_ITEMS, NAV_ITEMS } from "../../constant";
 import { getRatingTitle } from "~/lib/getRatingTitle";
+import { Suspense } from "react";
 
 type Props = {
 	user: User;
@@ -137,7 +138,9 @@ export default async function PcHomeScreen({ user }: Props) {
 					<div className="flex justify-between items-center">
 						<div className="text-xs text-green-500/70 font-mono flex items-center gap-2">
 							<div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-							<OnlineUserCounter />
+							<Suspense fallback={<span>Loading users...</span>}>
+								<OnlineUserCounter />
+							</Suspense>
 						</div>
 						<div className="text-xs text-green-500/70 font-mono">
 							v1.0.0-beta
