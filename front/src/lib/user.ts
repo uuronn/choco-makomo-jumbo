@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 import { adminAuth } from "./firebase-admin";
 
 export const fetchUserFromToken = async (token: string) => {
@@ -20,7 +22,22 @@ export const fetchUserFromToken = async (token: string) => {
 		}
 
 		return user;
-	} catch (e) {
-		console.error("⚠️ トークンの検証またはユーザー取得に失敗", e);
+	} catch (e: unknown) {
+		// トークン期限切れなど、Firebase Authの典型的なエラーを検出
+		const isTokenError =
+			typeof e === "object" &&
+			e !== null &&
+			"code" in e &&
+			["auth/id-token-expired", "auth/argument-error"].includes(
+				(e as { code: string }).code,
+			);
+
+		// リダイレクトレスポンスを返す
+		if (isTokenError) {
+			redirect("/auth/login");
+		}
+
+		// それ以外はサーバーエラー扱い
+		return new NextResponse("Internal Server Error", { status: 500 });
 	}
 };
