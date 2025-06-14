@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useUserContext } from "../../../context/UserProvider";
+import { useUserContext } from "../../../../context/UserProvider";
 import Loading from "~/components/Loading";
 import Pending from "~/components/Pending";
 import type { Room } from "~/type/room";

@@ -1,6 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ClientProviders } from "./client-providers";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -14,10 +13,8 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({
 	children,
-	modal,
 }: Readonly<{
 	children: React.ReactNode;
-	modal: React.ReactNode;
 }>) {
 	return (
 		<html lang="ja">
@@ -27,10 +24,7 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				<ClientProviders>
-					{children}
-					{modal}
-				</ClientProviders>
+				{children}
 			</body>
 		</html>
 	);

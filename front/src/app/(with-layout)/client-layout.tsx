@@ -3,7 +3,7 @@
 import { SnackbarProvider } from "notistack";
 import { FooterNavigation } from "~/components/FooterNavigation";
 
-export function ClientProviders({ children }: { children: React.ReactNode }) {
+export function ClientLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<>
 			<SnackbarProvider
