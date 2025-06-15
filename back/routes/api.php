@@ -43,7 +43,7 @@ Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () 
     Route::get('/users/{userId}/characters', GetUserCharacterListController::class);
 
     // ユーザーの特定の所持キャラクターを取得する
-    Route::get('/users/{userId}/characters/{characterId}', GetUserCharacterListController::class);
+    Route::get('/users/{userId}/characters/{characterId}', GetUserCharacterController::class);
 
     // ユーザーのpointを取得する
     Route::get('/users/{userId}/point', [UserController::class, 'getPoint']);
