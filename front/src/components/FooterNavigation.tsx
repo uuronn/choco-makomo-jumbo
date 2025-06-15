@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import { Home, Swords, LogOut, Coins } from "lucide-react";
+import { Home, Swords, Gamepad2Icon } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
 import { SlEnergy } from "react-icons/sl";
@@ -31,8 +31,8 @@ export function FooterNavigation({
 			setActiveItem("characters");
 		} else if (pathname === "/gacha") {
 			setActiveItem("gacha");
-		} else if (pathname === "/quiz") {
-			setActiveItem("quiz");
+		} else if (pathname === "/miniGame") {
+			setActiveItem("miniGame");
 		}
 	}, [pathname]);
 
@@ -62,10 +62,10 @@ export function FooterNavigation({
 			isActive: activeItem === "gacha",
 		},
 		{
-			title: "ポイ活",
-			icon: <Coins className="size-5" />,
-			href: "/quiz",
-			isActive: activeItem === "quiz",
+			title: "ミニゲーム",
+			icon: <Gamepad2Icon className="size-5" />,
+			href: "/miniGame",
+			isActive: activeItem === "miniGame",
 		},
 	];
 
