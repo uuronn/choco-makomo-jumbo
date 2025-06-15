@@ -3,15 +3,9 @@ import { twMerge } from "tailwind-merge";
 
 type Props = {
 	title: string;
-	icon: ReactNode;
 } & ComponentPropsWithoutRef<"section">;
 
-export const SectionContainer = ({
-	title,
-	icon,
-	className,
-	children,
-}: Props) => {
+export const SectionContainer = ({ title, className, children }: Props) => {
 	return (
 		<section
 			className={twMerge(
@@ -20,7 +14,6 @@ export const SectionContainer = ({
 			)}
 		>
 			<h2 className="mb-4 text-xl font-bold text-green-400 flex gap-2 items-center">
-				{icon}
 				{title}
 				<div className="h-px flex-grow bg-gradient-to-r from-emerald-400 to-transparent" />
 			</h2>
