@@ -1,7 +1,7 @@
 "use client";
 
-import { CharacterCard } from "../CharacterClient";
 import type { Character } from "~/type/character";
+import { CharacterCard } from "./CharacterCard";
 
 type Props = {
 	userCharacterList: Character[] | null;
@@ -23,6 +23,7 @@ export default function CharacterList({ userCharacterList }: Props) {
 							// selectedCharacter?.characterId === character.characterId
 							false
 						}
+						onSelect={() => {}}
 						// onSelect={() => onCharacterSelect(character)}
 					/>
 				))
