@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import { Home, Swords, Gamepad2Icon } from "lucide-react";
+import { Home, Swords, Gamepad2Icon, CpuIcon } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
 import { SlEnergy } from "react-icons/sl";
@@ -50,14 +50,14 @@ export function FooterNavigation({
 			isActive: activeItem === "battle",
 		},
 		{
-			title: "キャラクター",
+			title: "育成",
 			icon: <SlEnergy className="size-5" />,
 			href: "/characters",
 			isActive: activeItem === "characters",
 		},
 		{
 			title: "ガチャ",
-			icon: <FaLaptopCode className="size-5" />,
+			icon: <CpuIcon className="size-5" />,
 			href: "/gacha",
 			isActive: activeItem === "gacha",
 		},
@@ -76,11 +76,11 @@ export function FooterNavigation({
 	return (
 		<nav
 			className={cn(
-				"fixed bottom-0 left-0 right-0 bg-black/90 border-t border-emerald-900/30 z-50",
+				"fixed bottom-0 left-0 right-0 bg-black/90 z-50 p-3",
 				className,
 			)}
 		>
-			<ul className="flex justify-around items-center h-14">
+			<ul className="flex justify-around items-center">
 				{navItems.map((item) => (
 					<li
 						key={item.title}

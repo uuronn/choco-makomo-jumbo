@@ -9,7 +9,7 @@ export const SectionContainer = ({ title, className, children }: Props) => {
 	return (
 		<section
 			className={twMerge(
-				"w-full bg-gray-900/80 border border-green-400/30 rounded-lg p-4 overflow-hidden",
+				"w-full bg-gray-900/80 border border-green-400/30 rounded-lg p-4 h-[calc(100%-44px)]",
 				className,
 			)}
 		>

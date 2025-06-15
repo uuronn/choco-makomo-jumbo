@@ -23,7 +23,8 @@ export default async function CharactersPage() {
 		<MainContainer title="技術育成" icon={<ZapIcon size={40} />}>
 			<TechPoint />
 
-			<SectionContainer title="所持技術" className="h-full">
+			<SectionContainer title="所持技術">
+				{/* <div className="bg-red-400 h-[2000px]">test</div> */}
 				<CharacterList userCharacterList={userCharacterList} />
 			</SectionContainer>
 		</MainContainer>

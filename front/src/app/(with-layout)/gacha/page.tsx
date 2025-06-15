@@ -5,7 +5,7 @@ import { fetchUserFromToken } from "~/lib/user";
 import { GachaClient } from "./GachaClient";
 import { getDeviceFromCookies } from "~/utils/device";
 import { MainContainer } from "~/components/MainContainer";
-import { ZapIcon } from "lucide-react";
+import { CpuIcon, ZapIcon } from "lucide-react";
 import { TechPoint } from "~/components/TechPoint";
 
 export default async function GachaPage() {
@@ -19,7 +19,7 @@ export default async function GachaPage() {
 	}
 
 	return (
-		<MainContainer title="技術ガチャ" icon={<ZapIcon />}>
+		<MainContainer title="ガチャ" icon={<CpuIcon size={40} />}>
 			<TechPoint />
 			<GachaClient initialToken={token} />
 		</MainContainer>

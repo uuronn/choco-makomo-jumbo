@@ -1,7 +1,6 @@
 export const GameList = () => {
 	return (
 		<div className="flex flex-col items-center justify-center h-full p-4">
-			<h1 className="text-2xl font-bold mb-4">ミニゲーム一覧</h1>
 			<p className="text-gray-600 mb-8">
 				ここでは、様々なミニゲームをプレイできます。お楽しみください！
 			</p>
