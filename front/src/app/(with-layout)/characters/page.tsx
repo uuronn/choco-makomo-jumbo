@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { getTokenFromCookies } from "~/utils/token";
 import { fetchUserFromToken } from "~/lib/user";
 import { TechPoint } from "~/components/TechPoint";
-import { CpuIcon, ZapIcon } from "lucide-react";
+import { ZapIcon } from "lucide-react";
 import { MainContainer } from "~/components/MainContainer";
 import { SectionContainer } from "~/components/SectionContainer";
 import CharacterList from "./components/CharacterList";
@@ -23,7 +23,7 @@ export default async function CharactersPage() {
 		<MainContainer title="技術育成" icon={<ZapIcon size={40} />}>
 			<TechPoint />
 
-			<SectionContainer title="所持技術" icon={<CpuIcon />} className="h-full">
+			<SectionContainer title="所持技術" className="h-full">
 				<CharacterList userCharacterList={userCharacterList} />
 			</SectionContainer>
 		</MainContainer>
