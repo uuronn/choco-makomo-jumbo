@@ -3,7 +3,7 @@ import type { RefObject } from "react";
 import { characterToImagePath } from "~/lib/utils";
 
 type Props = {
-	selectedCharacter: {
+	character: {
 		characterId: string;
 		name: string;
 	};
@@ -12,7 +12,7 @@ type Props = {
 };
 
 export const CharacterImage = ({
-	selectedCharacter,
+	character,
 	isErrorState,
 	canvasRef,
 }: Props) => {
@@ -29,10 +29,10 @@ export const CharacterImage = ({
 			<Image
 				src={
 					isErrorState
-						? characterToImagePath(`${selectedCharacter.characterId}-error`)
-						: characterToImagePath(selectedCharacter.characterId)
+						? characterToImagePath(`${character.characterId}-error`)
+						: characterToImagePath(character.characterId)
 				}
-				alt={selectedCharacter.name}
+				alt={character.name}
 				fill
 				className="object-cover"
 				priority
