@@ -45,6 +45,7 @@ readonly class GetUserCharacterListController
                 'name' => $baseCharacter->name,
                 'type' => $baseCharacter->type,
                 'baseEvasion' => $baseCharacter->baseEvasion,
+                'baseCritical' => $baseCharacter->baseCritical,
                 'partySkillName' => $baseCharacter->partySkillName,
                 'partySkillDescription' => $baseCharacter->partySkillDescription,
                 'partySkillCondition' => $baseCharacter->partySkillCondition,

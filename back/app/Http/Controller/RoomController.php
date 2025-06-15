@@ -626,6 +626,7 @@ class RoomController
                         'power' => $userCharacter->power,
                         'speed' => $userCharacter->speed,
                         'evasion' => $character->baseEvasion,
+                        'critical' => $character->baseCritical,
                     ]);
                 }
 
@@ -643,6 +644,7 @@ class RoomController
                         'power' => $character->basePower,
                         'speed' => $character->baseSpeed,
                         'evasion' => $character->baseEvasion,
+                        'critical' => $character->baseCritical,
                     ]);
                 }
 
@@ -986,6 +988,7 @@ class RoomController
                         'power' => $userCharacter->power,
                         'speed' => $userCharacter->speed,
                         'evasion' => $character->baseEvasion,
+                        'critical' => $character->baseCritical,
                     ]);
                 }
 
@@ -1058,6 +1061,7 @@ class RoomController
                     'power' => $userCharacter->power,
                     'speed' => $userCharacter->speed,
                     'evasion' => $character->baseEvasion,
+                    'critical' => $character->baseCritical,
                 ]);
             }
 

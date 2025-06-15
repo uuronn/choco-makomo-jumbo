@@ -127,6 +127,7 @@ class TeamRoomController
                         'power' => $teamChar->character->basePower,
                         'speed' => $teamChar->character->baseSpeed,
                         'evasion' => $teamChar->character->baseEvasion,
+                        'critical' => $teamChar->character->baseCritical,
                     ]);
                 }
 
@@ -146,6 +147,7 @@ class TeamRoomController
                         'power' => $teamChar->character->basePower,
                         'speed' => $teamChar->character->baseSpeed,
                         'evasion' => $teamChar->character->baseEvasion,
+                        'critical' => $teamChar->character->baseCritical,
                     ]);
                 }
 
@@ -228,9 +230,9 @@ class TeamRoomController
             }
 
             // ユーザーがいずれかのチームに所属しているか確認
-            $isTeam1Member = $room->team1 && 
+            $isTeam1Member = $room->team1 &&
                 ($room->team1->leaderUserId === $userId || $room->team1->memberUserId === $userId);
-            $isTeam2Member = $room->team2 && 
+            $isTeam2Member = $room->team2 &&
                 ($room->team2->leaderUserId === $userId || $room->team2->memberUserId === $userId);
 
             if (!$isTeam1Member && !$isTeam2Member) {
@@ -418,7 +420,7 @@ class TeamRoomController
 
         if (!$team1Alive || !$team2Alive) {
             $winTeamId = !$team1Alive ? $room->team2Id : $room->team1Id;
-            
+
             $room->update([
                 'status' => 'finish',
                 'winTeamId' => $winTeamId,
@@ -433,4 +435,4 @@ class TeamRoomController
             ]);
         }
     }
-} 
+}

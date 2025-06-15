@@ -77,6 +77,7 @@ class UserCharacterSeeder extends Seeder
                         'baseLife' => $characterData['baseLife'],
                         'baseSpeed' => $characterData['baseSpeed'],
                         'baseEvasion' => $characterData['baseEvasion'],
+                        'baseCritical' => $characterData['baseCritical'],
                         'specialSkillName' => $characterData['specialSkillName'],
                         'specialSkillDescription' => $characterData['specialSkillDescription'],
                         'baseSpecialSkillTurn' => $characterData['baseSpecialSkillTurn'],

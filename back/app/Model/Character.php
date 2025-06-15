@@ -14,7 +14,7 @@ class Character extends Model
     protected $hidden = ['created_at', 'updated_at'];
 
     protected $fillable = [
-        'id', 'name', 'officialName', 'type', 'basePower', 'baseLife', 'baseSpeed', 'baseEvasion',
+        'id', 'name', 'officialName', 'type', 'basePower', 'baseLife', 'baseSpeed', 'baseEvasion', 'baseCritical',
         'partySkillName', 'partySkillDescription', 'partySkillCondition',
         'specialSkillName', 'specialSkillDescription', 'baseSpecialSkillTurn', 'passiveSkillName', 'passiveSkillDescription'
     ];

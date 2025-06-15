@@ -9,6 +9,7 @@ export type Character = {
 	name: string;
 	type: CharacterType;
 	baseEvasion: number;
+	baseCritical: number;
 	specialSkillName: string;
 	specialSkillDescription: string;
 	specialSkillTurn: number;

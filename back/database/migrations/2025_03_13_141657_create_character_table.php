@@ -17,6 +17,7 @@ return new class extends Migration
             $table->smallInteger('basePower')->unsigned();
             $table->smallInteger('baseSpeed')->unsigned();
             $table->tinyInteger('baseEvasion')->unsigned();
+            $table->tinyInteger('baseCritical')->unsigned();
             $table->string('partySkillName')->nullable();
             $table->string('partySkillDescription')->nullable();
             $table->string('partySkillCondition')->nullable();

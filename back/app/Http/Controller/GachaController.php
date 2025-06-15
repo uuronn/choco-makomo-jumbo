@@ -52,6 +52,7 @@ class GachaController
             'power' => $character->basePower,
             'speed' => $character->baseSpeed,
             'evasion' => $character->baseEvasion,
+            'critical' => $character->baseCritical,
             'level' => 0,
         ]);
 
@@ -202,6 +203,7 @@ class GachaController
                         'power' => $defaultCharacter->basePower,
                         'speed' => $defaultCharacter->baseSpeed,
                         'evasion' => $defaultCharacter->baseEvasion,
+                        'critical' => $defaultCharacter->baseCritical,
                         'level' => 0,
                     ]);
                     $userCharacter->save();
@@ -250,6 +252,7 @@ class GachaController
                 'power' => $character->basePower,
                 'speed' => $character->baseSpeed,
                 'evasion' => $character->baseEvasion,
+                'critical' => $character->baseCritical,
                 'level' => 0,
             ]);
             $userCharacter->save();

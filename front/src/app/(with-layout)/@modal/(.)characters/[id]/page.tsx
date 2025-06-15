@@ -22,6 +22,7 @@ export default async function CharacterModalPage({
 				power: 5, // 仮のデータ
 				speed: 3, // 仮のデータ
 				baseEvasion: 2, // 仮のデータ
+				baseCritical: 1, // 仮のデータ
 				partySkillName: "パーティースキル名", // 仮のデータ
 				partySkillDescription: "パーティースキル説明", // 仮のデータ
 				partySkillCondition: "条件", // 仮のデータ

@@ -71,7 +71,7 @@ export const CharacterStatsEditor = ({
 				<StatItem
 					label="クリティカル率"
 					icon={<CrosshairIcon className="h-4 w-4 text-yellow-300 mr-1" />}
-					value={`${character.baseEvasion} %`}
+					value={`${character.baseCritical} %`}
 				/>
 			</div>
 
