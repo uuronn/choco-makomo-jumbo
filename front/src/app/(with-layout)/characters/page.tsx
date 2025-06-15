@@ -24,7 +24,6 @@ export default async function CharactersPage() {
 			<TechPoint />
 
 			<SectionContainer title="所持技術">
-				{/* <div className="bg-red-400 h-[2000px]">test</div> */}
 				<CharacterList userCharacterList={userCharacterList} />
 			</SectionContainer>
 		</MainContainer>

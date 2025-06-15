@@ -85,7 +85,7 @@ export function FooterNavigation({
 					<li
 						key={item.title}
 						onClick={() => router.push(item.href)}
-						className="flex flex-col items-center text-emerald-400 group hover:text-emerald-300"
+						className="flex flex-col items-center text-emerald-400 group hover:text-emerald-300 cursor-pointer"
 						onKeyDown={() => {}}
 					>
 						<div
