@@ -65,12 +65,12 @@ export const CharacterStatsEditor = ({
 				/>
 				<StatItem
 					label="回避率"
-					icon={<GhostIcon />}
+					icon={<GhostIcon className="h-4 w-4 text-gray-300 mr-1" />}
 					value={`${character.baseEvasion} %`}
 				/>
 				<StatItem
 					label="クリティカル率"
-					icon={<CrosshairIcon />}
+					icon={<CrosshairIcon className="h-4 w-4 text-yellow-300 mr-1" />}
 					value={`${character.baseEvasion} %`}
 				/>
 			</div>
