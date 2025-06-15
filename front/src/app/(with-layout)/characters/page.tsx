@@ -6,7 +6,6 @@ import { ZapIcon } from "lucide-react";
 import { MainContainer } from "~/components/MainContainer";
 import { SectionContainer } from "~/components/SectionContainer";
 import CharacterList from "./components/CharacterList";
-import { getCharaList } from "./charaList";
 
 export default async function CharactersPage() {
 	const cookieStore = await cookies();
@@ -17,14 +16,12 @@ export default async function CharactersPage() {
 		return <div className="p-4">ユーザー情報の取得に失敗しました</div>;
 	}
 
-	const userCharacterList = await getCharaList();
-
 	return (
 		<MainContainer title="技術育成" icon={<ZapIcon size={40} />}>
 			<TechPoint />
 
 			<SectionContainer title="所持技術">
-				<CharacterList userCharacterList={userCharacterList} />
+				<CharacterList />
 			</SectionContainer>
 		</MainContainer>
 	);
