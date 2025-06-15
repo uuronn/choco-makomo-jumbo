@@ -7,7 +7,7 @@ export type Character = {
 	power: number;
 	speed: number;
 	name: string;
-	type: string;
+	type: CharacterType;
 	baseEvasion: number;
 	specialSkillName: string;
 	specialSkillDescription: string;
