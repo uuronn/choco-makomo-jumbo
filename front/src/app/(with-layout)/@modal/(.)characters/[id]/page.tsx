@@ -13,7 +13,7 @@ export default async function CharacterModalPage({
 			selectedCharacter={{
 				characterId: id,
 				name: "キャラクター名", // 仮のデータ
-				type: "攻撃", // 仮のデータ
+				type: "ライブラリ", // 仮のデータ
 				level: 1, // 仮のデータ
 				life: 10, // 仮のデータ
 				power: 5, // 仮のデータ
