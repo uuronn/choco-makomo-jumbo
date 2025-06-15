@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { fetchUserFromToken } from "~/lib/user";
+import type { Character } from "~/type/character";
 import { getTokenFromCookies } from "~/utils/token";
 
 export const fetchCharacterById = async (characterId: string) => {
@@ -21,5 +22,5 @@ export const fetchCharacterById = async (characterId: string) => {
 		throw new Error("キャラクターの取得に失敗しました");
 	}
 
-	return res.json();
+	return res.json() as Promise<Character>;
 };
