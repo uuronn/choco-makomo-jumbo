@@ -29,3 +29,15 @@ export type LevelUpResult = {
 	speed: number;
 	userId: string;
 };
+
+export type CharacterType =
+	| "バージョン管理"
+	| "データベース"
+	| "フレームワーク"
+	| "言語"
+	| "クラウド"
+	| "オペレーティングシステム"
+	| "実行環境"
+	| "ゲームエンジン"
+	| "コンテナー"
+	| "ライブラリ";
