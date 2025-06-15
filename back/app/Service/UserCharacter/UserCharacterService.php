@@ -29,6 +29,20 @@ class UserCharacterService
     }
 
     /**
+     * 特定のユーザーキャラを取得する
+     * @param string $userId ユーザーID
+     * @param string $characterId キャラクターID
+     * @return UserCharacter|null ユーザーキャラ
+     */
+    public function getUserCharacter(string $userId, string $characterId)
+    {
+        return UserCharacter::where('userId', $userId)
+            ->where('characterId', $characterId)
+            ->with('character')
+            ->first();
+    }
+
+    /**
      * 特定のユーザーキャラを強化する
      * @param string $userId ユーザーID
      * @param string $characterId キャラクターID

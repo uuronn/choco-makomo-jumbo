@@ -7,11 +7,11 @@ use App\Http\Controller\ReportLogController;
 use App\Http\Controller\RoomController;
 use App\Http\Controller\RoomLogController;
 use App\Http\Controller\UserCharacter\GetUserCharacterListController;
-use App\Http\Controller\UserCharacterController;
 use App\Http\Controller\UserController;
 use App\Http\Controller\UserCharacter\LevelUpUserCharacterController;
 use App\Http\Controller\TeamController;
 use App\Http\Controller\TeamRoomController;
+use App\Http\Controller\UserCharacter\GetUserCharacterController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -41,6 +41,9 @@ Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () 
 
     // ユーザーの所持キャラクター一覧を取得する
     Route::get('/users/{userId}/characters', GetUserCharacterListController::class);
+
+    // ユーザーの特定の所持キャラクターを取得する
+    Route::get('/users/{userId}/characters/{characterId}', GetUserCharacterListController::class);
 
     // ユーザーのpointを取得する
     Route::get('/users/{userId}/point', [UserController::class, 'getPoint']);
