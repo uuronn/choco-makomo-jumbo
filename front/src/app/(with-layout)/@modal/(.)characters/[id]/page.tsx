@@ -1,4 +1,4 @@
-import { CharacterModalClient } from "./components/CharacterModalClient";
+import { CharacterModal } from "./components/CharacterModal";
 
 export default async function CharacterModalPage({
 	params,
@@ -9,11 +9,14 @@ export default async function CharacterModalPage({
 	// const character = await fetchCharacterById(params.id);
 
 	return (
-		<CharacterModalClient
-			selectedCharacter={{
+		<CharacterModal
+			character={{
+				userId: "user123", // 仮のデータ
+				id: id,
+				baseSpecialSkillTurn: 3, // 仮のデータ
 				characterId: id,
 				name: "キャラクター名", // 仮のデータ
-				type: "ライブラリ", // 仮のデータ
+				type: "言語", // 仮のデータ
 				level: 1, // 仮のデータ
 				life: 10, // 仮のデータ
 				power: 5, // 仮のデータ
