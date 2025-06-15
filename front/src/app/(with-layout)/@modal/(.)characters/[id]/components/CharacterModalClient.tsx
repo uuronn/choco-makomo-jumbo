@@ -15,15 +15,17 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { CharacterImage } from "~/components/CharacterImage";
 import { CharacterStatus } from "~/components/CharacterStatus";
 import { CharacterStatusEditer } from "~/components/CharacterStatusEditer";
 import { Button } from "~/components/ui/button";
 import { characterToImagePath } from "~/lib/utils";
+import { CharacterAbilities } from "./CharacterAbilities";
 
-type Character = {
+export type Character = {
 	characterId: string;
 	name: string;
-	type: string;
+	type: CharacterType;
 	level: number;
 	life: number;
 	power: number;
@@ -39,12 +41,29 @@ type Character = {
 	specialSkillTurn?: number;
 };
 
-type CharacterType = string;
+type CharacterType =
+	| "バージョン管理"
+	| "データベース"
+	| "フレームワーク"
+	| "言語"
+	| "クラウド"
+	| "オペレーティングシステム"
+	| "実行環境"
+	| "ゲームエンジン"
+	| "コンテナー"
+	| "ライブラリ";
 
 const typeColors: Record<CharacterType, string> = {
-	攻撃: "bg-red-500",
-	防御: "bg-blue-500",
-	支援: "bg-green-500",
+	バージョン管理: "bg-red-500",
+	データベース: "bg-blue-500",
+	フレームワーク: "bg-amber-700",
+	言語: "bg-green-500",
+	クラウド: "bg-yellow-400",
+	オペレーティングシステム: "bg-purple-800",
+	実行環境: "bg-pink-500",
+	ゲームエンジン: "bg-indigo-500",
+	コンテナー: "bg-teal-500",
+	ライブラリ: "bg-gray-500",
 };
 
 export function CharacterModalClient({
@@ -87,7 +106,12 @@ export function CharacterModalClient({
 			className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center"
 			onClick={() => router.back()}
 		>
-			<div className="bg-gray-900 text-white rounded-xl shadow-xl p-6 w-full max-w-5xl relative overflow-y-auto max-h-[90vh]">
+			<div
+				onKeyDown={() => {}}
+				role="button"
+				onClick={(e) => e.stopPropagation()}
+				className="bg-gray-900 text-white rounded-xl shadow-xl p-6 w-full max-w-5xl relative overflow-y-auto max-h-[90vh]"
+			>
 				<Button
 					className="absolute top-3 right-3"
 					onClick={() => router.back()}
@@ -96,90 +120,17 @@ export function CharacterModalClient({
 				</Button>
 				<div className="flex flex-col md:flex-row gap-4">
 					<div className="flex flex-col items-center">
-						<div
-							className="relative w-32 h-32 md:w-64 md:h-64 mb-2 border-2 rounded-lg overflow-hidden shadow-lg"
-							style={{
-								boxShadow: isErrorState
-									? "0 0 15px rgba(239, 68, 68, 0.7)"
-									: "0 0 10px rgba(16, 185, 129, 0.5)",
-								borderColor: isErrorState ? "#ef4444" : "#10b981",
-							}}
-						>
-							<Image
-								src={
-									isErrorState
-										? characterToImagePath(
-												`${selectedCharacter.characterId}-error`,
-											)
-										: characterToImagePath(selectedCharacter.characterId)
-								}
-								alt={selectedCharacter.name}
-								fill
-								className="object-cover"
-								priority
-							/>
-							{isErrorState && (
-								<canvas
-									ref={canvasRef}
-									className="absolute inset-0 z-10 opacity-30"
-								/>
-							)}
-						</div>
+						<CharacterImage
+							selectedCharacter={selectedCharacter}
+							isErrorState={isErrorState}
+							canvasRef={canvasRef}
+						/>
 						<h2 className="text-lg font-bold text-green-400">
 							{selectedCharacter.name}【Lv.{selectedCharacter.level}】
 						</h2>
 					</div>
 
-					<div className="flex-1 h-[290px] p-3 rounded-md border border-emerald-500/30 overflow-y-scroll space-y-3">
-						<div className="flex items-center gap-1 text-sm">
-							<Layers className="h-4 w-4 text-emerald-400" />
-							<span className="font-bold">タイプ:</span>
-							<Badge
-								className={`ml-1 text-white ${
-									typeColors[selectedCharacter.type] || "bg-gray-500"
-								}`}
-							>
-								{selectedCharacter.type}
-							</Badge>
-						</div>
-						<div className="text-sm">
-							<HandshakeIcon className="inline h-4 w-4 text-sky-400 mr-1" />
-							パーティスキル: {selectedCharacter.partySkillName || "null"}
-							{selectedCharacter.partySkillDescription && (
-								<div className="text-xs text-gray-300 ml-5">
-									{selectedCharacter.partySkillDescription}
-								</div>
-							)}
-							{selectedCharacter.partySkillCondition && (
-								<div className="text-xs text-gray-300 ml-5">
-									{selectedCharacter.partySkillCondition}
-								</div>
-							)}
-						</div>
-						<div className="text-sm">
-							<ActivityIcon className="inline h-4 w-4 text-blue-300 mr-1" />
-							パッシブスキル: {selectedCharacter.passiveSkillName || "null"}
-							{selectedCharacter.passiveSkillDescription && (
-								<div className="text-xs text-gray-300 ml-5">
-									{selectedCharacter.passiveSkillDescription}
-								</div>
-							)}
-						</div>
-						<div className="text-sm">
-							<SparklesIcon className="inline h-4 w-4 text-orange-300 mr-1" />
-							スペシャルスキル: {selectedCharacter.specialSkillName || "null"}
-							{selectedCharacter.specialSkillDescription && (
-								<div className="text-xs text-gray-300 ml-5">
-									{selectedCharacter.specialSkillDescription}
-									{selectedCharacter.specialSkillTurn && (
-										<div className="text-yellow-200">
-											ターン: {selectedCharacter.specialSkillTurn}
-										</div>
-									)}
-								</div>
-							)}
-						</div>
-					</div>
+					<CharacterAbilities character={selectedCharacter} />
 
 					<div className="flex-1 h-[290px] bg-gray-800/50 rounded-md border border-emerald-500/30 p-3">
 						<div className="space-y-2">
