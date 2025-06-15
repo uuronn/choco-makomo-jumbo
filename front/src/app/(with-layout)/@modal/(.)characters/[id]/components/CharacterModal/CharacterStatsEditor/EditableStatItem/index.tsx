@@ -43,7 +43,7 @@ export const EditableStatItem = ({
 					type="button"
 					onClick={onDecrement}
 					disabled={!canDecrement}
-					className="bg-gray-800 p-1 rounded-sm hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
+					className="bg-gray-800 p-1 rounded-sm hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400 cursor-pointer"
 				>
 					<MinusIcon className="size-3" />
 				</button>
@@ -51,7 +51,7 @@ export const EditableStatItem = ({
 					type="button"
 					onClick={onIncrement}
 					disabled={!canIncrement}
-					className="bg-gray-800 p-1 rounded-sm hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400"
+					className="bg-gray-800 p-1 rounded-sm hover:bg-emerald-500 hover:text-gray-900 border border-emerald-500 text-emerald-400 cursor-pointer"
 				>
 					<PlusIcon className="size-3" />
 				</button>

@@ -76,7 +76,7 @@ export const CharacterStatsEditor = ({
 			</div>
 
 			<Button
-				className="mt-4 w-full bg-emerald-500 text-gray-900 hover:bg-green-400 font-bold"
+				className="mt-4 w-full bg-emerald-500 text-gray-900 hover:bg-green-400 font-bold cursor-pointer"
 				style={{ boxShadow: "0 0 8px rgba(16, 185, 129, 0.5)" }}
 				onClick={handleDevelop}
 				disabled={usedPoints === 0}

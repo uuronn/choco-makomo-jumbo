@@ -26,7 +26,7 @@ export const Modal = ({
 			>
 				<button
 					type="button"
-					className="absolute top-3 right-3"
+					className="absolute top-2 right-2 cursor-pointer bg-gray-600 rounded-full p-1"
 					onClick={() => router.back()}
 				>
 					<XIcon />
