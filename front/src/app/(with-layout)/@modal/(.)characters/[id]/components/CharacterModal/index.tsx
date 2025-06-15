@@ -40,7 +40,7 @@ export const CharacterModal = ({
 	return (
 		<Modal>
 			<div className="flex flex-col md:flex-row gap-4 min-h-fit">
-				<div className="flex flex-col items-center">
+				<div className="flex flex-col items-center gap-3">
 					<CharacterImage
 						character={character}
 						isErrorState={isErrorState}
