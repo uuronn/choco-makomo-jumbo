@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
 import {
 	Plus,
@@ -48,11 +48,12 @@ type PartyRoom = {
 
 type RoomsClientProps = {
 	initialToken: string;
+	children: ReactNode;
 };
 
 type BattleMode = "solo" | "duo" | "war" | "cpu";
 
-export function RoomsClient({ initialToken }: RoomsClientProps) {
+export function RoomsClient({ initialToken, children }: RoomsClientProps) {
 	// 既存のstateはそのまま
 	const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);
 	const [selectedRoom, setSelectedRoom] = useState<SelectingRoom | null>(null);
@@ -339,9 +340,7 @@ export function RoomsClient({ initialToken }: RoomsClientProps) {
 					{/* </div> */}
 				</SectionContainer>
 
-				<SectionContainer title="所持技術" className="h-full">
-					{/* <CharacterList /> */}
-				</SectionContainer>
+				{children}
 			</div>
 
 			<SectionContainer title="ルーム一覧">
