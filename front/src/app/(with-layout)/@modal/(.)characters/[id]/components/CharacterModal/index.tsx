@@ -13,7 +13,7 @@ export const CharacterModal = ({
 	character: Character;
 }) => {
 	const [statPoints, setStatPoints] = useState({ life: 0, power: 0, speed: 0 });
-	const [isErrorState, setIsErrorState] = useState(false);
+	const [isErrorState, _] = useState(false);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
 	const usedPoints = statPoints.life + statPoints.power + statPoints.speed;
