@@ -1,17 +1,14 @@
 import { cookies } from "next/headers";
-import { Suspense } from "react";
 import { getTokenFromCookies } from "~/utils/token";
 import { fetchUserFromToken } from "~/lib/user";
 import { GachaClient } from "./GachaClient";
-import { getDeviceFromCookies } from "~/utils/device";
 import { MainContainer } from "~/components/MainContainer";
-import { CpuIcon, ZapIcon } from "lucide-react";
+import { CpuIcon } from "lucide-react";
 import { TechPoint } from "~/components/TechPoint";
 
 export default async function GachaPage() {
 	const cookieStore = await cookies();
 	const token = getTokenFromCookies(cookieStore);
-	const device = getDeviceFromCookies(cookieStore);
 	const user = await fetchUserFromToken(token);
 
 	if (!user) {
