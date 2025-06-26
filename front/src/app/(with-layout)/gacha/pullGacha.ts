@@ -11,8 +11,8 @@ export const pullGacha = async () => {
 
 	const user = await fetchUserFromToken(token);
 
-	console.info("token:", token);
-	console.info("User:", user);
+	// console.info("token:", token);
+	// console.info("User:", user);
 
 	// if (availablePoints < 10) return;
 
