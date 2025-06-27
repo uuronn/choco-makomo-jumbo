@@ -16,6 +16,7 @@ export const CharacterCard = ({ character }: Props) => {
 			tabIndex={0}
 			role="button"
 			href={`/characters/${character.characterId}`}
+			prefetch
 		>
 			<div className="flex flex-col items-center">
 				<div className="relative w-16 h-16 mb-2 overflow-hidden rounded-lg">
