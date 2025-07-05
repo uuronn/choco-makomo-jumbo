@@ -1,4 +1,4 @@
-import { MatrixRainCanvas } from "./components/MatrixRainCanvas";
+import { MatrixRainCanvas } from "~/app/_components/MatrixRainCanvas";
 import { LoginForm } from "./components/LoginForm";
 
 export default function LoginPage() {
