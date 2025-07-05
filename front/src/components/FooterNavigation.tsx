@@ -40,7 +40,7 @@ export function FooterNavigation({
 		{
 			title: "ホーム",
 			icon: <Home className="size-5" />,
-			href: "/",
+			href: "/home",
 			isActive: activeItem === "home",
 		},
 		{
