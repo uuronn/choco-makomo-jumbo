@@ -104,6 +104,7 @@ export default async function PcHomeScreen({ user }: Props) {
                 transition-all duration-300 hover:shadow-[0_0_15px_rgba(0,255,128,0.3)]
                 hover:border-green-400/50
               `}
+							prefetch
 						>
 							<div className={`bg-gradient-to-br ${item.color} p-4 h-full`}>
 								<div className="flex flex-col h-full">
