@@ -213,7 +213,7 @@ export default function BugReportForm() {
 
 			// const token = await user.getIdToken();
 			const token = "sample";
-			const userId = user.uid;
+			const userId = user.id;
 
 			const sanitizedData = {
 				type: DOMPurify.sanitize(formData.type),
