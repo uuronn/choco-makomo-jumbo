@@ -11,7 +11,11 @@ import { useRooms } from "../_hooks/useRoomList";
 
 type Props = {
 	token: string;
-	user: any;
+	user: {
+		id: string;
+		name: string;
+		photoUrl?: string | null;
+	};
 };
 
 export const RoomListSectionContainerContent = ({ user, token }: Props) => {
@@ -19,7 +23,7 @@ export const RoomListSectionContainerContent = ({ user, token }: Props) => {
 	const searchParams = useSearchParams();
 	// const [rooms, setRooms] = useState<any[]>([]);
 
-	const isButtonDisabled = !(searchParams.get("chars")?.length > 0);
+	// const isButtonDisabled = !(searchParams.get("chars")?.length > 0);
 
 	const { rooms } = useRooms(token);
 
@@ -71,7 +75,10 @@ export const RoomListSectionContainerContent = ({ user, token }: Props) => {
 		router.push(`/rooms/${data.id}`);
 	};
 
-	const joinRoom = async (room: any) => {
+	const joinRoom = async (room: {
+		id: string;
+		host_user: { id: string; name: string; photoUrl?: string | null };
+	}) => {
 		if (!user) return;
 		const res = await fetch(
 			`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/join`,
@@ -114,7 +121,7 @@ export const RoomListSectionContainerContent = ({ user, token }: Props) => {
 						onClick={createRoom}
 						variant="outline"
 						className="w-[calc(50%-10px)] bg-green-400 text-black hover:bg-green-500 text-sm h-9"
-						disabled={isButtonDisabled}
+						// disabled={isButtonDisabled}
 					>
 						<Plus className="mr-1 h-4 w-4" /> ルーム作成
 					</Button>
@@ -127,32 +134,41 @@ export const RoomListSectionContainerContent = ({ user, token }: Props) => {
 			>
 				{rooms
 					.filter(
-						(room) =>
-							room.guest_user === null && room.host_user.id !== user?.id,
+						(room: {
+							id: string;
+							host_user: { id: string; name: string; photoUrl?: string | null };
+							guest_user: { id: string } | null;
+						}) => room.guest_user === null && room.host_user.id !== user?.id,
 					)
-					.map((room) => (
-						<div
-							key={room.id}
-							className="flex flex-col rounded-lg border transition-all justify-center items-center cursor-pointer min-w-[200px] min-h-[160px] overflow-hidden bg-black/30 border-green-400/20 hover:bg-green-400/10"
-							role="button"
-							onClick={() => joinRoom(room)}
-						>
-							<div className="relative h-[90px] w-full flex items-center justify-center">
-								<Image
-									src={room.host_user.photoUrl || "/placeholder.svg"}
-									alt={room.id}
-									width={80}
-									height={80}
-									className="object-cover rounded-full"
-								/>
+					.map(
+						(room: {
+							id: string;
+							host_user: { id: string; name: string; photoUrl?: string | null };
+						}) => (
+							<div
+								onKeyDown={() => {}}
+								key={room.id}
+								className="flex flex-col rounded-lg border transition-all justify-center items-center cursor-pointer min-w-[200px] min-h-[160px] overflow-hidden bg-black/30 border-green-400/20 hover:bg-green-400/10"
+								role="button"
+								onClick={() => joinRoom(room)}
+							>
+								<div className="relative h-[90px] w-full flex items-center justify-center">
+									<Image
+										src={room.host_user.photoUrl || "/placeholder.svg"}
+										alt={room.id}
+										width={80}
+										height={80}
+										className="object-cover rounded-full"
+									/>
+								</div>
+								<div className="p-2 text-center">
+									<h4 className="font-bold text-green-400 text-sm">
+										{room.host_user.name}
+									</h4>
+								</div>
 							</div>
-							<div className="p-2 text-center">
-								<h4 className="font-bold text-green-400 text-sm">
-									{room.host_user.name}
-								</h4>
-							</div>
-						</div>
-					))}
+						),
+					)}
 			</div>
 		</>
 	);

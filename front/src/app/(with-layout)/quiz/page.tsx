@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Coins, User } from "lucide-react";
+import { Coins } from "lucide-react";
 import { BiQuestionMark } from "react-icons/bi";
 import { enqueueSnackbar } from "notistack";
 import { useUserContext } from "~/context/UserProvider";
@@ -52,8 +52,6 @@ export default function CyberQuiz() {
 			}, 10);
 
 			return () => clearTimeout(timer);
-		} else {
-			setParticles([]);
 		}
 	}, [isAnimating]);
 
@@ -67,13 +65,16 @@ export default function CyberQuiz() {
 
 		// Show appropriate alert
 		if (isCorrect) {
-			fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user?.id}/point`, {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					point: 2,
-				}),
-			});
+			fetch(
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user?.uid}/point`,
+				{
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						point: 2,
+					}),
+				},
+			);
 			enqueueSnackbar("正解！ 2 ポイントGET", {
 				variant: "success",
 			});
@@ -104,20 +105,20 @@ export default function CyberQuiz() {
 	return (
 		<div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 overflow-hidden">
 			{/* Background grid effect */}
-			<div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djJoLTJ2LTJoMnptMC00aDJ2MmgtMnYtMnptLTQgMHYyaC0ydi0yaDJ6bTIgMGgydjJoLTJ2LTJ6bS02IDBoMnYyaC0ydi0yem0yLTRoMnYyaC0ydi0yem0yIDBIMzZ2Mmgtc3YtMnptMCA0aDJ2MmgtMnYtMnoiLz48L2c+PC9nPjwvc3ZnPg==')]"></div>
+			{/* <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djJoLTJ2LTJoMnptMC00aDJ2MmgtMnYtMnptLTQgMHYyaC0ydi0yaDJ6bTIgMGgydjJoLTJ2LTJ6bS02IDBoMnYyaC0ydi0yem0yLTRoMnYyaC0ydi0yem0yIDBIMzZ2Mmgtc3YtMnptMCA0aDJ2MmgtMnYtMnoiLz48L2c+PC9nPjwvc3ZnPg==')]"></div> */}
 
 			{/* Animated circuit lines */}
-			<div className="absolute inset-0 overflow-hidden opacity-20">
+			{/* <div className="absolute inset-0 overflow-hidden opacity-20">
 				<div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse"></div>
 				<div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse"></div>
 				<div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse"></div>
 				<div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse"></div>
-			</div>
+			</div> */}
 
 			<div className="py-3 gap-0 w-full max-w-2xl bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden relative z-10">
 				{/* Header */}
 				<div className="bg-gradient-to-r from-green-900/80 to-green-700/80 p-4 text-center relative">
-					<div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 via-green-300 to-green-400"></div>
+					{/* <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 via-green-300 to-green-400"></div> */}
 
 					<div className="flex items-center justify-center gap-3">
 						<motion.div
@@ -148,7 +149,7 @@ export default function CyberQuiz() {
 					</div>
 
 					{/* Tech decorations */}
-					<div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-20 h-6 bg-black/50 rounded-t-full border-t border-l border-r border-green-500/30"></div>
+					{/* <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-20 h-6 bg-black/50 rounded-t-full border-t border-l border-r border-green-500/30"></div> */}
 				</div>
 
 				<div className="p-6 flex flex-col items-center relative">
@@ -203,7 +204,9 @@ export default function CyberQuiz() {
 									repeat: Number.POSITIVE_INFINITY,
 									ease: "linear",
 								}}
-							></motion.div>
+							>
+								/
+							</motion.div>
 						</div>
 					</div>
 
@@ -221,7 +224,7 @@ export default function CyberQuiz() {
 								{shuffledQuizData[currentQuestion].options.map(
 									(option, index) => (
 										<motion.button
-											key={index}
+											key={`option-${index + 1}`}
 											onClick={() => handleSelectAnswer(option)}
 											disabled={buttonsDisabled}
 											initial={{ x: -10, opacity: 0 }}
@@ -248,7 +251,7 @@ export default function CyberQuiz() {
 											<span className="text-white">{option}</span>
 
 											{/* Button glow effect */}
-											<div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+											{/* <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div> */}
 
 											{/* Scan line */}
 											<motion.div
@@ -259,7 +262,7 @@ export default function CyberQuiz() {
 													repeat: Number.POSITIVE_INFINITY,
 													ease: "linear",
 												}}
-											></motion.div>
+											/>
 										</motion.button>
 									),
 								)}

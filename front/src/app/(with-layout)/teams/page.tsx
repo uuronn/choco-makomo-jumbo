@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { getTokenFromCookies } from "~/utils/token";
 import { fetchUserFromToken } from "~/lib/user";
-import { TeamsClient } from "./TeamsClient";
+// import { TeamsClient } from "./TeamsClient";
 
 export default async function TeamsPage() {
 	const cookieStore = await cookies();
@@ -16,7 +16,7 @@ export default async function TeamsPage() {
 	return (
 		<div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 overflow-hidden">
 			<Suspense fallback={<div>読み込み中...</div>}>
-				<TeamsClient initialToken={token} />
+				{/* <TeamsClient initialToken={token} /> */}
 			</Suspense>
 		</div>
 	);

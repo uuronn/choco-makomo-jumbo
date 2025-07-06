@@ -12,7 +12,7 @@ import JoinLoading from "~/components/JoinLoading";
 import CreateLoading from "~/components/CreateLoading";
 
 type Props = {
-	user: any;
+	user: { id: string; name: string } | null;
 };
 
 export default function RoomDetailClient({ user }: Props) {
