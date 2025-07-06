@@ -26,7 +26,7 @@ export const GoogleLoginButton = () => {
 		<Button
 			onClick={handleSignIn}
 			variant="outline"
-			className="w-full h-12 flex items-center justify-center gap-2 border-2 hover:bg-purple-50 transition-colors"
+			className="w-full h-12 flex items-center justify-center gap-2 border-2 hover:bg-purple-50 transition-colors cursor-pointer"
 		>
 			<FcGoogle className="h-5 w-5" />
 			<span>Googleでログイン</span>
