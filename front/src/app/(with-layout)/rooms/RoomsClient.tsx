@@ -64,51 +64,51 @@ export function RoomsClient({ initialToken, children }: RoomsClientProps) {
 	);
 	const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 	const [selectMode, setSelectMode] = useState<BattleMode>("solo");
-	const [partyRooms, setPartyRooms] = useState<PartyRoom[]>([
-		{
-			id: "party-1",
-			host_user: {
-				id: "user-1",
-				name: "テストユーザー1",
-				photoUrl: "/placeholder.svg",
-			},
-			character_list: [
-				{
-					characterId: "char-1",
-					name: "Python",
-					level: 5,
-					exp: 100,
-					maxExp: 200,
-				},
-				{
-					characterId: "char-2",
-					name: "JavaScript",
-					level: 3,
-					exp: 50,
-					maxExp: 100,
-				},
-			],
-			hasPassword: true,
-		},
-		{
-			id: "party-2",
-			host_user: {
-				id: "user-2",
-				name: "テストユーザー2",
-				photoUrl: "/placeholder.svg",
-			},
-			character_list: [
-				{
-					characterId: "char-3",
-					name: "Java",
-					level: 4,
-					exp: 75,
-					maxExp: 150,
-				},
-			],
-			hasPassword: false,
-		},
-	]);
+	// const [partyRooms, setPartyRooms] = useState<PartyRoom[]>([
+	// 	{
+	// 		id: "party-1",
+	// 		host_user: {
+	// 			id: "user-1",
+	// 			name: "テストユーザー1",
+	// 			photoUrl: "/placeholder.svg",
+	// 		},
+	// 		// character_list: [
+	// 		// 	{
+	// 		// 		characterId: "char-1",
+	// 		// 		name: "Python",
+	// 		// 		level: 5,
+	// 		// 		exp: 100,
+	// 		// 		maxExp: 200,
+	// 		// 	},
+	// 		// 	{
+	// 		// 		characterId: "char-2",
+	// 		// 		name: "JavaScript",
+	// 		// 		level: 3,
+	// 		// 		exp: 50,
+	// 		// 		maxExp: 100,
+	// 		// 	},
+	// 		// ],
+	// 		hasPassword: true,
+	// 	},
+	// 	{
+	// 		id: "party-2",
+	// 		host_user: {
+	// 			id: "user-2",
+	// 			name: "テストユーザー2",
+	// 			photoUrl: "/placeholder.svg",
+	// 		},
+	// 		character_list: [
+	// 			{
+	// 				characterId: "char-3",
+	// 				name: "Java",
+	// 				level: 4,
+	// 				// exp: 75,
+	// 				maxExp: 150,
+	// 			},
+	// 		],
+	// 		hasPassword: false,
+	// 	},
+	// ]);
 	const [partyPassword, setPartyPassword] = useState<string>("");
 	const [isCreatePartyModalOpen, setIsCreatePartyModalOpen] = useState(false);
 
@@ -270,18 +270,18 @@ export function RoomsClient({ initialToken, children }: RoomsClientProps) {
 			},
 		);
 		const data = await res.json();
-		setPartyRooms(data);
+		// setPartyRooms(data);
 	};
 
 	// useEffectも修正
-	useEffect(() => {
-		if (selectMode === "duo") {
-			fetchPartyRooms();
-			// 定期的に更新
-			const interval = setInterval(fetchPartyRooms, 5000);
-			return () => clearInterval(interval);
-		}
-	}, [selectMode, initialToken]);
+	// useEffect(() => {
+	// 	if (selectMode === "duo") {
+	// 		fetchPartyRooms();
+	// 		// 定期的に更新
+	// 		const interval = setInterval(fetchPartyRooms, 5000);
+	// 		return () => clearInterval(interval);
+	// 	}
+	// }, [selectMode, initialToken]);
 
 	return (
 		<div className="space-y-4 flex flex-col h-full">
@@ -418,57 +418,58 @@ export function RoomsClient({ initialToken, children }: RoomsClientProps) {
 									</div>
 								</div>
 							) : (
+								<></>
 								// 参加可能なパーティ一覧
-								partyRooms.map((room) => (
-									<div
-										key={room.id}
-										className={cn(
-											"flex flex-col rounded-lg border p-4 transition-all cursor-pointer",
-											selectedRoom?.id === room.id
-												? "bg-green-400/20 border-green-400"
-												: "bg-black/30 border-green-400/20 hover:bg-green-400/10",
-										)}
-										onClick={() => handleSelectRoom(room)}
-									>
-										<div className="flex items-center gap-3 mb-2">
-											<Image
-												src={room.host_user.photoUrl || "/placeholder.svg"}
-												alt={room.host_user.name}
-												width={40}
-												height={40}
-												className="rounded-full"
-											/>
-											<div>
-												<p className="font-medium text-green-200">
-													{room.host_user.name}
-												</p>
-												<p className="text-xs text-green-400">
-													{room.hasPassword
-														? "🔒 パスワード有り"
-														: "誰でも参加可能"}
-												</p>
-											</div>
-										</div>
-										<div className="flex items-center gap-2">
-											{room.character_list?.map((character) => (
-												<div
-													key={character.characterId}
-													className="relative w-8 h-8"
-												>
-													<Image
-														src={
-															characterToImagePath(character.characterId) ||
-															"/placeholder.svg"
-														}
-														alt={character.name}
-														fill
-														className="rounded-lg object-cover"
-													/>
-												</div>
-											))}
-										</div>
-									</div>
-								))
+								// partyRooms.map((room) => (
+								// 	<div
+								// 		key={room.id}
+								// 		className={cn(
+								// 			"flex flex-col rounded-lg border p-4 transition-all cursor-pointer",
+								// 			selectedRoom?.id === room.id
+								// 				? "bg-green-400/20 border-green-400"
+								// 				: "bg-black/30 border-green-400/20 hover:bg-green-400/10",
+								// 		)}
+								// 		onClick={() => handleSelectRoom(room)}
+								// 	>
+								// 		<div className="flex items-center gap-3 mb-2">
+								// 			<Image
+								// 				src={room.host_user.photoUrl || "/placeholder.svg"}
+								// 				alt={room.host_user.name}
+								// 				width={40}
+								// 				height={40}
+								// 				className="rounded-full"
+								// 			/>
+								// 			<div>
+								// 				<p className="font-medium text-green-200">
+								// 					{room.host_user.name}
+								// 				</p>
+								// 				<p className="text-xs text-green-400">
+								// 					{room.hasPassword
+								// 						? "🔒 パスワード有り"
+								// 						: "誰でも参加可能"}
+								// 				</p>
+								// 			</div>
+								// 		</div>
+								// 		<div className="flex items-center gap-2">
+								// 			{room.character_list?.map((character) => (
+								// 				<div
+								// 					key={character.characterId}
+								// 					className="relative w-8 h-8"
+								// 				>
+								// 					<Image
+								// 						src={
+								// 							characterToImagePath(character.characterId) ||
+								// 							"/placeholder.svg"
+								// 						}
+								// 						alt={character.name}
+								// 						fill
+								// 						className="rounded-lg object-cover"
+								// 					/>
+								// 				</div>
+								// 			))}
+								// 		</div>
+								// 	</div>
+								// ))
 							)}
 						</div>
 					</>
