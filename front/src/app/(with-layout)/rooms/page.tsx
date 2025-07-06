@@ -5,6 +5,7 @@ import { MainContainer } from "~/components/MainContainer";
 import { SwordsIcon } from "lucide-react";
 import { SectionContainer } from "~/components/SectionContainer";
 import { SelectCharacterContainer } from "./_components/SelectCharacterContainer";
+import { RoomListSectionContainerContent } from "./_components/RoomListSectionContainerContent";
 
 export default async function RoomsPage() {
 	const cookieStore = await cookies();
@@ -19,7 +20,9 @@ export default async function RoomsPage() {
 		<MainContainer title="対戦" icon={<SwordsIcon size={40} />}>
 			<SelectCharacterContainer />
 
-			<SectionContainer title="ルーム一覧">test</SectionContainer>
+			<SectionContainer title="ルーム一覧">
+				<RoomListSectionContainerContent token={token} user={user} />
+			</SectionContainer>
 		</MainContainer>
 	);
 }
