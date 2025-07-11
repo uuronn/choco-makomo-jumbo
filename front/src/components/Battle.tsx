@@ -18,6 +18,7 @@ import {
 
 type BattleProps = {
 	room: Room;
+	user: { id: string; name: string; photoUrl: string } | null;
 };
 
 type EffectInfo = {
@@ -26,8 +27,8 @@ type EffectInfo = {
 	resolve?: () => void; // Promise の resolve 関数を保存
 };
 
-export default function Battle({ room }: BattleProps) {
-	const { user } = useUserContext();
+export default function Battle({ room, user }: BattleProps) {
+	// const { user } = useUserContext();
 
 	// 前回の room を保持したい場合は useRef を使う
 	// let で定義すると毎renderごとに初期化されるのでリファレンスができません。
@@ -143,22 +144,20 @@ export default function Battle({ room }: BattleProps) {
 		// 初回 (oldRoom===null) の場合は差分チェック不要
 		if (!oldRoom) {
 			setLoading(false);
-			setPlayerTeam(
-				room.room_character.filter((ch) => ch.userId === user?.uid),
-			);
-			setEnemyTeam(room.room_character.filter((ch) => ch.userId !== user?.uid));
+			setPlayerTeam(room.room_character.filter((ch) => ch.userId === user?.id));
+			setEnemyTeam(room.room_character.filter((ch) => ch.userId !== user?.id));
 			setBattleLog(room.room_log.map((log) => log.description));
 
 			setActiveCharacter(
 				room.room_character.find(
 					(ch) =>
 						ch.characterId === room.currentTurnCharacterId &&
-						ch.userId === user?.uid &&
-						room.currentTurnUserId === user?.uid,
+						ch.userId === user?.id &&
+						room.currentTurnUserId === user?.id,
 				) || null,
 			);
-			setIsMyTurn(room.currentTurnUserId === user?.uid);
-			if (room.currentTurnUserId === user?.uid) {
+			setIsMyTurn(room.currentTurnUserId === user?.id);
+			if (room.currentTurnUserId === user?.id) {
 				setIsSelectingAction(true);
 			} else {
 				setIsSelectingAction(false);
@@ -176,14 +175,14 @@ export default function Battle({ room }: BattleProps) {
 			room.room_character.find(
 				(ch) =>
 					ch.characterId === room.currentTurnCharacterId &&
-					ch.userId === user?.uid &&
-					room.currentTurnUserId === user?.uid,
+					ch.userId === user?.id &&
+					room.currentTurnUserId === user?.id,
 			) || null,
 		);
 
 		// 味方・敵リスト
-		setPlayerTeam(room.room_character.filter((ch) => ch.userId === user?.uid));
-		setEnemyTeam(room.room_character.filter((ch) => ch.userId !== user?.uid));
+		setPlayerTeam(room.room_character.filter((ch) => ch.userId === user?.id));
+		setEnemyTeam(room.room_character.filter((ch) => ch.userId !== user?.id));
 
 		// ログ
 		setBattleLog(room.room_log.map((log) => log.description));
@@ -236,7 +235,7 @@ export default function Battle({ room }: BattleProps) {
 		}
 
 		// "今のターンは自分か？" フラグを更新
-		const nowMyTurn = room.currentTurnUserId === user?.uid;
+		const nowMyTurn = room.currentTurnUserId === user?.id;
 		setIsMyTurn(nowMyTurn);
 
 		// 自分ターンなら行動選択可能にする
@@ -248,7 +247,7 @@ export default function Battle({ room }: BattleProps) {
 		} else {
 			setIsSelectingAction(false);
 		}
-	}, [room, user?.uid, showEffect, selectedAction]);
+	}, [room, user?.id, showEffect, selectedAction]);
 
 	// useEffect(() => {
 	// 	if (room?.currentTurnUserId === "00000000-0000-0000-0000-000000000cpu") {
@@ -296,7 +295,7 @@ export default function Battle({ room }: BattleProps) {
 			setSelectedAction(null);
 			setIsSelectingAction(false);
 			await fetch(
-				`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/attack`,
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.id}/${room.id}/attack`,
 				{
 					method: "POST",
 					headers: {
@@ -313,7 +312,7 @@ export default function Battle({ room }: BattleProps) {
 			setSelectedAction(null);
 			setIsSelectingAction(false);
 			fetch(
-				`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/skill`,
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.id}/${room.id}/skill`,
 				{
 					method: "POST",
 					body: JSON.stringify({ targetCharacterId: characterId }),
@@ -333,7 +332,7 @@ export default function Battle({ room }: BattleProps) {
 		if (!requireTarget) {
 			setLoading(true);
 			await fetch(
-				`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/skill`,
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.id}/${room.id}/skill`,
 				{ method: "POST" },
 			);
 			setSelectedAction(null);
@@ -618,7 +617,7 @@ export default function Battle({ room }: BattleProps) {
 					<div className="absolute h-2 w-full bg-gray-800 rounded-full overflow-hidden">
 						<div
 							className={`h-full w-full animate-pulse ${
-								room.currentTurnUserId === user?.uid
+								room.currentTurnUserId === user?.id
 									? "bg-gradient-to-r from-green-500/30 via-green-400/50 to-green-500/30"
 									: "bg-gradient-to-r from-red-500/30 via-red-400/50 to-red-500/30"
 							}`}
@@ -632,7 +631,7 @@ export default function Battle({ room }: BattleProps) {
 							.sort((a, b) => b.speed - a.speed) // speedの降順でソート
 							.filter((character) => character.isDead === false) // 死んでいないキャラのみ
 							.map((character, index) => {
-								const isPlayer = character.userId === user?.uid;
+								const isPlayer = character.userId === user?.id;
 								const isCurrentTurn =
 									room.currentTurnCharacterId === character.characterId &&
 									room.currentTurnUserId === character.userId; // ユーザーIDも一致するか確認
@@ -852,7 +851,7 @@ export default function Battle({ room }: BattleProps) {
 							onClick={() => {
 								// Add your surrender logic here
 								fetch(
-									`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/surrender`,
+									`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.id}/${room.id}/surrender`,
 									{
 										method: "POST",
 									},

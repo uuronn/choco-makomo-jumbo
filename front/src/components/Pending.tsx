@@ -17,13 +17,14 @@ type Player = {
 type PendingProps = {
 	room: Room;
 	setRoom: (room: Room) => void;
+	user: { id: string; name: string; photoUrl: string } | null;
 };
 
-export default function Pending({ room, setRoom }: PendingProps) {
+export default function Pending({ room, setRoom, user }: PendingProps) {
 	const [name, setName] = useState<string>("Guest");
 	const [img, setImg] = useState<string>("/placeholder.svg");
 
-	const { user } = useUserContext();
+	// const { user } = useUserContext();
 
 	useEffect(() => {
 		(async () => {
@@ -40,7 +41,7 @@ export default function Pending({ room, setRoom }: PendingProps) {
 
 	const handleAccept = async () => {
 		const res = await fetch(
-			`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/approve`,
+			`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.id}/${room.id}/approve`,
 			{
 				method: "POST",
 			},
@@ -50,7 +51,7 @@ export default function Pending({ room, setRoom }: PendingProps) {
 
 	const handleReject = async () => {
 		const res = await fetch(
-			`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.uid}/${room.id}/reject`,
+			`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user?.id}/${room.id}/reject`,
 			{
 				method: "POST",
 			},

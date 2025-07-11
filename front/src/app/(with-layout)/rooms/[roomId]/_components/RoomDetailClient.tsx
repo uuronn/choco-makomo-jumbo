@@ -117,11 +117,11 @@ export default function RoomDetailClient({ user }: Props) {
 			handleCancelCreate={handleCancelCreate}
 		/>
 	) : room.status === "pending" && room.hostUserId === user.id ? (
-		<Pending room={room} setRoom={setRoom} />
+		<Pending room={room} setRoom={setRoom} user={user} />
 	) : room.status === "pending" && room.hostUserId !== user.id ? (
 		<JoinLoading message="参加中" handleCancelJoin={handleCancelJoin} />
 	) : room.status === "battling" ? (
-		<Battle room={room} />
+		<Battle room={room} user={user} />
 	) : room.status === "finish" && room.winUserId === user.id ? (
 		<Victory room={room} />
 	) : (
