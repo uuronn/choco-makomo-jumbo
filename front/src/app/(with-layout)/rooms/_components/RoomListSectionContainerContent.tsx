@@ -111,12 +111,10 @@ export const RoomListSectionContainerContent = ({ user, token }: Props) => {
 						更新
 					</Button>
 
-					{/* CPUボタン（未処理） */}
 					<Button className="text-sm bg-black/30 border-green-400/30 text-green-400 hover:bg-green-400/20">
 						<BotIcon className="h-4 w-4" /> CPU対戦
 					</Button>
 
-					{/* ✅ ルーム作成ボタン（完全一致で埋め込み） */}
 					<Button
 						onClick={createRoom}
 						variant="outline"
