@@ -2047,7 +2047,7 @@ class RoomController
             ->where('roomId',$roomId)->where('userId',$userId)
             ->where('isDead',false)->get();
         foreach ($friends as $f) {
-            $f->update(['block'=>$f->block + 1]);
+            $f->update(['blockCount'=>$f->blockCount + 1]);
         }
         $description = "{$attacker->character->name} が 証明書の自動更新！ 味方全員にシールド";
         $targets = $friends;
