@@ -111,6 +111,7 @@ export default function RoomDetailClient({ user }: Props) {
 
 	if (!user) return <Loading message="認証中" />;
 	if (room == null) return <Loading message="ルーム情報取得中" />;
+
 	return room.status === "waiting" ? (
 		<CreateLoading
 			message="マッチング中"
@@ -123,8 +124,8 @@ export default function RoomDetailClient({ user }: Props) {
 	) : room.status === "battling" ? (
 		<Battle room={room} user={user} />
 	) : room.status === "finish" && room.winUserId === user.id ? (
-		<Victory room={room} />
+		<Victory room={room} user={user} />
 	) : (
-		<Defeat room={room} />
+		<Defeat room={room} user={user} />
 	);
 }

@@ -11,7 +11,10 @@ import type { Room } from "~/type/room";
 import { useUser } from "~/hook/useUser";
 import Loading from "./Loading";
 
-export default function Defeat({ room }: { room: Room }) {
+export default function Defeat({
+	room,
+	user,
+}: { room: Room; user: { id: string; name: string } | null }) {
 	const [showScreen, setShowScreen] = useState(false);
 	const [showRateDecrease, setShowRateDecrease] = useState(false);
 	const [currentRate, setCurrentRate] = useState(0);
@@ -19,16 +22,16 @@ export default function Defeat({ room }: { room: Room }) {
 	const [rateDecrease, setRateDecrease] = useState(0);
 	const [animationComplete, setAnimationComplete] = useState(false);
 	const glitchRef = useRef<HTMLDivElement>(null);
-	const { user: authUser } = useUserContext();
+	// const { user: authUser } = useUserContext();
 
 	const router = useRouter();
 
-	const {
-		data: user,
-		error,
-		isLoading,
-		mutate,
-	} = useUser(authUser?.uid ?? null);
+	// const {
+	// 	data: user,
+	// 	error,
+	// 	isLoading,
+	// 	mutate,
+	// } = useUser(authUser?.uid ?? null);
 
 	// レートポイントのカウントダウンアニメーション
 	useEffect(() => {
@@ -133,10 +136,10 @@ export default function Defeat({ room }: { room: Room }) {
 	}, [room.hostUserId, room.id]);
 
 	// 👇 データの状態を見てレンダリングを制御
-	if (!authUser) return <Loading message="認証中" />;
-	if (isLoading) return <Loading message="ユーザー情報を取得中" />;
+	if (!user) return <Loading message="認証中" />;
+	// if (isLoading) return <Loading message="ユーザー情報を取得中" />;
 
-	if (!user || error) return <div>エラー: {error.message}</div>;
+	// if (!user || error) return <div>エラー: {error.message}</div>;
 
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">

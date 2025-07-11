@@ -12,7 +12,10 @@ import type { Room } from "~/type/room";
 import { useUser } from "~/hook/useUser";
 import Loading from "./Loading";
 
-export default function Victory({ room }: { room: Room }) {
+export default function Victory({
+	room,
+	user,
+}: { room: Room; user: { id: string; name: string } | null }) {
 	const [showScreen, setShowScreen] = useState(false);
 	const [showRateIncrease, setShowRateIncrease] = useState(false);
 	const [currentRate, setCurrentRate] = useState(0);
@@ -20,16 +23,16 @@ export default function Victory({ room }: { room: Room }) {
 	const [rateIncrease, setRateIncrease] = useState(0);
 	const [animationComplete, setAnimationComplete] = useState(false);
 	const sparklesRef = useRef<HTMLDivElement>(null);
-	const { user: authUser } = useUserContext();
+	// const { user: authUser } = useUserContext();
 
 	const router = useRouter();
 
-	const {
-		data: user,
-		error,
-		isLoading,
-		mutate,
-	} = useUser(authUser?.uid ?? null);
+	// const {
+	// 	data: user,
+	// 	error,
+	// 	isLoading,
+	// 	mutate,
+	// } = useUser(authUser?.uid ?? null);
 
 	// レートポイントのカウントアップアニメーション
 	useEffect(() => {
