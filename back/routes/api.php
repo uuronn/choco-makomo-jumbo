@@ -2,6 +2,7 @@
 
 use App\Http\Controller\Character\GetCharacterController;
 use App\Http\Controller\Character\GetCharacterListController;
+use App\Http\Controller\DuoRoomController;
 use App\Http\Controller\GachaController;
 use App\Http\Controller\ReportLogController;
 use App\Http\Controller\RoomController;
@@ -113,6 +114,22 @@ Route::get('/characters/{characterId}', GetCharacterController::class);
 
 // ルーム一覧を取得する
 Route::get('/rooms', [RoomController::class, 'list']);
+
+// ルームを全て削除する（テスト用）
+// Route::delete('/rooms', [RoomController::class, 'allDelete']);
+
+// ルームを作成する
+Route::post('/rooms/create', [RoomController::class, 'create']);
+
+// ルームに参加する
+Route::post('/rooms/join', [RoomController::class, 'join']);
+
+Route::post('/rooms/{roomId}/cancel', [RoomController::class, 'cancelJoin']);
+
+Route::post('/rooms/{roomId}/cancelCreate', [RoomController::class, 'cancelCreate']);
+
+// デュオルーム一覧を取得する
+Route::get('/duoRooms', [DuoRoomController::class, 'list']);
 
 // ルームを全て削除する（テスト用）
 // Route::delete('/rooms', [RoomController::class, 'allDelete']);
