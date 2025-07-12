@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import { RoomRefreshButton } from "./RoomRefreshButton";
 import { handleRefresh } from "./actions";
 import { useRooms } from "../_hooks/useRoomList";
+import Link from "next/link";
 
 type Props = {
 	token: string;
@@ -114,6 +115,13 @@ export const RoomListSectionContainerContent = ({ user, token }: Props) => {
 					<Button className="text-sm bg-black/30 border-green-400/30 text-green-400 hover:bg-green-400/20">
 						<BotIcon className="h-4 w-4" /> CPU対戦
 					</Button>
+
+					<Link
+						href="/duoRooms"
+						className="text-sm bg-black/30 border-green-400/30 text-green-400 hover:bg-green-400/20 flex items-center justify-center"
+					>
+						デュオ対戦
+					</Link>
 
 					<Button
 						onClick={createRoom}
