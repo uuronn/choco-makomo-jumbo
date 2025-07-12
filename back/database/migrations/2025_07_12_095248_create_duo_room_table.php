@@ -11,21 +11,20 @@ return new class extends Migration
         Schema::create('duoRoom', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('hostUserId')->index();
+            $table->uuid('coHostUserId')->nullable()->index();
             $table->uuid('guestUserId')->nullable()->index();
-            $table->string('status'); // waiting, pending, battling, finished
-            $table->smallInteger('totalTurns')->unsigned()->default(0);
+            $table->uuid('coGuestUserId')->nullable()->index();
+            $table->string('status');
+            $table->unsignedSmallInteger('totalTurns')->default(0);
             $table->uuid('winUserId')->nullable();
             $table->uuid('currentTurnUserId')->nullable();
             $table->uuid('currentTurnCharacterId')->nullable();
             $table->timestamps();
 
-            // 外部キー制約
-            $table->foreign('hostUserId')
-                  ->references('id')->on('user')
-                  ->onDelete('cascade');
-            $table->foreign('guestUserId')
-                  ->references('id')->on('user')
-                  ->onDelete('set null');
+            $table->foreign('hostUserId')->references('id')->on('user')->onDelete('cascade');
+            $table->foreign('coHostUserId')->references('id')->on('user')->onDelete('cascade');
+            $table->foreign('guestUserId')->references('id')->on('user')->onDelete('set null');
+            $table->foreign('coGuestUserId')->references('id')->on('user')->onDelete('set null');
         });
     }
 
