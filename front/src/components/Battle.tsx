@@ -18,7 +18,7 @@ import {
 
 type BattleProps = {
 	room: Room;
-	user: { id: string; name: string; photoUrl: string } | null;
+	user: { id: string; name: string } | null;
 };
 
 type EffectInfo = {

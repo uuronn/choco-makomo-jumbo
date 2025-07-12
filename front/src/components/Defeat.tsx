@@ -14,7 +14,7 @@ import Loading from "./Loading";
 export default function Defeat({
 	room,
 	user,
-}: { room: Room; user: { id: string; name: string } | null }) {
+}: { room: Room; user: { id: string; name: string; rating: number } | null }) {
 	const [showScreen, setShowScreen] = useState(false);
 	const [showRateDecrease, setShowRateDecrease] = useState(false);
 	const [currentRate, setCurrentRate] = useState(0);

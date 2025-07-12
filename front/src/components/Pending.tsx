@@ -17,7 +17,7 @@ type Player = {
 type PendingProps = {
 	room: Room;
 	setRoom: (room: Room) => void;
-	user: { id: string; name: string; photoUrl: string } | null;
+	user: { id: string; name: string } | null;
 };
 
 export default function Pending({ room, setRoom, user }: PendingProps) {

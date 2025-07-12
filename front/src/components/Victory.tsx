@@ -15,7 +15,7 @@ import Loading from "./Loading";
 export default function Victory({
 	room,
 	user,
-}: { room: Room; user: { id: string; name: string } | null }) {
+}: { room: Room; user: { id: string; name: string; rating: number } | null }) {
 	const [showScreen, setShowScreen] = useState(false);
 	const [showRateIncrease, setShowRateIncrease] = useState(false);
 	const [currentRate, setCurrentRate] = useState(0);
@@ -129,10 +129,10 @@ export default function Victory({
 	}, [room.hostUserId, room.id]);
 
 	// 👇 データの状態を見てレンダリングを制御
-	if (!authUser) return <Loading message="認証中" />;
-	if (isLoading) return <Loading message="ユーザー情報を取得中" />;
+	// if (!authUser) return <Loading message="認証中" />;
+	// if (isLoading) return <Loading message="ユーザー情報を取得中" />;
 
-	if (!user || error) return <div>エラー: {error.message}</div>;
+	// if (!user || error) return <div>エラー: {error.message}</div>;
 
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
