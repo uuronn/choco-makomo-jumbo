@@ -93,6 +93,13 @@ export const SelectCharacterContainer = () => {
 								type="button"
 								key={character.characterId}
 								onClick={() => handleSelect(character)}
+								className={`cursor-pointer p-2 rounded-lg transition-all hover:bg-gray-800 border border-emerald-500/10 hover:border-emerald-500/50 ${
+									selectedCharacters.some(
+										(c) => c.characterId === character.characterId,
+									)
+										? "bg-gray-800 border-emerald-500/50"
+										: ""
+								}`}
 							>
 								<CharacterCard
 									character={character}
