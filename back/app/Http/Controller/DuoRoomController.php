@@ -776,7 +776,7 @@ public function duoRoomCreate(Request $request)
         // リクエスト例: { hostUserId: "uuid1" }
         $hostUserId = $request->input('hostUserId');
 
-        if (! $hostUserId) {
+        if (!$hostUserId) {
             return response()->json(['message' => 'hostUserId が必要です'], 400);
         }
 
