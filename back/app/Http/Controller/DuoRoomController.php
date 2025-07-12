@@ -492,42 +492,54 @@ class DuoRoomController
     }
 
     /**
-     * ルーム一覧を取得
+     * Duoルーム一覧を取得
      */
     public function list()
     {
         try {
-            $rooms = Room::with([
-                'hostUser' => function ($query) {
-                    $query->select('id', 'name', 'photoUrl');
-                },
-                'guestUser' => function ($query) {
-                    $query->select('id', 'name', 'photoUrl');
-                }
+            $rooms = DuoRoom::with([
+                'hostUser:id,name,photoUrl',
+                'coHostUser:id,name,photoUrl',
+                'guestUser:id,name,photoUrl',
+                'coGuestUser:id,name,photoUrl',
             ])->get();
 
             $rooms->transform(function ($room) {
                 return [
-                    'id' => $room->id,
-                    'host_user' => $room->hostUser ? [
-                        'id' => $room->hostUser->id,
-                        'name' => $room->hostUser->name,
+                    'id'                  => $room->id,
+                    'hostUser'            => $room->hostUser ? [
+                        'id'       => $room->hostUser->id,
+                        'name'     => $room->hostUser->name,
                         'photoUrl' => $room->hostUser->photoUrl,
                     ] : null,
-                    'guest_user' => $room->guestUser ? [
-                        'id' => $room->guestUser->id,
-                        'name' => $room->guestUser->name,
+                    'coHostUser'          => $room->coHostUser ? [
+                        'id'       => $room->coHostUser->id,
+                        'name'     => $room->coHostUser->name,
+                        'photoUrl' => $room->coHostUser->photoUrl,
+                    ] : null,
+                    'guestUser'           => $room->guestUser ? [
+                        'id'       => $room->guestUser->id,
+                        'name'     => $room->guestUser->name,
                         'photoUrl' => $room->guestUser->photoUrl,
                     ] : null,
-                    'status' => $room->status
+                    'coGuestUser'         => $room->coGuestUser ? [
+                        'id'       => $room->coGuestUser->id,
+                        'name'     => $room->coGuestUser->name,
+                        'photoUrl' => $room->coGuestUser->photoUrl,
+                    ] : null,
+                    'status'              => $room->status,
+                    'totalTurns'          => $room->totalTurns,
+                    'winUserId'           => $room->winUserId,
+                    'currentTurnUserId'   => $room->currentTurnUserId,
+                    'currentTurnCharacterId' => $room->currentTurnCharacterId,
                 ];
             });
 
             return response()->json($rooms, 200);
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Failed to retrieve rooms',
-                'error' => $e->getMessage(),
+                'message' => 'Duoルーム一覧の取得に失敗しました',
+                'error'   => $e->getMessage(),
             ], 500);
         }
     }
