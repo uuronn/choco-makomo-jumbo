@@ -767,7 +767,7 @@ class DuoRoomController
     //     ];
     // }
 
-    /**
+   /**
  * ルーム作成（最初はホスト１名のみ）
  */
 public function duoRoomCreate(Request $request)
@@ -776,15 +776,14 @@ public function duoRoomCreate(Request $request)
         // リクエスト例: { hostUserId: "uuid1" }
         $hostUserId = $request->input('hostUserId');
 
-        // hostUserId があるか
-        if (!$hostUserId) {
+        if (! $hostUserId) {
             return response()->json(['message' => 'hostUserId が必要です'], 400);
         }
 
         // すでに waiting 状態のルームがこのユーザーを含んでいないか
         $existing = DuoRoom::where(function ($q) use ($hostUserId) {
-                $q->where('host_user_id', $hostUserId)
-                  ->orWhere('co_host_user_id', $hostUserId);
+                $q->where('hostUserId', $hostUserId)
+                  ->orWhere('coHostUserId', $hostUserId);
             })
             ->where('status', 'waiting')
             ->first();
@@ -796,15 +795,13 @@ public function duoRoomCreate(Request $request)
         // トランザクションでルーム作成
         $room = DB::transaction(function () use ($hostUserId) {
             return DuoRoom::create([
-                'host_user_id'    => $hostUserId,
-                'co_host_user_id' => null,        // コホストは後から参加
-                'status'          => 'waiting',   // waiting → pending → battling → finished
-                // total_turns, current_turn_*, win_user_id は DB のデフォルト(null/0)
+                'hostUserId'   => $hostUserId,
+                'coHostUserId' => null,
+                'status'       => 'waiting',
             ]);
         });
 
         return response()->json($room, 201);
-
     } catch (Exception $e) {
         return response()->json([
             'message' => 'DuoRoom の作成に失敗しました',
@@ -812,6 +809,7 @@ public function duoRoomCreate(Request $request)
         ], 500);
     }
 }
+
 
     /**
      * ルームに参加
