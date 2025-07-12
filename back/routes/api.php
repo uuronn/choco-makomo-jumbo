@@ -15,7 +15,6 @@ use App\Http\Controller\TeamRoomController;
 use App\Http\Controller\UserCharacter\GetUserCharacterController;
 use Illuminate\Support\Facades\Route;
 
-
 // ユーザー関連のAPI--------------------------------
 
 // ユーザーを作成する
@@ -131,11 +130,11 @@ Route::post('/rooms/{roomId}/cancelCreate', [RoomController::class, 'cancelCreat
 // デュオルーム一覧を取得する
 Route::get('/duoRooms', [DuoRoomController::class, 'list']);
 
-// ルームを全て削除する（テスト用）
+// デュオルームを全て削除する（テスト用）
 // Route::delete('/rooms', [RoomController::class, 'allDelete']);
 
-// ルームを作成する
-Route::post('/rooms/create', [RoomController::class, 'create']);
+// デュオルームを作成する
+Route::post('/duoRooms/create', [DuoRoomController::class, 'duoRoomCreate']);
 
 // ルームに参加する
 Route::post('/rooms/join', [RoomController::class, 'join']);
@@ -150,13 +149,11 @@ Route::get('/{userId}/{roomId}/status', [RoomController::class, 'status']);
 // 参加申請を承認
 Route::post('/{userId}/{roomId}/approve', [RoomController::class, 'approve']);
 
-
 // 参加申請を拒否
 Route::post('/{userId}/{roomId}/reject', [RoomController::class, 'reject']);
 
 // 通常攻撃を行う
 Route::post('{userId}/{roomId}/attack', [RoomController::class, 'attack']);
-
 
 Route::post('{userId}/{roomId}/surrender', [RoomController::class, 'surrender']);
 
@@ -165,7 +162,6 @@ Route::post('{userId}/{roomId}/skill', [RoomController::class, 'skill']);
 
 // ルームを削除する
 Route::delete('{userId}/{roomId}/delete', [RoomController::class, 'delete']);
-
 
 // 次のターンに進む
 Route::post('/{userId}/{roomId}/nextTurn', [RoomController::class, 'nextTurn']);
