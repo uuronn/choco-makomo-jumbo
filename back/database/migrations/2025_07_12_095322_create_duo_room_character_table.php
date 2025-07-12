@@ -11,35 +11,26 @@ return new class extends Migration
         Schema::create('duoRoomCharacter', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('duoRoomId')->index();
-            $table->uuid('characterId')->index();
-            $table->uuid('userId')->index();
-            $table->smallInteger('level')->unsigned();
-            $table->smallInteger('maxLife')->unsigned();
-            $table->smallInteger('life')->unsigned();
-            $table->smallInteger('power')->unsigned();
-            $table->smallInteger('speed')->unsigned();
-            $table->tinyInteger('evasion')->unsigned();
-            $table->tinyInteger('critical')->unsigned()->default(0);
+            $table->uuid('characterId');
+            $table->uuid('userId');
+            $table->unsignedSmallInteger('level');
+            $table->unsignedSmallInteger('maxLife');
+            $table->unsignedSmallInteger('life');
+            $table->unsignedSmallInteger('power');
+            $table->unsignedSmallInteger('speed');
+            $table->unsignedTinyInteger('evasion');
+            $table->unsignedTinyInteger('critical');
             $table->boolean('isActive')->default(true);
             $table->boolean('isDead')->default(false);
-            $table->tinyInteger('blockCount')->unsigned()->default(0);
-            $table->tinyInteger('confusionCount')->unsigned()->default(0);
-            $table->tinyInteger('poisonCount')->unsigned()->default(0);
-            $table->tinyInteger('specialSkillTurn')->unsigned()->default(0);
+            $table->unsignedTinyInteger('blockCount')->default(0);
+            $table->unsignedTinyInteger('confusionCount')->default(0);
+            $table->unsignedTinyInteger('poisonCount')->default(0);
+            $table->unsignedTinyInteger('specialSkillTurn')->default(0);
             $table->boolean('specialUsed')->default(false);
             $table->boolean('isErrorMode')->default(false);
             $table->timestamps();
 
-            // 外部キー制約
-            $table->foreign('duoRoomId')
-                  ->references('id')->on('duoRoom')
-                  ->onDelete('cascade');
-            $table->foreign('characterId')
-                  ->references('id')->on('character')
-                  ->onDelete('restrict');
-            $table->foreign('userId')
-                  ->references('id')->on('user')
-                  ->onDelete('cascade');
+            $table->foreign('duoRoomId')->references('id')->on('duoRoom')->onDelete('cascade');
         });
     }
 
