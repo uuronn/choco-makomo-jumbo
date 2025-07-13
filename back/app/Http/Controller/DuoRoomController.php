@@ -883,36 +883,72 @@ public function joinCoHost(Request $request)
     }
 }
 
- public function getCharacterSelection(Request $request, $roomId)
+public function getCharacterSelection(Request $request, $duoRoomId)
 {
     $userId = $request->query('userId');
 
-    $room = DuoRoom::with(['characters.character'])->findOrFail($roomId);
+    $room = DuoRoom::findOrFail($duoRoomId);
 
-    if (!in_array($userId, [
-        $room->hostUserId,
-        $room->coHostUserId,
-        $room->guestUserId,
-        $room->coGuestUserId,
-    ])) {
-        return response()->json(['message' => 'このルームにアクセスする権限がありません'], 403);
+    // チームメイト判定（hostUserId + coHostUserId）
+    $teamUserIds = [$room->hostUserId, $room->coHostUserId];
+
+    if (!in_array($userId, $teamUserIds)) {
+        return response()->json(['message' => 'このチームに所属していません'], 403);
     }
 
-    // 選択済みキャラ
-    $selected = $room->characters
+    // 自分の選択済みキャラ
+    $selected = DuoRoomCharacter::with('character')
+        ->where('duoRoomId', $duoRoomId)
         ->where('userId', $userId)
-        ->values();
+        ->get()
+        ->map(function ($item) {
+            return [
+                'id'    => $item->character->id,
+                'name'  => $item->character->name,
+                'level' => $item->level,
+            ];
+        });
 
-    // 所有キャラ一覧
-    $available = UserCharacter::with('character')
+    // 味方の選択済みキャラ（自分以外）
+    $teammateSelected = DuoRoomCharacter::with('character')
+        ->where('duoRoomId', $duoRoomId)
+        ->whereIn('userId', $teamUserIds)
+        ->where('userId', '!=', $userId)
+        ->get()
+        ->map(function ($item) {
+            return [
+                'id'    => $item->character->id,
+                'name'  => $item->character->name,
+                'level' => $item->level,
+            ];
+        });
+
+    // 自分の所持キャラ一覧
+    $allUserCharacters = UserCharacter::with('character')
         ->where('userId', $userId)
         ->get();
 
+    // 既に選ばれているキャラID一覧（同チーム内）
+    $selectedCharacterIds = DuoRoomCharacter::where('duoRoomId', $duoRoomId)
+        ->whereIn('userId', $teamUserIds)
+        ->pluck('characterId')
+        ->toArray();
+
+    // 選択可能キャラ（＝所持キャラ − すでに選ばれたキャラ）
+    $available = $allUserCharacters
+        ->filter(fn($uc) => !in_array($uc->characterId, $selectedCharacterIds))
+        ->map(fn($uc) => [
+            'id'   => $uc->character->id,
+            'name' => $uc->character->name,
+        ])
+        ->values();
+
     return response()->json([
-        'available' => $available,
-        'selected' => $selected,
-        'canSelectMore' => $selected->count() < 3,
-        'selectedCount' => $selected->count(),
+        'available'       => $available,
+        'selected'        => $selected,
+        'teammateSelected'=> $teammateSelected,
+        'canSelectMore'   => $selected->count() < 3,
+        'selectedCount'   => $selected->count(),
     ]);
 }
 
