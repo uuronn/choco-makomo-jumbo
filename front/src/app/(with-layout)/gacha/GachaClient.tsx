@@ -284,94 +284,70 @@ export function GachaClient({ initialToken }: GachaClientProps) {
 	};
 
 	return (
-		<div className="py-3 gap-0 w-full h-full max-w-md bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden relative z-10">
-			{/* 紙吹雬用のキャンバス */}
-			<canvas
-				ref={confettiCanvasRef}
-				className="fixed inset-0 pointer-events-none z-50"
-				style={{ width: "100%", height: "100%" }}
-			/>
+		<div className="px-4 pt-4 flex flex-col justify-between h-full">
+			<Tabs
+				value={activeTab}
+				onValueChange={setActiveTab}
+				className="w-full h-full flex flex-col justify-between"
+			>
+				<TabsList className="grid w-full grid-cols-2 bg-black/50 border border-green-500/30">
+					<TabsTrigger
+						value="regular"
+						disabled={isAnimating}
+						className="data-[state=active]:bg-green-900/50 data-[state=active]:text-green-300 text-green-500"
+					>
+						<div className="flex items-center gap-2">
+							<Gamepad2 className="h-4 w-4" />
+							<span>通常ガチャ</span>
+						</div>
+					</TabsTrigger>
+					<TabsTrigger
+						value="github"
+						disabled={isAnimating}
+						className="data-[state=active]:bg-green-900/50 data-[state=active]:text-green-300 text-green-500"
+					>
+						<div className="flex items-center gap-2">
+							<Github className="h-4 w-4" />
+							<span>GitHub ガチャ</span>
+						</div>
+					</TabsTrigger>
+				</TabsList>
 
-			{/* ヘッダー */}
-			<div className="bg-gradient-to-r from-green-900/80 to-green-700/80 p-4 text-center relative">
-				<div className="flex items-center justify-center gap-3">
-					<Cpu className="h-6 w-6 text-green-300" />
-					<h1 className="text-2xl font-bold text-green-300 tracking-wider">
-						技術ガチャ
-					</h1>
-					<Terminal className="h-6 w-6 text-green-300" />
-				</div>
-			</div>
-
-			{/* ポイント表示 */}
-			<div className="text-2xl font-semibold mb-1 text-green-400 bg-black/50 px-4 py-2 rounded-lg border border-green-500/30 shadow-[0_0_10px_rgba(0,255,128,0.2)]">
-				<div className="flex items-center gap-2">
-					<Database className="h-5 w-5 text-green-400" />
-					技術ポイント:{" "}
-					<span className="text-emerald-400">{availablePoints}</span>
-				</div>
-			</div>
-
-			{/* タブ */}
-			<div className="px-4 pt-4">
-				<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-					<TabsList className="grid w-full h-full grid-cols-2 bg-black/50 border border-green-500/30">
-						<TabsTrigger
-							value="regular"
-							disabled={isAnimating}
-							className="data-[state=active]:bg-green-900/50 data-[state=active]:text-green-300 text-green-500"
-						>
-							<div className="flex items-center gap-2">
-								<Gamepad2 className="h-4 w-4" />
-								<span>通常ガチャ</span>
-							</div>
-						</TabsTrigger>
-						<TabsTrigger
-							value="github"
-							disabled={isAnimating}
-							className="data-[state=active]:bg-green-900/50 data-[state=active]:text-green-300 text-green-500"
-						>
-							<div className="flex items-center gap-2">
-								<Github className="h-4 w-4" />
-								<span>GitHub ガチャ</span>
-							</div>
-						</TabsTrigger>
-					</TabsList>
-
-					<div className="p-4">
-						{/* GitHub URL入力 */}
-						{activeTab === "github" && !isAnimating && !showResult && (
-							<div className="w-full mb-6">
-								<div className="relative">
-									<div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-										<Github className="h-5 w-5 text-green-500" />
-									</div>
-									<Input
-										type="text"
-										value={githubUrl}
-										onChange={(e) => setGithubUrl(e.target.value)}
-										placeholder="https://github.com/username/repository"
-										className="pl-10 bg-black/50 border-green-500/30 text-green-300 placeholder:text-green-500/50"
-									/>
+				<div className="p-4 h-full flex flex-col justify-between">
+					{/* GitHub URL入力 */}
+					{activeTab === "github" && !isAnimating && !showResult && (
+						<div className="w-full mb-6">
+							<div className="relative">
+								<div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+									<Github className="h-5 w-5 text-green-500" />
 								</div>
-								{error && (
-									<div className="mt-2 text-red-400 text-sm bg-red-900/20 p-2 rounded border border-red-500/30">
-										{error}
-									</div>
-								)}
-							</div>
-						)}
-
-						{/* ローディングプログレス */}
-						{isAnimating && (
-							<div className="w-full bg-gray-800 rounded-full h-5 overflow-hidden border border-green-500/30">
-								<div
-									className={`h-full ${loadingBarColor} rounded-full transition-all duration-300`}
-									style={{ width: `${loadingProgress}%` }}
+								<Input
+									type="text"
+									value={githubUrl}
+									onChange={(e) => setGithubUrl(e.target.value)}
+									placeholder="https://github.com/username/repository"
+									className="pl-10 bg-black/50 border-green-500/30 text-green-300 placeholder:text-green-500/50"
 								/>
 							</div>
-						)}
+							{error && (
+								<div className="mt-2 text-red-400 text-sm bg-red-900/20 p-2 rounded border border-red-500/30">
+									{error}
+								</div>
+							)}
+						</div>
+					)}
 
+					{/* ローディングプログレス */}
+					{isAnimating && (
+						<div className="w-full bg-gray-800 rounded-full h-5 overflow-hidden border border-green-500/30">
+							<div
+								className={`h-full ${loadingBarColor} rounded-full transition-all duration-300`}
+								style={{ width: `${loadingProgress}%` }}
+							/>
+						</div>
+					)}
+
+					<div className="h-full flex flex-col justify-center bg-black">
 						{/* 結果表示 */}
 						{result && (
 							<div className="text-center">
@@ -407,47 +383,47 @@ export function GachaClient({ initialToken }: GachaClientProps) {
 								)}
 							</div>
 						)}
-
-						{/* アクションボタン */}
-						<div className="mt-6 flex gap-4">
-							<Link href="/" className="flex-1">
-								<Button
-									disabled={isAnimating}
-									className="w-full bg-black hover:bg-green-900 text-green-400 border border-green-500/50"
-								>
-									<ArrowLeft className="mr-2 h-4 w-4" />
-									戻る
-								</Button>
-							</Link>
-							<Button
-								onClick={
-									activeTab === "regular"
-										? async () => {
-												const h = await pullGacha();
-												console.info("Gacha result:", h);
-												setResult(h);
-											}
-										: getCharacterByGithubUrl
-								}
-								disabled={isAnimating}
-								className="flex-1 bg-black hover:bg-green-900 text-green-400 border border-green-500/50"
-							>
-								{activeTab === "regular" ? (
-									<>
-										<Server className="mr-2 h-4 w-4" />
-										ガチャを引く
-									</>
-								) : (
-									<>
-										<Github className="mr-2 h-4 w-4" />
-										取得する
-									</>
-								)}
-							</Button>
-						</div>
 					</div>
-				</Tabs>
-			</div>
+
+					{/* アクションボタン */}
+					<div className="mt-6 flex gap-4">
+						<Link href="/" className="flex-1">
+							<Button
+								disabled={isAnimating}
+								className="w-full bg-black hover:bg-green-900 text-green-400 border border-green-500/50"
+							>
+								<ArrowLeft className="mr-2 h-4 w-4" />
+								戻る
+							</Button>
+						</Link>
+						<Button
+							onClick={
+								activeTab === "regular"
+									? async () => {
+											const h = await pullGacha();
+											console.info("Gacha result:", h);
+											setResult(h);
+										}
+									: getCharacterByGithubUrl
+							}
+							disabled={isAnimating}
+							className="flex-1 bg-black hover:bg-green-900 text-green-400 border border-green-500/50"
+						>
+							{activeTab === "regular" ? (
+								<>
+									<Server className="mr-2 h-4 w-4" />
+									ガチャを引く
+								</>
+							) : (
+								<>
+									<Github className="mr-2 h-4 w-4" />
+									取得する
+								</>
+							)}
+						</Button>
+					</div>
+				</div>
+			</Tabs>
 		</div>
 	);
 }
