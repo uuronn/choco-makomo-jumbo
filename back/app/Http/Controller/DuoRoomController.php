@@ -797,11 +797,11 @@ public function duoRoomCreate(Request $request)
                 $q->where('hostUserId', $hostUserId)
                   ->orWhere('coHostUserId', $hostUserId);
             })
-            ->where('status', 'waiting')
+            ->where('status', 'teamMateWaiting')
             ->first();
 
         if ($existing) {
-            return response()->json(['message' => '既に waiting 状態のルームが存在します'], 409);
+            return response()->json(['message' => '既に teamMateWaiting 状態のルームが存在します'], 409);
         }
 
         // トランザクションでルーム作成
@@ -809,7 +809,7 @@ public function duoRoomCreate(Request $request)
             return DuoRoom::create([
                 'hostUserId'   => $hostUserId,
                 'coHostUserId' => null,
-                'status'       => 'waiting',
+                'status'       => 'teamMateWaiting',
             ]);
         });
 
@@ -817,6 +817,66 @@ public function duoRoomCreate(Request $request)
     } catch (Exception $e) {
         return response()->json([
             'message' => 'DuoRoom の作成に失敗しました',
+            'error'   => $e->getMessage(),
+        ], 500);
+    }
+}
+
+/**
+ * Aチーム（ホスト側）2人目が参加
+ */
+public function joinCoHost(Request $request)
+{
+    try {
+        DB::beginTransaction();
+
+        // room を取得
+        $room = DuoRoom::where('id', $request->roomId)->first();
+        if (! $room) {
+            return response()->json(['message' => '指定されたルームが見つかりません'], 404);
+        }
+
+        // ステータスが waiting でなければ参加不可
+        if ($room->status !== 'teamMateWaiting') {
+            return response()->json(['message' => 'このルームには参加できません'], 400);
+        }
+
+        // すでにコホストが埋まっていれば参加不可
+        if ($room->coHostUserId) {
+            return response()->json(['message' => 'Aチームには既に2人目が参加しています'], 400);
+        }
+
+        // coHostUserId の指定チェック
+        $coHostUserId = $request->input('coHostUserId');
+        if (! $coHostUserId) {
+            return response()->json(['message' => 'coHostUserId が必要です'], 400);
+        }
+
+        // ホストと同一IDでないか
+        if ($coHostUserId === $room->hostUserId) {
+            return response()->json(['message' => '異なるユーザーIDを指定してください'], 400);
+        }
+
+        // ユーザー存在チェック
+        $user = User::find($coHostUserId);
+        if (! $user) {
+            return response()->json(['message' => '指定されたユーザーが存在しません'], 404);
+        }
+
+        // 更新
+        $room->update([
+            'coHostUserId' => $coHostUserId,
+            'status'       => 'selecting',  // co-host 参加後は次ステータスへ
+        ]);
+
+        DB::commit();
+
+        return response()->json($room, 200);
+
+    } catch (Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'message' => 'コホスト参加に失敗しました',
             'error'   => $e->getMessage(),
         ], 500);
     }

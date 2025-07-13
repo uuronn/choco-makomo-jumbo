@@ -137,7 +137,7 @@ Route::get('/duoRooms', [DuoRoomController::class, 'list']);
 Route::post('/duoRooms/create', [DuoRoomController::class, 'duoRoomCreate']);
 
 // ルームに参加する
-Route::post('/rooms/join', [RoomController::class, 'join']);
+Route::post('/duoRooms/join', [DuoRoomController::class, 'joinCoHost']);
 
 Route::post('/rooms/{roomId}/cancel', [RoomController::class, 'cancelJoin']);
 

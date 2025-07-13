@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "~/components/ui/button";
 import { RoomRefreshButton } from "./RoomRefreshButton";
 import { handleRefresh } from "./actions";
+import { useDuoRoomList } from "../_hooks/useDuoRoomList";
 // import { useDuoRooms } from "../_hooks/useDuoRoomList";
 
 type Props = {
@@ -25,9 +26,9 @@ export const DuoRoomListSectionContainerContent = ({ user, token }: Props) => {
 
 	// const isButtonDisabled = !(searchParams.get("chars")?.length > 0);
 
-	// const { rooms } = useRooms(token);
+	const { rooms } = useDuoRoomList(token);
 
-	// console.info("rooms", rooms);
+	console.info("rooms", rooms);
 
 	// useEffect(() => {
 	// 	const fetchRooms = async () => {
@@ -75,30 +76,29 @@ export const DuoRoomListSectionContainerContent = ({ user, token }: Props) => {
 		router.push(`/duoRooms/${data.id}`);
 	};
 
-	// const joinRoom = async (room: {
-	// 	id: string;
-	// 	host_user: { id: string; name: string; photoUrl?: string | null };
-	// }) => {
-	// 	if (!user) return;
-	// 	const res = await fetch(
-	// 		`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/join`,
-	// 		{
-	// 			method: "POST",
-	// 			headers: {
-	// 				"Content-Type": "application/json",
-	// 				Authorization: `Bearer ${token}`,
-	// 			},
-	// 			body: JSON.stringify({
-	// 				roomId: room?.id,
-	// 				characterIdList: characterIdList,
-	// 				guestUserId: user.id,
-	// 			}),
-	// 		},
-	// 	);
+	const joinRoom = async (room: {
+		id: string;
+		host_user: { id: string; name: string; photoUrl?: string | null };
+	}) => {
+		if (!user) return;
+		const res = await fetch(
+			`${process.env.NEXT_PUBLIC_BASE_URL}/api/duoRooms/join`,
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({
+					roomId: room?.id,
+					coHostUserId: user.id,
+				}),
+			},
+		);
 
-	// 	const data = await res.json();
-	// 	router.push(`/rooms/${room?.id}`);
-	// };
+		const data = await res.json();
+		router.push(`/duoRooms/${room?.id}`);
+	};
 
 	return (
 		<>
@@ -126,19 +126,18 @@ export const DuoRoomListSectionContainerContent = ({ user, token }: Props) => {
 				</div>
 			</div>
 
-			{/* 
 			<div
 				className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto"
 				style={{ maxHeight: "calc(100vh - 400px)" }}
 			>
 				{rooms
-					.filter(
-						(room: {
-							id: string;
-							host_user: { id: string; name: string; photoUrl?: string | null };
-							guest_user: { id: string } | null;
-						}) => room.guest_user === null && room.host_user.id !== user?.id,
-					)
+					// .filter(
+					// 	(room: {
+					// 		id: string;
+					// 		host_user: { id: string; name: string; photoUrl?: string | null };
+					// 		guest_user: { id: string } | null;
+					// 	}) => room.guest_user === null && room.host_user.id !== user?.id,
+					// )
 					.map(
 						(room: {
 							id: string;
@@ -153,7 +152,7 @@ export const DuoRoomListSectionContainerContent = ({ user, token }: Props) => {
 							>
 								<div className="relative h-[90px] w-full flex items-center justify-center">
 									<Image
-										src={room.host_user.photoUrl || "/placeholder.svg"}
+										src={room.hostUserId || "/placeholder.svg"}
 										alt={room.id}
 										width={80}
 										height={80}
@@ -162,13 +161,13 @@ export const DuoRoomListSectionContainerContent = ({ user, token }: Props) => {
 								</div>
 								<div className="p-2 text-center">
 									<h4 className="font-bold text-green-400 text-sm">
-										{room.host_user.name}
+										{room.hostUserId}
 									</h4>
 								</div>
 							</div>
 						),
 					)}
-			</div> */}
+			</div>
 		</>
 	);
 };
