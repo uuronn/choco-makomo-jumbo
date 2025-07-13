@@ -372,8 +372,8 @@ export function GachaClient({ initialToken }: GachaClientProps) {
 									<div className="mt-4">
 										<Image
 											alt={result.name}
-											height={140}
-											width={140}
+											height={240}
+											width={240}
 											src={
 												characterToImagePath(result.id) || "/placeholder.svg"
 											}
