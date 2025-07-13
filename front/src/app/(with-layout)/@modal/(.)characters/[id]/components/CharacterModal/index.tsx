@@ -6,11 +6,16 @@ import { CharacterAbilities } from "./CharacterAbilities";
 import { CharacterStatsEditor } from "./CharacterStatsEditor";
 import type { Character } from "~/type/character";
 import { Modal } from "~/components/Modal";
+import { developCharacter } from "./actions";
 
 export const CharacterModal = ({
 	character,
+	userId,
+	token,
 }: {
 	character: Character;
+	userId: string;
+	token: string;
 }) => {
 	const [statPoints, setStatPoints] = useState({ life: 0, power: 0, speed: 0 });
 	const [isErrorState, _] = useState(false);
@@ -30,11 +35,6 @@ export const CharacterModal = ({
 			else if (!increment && next[type] > 0) next[type]--;
 			return next;
 		});
-	};
-
-	const handleDevelop = () => {
-		// 開発のロジックをここに書く（APIコールなど）
-		console.log("Developing character with:", statPoints);
 	};
 
 	return (
@@ -59,7 +59,16 @@ export const CharacterModal = ({
 					statPoints={statPoints}
 					remainingPoints={remainingPoints}
 					usedPoints={usedPoints}
-					handleDevelop={handleDevelop}
+					handleDevelop={async () => {
+						await developCharacter(
+							userId,
+							character.characterId,
+							statPoints,
+							token,
+						);
+
+						setStatPoints({ life: 0, power: 0, speed: 0 });
+					}}
 				/>
 			</div>
 		</Modal>
