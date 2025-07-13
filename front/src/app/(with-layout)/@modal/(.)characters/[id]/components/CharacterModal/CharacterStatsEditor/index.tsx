@@ -19,7 +19,7 @@ type Props = {
 	statPoints: { life: number; power: number; speed: number };
 	remainingPoints: number;
 	usedPoints: number;
-	handleDevelop: () => void;
+	handleDevelop: () => Promise<void>;
 };
 
 export const CharacterStatsEditor = ({
