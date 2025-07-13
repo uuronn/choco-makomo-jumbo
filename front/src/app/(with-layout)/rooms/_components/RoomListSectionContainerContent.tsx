@@ -116,12 +116,13 @@ export const RoomListSectionContainerContent = ({ user, token }: Props) => {
 						<BotIcon className="h-4 w-4" /> CPU対戦
 					</Button>
 
-					<Link
+					{/* TODO: 一旦コメントアウト */}
+					{/* <Link
 						href="/duoRooms"
 						className="text-sm bg-black/30 border-green-400/30 text-green-400 hover:bg-green-400/20 flex items-center justify-center"
 					>
 						デュオ対戦
-					</Link>
+					</Link> */}
 
 					<Button
 						onClick={createRoom}
