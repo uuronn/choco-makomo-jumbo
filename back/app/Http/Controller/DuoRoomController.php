@@ -954,26 +954,26 @@ public function joinCoHost(Request $request)
             if ($exists) {
                 return response()->json(['message' => 'すでに選択済みのキャラです'], 409);
             }
-
-            DuoRoomCharacter::create([
-                'duoRoomId' => $duoRoomId,
-                'userId' => $userId,
-                'characterId' => $characterId,
-                'level' => 1,
-                'life' => 0,
-                'power' => 0,
-                'speed' => 0,
-                'evasion' => 0,
-                'critical' => 0,
-                'isActive' => true,
-                'isDead' => false,
-                'blockCount' => 0,
-                'confusionCount' => 0,
-                'poisonCount' => 0,
-                'specialSkillTurn' => 0,
-                'specialUsed' => false,
-                'isErrorMode' => false,
-            ]);
+DuoRoomCharacter::create([
+    'duoRoomId' => $duoRoomId,
+    'userId' => $userId,
+    'characterId' => $characterId,
+    'level' => 1,
+    'maxLife' => 0, // ← これを追加する必要あり
+    'life' => 0,
+    'power' => 0,
+    'speed' => 0,
+    'evasion' => 0,
+    'critical' => 0,
+    'isActive' => true,
+    'isDead' => false,
+    'blockCount' => 0,
+    'confusionCount' => 0,
+    'poisonCount' => 0,
+    'specialSkillTurn' => 0,
+    'specialUsed' => false,
+    'isErrorMode' => false,
+]);
         } elseif ($action === 'deselect') {
             DuoRoomCharacter::where('duoRoomId', $duoRoomId)
                 ->where('userId', $userId)
