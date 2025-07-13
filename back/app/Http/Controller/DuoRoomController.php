@@ -917,13 +917,13 @@ public function joinCoHost(Request $request)
 }
 
 
-    public function updateCharacterSelection(Request $request, $teamRoomId)
+    public function updateCharacterSelection(Request $request, $duoRoomId)
 {
     $userId = $request->input('userId');
     $characterId = $request->input('characterId');
     $action = $request->input('action'); // 'select' or 'deselect'
 
-    $room = DuoRoom::findOrFail($teamRoomId);
+    $room = DuoRoom::findOrFail($duoRoomId);
 
     // チーム所属確認
     if (!in_array($userId, [$room->hostUserId, $room->coHostUserId])) {
@@ -932,7 +932,7 @@ public function joinCoHost(Request $request)
 
     try {
         if ($action === 'select') {
-            $count = DuoRoomCharacter::where('teamRoomId', $teamRoomId)
+            $count = DuoRoomCharacter::where('duoRoomId', $duoRoomId)
                 ->where('userId', $userId)
                 ->count();
 
@@ -946,7 +946,7 @@ public function joinCoHost(Request $request)
                 ->firstOrFail();
 
             // 重複確認
-            $exists = DuoRoomCharacter::where('teamRoomId', $teamRoomId)
+            $exists = DuoRoomCharacter::where('duoRoomId', $duoRoomId)
                 ->where('userId', $userId)
                 ->where('characterId', $characterId)
                 ->exists();
@@ -956,31 +956,31 @@ public function joinCoHost(Request $request)
             }
 
             DuoRoomCharacter::create([
-                'teamRoomId'   => $teamRoomId,
-                'userId'       => $userId,
-                'characterId'  => $characterId,
-                'level'        => 1,
-                'life'         => 0,
-                'power'        => 0,
-                'speed'        => 0,
-                'evasion'      => 0,
-                'critical'     => 0,
-                'isActive'     => true,
-                'isDead'       => false,
-                'blockCount'   => 0,
+                'duoRoomId' => $duoRoomId,
+                'userId' => $userId,
+                'characterId' => $characterId,
+                'level' => 1,
+                'life' => 0,
+                'power' => 0,
+                'speed' => 0,
+                'evasion' => 0,
+                'critical' => 0,
+                'isActive' => true,
+                'isDead' => false,
+                'blockCount' => 0,
                 'confusionCount' => 0,
-                'poisonCount'  => 0,
+                'poisonCount' => 0,
                 'specialSkillTurn' => 0,
-                'specialUsed'  => false,
-                'isErrorMode'  => false,
+                'specialUsed' => false,
+                'isErrorMode' => false,
             ]);
         } elseif ($action === 'deselect') {
-            DuoRoomCharacter::where('teamRoomId', $teamRoomId)
+            DuoRoomCharacter::where('duoRoomId', $duoRoomId)
                 ->where('userId', $userId)
                 ->where('characterId', $characterId)
                 ->delete();
         } else {
-            return response()->json(['message' => 'action は select または deselect を指定してください'], 400);
+            return response()->json(['message' => 'action は select または deselect にしてください'], 400);
         }
 
         return response()->json(['message' => 'キャラ選択を更新しました'], 200);
