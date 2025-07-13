@@ -15,7 +15,9 @@ export const fetchCharacterById = async (characterId: string) => {
 		`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.id}/characters/${characterId}`,
 		{
 			headers: { Authorization: `Bearer ${token}` },
-			// next: { revalidate: 60 }, // キャッシュの再検証を60秒ごとに行う
+			next: {
+				tags: [`character-${characterId}`],
+			},
 		},
 	);
 
