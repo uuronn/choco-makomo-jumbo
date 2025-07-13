@@ -141,6 +141,8 @@ Route::post('/duoRooms/join', [DuoRoomController::class, 'joinCoHost']);
 
 Route::get('/duoRooms/{roomId}/characterSelection', [DuoRoomController::class, 'getCharacterSelection']);
 
+Route::post('/duoRooms/{roomId}/characterSelection', [DuoRoomController::class, 'updateCharacterSelection']);
+
 Route::post('/rooms/{roomId}/cancel', [RoomController::class, 'cancelJoin']);
 
 Route::post('/rooms/{roomId}/cancelCreate', [RoomController::class, 'cancelCreate']);
