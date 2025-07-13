@@ -5,6 +5,7 @@ namespace App\Http\Controller;
 use App\Service\PassiveSkillManager;
 use App\Model\Character;
 use App\Model\DuoRoom;
+use App\Model\DuoRoomCharacter;
 use App\Model\Room;
 use App\Model\RoomCharacter;
 use App\Model\RoomLog;
@@ -879,6 +880,112 @@ public function joinCoHost(Request $request)
             'message' => 'コホスト参加に失敗しました',
             'error'   => $e->getMessage(),
         ], 500);
+    }
+}
+
+ public function getCharacterSelection(Request $request, $roomId)
+{
+    $userId = $request->query('userId');
+
+    $room = DuoRoom::with(['characters.character'])->findOrFail($roomId);
+
+    if (!in_array($userId, [
+        $room->hostUserId,
+        $room->coHostUserId,
+        $room->guestUserId,
+        $room->coGuestUserId,
+    ])) {
+        return response()->json(['message' => 'このルームにアクセスする権限がありません'], 403);
+    }
+
+    // 選択済みキャラ
+    $selected = $room->characters
+        ->where('userId', $userId)
+        ->values();
+
+    // 所有キャラ一覧
+    $available = UserCharacter::with('character')
+        ->where('userId', $userId)
+        ->get();
+
+    return response()->json([
+        'available' => $available,
+        'selected' => $selected,
+        'canSelectMore' => $selected->count() < 3,
+        'selectedCount' => $selected->count(),
+    ]);
+}
+
+
+    public function updateCharacterSelection(Request $request, $teamRoomId)
+{
+    $userId = $request->input('userId');
+    $characterId = $request->input('characterId');
+    $action = $request->input('action'); // 'select' or 'deselect'
+
+    $room = DuoRoom::findOrFail($teamRoomId);
+
+    // チーム所属確認
+    if (!in_array($userId, [$room->hostUserId, $room->coHostUserId])) {
+        return response()->json(['message' => 'このチームに所属していません'], 403);
+    }
+
+    try {
+        if ($action === 'select') {
+            $count = DuoRoomCharacter::where('teamRoomId', $teamRoomId)
+                ->where('userId', $userId)
+                ->count();
+
+            if ($count >= 3) {
+                return response()->json(['message' => 'キャラは最大3体まで選択可能です'], 400);
+            }
+
+            // 所有キャラ確認
+            UserCharacter::where('userId', $userId)
+                ->where('characterId', $characterId)
+                ->firstOrFail();
+
+            // 重複確認
+            $exists = DuoRoomCharacter::where('teamRoomId', $teamRoomId)
+                ->where('userId', $userId)
+                ->where('characterId', $characterId)
+                ->exists();
+
+            if ($exists) {
+                return response()->json(['message' => 'すでに選択済みのキャラです'], 409);
+            }
+
+            DuoRoomCharacter::create([
+                'teamRoomId'   => $teamRoomId,
+                'userId'       => $userId,
+                'characterId'  => $characterId,
+                'level'        => 1,
+                'life'         => 0,
+                'power'        => 0,
+                'speed'        => 0,
+                'evasion'      => 0,
+                'critical'     => 0,
+                'isActive'     => true,
+                'isDead'       => false,
+                'blockCount'   => 0,
+                'confusionCount' => 0,
+                'poisonCount'  => 0,
+                'specialSkillTurn' => 0,
+                'specialUsed'  => false,
+                'isErrorMode'  => false,
+            ]);
+        } elseif ($action === 'deselect') {
+            DuoRoomCharacter::where('teamRoomId', $teamRoomId)
+                ->where('userId', $userId)
+                ->where('characterId', $characterId)
+                ->delete();
+        } else {
+            return response()->json(['message' => 'action は select または deselect を指定してください'], 400);
+        }
+
+        return response()->json(['message' => 'キャラ選択を更新しました'], 200);
+    } catch (Exception $e) {
+        return response()->json(['message' => $e->getMessage()], 500);
     }
 }
 
