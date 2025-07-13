@@ -1,131 +1,171 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Loading from "~/components/Loading";
-import Pending from "~/components/Pending";
-import type { Room } from "~/type/room";
-import Battle from "~/components/Battle";
-import Victory from "~/components/Victory";
-import Defeat from "~/components/Defeat";
-import JoinLoading from "~/components/JoinLoading";
-import CreateLoading from "~/components/CreateLoading";
+import { useParams } from "next/navigation";
 
-type Props = {
-	user: { id: string; name: string; rating: number } | null;
+type Character = {
+	id: string;
+	name: string;
 };
 
-export default function RoomDetailClient({ user }: Props) {
+type SelectedCharacter = {
+	id: string;
+	name: string;
+	level: number;
+};
+
+type Props = {
+	userId: string;
+	availableCharacters: Character[]; // 外部から取得・受け渡し済み
+};
+
+export default function DuoRoomCharacterSelectionClient({
+	userId,
+	availableCharacters,
+}: Props) {
 	const { roomId } = useParams();
-	const [room, setRoom] = useState<Room | null>(null);
-	const router = useRouter();
+	const [selected, setSelected] = useState<SelectedCharacter[]>([]);
+	const [selection, setSelection] = useState<{
+		selected: SelectedCharacter[];
+		teammateSelected: SelectedCharacter[];
+	}>({
+		selected: [],
+		teammateSelected: [],
+	});
+
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		if (!roomId || !user) return;
+		if (!roomId || !userId) return;
 
-		const fetchRoom = async () => {
+		const fetchSelectedCharacters = async () => {
 			try {
 				const res = await fetch(
-					`${process.env.NEXT_PUBLIC_BASE_URL}/api/${user.id}/${roomId}/status`,
-					{
-						headers: { "Content-Type": "application/json" },
-					},
+					`${process.env.NEXT_PUBLIC_BASE_URL}/api/duoRooms/${roomId}/characterSelection?userId=${userId}`,
+					{ headers: { "Content-Type": "application/json" } },
 				);
-				const data = await res.json();
+				const data: SelectedCharacter[] = await res.json();
 
-				if (
-					data.message === "このルームにアクセスする権限がありません" ||
-					data.message === "指定されたルームが見つかりません"
-				) {
-					router.push("/rooms");
-					return;
-				}
-				if (data.status === "finish") {
-					clearInterval(interval);
-					setRoom((prevRoom) => ({
-						...prevRoom,
-						...data,
-						status: "battling",
-						currentTurnUserId: null,
-					}));
-					setTimeout(() => {
-						setRoom(data);
-					}, 2000);
-				} else {
-					setRoom(data);
-				}
+				console.info("選択キャラ", data.selected);
+
+				setSelection(data);
 			} catch (e) {
-				console.log(e);
+				console.error("選択キャラ取得失敗", e);
 			}
 		};
-		fetchRoom();
 
-		const interval = setInterval(fetchRoom, 1000);
+		fetchSelectedCharacters();
+		const interval = setInterval(fetchSelectedCharacters, 1000);
 		return () => clearInterval(interval);
-	}, [roomId, user, router]);
+	}, [roomId, userId]);
 
-	// ルーム作成のキャンセル処理
-	const handleCancelCreate = async () => {
+	const canSelectMore = selected.length < 3;
+
+	const handleSelect = async (characterId: string) => {
+		if (!roomId || !userId || !canSelectMore) return;
+		setLoading(true);
 		try {
 			const res = await fetch(
-				`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/${roomId}/cancelCreate`,
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/duoRooms/${roomId}/characterSelection`,
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ hostUserId: user?.id }),
+					body: JSON.stringify({
+						userId,
+						characterId,
+						action: "select",
+					}),
 				},
 			);
-			const data = await res.json();
-			if (res.ok) {
-				router.push("/rooms"); // ルーム一覧に戻る
-			} else {
-				console.error(data.message);
+			if (!res.ok) {
+				const data = await res.json();
+				alert(data.message ?? "選択に失敗しました");
 			}
 		} catch (e) {
-			console.error("キャンセルに失敗しました", e);
+			console.error("選択エラー", e);
+		} finally {
+			setLoading(false);
 		}
 	};
 
-	// キャンセル処理
-	const handleCancelJoin = async () => {
+	const handleDeselect = async (characterId: string) => {
+		if (!roomId || !userId) return;
+		setLoading(true);
 		try {
 			const res = await fetch(
-				`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/${roomId}/cancel`,
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/duoRooms/${roomId}/characterSelection`,
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ guestUserId: user?.id }),
+					body: JSON.stringify({
+						userId,
+						characterId,
+						action: "deselect",
+					}),
 				},
 			);
-			const data = await res.json();
-			if (res.ok) {
-				setRoom(data); // ルーム状態を更新
-				router.push("/rooms"); // ルーム一覧に戻る（任意）
-			} else {
-				console.error(data.message);
+			if (!res.ok) {
+				const data = await res.json();
+				alert(data.message ?? "解除に失敗しました");
 			}
 		} catch (e) {
-			console.error("キャンセルに失敗しました", e);
+			console.error("解除エラー", e);
+		} finally {
+			setLoading(false);
 		}
 	};
 
-	if (!user) return <Loading message="認証中" />;
-	if (room == null) return <Loading message="ルーム情報取得中" />;
+	return (
+		<div className="space-y-4 bg-white p-4 rounded shadow">
+			<h2 className="text-lg font-semibold">
+				選択済みキャラクター（{selected.length}/3）
+			</h2>
+			<ul className="space-y-2">
+				{selection.selected.map((char) => (
+					<li key={char.id} className="flex justify-between items-center">
+						<span>
+							{char.name} (Lv{char.level})
+						</span>
+						<button
+							onClick={() => handleDeselect(char.id)}
+							disabled={loading}
+							className="bg-red-500 text-white px-2 py-1 rounded disabled:opacity-50"
+						>
+							−
+						</button>
+					</li>
+				))}
+			</ul>
 
-	return room.status === "waiting" ? (
-		<CreateLoading
-			message="マッチング中"
-			handleCancelCreate={handleCancelCreate}
-		/>
-	) : room.status === "pending" && room.hostUserId === user.id ? (
-		<Pending room={room} setRoom={setRoom} user={user} />
-	) : room.status === "pending" && room.hostUserId !== user.id ? (
-		<JoinLoading message="参加中" handleCancelJoin={handleCancelJoin} />
-	) : room.status === "battling" ? (
-		<Battle room={room} user={user} />
-	) : room.status === "finish" && room.winUserId === user.id ? (
-		<Victory room={room} user={user} />
-	) : (
-		<Defeat room={room} user={user} />
+			<h2>味方が選択したキャラクター</h2>
+			<ul>
+				{selection.teammateSelected.map((char) => (
+					<li key={char.id}>
+						{char.name} (Lv{char.level})
+					</li>
+				))}
+			</ul>
+
+			<h2 className="text-lg font-semibold">選択可能キャラクター</h2>
+			<ul className="grid grid-cols-2 gap-2">
+				{availableCharacters.map((char, i) => {
+					const isSelected = selected.some((s) => s.id === char.id);
+
+					console.info("キャラクター", char, "選択済み:", isSelected);
+					return (
+						<li key={i} className="flex justify-between items-center">
+							<span>{char.name}</span>
+							<button
+								onClick={() => handleSelect(char.characterId)}
+								disabled={loading || !canSelectMore || isSelected}
+								className="bg-blue-500 text-white px-2 py-1 rounded disabled:opacity-50"
+							>
+								＋
+							</button>
+						</li>
+					);
+				})}
+			</ul>
+		</div>
 	);
 }

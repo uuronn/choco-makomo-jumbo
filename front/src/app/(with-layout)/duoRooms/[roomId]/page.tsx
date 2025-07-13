@@ -1,14 +1,23 @@
 import { cookies } from "next/headers";
-import RoomDetailClient from "./_components/RoomDetailClient";
 import { getTokenFromCookies } from "~/utils/token";
 import { fetchUserFromToken } from "~/lib/user";
+import DuoRoomCharacterSelectionClient from "./_components/RoomDetailClient";
+import { getCharaList } from "../../characters/charaList";
+import type { Character } from "~/type/character";
 
 export default async function RoomDetailPage() {
 	const cookieStore = await cookies();
 	const token = getTokenFromCookies(cookieStore);
 	const user = await fetchUserFromToken(token);
 
-	<div>{user.id}</div>;
+	const userCharacterList: Character[] = await getCharaList();
 
-	// return <RoomDetailClient user={user} />;
+	// <div>{user.id}</div>;
+
+	return (
+		<DuoRoomCharacterSelectionClient
+			userId={user.id}
+			availableCharacters={userCharacterList}
+		/>
+	);
 }
