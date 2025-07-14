@@ -9,6 +9,7 @@ import {
 	GitBranch,
 	Users,
 	FileCode,
+	GithubIcon,
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
@@ -42,7 +43,7 @@ export default function GithubGachaInfo({
 						<div className="bg-gradient-to-r from-green-900/80 to-green-700/80 p-4 relative">
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-2">
-									<Github className="h-5 w-5 text-green-300" />
+									<GithubIcon className="h-5 w-5 text-green-300" />
 									<h2 className="text-xl font-bold text-green-300 tracking-wider">
 										GitHub技術ガチャとは
 									</h2>
