@@ -39,7 +39,6 @@ export default function GithubGachaInfo({
 						exit={{ scale: 0.9, y: 20 }}
 						onClick={(e) => e.stopPropagation()}
 					>
-						{/* Header */}
 						<div className="bg-gradient-to-r from-green-900/80 to-green-700/80 p-4 relative">
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-2">
