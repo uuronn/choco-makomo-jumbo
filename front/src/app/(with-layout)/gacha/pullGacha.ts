@@ -10,7 +10,6 @@ export const pullGacha = async () => {
 
 	const user = await fetchUserFromToken(token);
 
-	// if (availablePoints < 10) return;
 
 	// setAvailablePoints((prev) => prev - 10);
 	// setIsAnimating(true);
