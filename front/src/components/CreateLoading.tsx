@@ -36,7 +36,7 @@ export default function CreateLoading({
 					<button
 						type="button"
 						onClick={handleCancelCreate}
-						className="mt-12 px-6 py-2 bg-transparent border-2 border-emerald-500 text-emerald-400 rounded-md hover:bg-emerald-900/30 hover:text-emerald-300 transition-all duration-300 font-mono tracking-wide relative overflow-hidden group"
+						className="mt-12 px-6 py-2 bg-transparent border-2 border-emerald-500 text-emerald-400 rounded-md hover:bg-emerald-900/30 hover:text-emerald-300 transition-all duration-300 font-mono tracking-wide relative overflow-hidden group cursor-pointer"
 					>
 						<span className="relative z-10">ルームを閉じる</span>
 						<span className="absolute inset-0 bg-emerald-500/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></span>

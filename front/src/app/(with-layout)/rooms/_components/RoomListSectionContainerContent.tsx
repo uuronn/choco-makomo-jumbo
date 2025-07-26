@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BotIcon, Plus, UserIcon } from "lucide-react";
+import { BotIcon, Loader2Icon, Plus, UserIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "~/components/ui/button";
@@ -22,6 +22,7 @@ type Props = {
 export const RoomListSectionContainerContent = ({ user, token }: Props) => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
+	const [isLoading, setIsLoading] = useState(false);
 	// const [rooms, setRooms] = useState<any[]>([]);
 
 	// const isButtonDisabled = !(searchParams.get("chars")?.length > 0);
@@ -55,25 +56,32 @@ export const RoomListSectionContainerContent = ({ user, token }: Props) => {
 	console.info("user", user);
 
 	const createRoom = async () => {
-		if (!user) return;
+		if (!user || characterIdList.length === 0) return;
 
-		const res = await fetch(
-			`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/create`,
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
+		setIsLoading(true);
+		try {
+			const res = await fetch(
+				`${process.env.NEXT_PUBLIC_BASE_URL}/api/rooms/create`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({
+						hostUserId: user.id,
+						characterIdList,
+					}),
 				},
-				body: JSON.stringify({
-					hostUserId: user.id,
-					characterIdList,
-				}),
-			},
-		);
+			);
 
-		const data = await res.json();
-		router.push(`/rooms/${data.id}`);
+			const data = await res.json();
+			router.push(`/rooms/${data.id}`);
+		} catch (e) {
+			console.error("ルーム作成エラー:", e);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const joinRoom = async (room: {
@@ -107,12 +115,12 @@ export const RoomListSectionContainerContent = ({ user, token }: Props) => {
 				<div className="flex mb-2 gap-2">
 					<Button
 						onClick={handleRefresh}
-						className="bg-green-400 text-black hover:bg-green-500 text-sm"
+						className="bg-green-400 text-black hover:bg-green-500 text-sm cursor-pointer"
 					>
 						更新
 					</Button>
 
-					<Button className="text-sm bg-black/30 border-green-400/30 text-green-400 hover:bg-green-400/20">
+					<Button className="text-sm bg-black/30 border-green-400/30 text-green-400 hover:bg-green-400/20 cursor-pointer">
 						<BotIcon className="h-4 w-4" /> CPU対戦
 					</Button>
 
@@ -127,10 +135,19 @@ export const RoomListSectionContainerContent = ({ user, token }: Props) => {
 					<Button
 						onClick={createRoom}
 						variant="outline"
-						className="w-[calc(50%-10px)] bg-green-400 text-black hover:bg-green-500 text-sm h-9"
-						// disabled={isButtonDisabled}
+						className="w-[calc(50%-10px)] bg-green-400 text-black hover:bg-green-500 text-sm h-9 cursor-pointer"
+						disabled={characterIdList.length === 0 || isLoading}
 					>
-						<Plus className="mr-1 h-4 w-4" /> ルーム作成
+						{isLoading ? (
+							<>
+								<Loader2Icon className="mr-1 h-4 w-4 animate-spin" /> 作成中…
+							</>
+						) : (
+							<>
+								<Plus className="mr-1 h-4 w-4" /> ルーム作成
+							</>
+						)}
+						{/* <Plus className="mr-1 h-4 w-4" /> ルーム作成 */}
 					</Button>
 				</div>
 			</div>
