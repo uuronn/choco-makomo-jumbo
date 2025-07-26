@@ -22,7 +22,7 @@ export default function RootLayout({
 				<title>技術大戦争</title>
 			</head>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black`}
+				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
 				{children}
 			</body>
