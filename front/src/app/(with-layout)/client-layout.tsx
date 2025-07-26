@@ -29,6 +29,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
 	return (
 		<div ref={layoutRef} className="bg-red-200 min-h-screen">
+			{/* SP版でこれが出現する */}
 			<div className="h-[40px] bg-red-600">test</div>
 			<div className="bg-red-200 p-4">
 				<p>Width: {dimensions.width}px</p>
