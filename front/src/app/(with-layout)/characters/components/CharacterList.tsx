@@ -21,7 +21,6 @@ export default async function CharacterList() {
 						tabIndex={0}
 						role="button"
 						href={`/characters/${character.characterId}`}
-						prefetch
 						key={character.characterId}
 					>
 						<CharacterCard character={character} />
