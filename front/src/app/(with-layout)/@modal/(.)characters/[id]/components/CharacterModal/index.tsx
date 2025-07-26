@@ -40,13 +40,13 @@ export const CharacterModal = ({
 	return (
 		<Modal>
 			<div className="flex md:flex-row min-h-fit gap-2">
-				<div className="flex flex-col items-center justify-around">
+				<div className="flex flex-col items-center justify-start">
 					<CharacterImage
 						character={character}
 						isErrorState={isErrorState}
 						canvasRef={canvasRef}
 					/>
-					<p className="text-md font-bold text-green-400">
+					<p className="text-md mt-auto mb-4 font-bold text-green-400">
 						{character.name}【Lv.{character.level}】
 					</p>
 				</div>
