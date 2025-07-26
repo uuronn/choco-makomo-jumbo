@@ -21,6 +21,7 @@ export default function RootLayout({
 			<head>
 				<title>技術大戦争</title>
 				<meta name="mobile-web-app-capable" content="yes" />
+				<meta name="apple-mobile-web-app-capable" content="yes" />
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
