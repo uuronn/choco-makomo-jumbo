@@ -30,7 +30,7 @@ export function FooterNavigation({
 	const pathname = usePathname();
 
 	useEffect(() => {
-		if (pathname === "/") {
+		if (pathname === "/" || pathname === "/home") {
 			setActiveItem("home");
 		} else if (pathname === "/rooms") {
 			setActiveItem("battle");
@@ -40,8 +40,14 @@ export function FooterNavigation({
 			setActiveItem("gacha");
 		} else if (pathname === "/miniGame") {
 			setActiveItem("miniGame");
+		} else if (pathname === "/ranking") {
+			setActiveItem("ranking");
+		} else if (pathname === "/other") {
+			setActiveItem("other");
 		}
 	}, [pathname]);
+
+	console.info("Active Item:", activeItem);
 
 	const navItems: NavItem[] = [
 		{
@@ -95,7 +101,7 @@ export function FooterNavigation({
 	return (
 		<nav
 			className={cn(
-				"fixed bottom-0 left-0 right-0 bg-black/90 z-50 p-2",
+				"fixed bottom-0 left-0 right-0 bg-black/90 z-50 p-1.5",
 				className,
 			)}
 		>
@@ -104,13 +110,15 @@ export function FooterNavigation({
 					<li
 						key={item.title}
 						onClick={() => router.push(item.href)}
-						className="flex w-[64px] flex-col items-center text-emerald-400 group hover:text-emerald-300 cursor-pointer"
+						className={cn(
+							"flex w-[64px] flex-col items-center text-emerald-400 group hover:text-emerald-300 cursor-pointer p-0.5",
+							item.isActive && "bg-emerald-400/10 rounded-lg",
+						)}
 						onKeyDown={() => {}}
 					>
 						<div
 							className={cn(
-								"flex h-8 w-8 items-center justify-center rounded-md bg-black/50",
-								item.isActive && "text-emerald-300",
+								"flex h-8 w-8 items-center justify-center rounded-md",
 							)}
 						>
 							{item.icon}

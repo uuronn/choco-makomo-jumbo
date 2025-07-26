@@ -33,7 +33,7 @@ export default async function PcHomeScreen({ user }: Props) {
 				<div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse-line-vertical" />
 			</div> */}
 
-			<div className="w-full max-w-2xl bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden relative z-10 h-[75vh] md:h-[600px]">
+			<div className="w-full flex h-full flex-col max-w-2xl bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden relative z-10 max-h-[75vh] md:h-[600px]">
 				{/* User Profile */}
 				<div className="border-b border-green-500/30 bg-black/50 p-2">
 					<div className="flex flex-col">
@@ -67,7 +67,7 @@ export default async function PcHomeScreen({ user }: Props) {
 									</div>
 								</div>
 								{/* 下部：称号と技術力 */}
-								<div className="mt-3 flex flex-wrap gap-3">
+								<div className="m-auto mr-0 flex flex-wrap gap-3">
 									{/* 称号表示 */}
 									<div
 										className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md border ${ratingTitle.bgColor} ${ratingTitle.borderColor} ${ratingTitle.glowColor} relative overflow-hidden animate-fade-in-scale`}
@@ -95,7 +95,7 @@ export default async function PcHomeScreen({ user }: Props) {
 					</div>
 				</div>
 
-				<div className="p-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+				<div className="p-2 grid grid-cols-1 sm:grid-cols-2 gap-2 h-full">
 					{NAV_ITEMS.map((item) => (
 						<Link
 							href={item.path}
@@ -104,7 +104,7 @@ export default async function PcHomeScreen({ user }: Props) {
                 relative overflow-hidden group rounded-lg border border-green-500/30
                 transition-all duration-300 hover:shadow-[0_0_15px_rgba(0,255,128,0.3)]
                 hover:border-green-400/50
-				h-[68px]
+				
 				
               `}
 						>
@@ -155,7 +155,7 @@ export default async function PcHomeScreen({ user }: Props) {
 					</div>
 
 					{/* フッターナビゲーション */}
-					<div className="mt-3 flex justify-center gap-4">
+					{/* <div className="mt-3 flex justify-center gap-4">
 						{FOOTER_ITEMS.map((item) => (
 							<Link
 								key={item.id}
@@ -166,12 +166,12 @@ export default async function PcHomeScreen({ user }: Props) {
 								<span className="text-sm">{item.title}</span>
 							</Link>
 						))}
-					</div>
+					</div> */}
 				</div>
 			</div>
 
 			{/* Tech decorations around the card */}
-			<div className="absolute bottom-4 left-4 text-green-500/30 font-mono text-xs">
+			{/* <div className="absolute bottom-4 left-4 text-green-500/30 font-mono text-xs">
 				<div>SYS:ONLINE</div>
 			</div>
 
@@ -179,7 +179,7 @@ export default async function PcHomeScreen({ user }: Props) {
 				<div className="flex items-center gap-1">
 					<div className="w-1 h-1 bg-green-500 rounded-full" />
 				</div>
-			</div>
+			</div> */}
 		</div>
 	);
 }
