@@ -18,7 +18,7 @@ export const CharacterImage = ({
 }: Props) => {
 	return (
 		<div
-			className="relative w-32 h-32 md:w-64 md:h-64 mb-2 border-2 rounded-lg overflow-hidden shadow-lg"
+			className="relative w-40 h-40 md:w-64 md:h-64 mb-2 border-2 rounded-lg overflow-hidden shadow-lg"
 			style={{
 				boxShadow: isErrorState
 					? "0 0 15px rgba(239, 68, 68, 0.7)"

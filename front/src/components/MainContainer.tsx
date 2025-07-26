@@ -8,7 +8,7 @@ type Props = {
 export const MainContainer = ({ title, icon, children }: Props) => {
 	return (
 		<div
-			className="h-[calc(100vh-76px)] p-4"
+			className="p-4"
 			// style={{
 			// 	backgroundImage: `
 			// 		radial-gradient(rgba(16, 185, 129, 0.15) 1px, transparent 1px),
@@ -18,7 +18,7 @@ export const MainContainer = ({ title, icon, children }: Props) => {
 			// 	backgroundSize: "20px 20px, 20px 20px, 20px 20px, 20px 20px",
 			// }}
 		>
-			<div className="container mx-auto p-4 flex flex-col h-[calc(100vh-104px)]">
+			<div className="container mx-auto p-0 pb-4 flex flex-col h-[calc(100vh-84px)]">
 				<h1 className="gap-3 text-2xl font-bold mb-4 text-green-400 flex items-center">
 					{icon}
 					{title}

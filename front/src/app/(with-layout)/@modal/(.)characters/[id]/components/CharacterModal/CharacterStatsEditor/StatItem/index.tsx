@@ -8,8 +8,8 @@ type Props = {
 
 export const StatItem = ({ icon, label, value }: Props) => {
 	return (
-		<div className="flex h-[42px] items-center bg-gray-800/80 p-2 rounded-md border border-emerald-500/30 whitespace-nowrap text-sm">
-			<div className="flex items-center w-36 text-green-200 gap-1">
+		<div className="flex h-[34px] items-center bg-gray-800/80 p-1 rounded-md border border-emerald-500/30 whitespace-nowrap text-[10px]">
+			<div className="flex items-center w-26 text-green-200 gap-1">
 				{icon}
 				{label}：
 			</div>

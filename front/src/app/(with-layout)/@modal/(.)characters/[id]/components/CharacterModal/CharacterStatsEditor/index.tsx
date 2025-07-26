@@ -31,8 +31,8 @@ export const CharacterStatsEditor = ({
 	handleDevelop,
 }: Props) => {
 	return (
-		<div className="flex-1 bg-gray-800/50 rounded-md border border-emerald-500/30 p-3">
-			<div className="space-y-2">
+		<div className="flex-1 bg-gray-800/50 rounded-md border border-emerald-500/30 p-1">
+			<div className="space-y-1">
 				<EditableStatItem
 					label="HP"
 					icon={<HeartIcon className="h-4 w-4 text-green-300 mr-1" />}
@@ -76,7 +76,7 @@ export const CharacterStatsEditor = ({
 			</div>
 
 			<Button
-				className="mt-4 w-full bg-emerald-500 text-gray-900 hover:bg-green-400 font-bold cursor-pointer"
+				className="mt-2 flex w-full text-[12px] bg-emerald-500 text-gray-900 hover:bg-green-400 font-bold cursor-pointer"
 				style={{ boxShadow: "0 0 8px rgba(16, 185, 129, 0.5)" }}
 				onClick={handleDevelop}
 				disabled={usedPoints === 0}

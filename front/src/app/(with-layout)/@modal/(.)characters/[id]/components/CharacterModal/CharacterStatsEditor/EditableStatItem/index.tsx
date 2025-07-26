@@ -25,16 +25,16 @@ export const EditableStatItem = ({
 	canDecrement,
 }: Props) => {
 	return (
-		<div className="flex items-center justify-between bg-gray-800/80 p-2 rounded-md border border-emerald-500/30">
-			<div className="flex items-center whitespace-nowrap text-sm">
-				<div className="flex items-center w-36 text-green-200 gap-1">
+		<div className="flex items-center justify-between bg-gray-800/80 p-1 rounded-md border border-emerald-500/30">
+			<div className="flex items-center whitespace-nowrap text-[10px]">
+				<div className="flex items-center w-26 text-green-200 gap-1">
 					{icon}
 					{label}：
 				</div>
 				<div className="text-green-400 font-medium flex items-center gap-1">
 					{baseValue}
 					{addedPoints > 0 && (
-						<span className="text-emerald-400 text-xs">{` (+${addedPoints})`}</span>
+						<span className="text-emerald-400 text-[10px]">{` (+${addedPoints})`}</span>
 					)}
 				</div>
 			</div>

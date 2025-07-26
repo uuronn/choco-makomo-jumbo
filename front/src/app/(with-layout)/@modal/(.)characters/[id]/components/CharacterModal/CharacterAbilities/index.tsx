@@ -38,8 +38,8 @@ const typeColors: Record<CharacterType, string> = {
 
 export const CharacterAbilities = ({ character }: Props) => {
 	return (
-		<div className="flex-1 p-3 rounded-md border border-emerald-500/30 overflow-y-scroll space-y-3">
-			<div className="flex items-center gap-1 text-sm">
+		<div className="flex-1 p-2 rounded-md border border-emerald-500/30 overflow-y-scroll space-y-2">
+			<div className="flex items-center gap-1 text-xs">
 				<LayersIcon className="h-4 w-4 text-emerald-400" />
 				<span className="font-bold">タイプ：</span>
 				<p
@@ -50,34 +50,34 @@ export const CharacterAbilities = ({ character }: Props) => {
 					{character.type}
 				</p>
 			</div>
-			<div className="text-sm">
+			<div className="text-xs">
 				<HandshakeIcon className="inline h-4 w-4 text-sky-400 mr-1" />
-				パーティスキル: {character.partySkillName || "null"}
+				パーティスキル： {character.partySkillName || "null"}
 				{character.partySkillDescription && (
-					<div className="text-xs text-gray-300 ml-5">
+					<div className="text-[10px] text-gray-300 ml-5">
 						{character.partySkillDescription}
 					</div>
 				)}
 				{character.partySkillCondition && (
-					<div className="text-xs text-gray-300 ml-5">
+					<div className="text-[10px] text-gray-300 ml-5">
 						{character.partySkillCondition}
 					</div>
 				)}
 			</div>
-			<div className="text-sm">
+			<div className="text-xs">
 				<ActivityIcon className="inline h-4 w-4 text-blue-300 mr-1" />
 				パッシブスキル: {character.passiveSkillName || "null"}
 				{character.passiveSkillDescription && (
-					<div className="text-xs text-gray-300 ml-5">
+					<div className="text-[10px] text-gray-300 ml-5">
 						{character.passiveSkillDescription}
 					</div>
 				)}
 			</div>
-			<div className="text-sm">
+			<div className="text-xs">
 				<SparklesIcon className="inline h-4 w-4 text-orange-300 mr-1" />
 				スペシャルスキル: {character.specialSkillName || "null"}
 				{character.specialSkillDescription && (
-					<div className="text-xs text-gray-300 ml-5">
+					<div className="text-[10px] text-gray-300 ml-5">
 						{character.specialSkillDescription}
 						{character.specialSkillTurn && (
 							<div className="text-yellow-200">
