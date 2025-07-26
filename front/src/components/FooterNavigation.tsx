@@ -112,7 +112,7 @@ export function FooterNavigation({
 						onClick={() => router.push(item.href)}
 						className={cn(
 							"flex w-[64px] flex-col items-center text-emerald-400 group hover:text-emerald-300 cursor-pointer p-0.5",
-							item.isActive && "bg-emerald-400/10 rounded-lg",
+							item.isActive && "bg-green-400/40 rounded-lg",
 						)}
 						onKeyDown={() => {}}
 					>
