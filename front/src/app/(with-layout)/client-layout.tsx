@@ -7,19 +7,23 @@ import { MatrixRainCanvas } from "../_components/MatrixRainCanvas";
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
 	const layoutRef = useRef<HTMLDivElement>(null);
-	const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+	const [dimensions, setDimensions] = useState<{
+		width: number;
+		height: number;
+	}>({ width: 0, height: 0 });
 
 	useEffect(() => {
+		if (!layoutRef.current) return;
+
 		const resize = () => {
-			if (!layoutRef.current) return;
 			setDimensions({
-				width: layoutRef.current.clientWidth,
-				height: layoutRef.current.clientHeight,
+				width: layoutRef.current?.clientWidth || 0,
+				height: layoutRef.current?.clientHeight || 0,
 			});
 		};
 
-		resize();
-		window.addEventListener("resize", resize);
+		resize(); // 初期取得
+		window.addEventListener("resize", resize); // リサイズ時にも反映
 		return () => window.removeEventListener("resize", resize);
 	}, []);
 
