@@ -10,16 +10,16 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 	const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
 	useEffect(() => {
-		if (!layoutRef.current) return;
 		const resize = () => {
+			if (!layoutRef.current) return;
 			setDimensions({
-				width: layoutRef.current!.clientWidth,
-				height: layoutRef.current!.clientHeight,
+				width: layoutRef.current.clientWidth,
+				height: layoutRef.current.clientHeight,
 			});
 		};
 
-		resize(); // 初期取得
-		window.addEventListener("resize", resize); // リサイズ時にも反映
+		resize();
+		window.addEventListener("resize", resize);
 		return () => window.removeEventListener("resize", resize);
 	}, []);
 
