@@ -46,9 +46,9 @@ export default function DuoRoomCharacterSelectionClient({
 				);
 				const data: SelectedCharacter[] = await res.json();
 
-				console.info("選択キャラ", data.selected);
+				// console.info("選択キャラ", data.selected);
 
-				setSelection(data);
+				// setSelection(data);
 			} catch (e) {
 				console.error("選択キャラ取得失敗", e);
 			}
@@ -155,13 +155,13 @@ export default function DuoRoomCharacterSelectionClient({
 					return (
 						<li key={i} className="flex justify-between items-center">
 							<span>{char.name}</span>
-							<button
+							{/* <button
 								onClick={() => handleSelect(char.characterId)}
 								disabled={loading || !canSelectMore || isSelected}
 								className="bg-blue-500 text-white px-2 py-1 rounded disabled:opacity-50"
 							>
 								＋
-							</button>
+							</button> */}
 						</li>
 					);
 				})}

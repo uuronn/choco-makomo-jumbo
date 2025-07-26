@@ -150,7 +150,8 @@ export const DuoRoomListSectionContainerContent = ({ user, token }: Props) => {
 								role="button"
 								onClick={() => joinRoom(room)}
 							>
-								<div className="relative h-[90px] w-full flex items-center justify-center">
+								<p>test</p>
+								{/* <div className="relative h-[90px] w-full flex items-center justify-center">
 									<Image
 										src={room.hostUserId || "/placeholder.svg"}
 										alt={room.id}
@@ -163,7 +164,7 @@ export const DuoRoomListSectionContainerContent = ({ user, token }: Props) => {
 									<h4 className="font-bold text-green-400 text-sm">
 										{room.hostUserId}
 									</h4>
-								</div>
+								</div> */}
 							</div>
 						),
 					)}
