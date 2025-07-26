@@ -35,9 +35,9 @@ export default function FullscreenButton() {
 		<button
 			type="button"
 			onClick={handleClick}
-			className="px-4 py-2 bg-black text-white rounded"
+			className="bg-black text-white rounded text-sm"
 		>
-			フルスクリーンで始める
+			フルスクリーン
 		</button>
 	);
 }
