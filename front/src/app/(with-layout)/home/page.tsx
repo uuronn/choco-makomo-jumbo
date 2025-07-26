@@ -5,6 +5,15 @@ import { fetchUserFromToken } from "~/lib/user";
 // import SpHomeScreen from "./components/sp";
 import PcHomeScreen from "./components/pc";
 
+export async function generateMetadata() {
+	return {
+		other: {
+			"mobile-web-app-capable": "yes",
+			"apple-mobile-web-app-capable": "yes",
+		},
+	};
+}
+
 export default async function HomePage() {
 	const cookieStore = await cookies();
 	const token = getTokenFromCookies(cookieStore);
