@@ -12,6 +12,7 @@ import { EditUserName } from "../EditUserName";
 import { FOOTER_ITEMS, NAV_ITEMS } from "../../constant";
 import { getRatingTitle } from "~/lib/getRatingTitle";
 import { Suspense } from "react";
+import FullscreenButton from "../FullscreenButton";
 
 type Props = {
 	user: User;
@@ -52,7 +53,7 @@ export default async function PcHomeScreen({ user }: Props) {
 								</div>
 							</div>
 
-							<div className="flex-1 flex">
+							<div className="flex-1 flex justify-between">
 								<div>
 									{/* 名前表示/編集 */}
 									<EditUserName currentName={user.name} />
@@ -89,6 +90,8 @@ export default async function PcHomeScreen({ user }: Props) {
 											技術力: <span className="font-bold">{user.rating}</span>
 										</span>
 									</div>
+
+									<FullscreenButton />
 								</div>
 							</div>
 						</div>
