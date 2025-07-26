@@ -12,7 +12,6 @@ import { EditUserName } from "../EditUserName";
 import { FOOTER_ITEMS, NAV_ITEMS } from "../../constant";
 import { getRatingTitle } from "~/lib/getRatingTitle";
 import { Suspense } from "react";
-import FullscreenButton from "../FullscreenButton";
 
 type Props = {
 	user: User;
@@ -34,7 +33,7 @@ export default async function PcHomeScreen({ user }: Props) {
 				<div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse-line-vertical" />
 			</div> */}
 
-			<div className="w-full max-w-2xl bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden relative z-10 h-[74vh] md:h-[600px]">
+			<div className="w-full max-w-2xl bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden relative z-10 h-[75vh] md:h-[600px]">
 				{/* User Profile */}
 				<div className="border-b border-green-500/30 bg-black/50 p-2">
 					<div className="flex flex-col">
@@ -90,8 +89,6 @@ export default async function PcHomeScreen({ user }: Props) {
 											技術力: <span className="font-bold">{user.rating}</span>
 										</span>
 									</div>
-
-									<FullscreenButton />
 								</div>
 							</div>
 						</div>

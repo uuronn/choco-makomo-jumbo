@@ -115,7 +115,7 @@ export function FooterNavigation({
 						>
 							{item.icon}
 						</div>
-						<span className="text-xs mt-1">{item.title}</span>
+						<span className="text-xs">{item.title}</span>
 					</li>
 				))}
 			</ul>
