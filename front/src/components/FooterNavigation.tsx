@@ -2,7 +2,14 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import { Home, Swords, Gamepad2Icon, CpuIcon } from "lucide-react";
+import {
+	Home,
+	Swords,
+	Gamepad2Icon,
+	CpuIcon,
+	AlignJustifyIcon,
+	CrownIcon,
+} from "lucide-react";
 import { cn } from "~/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
 import { SlEnergy } from "react-icons/sl";
@@ -67,6 +74,18 @@ export function FooterNavigation({
 			href: "/miniGame",
 			isActive: activeItem === "miniGame",
 		},
+		{
+			title: "ランキング",
+			icon: <CrownIcon className="size-5" />,
+			href: "/ranking",
+			isActive: activeItem === "ranking",
+		},
+		{
+			title: "その他",
+			icon: <AlignJustifyIcon className="size-5" />,
+			href: "/other",
+			isActive: activeItem === "other",
+		},
 	];
 
 	if (pathname === "/auth/signIn" || pathname.startsWith("/rooms/")) {
@@ -76,7 +95,7 @@ export function FooterNavigation({
 	return (
 		<nav
 			className={cn(
-				"fixed bottom-0 left-0 right-0 bg-black/90 z-50 p-3",
+				"fixed bottom-0 left-0 right-0 bg-black/90 z-50 p-2",
 				className,
 			)}
 		>
@@ -85,7 +104,7 @@ export function FooterNavigation({
 					<li
 						key={item.title}
 						onClick={() => router.push(item.href)}
-						className="flex flex-col items-center text-emerald-400 group hover:text-emerald-300 cursor-pointer"
+						className="flex w-[64px] flex-col items-center text-emerald-400 group hover:text-emerald-300 cursor-pointer"
 						onKeyDown={() => {}}
 					>
 						<div
