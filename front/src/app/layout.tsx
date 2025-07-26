@@ -20,6 +20,7 @@ export default function RootLayout({
 		<html lang="ja">
 			<head>
 				<title>技術大戦争</title>
+				<meta name="mobile-web-app-capable" content="yes" />
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
