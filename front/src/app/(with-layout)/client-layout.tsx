@@ -6,7 +6,9 @@ import { FooterNavigation } from "~/components/FooterNavigation";
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
 	const [innerHeight, setInnerHeight] = useState<number | null>(null);
-	const [screenHeight, setScreenHeight] = useState<number | null>(null);
+	const [screenHeight, setScreenHeight] = useState<number | null | undefined>(
+		null,
+	);
 
 	const layoutRef = useRef<HTMLDivElement>(null);
 
