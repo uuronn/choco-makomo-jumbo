@@ -32,7 +32,7 @@ export default async function PcHomeScreen({ user }: Props) {
 				<div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse-line-horizontal" />
 				<div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse-line-vertical" />
 			</div> */}
-			<div className="flex h-full flex-col bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden">
+			<div className="flex h-full flex-col bg-black/80 backdrop-blur-sm rounded-lg shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden">
 				{/* User Profile */}
 				<div className="border-b border-green-500/30 bg-black/50 p-2">
 					<div className="flex flex-col">
@@ -42,8 +42,8 @@ export default async function PcHomeScreen({ user }: Props) {
 								<Image
 									src={user.photoUrl || "/placeholder.svg"}
 									alt="ユーザーアバター"
-									width={40}
-									height={40}
+									width={36}
+									height={36}
 									className="object-cover rounded-full border-2 border-green-500/50"
 								/>
 								<div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full w-4 h-4 flex items-center justify-center">
@@ -59,7 +59,7 @@ export default async function PcHomeScreen({ user }: Props) {
 									{/* 技術ポイント表示 */}
 									<div className="flex items-center gap-2">
 										<DatabaseIcon className="h-4 w-4 text-green-400" />
-										<span className="text-sm text-green-400 font-mono">
+										<span className="text-xs text-green-400 font-mono">
 											技術ポイント:{" "}
 											<span className="font-bold">{user.point}</span>
 										</span>
@@ -140,7 +140,7 @@ export default async function PcHomeScreen({ user }: Props) {
 					))}
 				</div>
 
-				<div className="p-2 border-t border-green-500/30 bg-black/50">
+				<div className="px-2 py-1 border-t border-green-500/30 bg-black/50">
 					<div className="flex justify-between items-center">
 						<div className="text-xs text-green-500/70 font-mono flex items-center gap-2">
 							<div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />

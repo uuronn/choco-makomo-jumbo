@@ -86,7 +86,7 @@ export function EditUserName({ currentName }: Props) {
 				</div> */}
 
 			<div className="flex items-center gap-2 animate-fade-in">
-				<h2 className="text-lg font-bold text-green-300 font-mono">
+				<h2 className="text-md font-bold text-green-300 font-mono">
 					{currentName}
 				</h2>
 				{/* <button
