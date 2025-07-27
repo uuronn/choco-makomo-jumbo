@@ -56,5 +56,5 @@ export const MatrixRainCanvas = () => {
 		};
 	}, []);
 
-	return <canvas ref={canvasRef} className="absolute inset-0 z-0" />;
+	return <canvas ref={canvasRef} className="absolute inset-0 -z-50" />;
 };
