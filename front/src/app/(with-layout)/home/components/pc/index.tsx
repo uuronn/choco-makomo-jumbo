@@ -21,10 +21,10 @@ export default async function PcHomeScreen({ user }: Props) {
 	const ratingTitle = getRatingTitle(user.rating);
 
 	return (
-		<div className="m-auto overflow-hidden">
+		<>
+			{/* <div className="m-auto"> */}
 			{/* Background grid effect */}
 			{/* <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djJoLTJ2LTJoMnptMC00aDJ2MmgtMnYtMnptLTQgMHYyaC0ydi0yaDJ6bTIgMGgydjJoLTJ2LTJ6bS02IDBoMnYyaC0ydi0yem0yLTRoMnYyaC0ydi0yem0yIDBIMzZ2Mmgtc3YtMnptMCA0aDJ2MmgtMnYtMnoiLz48L2c+PC9nPjwvc3ZnPg==')]" /> */}
-
 			{/* Animated circuit lines */}
 			{/* <div className="absolute inset-0 overflow-hidden opacity-20">
 				<div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse-line-horizontal" />
@@ -32,7 +32,6 @@ export default async function PcHomeScreen({ user }: Props) {
 				<div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse-line-horizontal" />
 				<div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse-line-vertical" />
 			</div> */}
-
 			<div className="w-full flex h-full flex-col max-w-2xl bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden relative z-10 max-h-[75vh] md:h-[600px]">
 				{/* User Profile */}
 				<div className="border-b border-green-500/30 bg-black/50 p-2">
@@ -169,7 +168,6 @@ export default async function PcHomeScreen({ user }: Props) {
 					</div> */}
 				</div>
 			</div>
-
 			{/* Tech decorations around the card */}
 			{/* <div className="absolute bottom-4 left-4 text-green-500/30 font-mono text-xs">
 				<div>SYS:ONLINE</div>
@@ -180,6 +178,7 @@ export default async function PcHomeScreen({ user }: Props) {
 					<div className="w-1 h-1 bg-green-500 rounded-full" />
 				</div>
 			</div> */}
-		</div>
+			{/* </div> */}
+		</>
 	);
 }
