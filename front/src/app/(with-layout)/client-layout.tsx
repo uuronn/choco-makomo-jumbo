@@ -16,6 +16,14 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 		setScreenHeight(window.screen.width);
 	}, []);
 
+	useEffect(() => {
+		if (layoutRef.current && screenHeight && innerHeight) {
+			const calcHeight = screenHeight - innerHeight - 64;
+
+			layoutRef.current.style.height = `${calcHeight}px`;
+		}
+	}, [screenHeight, innerHeight]);
+
 	return (
 		<SnackbarProvider
 			anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -26,7 +34,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
 			{/* Layout container */}
 			{/* Using ref to potentially manipulate layout later if needed */}
-			<div ref={layoutRef} className="flex flex-col h-screen">
+			<div ref={layoutRef} className="flex flex-col">
 				<div className="h-full flex justify-center">{children}</div>
 				<FooterNavigation />
 			</div>
