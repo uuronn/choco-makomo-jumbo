@@ -13,7 +13,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		setInnerHeight(window.innerHeight);
 		// 横画面のため、横幅を高さに置き換える
-		setScreenHeight(window.screen.width);
+		setScreenHeight(window.visualViewport?.height);
 	}, []);
 
 	useEffect(() => {
@@ -21,9 +21,15 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 			// 高さを計算して設定
 			// 画面の高さからinnerHeightとフッターメニューの高さを引いて計算
 			// フッターメニューの高さは64px
-			const calcHeight = screenHeight - innerHeight - 64;
+			const calcHeight = screenHeight - innerHeight;
 
-			layoutRef.current.style.height = `${calcHeight}px`;
+			const height = screenHeight - calcHeight;
+
+			console.info("Inner Height:", innerHeight);
+			console.info("Screen Height:", screenHeight);
+			console.info("Calculated Height:", calcHeight);
+			console.info("Layout Height:", height);
+			layoutRef.current.style.height = `${height}px`;
 		}
 	}, [screenHeight, innerHeight]);
 
@@ -37,10 +43,13 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
 			{/* Layout container */}
 			{/* Using ref to potentially manipulate layout later if needed */}
-			<div ref={layoutRef} className="flex flex-col">
-				<div className="h-full flex justify-center">{children}</div>
+			{/* <div ref={layoutRef} className="flex flex-col"> */}
+			<div ref={layoutRef} className="flex-col flex justify-center">
+				{children}
+
 				<FooterNavigation />
 			</div>
+			{/* </div> */}
 		</SnackbarProvider>
 	);
 }
