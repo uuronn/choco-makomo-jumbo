@@ -32,7 +32,7 @@ export default async function PcHomeScreen({ user }: Props) {
 				<div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500 to-transparent animate-pulse-line-horizontal" />
 				<div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-green-500 to-transparent animate-pulse-line-vertical" />
 			</div> */}
-			<div className="flex h-full flex-col bg-black/80 backdrop-blur-sm rounded-xl shadow-[0_0_15px_rgba(0,255,128,0.3)] border border-green-500/30 overflow-hidden">
+			<div className="">
 				{/* User Profile */}
 				<div className="border-b border-green-500/30 bg-black/50 p-2">
 					<div className="flex flex-col">

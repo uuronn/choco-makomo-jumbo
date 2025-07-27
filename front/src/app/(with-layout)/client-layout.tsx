@@ -49,6 +49,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 			<div ref={layoutRef} className="flex-col flex justify-center">
 				<div className="w-full h-full p-4">
 					{/* clacを使ってh-fullにpを引く */}
+					{children}
 
 					{/* <div className="m-auto p-4 h-full w-full">{children}</div> */}
 				</div>
