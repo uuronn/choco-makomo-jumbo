@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { SnackbarProvider } from "notistack";
 import { FooterNavigation } from "~/components/FooterNavigation";
+import { MatrixRainCanvas } from "../_components/MatrixRainCanvas";
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
 	const [innerHeight, setInnerHeight] = useState<number | null>(null);
@@ -47,6 +48,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 			{/* Using ref to potentially manipulate layout later if needed */}
 			{/* <div ref={layoutRef} className="flex flex-col"> */}
 			<div ref={layoutRef} className="flex-col flex justify-center">
+				<MatrixRainCanvas />
 				<div className="w-full h-full p-4">
 					{/* clacを使ってh-fullにpを引く */}
 					{children}
