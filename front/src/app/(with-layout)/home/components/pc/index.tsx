@@ -94,7 +94,7 @@ export default async function PcHomeScreen({ user }: Props) {
 					</div>
 				</div>
 
-				<div className="p-2 grid grid-cols-1 sm:grid-cols-2 gap-2 h-full">
+				<div className="p-2 grid grid-cols-1 sm:grid-cols-2 gap-1 h-full">
 					{NAV_ITEMS.map((item) => (
 						<Link
 							href={item.path}
