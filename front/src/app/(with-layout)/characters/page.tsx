@@ -22,6 +22,7 @@ export default async function CharactersPage() {
 
 			<SectionContainer title="所持技術">
 				<CharacterList />
+				{/* テｓ */}
 			</SectionContainer>
 		</MainContainer>
 	);
