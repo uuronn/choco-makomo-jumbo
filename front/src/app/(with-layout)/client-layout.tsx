@@ -47,7 +47,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 			{/* Using ref to potentially manipulate layout later if needed */}
 			{/* <div ref={layoutRef} className="flex flex-col"> */}
 			<div ref={layoutRef} className="flex-col flex justify-center">
-				<div className="m-auto w-full h-full p-4">{children}</div>
+				<div className="m-auto w-full h-full px-4 py-3">{children}</div>
 
 				<FooterNavigation />
 			</div>
