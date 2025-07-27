@@ -12,7 +12,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
 	useEffect(() => {
 		setInnerHeight(window.innerHeight);
-		setScreenHeight(window.screen.height);
+		// 横画面のため、横幅を高さに置き換える
+		setScreenHeight(window.screen.width);
 	}, []);
 
 	return (
