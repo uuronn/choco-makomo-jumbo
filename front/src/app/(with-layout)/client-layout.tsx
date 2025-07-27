@@ -7,6 +7,25 @@ import { FooterNavigation } from "~/components/FooterNavigation";
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
 	const layoutRef = useRef<HTMLDivElement>(null);
+
+	// function useAppHeight() {
+	// 	console.info("window.innerHeight", window.innerHeight);
+	// 	useEffect(() => {
+	// 		const updateAppHeight = () => {
+	// 			document.documentElement.style.setProperty(
+	// 				"--app-height",
+	// 				`${window.innerHeight}px`,
+	// 			);
+	// 		};
+
+	// 		updateAppHeight();
+	// 		window.addEventListener("resize", updateAppHeight);
+	// 		return () => window.removeEventListener("resize", updateAppHeight);
+	// 	}, []);
+	// }
+
+	// useAppHeight();
+
 	// const [dimensions, setDimensions] = useState<{
 	// 	width: number;
 	// 	height: number;
@@ -39,6 +58,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 			anchorOrigin={{ vertical: "top", horizontal: "right" }}
 			maxSnack={3}
 		>
+			<p>{window.innerHeight}</p>
 			<div className="flex flex-col h-screen">
 				{/* <MatrixRainCanvas /> */}
 				{/* <div className="relative z-10">{children}</div> */}
