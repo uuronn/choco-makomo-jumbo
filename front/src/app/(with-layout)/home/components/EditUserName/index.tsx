@@ -43,9 +43,9 @@ export function EditUserName({ currentName }: Props) {
 	}, [isEditingName]);
 
 	return (
-		<div className="flex items-center h-[34px]">
-			{isEditingName ? (
-				<div className="flex items-center gap-2 w-full animate-fade-in">
+		<div className="flex items-center">
+			{/* {isEditingName ? (
+				<div className="flex items-center gap-2 w-full h-[28px] animate-fade-in">
 					<div className="relative flex-1">
 						<input
 							ref={inputRef}
@@ -83,21 +83,20 @@ export function EditUserName({ currentName }: Props) {
 					>
 						<X className="h-4 w-4" />
 					</button>
-				</div>
-			) : (
-				<div className="flex items-center gap-2 animate-fade-in">
-					<h2 className="text-xl font-bold text-green-300 font-mono">
-						{currentName}
-					</h2>
-					<button
-						type="button"
-						onClick={startEditingName}
-						className="p-1 cursor-pointer rounded-full bg-black/50 border border-green-500/30 text-green-500/70 hover:text-green-400 hover:border-green-500/50 transition-colors"
-					>
-						<Edit2 className="h-3.5 w-3.5" />
-					</button>
-				</div>
-			)}
+				</div> */}
+
+			<div className="flex items-center gap-2 animate-fade-in">
+				<h2 className="text-lg font-bold text-green-300 font-mono">
+					{currentName}
+				</h2>
+				{/* <button
+					type="button"
+					onClick={startEditingName}
+					className="p-1 cursor-pointer rounded-full bg-black/50 border border-green-500/30 text-green-500/70 hover:text-green-400 hover:border-green-500/50 transition-colors"
+				>
+					<Edit2 className="h-3.5 w-3.5" />
+				</button> */}
+			</div>
 		</div>
 	);
 }
