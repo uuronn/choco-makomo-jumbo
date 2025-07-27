@@ -18,6 +18,9 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
 	useEffect(() => {
 		if (layoutRef.current && screenHeight && innerHeight) {
+			// 高さを計算して設定
+			// 画面の高さからinnerHeightとフッターメニューの高さを引いて計算
+			// フッターメニューの高さは64px
 			const calcHeight = screenHeight - innerHeight - 64;
 
 			layoutRef.current.style.height = `${calcHeight}px`;
