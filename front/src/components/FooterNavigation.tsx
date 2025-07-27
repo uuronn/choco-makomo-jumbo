@@ -99,12 +99,7 @@ export function FooterNavigation({
 	}
 
 	return (
-		<nav
-			className={cn(
-				"fixed bottom-0 left-0 right-0 bg-black/90 z-50 p-1.5",
-				className,
-			)}
-		>
+		<nav className={cn("bg-black/90 z-50 p-1.5", className)}>
 			<ul className="flex justify-around items-center">
 				{navItems.map((item) => (
 					<li
