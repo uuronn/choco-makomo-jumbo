@@ -29,8 +29,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 			anchorOrigin={{ vertical: "top", horizontal: "right" }}
 			maxSnack={3}
 		>
-			<p>{innerHeight !== null ? `${innerHeight}px` : "読み込み中..."}</p>
-			<p>{screenHeight !== null ? `${screenHeight}px` : "読み込み中..."}</p>
+			{/* <p>{innerHeight !== null ? `${innerHeight}px` : "読み込み中..."}</p>
+			<p>{screenHeight !== null ? `${screenHeight}px` : "読み込み中..."}</p> */}
 
 			{/* Layout container */}
 			{/* Using ref to potentially manipulate layout later if needed */}
