@@ -3,10 +3,8 @@ import { getTokenFromCookies } from "~/utils/token";
 import { fetchUserFromToken } from "~/lib/user";
 import { MainContainer } from "~/components/MainContainer";
 import { Gamepad2Icon } from "lucide-react";
-// import { TechPoint } from "~/components/TechPoint";
 import { SectionContainer } from "~/components/SectionContainer";
 import FullscreenButton from "../home/components/FullscreenButton";
-// import { GameList } from "./components/GameList";
 
 export default async function OtherPage() {
 	const cookieStore = await cookies();
