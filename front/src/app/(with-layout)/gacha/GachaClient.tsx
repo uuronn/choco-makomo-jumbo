@@ -3,10 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-	Code2,
-	Terminal,
-	Cpu,
-	Zap,
 	ArrowLeft,
 	Database,
 	Server,
