@@ -13,15 +13,12 @@ import {
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
-type GithubGachaInfoProps = {
+type Props = {
 	isOpen: boolean;
 	onClose: () => void;
 };
 
-export default function GithubGachaInfo({
-	isOpen,
-	onClose,
-}: GithubGachaInfoProps) {
+export default function GithubGachaInfo({ isOpen, onClose }: Props) {
 	return (
 		<AnimatePresence>
 			{isOpen && (
