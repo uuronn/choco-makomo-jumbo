@@ -10,7 +10,6 @@ export const getCharaList = async () => {
 
 	const user = await fetchUserFromToken(token);
 
-	console.info("user", user);
 	const res = await fetch(
 		`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${user.id}/characters`,
 		{
