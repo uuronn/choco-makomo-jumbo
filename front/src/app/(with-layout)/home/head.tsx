@@ -1,6 +1,4 @@
-// app/(with-layout)/home/head.tsx
 export default function Head() {
-	console.log("Headコンポーネントが呼び出されました");
 	return (
 		<>
 			{/* アイコンの指定（必須） */}
