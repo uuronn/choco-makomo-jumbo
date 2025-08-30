@@ -4,7 +4,6 @@ import { fetchUserFromToken } from "~/lib/user";
 import { MainContainer } from "~/components/MainContainer";
 import { SwordsIcon } from "lucide-react";
 import { SectionContainer } from "~/components/SectionContainer";
-import { SelectCharacterContainer } from "./_components/SelectCharacterContainer";
 import { DuoRoomListSectionContainerContent } from "./_components/DuoRoomListSectionContainerContent";
 
 export default async function DuoRoomsPage() {
@@ -18,8 +17,6 @@ export default async function DuoRoomsPage() {
 
 	return (
 		<MainContainer title="デュオ対戦" icon={<SwordsIcon size={40} />}>
-			{/* <SelectCharacterContainer /> */}
-
 			<SectionContainer title="ルーム一覧">
 				<DuoRoomListSectionContainerContent token={token} user={user} />
 			</SectionContainer>
