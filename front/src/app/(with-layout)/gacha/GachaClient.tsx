@@ -57,11 +57,11 @@ type GachaResult = {
 	isNew?: boolean;
 };
 
-type GachaClientProps = {
+type Props = {
 	initialToken: string;
 };
 
-export function GachaClient({ initialToken }: GachaClientProps) {
+export function GachaClient({ initialToken }: Props) {
 	const { user } = useUserContext();
 	const [activeTab, setActiveTab] = useState("regular");
 	const [availablePoints, setAvailablePoints] = useState(0);
