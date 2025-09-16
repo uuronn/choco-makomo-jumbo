@@ -1,9 +1,11 @@
 import withPWAInit from "next-pwa";
+import runtimeCaching from "next-pwa/cache";
 
 const withPWA = withPWAInit({
 	dest: "public",
 	register: true,
 	skipWaiting: true,
+	runtimeCaching: runtimeCaching,
 });
 
 /** @type {import('next').NextConfig} */
