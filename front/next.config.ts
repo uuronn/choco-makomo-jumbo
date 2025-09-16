@@ -1,16 +1,21 @@
 import withPWAInit from "next-pwa";
 
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+	swcMinify: true,
+	images: {
+		domains: ["cover.openbd.jp"],
+	},
+	reactStrictMode: true,
+	compiler: {
+		removeConsole: process.env.NODE_ENV !== "development",
+	},
+};
+
 const withPWA = withPWAInit({
 	dest: "public",
+	disable: process.env.NODE_ENV === "development",
 	register: true,
-	skipWaiting: true,
 });
 
-/** @type {import('next').NextConfig} */
-const nextConfig = withPWA({
-	images: {
-		domains: ["lh3.googleusercontent.com"],
-	},
-});
-
-export default nextConfig;
+export default withPWA(nextConfig);
