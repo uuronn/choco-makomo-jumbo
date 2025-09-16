@@ -1,9 +1,14 @@
-import type { NextConfig } from "next";
+const withPWA = require("next-pwa")({
+	dest: "public",
+	register: true,
+	skipWaiting: true,
+});
 
-const nextConfig: NextConfig = {
-  images: {
-    domains: ["lh3.googleusercontent.com"],
-  },
-};
+/** @type {import('next').NextConfig} */
+const nextConfig = withPWA({
+	images: {
+		domains: ["lh3.googleusercontent.com"],
+	},
+});
 
-export default nextConfig;
+module.exports = nextConfig;
