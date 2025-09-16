@@ -11,15 +11,28 @@ const geistMono = Geist_Mono({
 	subsets: ["latin"],
 });
 
+export const metadata = {
+	title: "技術大戦争",
+	description: "PWA対応サンプル",
+	manifest: "/manifest.json",
+	themeColor: "#000000",
+};
+
 export default function RootLayout({
 	children,
-}: Readonly<{
+}: {
 	children: React.ReactNode;
-}>) {
+}) {
 	return (
 		<html lang="ja">
 			<head>
-				<title>技術大戦争</title>
+				{/* iOS Safari向け */}
+				<meta name="apple-mobile-web-app-capable" content="yes" />
+				<meta
+					name="apple-mobile-web-app-status-bar-style"
+					content="black-translucent"
+				/>
+				<link rel="apple-touch-icon" href="/icons/icon-192.png" />
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
