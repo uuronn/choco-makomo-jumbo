@@ -1,0 +1,19 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-BABd-8HT.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-Bj43h_rG.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/ts/app.tsx": {
+    "file": "assets/app-_lDytayF.js",
+    "name": "app",
+    "src": "resources/ts/app.tsx",
+    "isEntry": true
+  }
+}
