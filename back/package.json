@@ -6,13 +6,26 @@
         "dev": "vite"
     },
     "devDependencies": {
+        "@tanstack/router-cli": "^1.131.44",
+        "@types/react": "^19.1.13",
+        "@types/react-dom": "^19.1.9",
         "autoprefixer": "^10.4.20",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^1.2.0",
         "postcss": "^8.4.47",
-        "tailwindcss": "^3.4.13",
+        "tailwindcss": "^3.4.17",
+        "typescript": "^5.9.2",
         "vite": "^6.0.11"
     },
-    "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0"
+    "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0",
+    "dependencies": {
+        "@tailwindcss/vite": "^4.1.13",
+        "@tanstack/react-router": "^1.131.44",
+        "clsx": "^2.1.1",
+        "lucide-react": "^0.544.0",
+        "react": "^19.1.1",
+        "react-dom": "^19.1.1",
+        "zustand": "^5.0.8"
+    }
 }
