@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { create } from "zustand";
-// import "./index.css"; // Tailwind
+import "../css/app.css"; // Tailwind
 
 const useStore = create<{ count: number; inc: () => void }>((set) => ({
 	count: 0,
@@ -30,9 +30,3 @@ ReactDOM.createRoot(document.getElementById("app") as HTMLElement).render(
 		<App />
 	</React.StrictMode>,
 );
-
-if ("serviceWorker" in navigator) {
-	window.addEventListener("load", () => {
-		navigator.serviceWorker.register("/sw.js");
-	});
-}
