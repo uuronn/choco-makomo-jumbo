@@ -6,7 +6,7 @@ use App\Http\Controller\DuoRoomController;
 use App\Http\Controller\GachaController;
 use App\Http\Controller\ReportLogController;
 use App\Http\Controller\RoomController;
-use App\Http\Controller\RoomLogController;
+// use App\Http\Controller\RoomLogController;
 use App\Http\Controller\UserCharacter\GetUserCharacterListController;
 use App\Http\Controller\UserController;
 use App\Http\Controller\UserCharacter\LevelUpUserCharacterController;
@@ -171,7 +171,7 @@ Route::delete('{userId}/{roomId}/delete', [RoomController::class, 'delete']);
 Route::post('/{userId}/{roomId}/nextTurn', [RoomController::class, 'nextTurn']);
 
 // ルームログ取得
-Route::get('/rooms/{roomId}/log', [RoomLogController::class, 'logs']);
+// Route::get('/rooms/{roomId}/log', [RoomLogController::class, 'logs']);
 
 // Route::post('/rooms/{roomId}/cpu-turn', [RoomController::class, 'handleCpuTurn']);
 
