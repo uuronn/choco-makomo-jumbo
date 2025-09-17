@@ -2,6 +2,8 @@ import { defineConfig } from "vite";
 import laravel from "laravel-vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
+
 
 export default defineConfig({
 	plugins: [
@@ -38,5 +40,9 @@ export default defineConfig({
 				],
 			},
 		}),
+        tanstackRouter({
+            routesDirectory: 'resources/ts/routes',
+            generatedRouteTree: 'resources/ts/routeTree.gen.ts',
+        }),
 	],
 });
