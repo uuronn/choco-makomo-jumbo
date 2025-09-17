@@ -1,16 +1,14 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
-import { create } from "zustand";
-import "../css/app.css"; // Tailwind
-// import { StrictMode } from "react";
-// import { createRoot } from "react-dom/client";
+// import { create } from "zustand";
+import "../css/app.css";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
+import { StrictMode } from 'react';
 
-const useStore = create<{ count: number; inc: () => void }>((set) => ({
-	count: 0,
-	inc: () => set((s) => ({ count: s.count + 1 })),
-}));
+// const useStore = create<{ count: number; inc: () => void }>((set) => ({
+// 	count: 0,
+// 	inc: () => set((s) => ({ count: s.count + 1 })),
+// }));
 
 const router = createRouter({ routeTree });
 
@@ -39,7 +37,7 @@ declare module "@tanstack/react-router" {
 // }
 
 ReactDOM.createRoot(document.getElementById("app") as HTMLElement).render(
-	<React.StrictMode>
+	<StrictMode>
 	<RouterProvider router={router} />
-	</React.StrictMode>,
+	</StrictMode>,
 );
