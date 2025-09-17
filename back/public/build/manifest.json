@@ -11,9 +11,12 @@
     "isEntry": true
   },
   "resources/ts/app.tsx": {
-    "file": "assets/app--hmnR5Mj.js",
+    "file": "assets/app-Fxekj4Wu.js",
     "name": "app",
     "src": "resources/ts/app.tsx",
-    "isEntry": true
+    "isEntry": true,
+    "css": [
+      "assets/app-DUYfk-QS.css"
+    ]
   }
 }
