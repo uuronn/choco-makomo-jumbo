@@ -13,9 +13,21 @@ use App\Http\Controller\UserCharacter\LevelUpUserCharacterController;
 use App\Http\Controller\TeamController;
 use App\Http\Controller\TeamRoomController;
 use App\Http\Controller\UserCharacter\GetUserCharacterController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // ユーザー関連のAPI--------------------------------
+
+Route::post('/login', function (Request $request) {
+    $credentials = $request->only('email', 'password');
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        return response()->json(['message' => 'ok']);
+    }
+    return response()->json(['message' => 'unauthorized'], 401);
+});
+
 
 // ユーザーを作成する
 // Route::post('/users', [UserController::class, 'create']);
