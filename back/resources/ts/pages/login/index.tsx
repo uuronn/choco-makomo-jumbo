@@ -3,11 +3,16 @@ import { LoginForm } from "./components/LoginForm";
 
 export default function LoginPage() {
 
+    const token = document
+  .querySelector('meta[name="csrf-token"]')
+  ?.getAttribute("content");
+
     const test = async function login(email: string, password: string) {
   const res = await fetch("https://www.issei.website/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+       "X-CSRF-TOKEN": token || "",
     },
     credentials: "include", // Cookie を送る！
     body: JSON.stringify({ email, password }),
