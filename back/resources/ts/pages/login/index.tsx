@@ -4,7 +4,7 @@ import { LoginForm } from "./components/LoginForm";
 export default function LoginPage() {
 
     const test = async function login(email: string, password: string) {
-  const res = await fetch("https://www.issei.website/api/login", {
+  const res = await fetch("https://www.issei.website/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
