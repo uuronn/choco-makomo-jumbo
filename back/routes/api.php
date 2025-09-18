@@ -19,14 +19,14 @@ use Illuminate\Support\Facades\Route;
 
 // ユーザー関連のAPI--------------------------------
 
-Route::post('/login', function (Request $request) {
-    $credentials = $request->only('email', 'password');
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-        return response()->json(['message' => 'ok']);
-    }
-    return response()->json(['message' => 'unauthorized'], 401);
-});
+// Route::post('/login', function (Request $request) {
+//     $credentials = $request->only('email', 'password');
+//     if (Auth::attempt($credentials)) {
+//         $request->session()->regenerate();
+//         return response()->json(['message' => 'ok']);
+//     }
+//     return response()->json(['message' => 'unauthorized'], 401);
+// });
 
 
 // ユーザーを作成する
