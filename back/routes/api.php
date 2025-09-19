@@ -41,6 +41,14 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () {
+    Route::get('/auth/test', function (Request $request) {
+        return response()->json([
+            'message' => '認証成功',
+            'uid' => $request->attributes->get('firebase_uid'),
+            'user' => Auth::user(),
+        ]);
+    });
+
     // ユーザー作成（初回のみ）
     Route::post('/users', [UserController::class, 'create']);
 
