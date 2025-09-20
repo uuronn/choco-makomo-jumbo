@@ -14,6 +14,8 @@ async function loginWithGoogle() {
   const result = await signInWithPopup(auth, googleProvider);
   const idToken = await result.user.getIdToken();
 
+  console.log(idToken);
+
   const res = await fetch("https://www.issei.website/api/auth/test", {
   headers: {
     Authorization: `Bearer ${idToken}`,
