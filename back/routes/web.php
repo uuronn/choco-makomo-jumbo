@@ -6,16 +6,31 @@ use Illuminate\Support\Facades\Route;
 
 
 // ログイン
-Route::post('/login', function (Request $request) {
-    $credentials = $request->only('email', 'password');
+// Route::post('/login', function (Request $request) {
+//     $credentials = $request->only('email', 'password');
 
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate(); // セッション固定攻撃対策
-        return response()->json(['message' => 'ok']);
-    }
+//     if (Auth::attempt($credentials)) {
+//         $request->session()->regenerate(); // セッション固定攻撃対策
+//         return response()->json(['message' => 'ok']);
+//     }
 
-    return response()->json(['message' => 'unauthorized'], 401);
+//     return response()->json(['message' => 'unauthorized'], 401);
+// });
+
+Route::middleware('auth')->get('/me', function () {
+    $user = Auth::user();
+
+    return response()->json([
+        'id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+        'point' => $user->point,
+        'rating' => $user->rating,
+        'photoUrl' => $user->photoUrl,
+        'last_activity_at' => $user->last_activity_at,
+    ]);
 });
+
 
 Route::get('/{any}', function () {
     return view('welcome'); // React を埋め込んだ Blade
