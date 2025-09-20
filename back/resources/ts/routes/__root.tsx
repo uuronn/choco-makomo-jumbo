@@ -16,7 +16,7 @@ export const Route = createRootRoute({
 		useEffect(() => {
 			(async () => {
 				try {
-					const res = await fetch("/api/me", {
+					const res = await fetch("/me", {
 						credentials: "include", // セッション Cookie を送る
 					});
 					if (res.ok) {
