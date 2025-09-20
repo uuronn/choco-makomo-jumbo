@@ -40,16 +40,7 @@ use Illuminate\Support\Facades\Route;
 //     // Route::put('/users/{userId}/pointtest', [UserController::class, 'updatePointTest']);
 // });
 
-Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () {
-    Route::get('/auth/test', function (Request $request) {
-        return response()->json([
-            'message' => '認証成功',
-            'uid' => $request->attributes->get('firebase_uid'),
-            'user' => Auth::user(),
-        ]);
-    });
-
-     Route::get('/me', function () {
+ Route::get('/me', function () {
          $user = Auth::user(); // 現在のユーザーインスタンス
 
     return response()->json([
@@ -62,6 +53,17 @@ Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () 
         'last_activity_at' => $user->last_activity_at,
     ]);
     });
+
+Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () {
+    Route::get('/auth/test', function (Request $request) {
+        return response()->json([
+            'message' => '認証成功',
+            'uid' => $request->attributes->get('firebase_uid'),
+            'user' => Auth::user(),
+        ]);
+    });
+
+
 
     // ユーザー作成（初回のみ）
     Route::post('/users', [UserController::class, 'create']);
