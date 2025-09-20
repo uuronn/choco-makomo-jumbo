@@ -40,8 +40,8 @@ use Illuminate\Support\Facades\Route;
 //     // Route::put('/users/{userId}/pointtest', [UserController::class, 'updatePointTest']);
 // });
 
- Route::get('/me', function () {
-         $user = Auth::user(); // 現在のユーザーインスタンス
+Route::middleware('auth')->get('/me', function () {
+    $user = Auth::user();
 
     return response()->json([
         'id' => $user->id,
@@ -52,7 +52,7 @@ use Illuminate\Support\Facades\Route;
         'photoUrl' => $user->photoUrl,
         'last_activity_at' => $user->last_activity_at,
     ]);
-    });
+});
 
 Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () {
     Route::get('/auth/test', function (Request $request) {
