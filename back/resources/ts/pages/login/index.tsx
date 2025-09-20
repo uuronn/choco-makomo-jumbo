@@ -14,7 +14,7 @@ export default function LoginPage() {
 
 		console.log(idToken);
 
-		const res = await fetch("https://www.issei.website/api/auth/test", {
+		const res = await fetch("https://www.issei.website/auth/test", {
 			headers: {
 				Authorization: `Bearer ${idToken}`,
 			},
