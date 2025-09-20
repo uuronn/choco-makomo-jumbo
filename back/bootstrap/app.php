@@ -23,12 +23,13 @@ return Application::configure(basePath: dirname(__DIR__))
     })
      ->withExceptions(function (Exceptions $exceptions) {
         // ★ 未認証エラーをキャッチして 401 を返す
-        $exceptions->render(function (AuthenticationException $e, $request) {
+       $exceptions->render(function (AuthenticationException $e, $request) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => '未ログインです'], 401);
             }
-            // SPAなのでリダイレクト先を / にするなど調整可能
-            return redirect('/');
+
+            // JSON以外のリクエストに対しては /login にリダイレクト
+            return redirect()->guest('/login');
         });
     })
 ->create();
