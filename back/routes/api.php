@@ -49,6 +49,20 @@ Route::middleware(['firebase.auth', 'update.last.activity'])->group(function () 
         ]);
     });
 
+     Route::get('/me', function () {
+         $user = Auth::user(); // 現在のユーザーインスタンス
+
+    return response()->json([
+        'id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+        'point' => $user->point,
+        'rating' => $user->rating,
+        'photoUrl' => $user->photoUrl,
+        'last_activity_at' => $user->last_activity_at,
+    ]);
+    });
+
     // ユーザー作成（初回のみ）
     Route::post('/users', [UserController::class, 'create']);
 
