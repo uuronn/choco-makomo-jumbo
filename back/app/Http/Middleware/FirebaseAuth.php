@@ -25,7 +25,7 @@ class FirebaseAuth
             $uid = $verifiedIdToken->claims()->get('sub');
 
             // UIDでユーザーを探して、なければ作成
-            $user = User::firstOrCreate(
+            $user = User::updateOrCreate(
                 ['id' => $uid], // FirebaseのUIDをそのまま主キーに使う場合
                 [
                     'name' => $verifiedIdToken->claims()->get('name') ?? 'No Name',
