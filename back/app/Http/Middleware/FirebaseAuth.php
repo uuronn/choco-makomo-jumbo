@@ -38,6 +38,8 @@ class FirebaseAuth
 
             LaravelAuth::login($user);
 
+            $request->session()->regenerate();
+
             $request->attributes->add(['firebase_uid' => $uid]);
 
             return $next($request);
