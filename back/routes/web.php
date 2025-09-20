@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 
+Route::get('/login', function () {
+    return response()->json(['message' => 'Unauthenticated'], 401);
+})->name('login');
 // ログイン
 // Route::post('/login', function (Request $request) {
 //     $credentials = $request->only('email', 'password');

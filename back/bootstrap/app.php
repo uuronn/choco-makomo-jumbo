@@ -21,13 +21,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth' => Authenticate::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions) {
-        // 未認証時の処理を上書き
+     ->withExceptions(function (Exceptions $exceptions) {
+        // ★ 未認証エラーをキャッチして 401 を返す
         $exceptions->render(function (AuthenticationException $e, $request) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => '未ログイン'], 401);
+                return response()->json(['message' => '未ログインです'], 401);
             }
-            return redirect('/'); // SPAならトップに飛ばす
+            // SPAなのでリダイレクト先を / にするなど調整可能
+            return redirect('/');
         });
     })
 ->create();
